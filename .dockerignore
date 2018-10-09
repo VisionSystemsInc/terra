@@ -1,0 +1,6 @@
+*
+!docker
+!external/vsi_common
+!vxl.env
+!Pipfile
+!Pipfile.lock

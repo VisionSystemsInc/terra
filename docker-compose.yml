@@ -1,0 +1,36 @@
+version: "2.3"
+
+services:
+  vxl: &vxl_anchor
+    build:
+      context: .
+      dockerfile: docker/vxl.Dockerfile
+    # prevent different users from clobbering each others images
+    image: ${VXL_DOCKER_REPO}:vxl_${VXL_USERNAME}
+    environment:
+      # Variables for docker_entrypoint.bsh
+      - DOCKER_UID=${VXL_UID}
+      - DOCKER_GIDS=${VXL_GIDS}
+      - DOCKER_GROUP_NAMES=${VXL_GROUP_NAMES}
+      - DOCKER_USERNAME=user
+
+      #- DOCKER_HOME=${VXL_HOME}
+
+      - DISPLAY
+#     cap_add:
+#       - SYS_PTRACE # Useful for gdb
+    volumes:
+      - type: bind
+        source: ${VXL_SOURCE_DIR}
+        target: ${VXL_SOURCE_DIR_DOCKER}
+      - type: volume
+        source: venv
+        target: /venv
+#       - type: volume
+#         source: home-volume
+#         target: ${VXL_HOME} # home-volume should be overridable
+  vxl2:
+    <<: *vxl_anchor
+volumes:
+  venv:
+#   home-volume:

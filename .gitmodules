@@ -1,0 +1,9 @@
+[submodule "external/vsi_common"]
+	path = external/vsi_common
+	url = ../../VisionSystemsInc/vsi_common.git
+[submodule "external/vxl"]
+	path = external/vxl
+	url = ../../vxl/vxl.git
+[submodule "external/pyvxl"]
+	path = external/pyvxl
+	url = ../../VisionSystemsInc/pyvxl.git
