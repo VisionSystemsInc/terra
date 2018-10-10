@@ -12,11 +12,11 @@ bool import_exists(std::string const& library_name)
 }
 
 
-PYBIND11_MODULE(core3d, m)
+PYBIND11_MODULE(proj, m)
 {
   m.doc() =  "Python bindings for Project";
 
-  py::module mod = m.def_submodule("proj");
+  py::module mod = m.def_submodule("hello");
   pyproj::hello::wrap_hello(mod);
 
   if (import_exists("vxl"))

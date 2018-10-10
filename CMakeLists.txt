@@ -7,8 +7,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE on)
 
 # Set some defaults that should be set by a super project. Great for debugging
-set(PROJ_EXTERNAL_DIR ${CMAKE_CURRENT_LIST_DIR}/external)
-set(PROJ_TOP_LEVEL_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(PROJ_EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
+set(PROJ_TOP_LEVEL_DIR ${CMAKE_SOURCE_DIR})
+
+# Include the base directory, so include files can be found, like "hello/hi.h"
+include_directories(${CMAKE_SOURCE_DIR})
 
 # This must come before add_subdir for vxl, or else ctest doesn't work right
 include(CTest)
@@ -18,7 +21,6 @@ include(CTest)
 find_package(OpenMP)
 if (OpenMP_FOUND)
   message("${PROJECT_NAME} FIND OpenMP")
-  #add_definitions(-DDOPARALLEL)
   string(APPEND CMAKE_C_FLAGS " ${OpenMP_C_FLAGS}")
   string(APPEND CMAKE_CXX_FLAGS " ${OpenMP_CXX_FLAGS}")
 else()

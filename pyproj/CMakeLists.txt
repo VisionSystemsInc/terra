@@ -11,6 +11,8 @@ pybind11_add_module(pyproj ${PYPROJ_SOURCES})
 target_link_libraries(pyproj PUBLIC hello)
 set_target_properties(pyproj PROPERTIES OUTPUT_NAME "proj")
 
+add_subdirectory(tests)
+
 execute_process(
   COMMAND "${PYTHON_EXECUTABLE}" -c "if True:
     from distutils import sysconfig as sc

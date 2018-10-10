@@ -1,9 +1,6 @@
-#include <iostream>
+#include "hi.hxx"
 
-using namespace std;
-
-int stuff()
+int foo()
 {
-  cout << "Hi" << endl;
-  return 0;
+  return 1;
 }
