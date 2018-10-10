@@ -40,8 +40,16 @@ filter_docker_variables
 
 
 # default CMD
-if [ "$1" == "vxl" ]; then
-  pipenv shell
+if [ "$1" == "compile" ]; then
+  pushd ${VXL_BUILD_DIR}
+  if [ ! -f .cmake_ran ] || [ "${VXL_FORCE_RUN_CMAKE-}" == "1" ]; then
+    cmake -G Ninja ${VXL_SOURCE_DIR} -DCMAKE_BUILD_TYPE=${VXL_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${VXL_INSTALL_DIR}
+    touch .cmake_ran # Mark that the build files have successfully been created
+  fi
+  ninja
+  popd
+elif [ "$1" == "test" ]; then
+  :
 elif [ "$1" == "nopipenv" ]; then
   shift 1
   exec "${@}"

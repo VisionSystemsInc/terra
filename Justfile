@@ -33,11 +33,14 @@ function caseify()
       docker cp ${image_name}:/venv/Pipfile.lock "${VXL_CWD}/Pipfile.lock"
       docker rm ${image_name}
       ;;
-    run_vxl) # Run vxl 1
+    run_vxl) # Run vxl
       Just-docker-compose run vxl ${@+"${@}"}
       extra_args+=$#
       ;;
-
+    compile) # Compile vxl
+      Just-docker-compose run vxl compile ${@+"${@}"}
+      extra_args+=$#
+      ;;
     setup) # Run any special command to set up the environment for the first \
            # time after checking out the repo. Usually population of volumes/databases \
            # go here.

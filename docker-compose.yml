@@ -20,17 +20,22 @@ services:
 #     cap_add:
 #       - SYS_PTRACE # Useful for gdb
     volumes:
-      - type: bind
+      - type: ${VXL_SOURCE_DIR_TYPE}
         source: ${VXL_SOURCE_DIR}
         target: ${VXL_SOURCE_DIR_DOCKER}
+        read_only: true
+      - type: ${VXL_BUILD_DIR_TYPE}
+        source: ${VXL_BUILD_DIR}
+        target: ${VXL_BUILD_DIR_DOCKER}
+      - type: ${VXL_INSTALL_DIR_TYPE}
+        source: ${VXL_INSTALL_DIR}
+        target: ${VXL_INSTALL_DIR_DOCKER}
       - type: volume
         source: venv
         target: /venv
-#       - type: volume
-#         source: home-volume
-#         target: ${VXL_HOME} # home-volume should be overridable
   vxl2:
     <<: *vxl_anchor
 volumes:
   venv:
-#   home-volume:
+  vxl-install:
+  vxl-build:

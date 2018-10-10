@@ -7,3 +7,6 @@
 [submodule "external/pyvxl"]
 	path = external/pyvxl
 	url = ../../VisionSystemsInc/pyvxl.git
+[submodule "external/pybind11"]
+	path = external/pybind11
+	url = ../../pybind/pybind11.git
