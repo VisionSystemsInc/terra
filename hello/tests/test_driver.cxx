@@ -1,11 +1,16 @@
-#include <testlib/testlib_register.h>
+// #include <testlib/testlib_register.h>
 
-DECLARE(test_hiya);
+// DECLARE(test_hiya);
 
-void
-register_tests()
+// void
+// register_tests()
+// {
+//   REGISTER(test_hiya);
+// }
+
+// DEFINE_MAIN;
+
+int main()
 {
-  REGISTER(test_hiya);
+  return 0;
 }
-
-DEFINE_MAIN;

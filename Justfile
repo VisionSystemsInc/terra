@@ -41,6 +41,9 @@ function caseify()
       Just-docker-compose run vxl compile ${@+"${@}"}
       extra_args+=$#
       ;;
+    test) # Run unit tests
+      Just-docker-compose run -w "${VXL_BUILD_DIR_DOCKER}" vxl ctest ${@+"${@}"}
+      ;;
     setup) # Run any special command to set up the environment for the first \
            # time after checking out the repo. Usually population of volumes/databases \
            # go here.

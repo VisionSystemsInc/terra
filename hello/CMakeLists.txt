@@ -7,6 +7,4 @@ set(HELLO_SOURCES
 add_library(hello ${HELLO_SOURCES})
 # target_link_libraries(hello vnl)
 
-enable_testing()
-
 add_subdirectory(tests)

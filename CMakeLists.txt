@@ -10,6 +10,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE on)
 set(PROJ_EXTERNAL_DIR ${CMAKE_CURRENT_LIST_DIR}/external)
 set(PROJ_TOP_LEVEL_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+# This must come before add_subdir for vxl, or else ctest doesn't work right
+include(CTest)
+
 ### basic dependencies
 
 find_package(OpenMP)
@@ -53,7 +56,6 @@ if(BUILD_PYBIND)
 endif(BUILD_PYBIND)
 
 ### Project directories
-# include(CTest)
 
 # Hello
 add_subdirectory(${PROJ_TOP_LEVEL_DIR}/hello ${CMAKE_BINARY_DIR}/hello-build)
