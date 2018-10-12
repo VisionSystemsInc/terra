@@ -34,7 +34,6 @@ set(VXL_BINARY_DIR ${CMAKE_BINARY_DIR}/vxl-build)
 set(BUILD_CONTRIB "TRUE" CACHE BOOL "BUILD CONTRIB")
 set(BUILD_BRL "TRUE" CACHE BOOL "BUILD BRL")
 
-set(BUILD_TESTING OFF CACHE BOOL "Override testing off by default" FORCE)
 add_subdirectory(${VXL_SOURCE_DIR} ${VXL_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 include_directories(${VXL_SOURCE_DIR})
@@ -62,3 +61,8 @@ endif(BUILD_PYBIND)
 # Hello
 add_subdirectory(${PROJ_TOP_LEVEL_DIR}/hello ${CMAKE_BINARY_DIR}/hello-build)
 include_directories(${PROJ_TOP_LEVEL_DIR}/hello)
+
+# Optionally exclude VXL tests
+configure_file(${CMAKE_SOURCE_DIR}/CTestCustom.cmake ${CMAKE_BINARY_DIR})
+execute_process(COMMAND sh -c "echo 'set(CTEST_CUSTOM_TESTS_IGNORE'; find '${CMAKE_SOURCE_DIR}/external/vxl' -path '*tests/CMakeLists.txt' -exec sed -nE '/add_test.*NAME/{s|.*NAME *([^ ]+).*|\\1|; p}' {} +; echo ')'"
+                OUTPUT_FILE ${CMAKE_BINARY_DIR}/CTestCustom2.cmake)

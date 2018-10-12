@@ -1,0 +1,33 @@
+include(CTestCustom2.cmake)
+
+list(APPEND CTEST_CUSTOM_TESTS_IGNORE
+  vul_test_checksum
+  vul_test_arg
+  vul_test_file_iterator
+  vul_test_vul_file
+  vul_test_ios_state
+  vul_test_psfile
+  vul_test_sprintf
+  vul_test_temp_filename
+  vul_test_regexp
+  vul_test_string
+  vul_test_sleep_timer
+  vul_test_get_time_as_string
+  vul_test_awk
+  vul_test_expand_path
+  vul_test_debug
+  vul_test_url
+  rgrl_registration1_test
+  rgrl_registration2_test
+  rgrl_registration3_test
+  rgrl_registration_simple_shapes_test
+  rgrl_registration_simple_shapes_outliers_test
+  rgrl_registration_blackbox
+  rgrl_registration_landmark_test
+  rgrl_registration_retina_no_view_test
+  rgrl_registration_range_data_test
+  rgrl_registration_blackbox_range_data_test
+  rgrl_estimate_normals_3d_test
+  rgrl_pseudo_match_2d_test
+  rgrl_pseudo_match_2d_mult_test
+)
