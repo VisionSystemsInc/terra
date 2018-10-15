@@ -49,8 +49,9 @@ include_directories(${VXL_BINARY_DIR}/contrib)
 
 ### pybind11, pyvxl, py project
 if(BUILD_PYBIND)
+  set(PYBIND11_DIR "${PROJ_EXTERNAL_DIR}/pybind11" CACHE PATH "Location of Pybind11 source directory")
   find_package(PythonLibs 3 REQUIRED)
-  add_subdirectory(${PROJ_EXTERNAL_DIR}/pybind11 ${CMAKE_BINARY_DIR}/pybind11-build)
+  add_subdirectory(${PYBIND11_DIR} ${CMAKE_BINARY_DIR}/pybind11-build)
   add_subdirectory(${PROJ_EXTERNAL_DIR}/pyvxl ${CMAKE_BINARY_DIR}/pyvxl-build)
   # Optional, project specific python bindings
   add_subdirectory(${PROJ_TOP_LEVEL_DIR}/pyproj ${CMAKE_BINARY_DIR}/pyproj-build)
