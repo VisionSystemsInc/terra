@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project("VXL Project")
+project("Terra")
 
 # Pybind 11 for pyvxl
 set(BUILD_PYBIND ON)
@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_POSITION_INDEPENDENT_CODE on)
 
 # Set some defaults that should be set by a super project. Great for debugging
-set(PROJ_EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
-set(PROJ_TOP_LEVEL_DIR ${CMAKE_SOURCE_DIR})
+set(TERRA_EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
+set(TERRA_TOP_LEVEL_DIR ${CMAKE_SOURCE_DIR})
 
 # Include the base directory, so include files can be found, like "hello/hi.h"
 include_directories(${CMAKE_SOURCE_DIR})
@@ -28,7 +28,7 @@ else()
 endif()
 
 ### VXL
-set(VXL_SOURCE_DIR ${PROJ_EXTERNAL_DIR}/vxl)
+set(VXL_SOURCE_DIR ${TERRA_EXTERNAL_DIR}/vxl)
 set(VXL_BINARY_DIR ${CMAKE_BINARY_DIR}/vxl-build)
 
 set(BUILD_CONTRIB "TRUE" CACHE BOOL "BUILD CONTRIB")
@@ -49,19 +49,19 @@ include_directories(${VXL_BINARY_DIR}/contrib)
 
 ### pybind11, pyvxl, py project
 if(BUILD_PYBIND)
-  set(PYBIND11_DIR "${PROJ_EXTERNAL_DIR}/pybind11" CACHE PATH "Location of Pybind11 source directory")
+  set(PYBIND11_DIR "${TERRA_EXTERNAL_DIR}/pybind11" CACHE PATH "Location of Pybind11 source directory")
   find_package(PythonLibs 3 REQUIRED)
   add_subdirectory(${PYBIND11_DIR} ${CMAKE_BINARY_DIR}/pybind11-build)
-  add_subdirectory(${PROJ_EXTERNAL_DIR}/pyvxl ${CMAKE_BINARY_DIR}/pyvxl-build)
+  add_subdirectory(${TERRA_EXTERNAL_DIR}/pyvxl ${CMAKE_BINARY_DIR}/pyvxl-build)
   # Optional, project specific python bindings
-  add_subdirectory(${PROJ_TOP_LEVEL_DIR}/pyproj ${CMAKE_BINARY_DIR}/pyproj-build)
+  add_subdirectory(${TERRA_TOP_LEVEL_DIR}/pyterra ${CMAKE_BINARY_DIR}/pyterra-build)
 endif(BUILD_PYBIND)
 
 ### Project directories
 
 # Hello
-add_subdirectory(${PROJ_TOP_LEVEL_DIR}/hello ${CMAKE_BINARY_DIR}/hello-build)
-include_directories(${PROJ_TOP_LEVEL_DIR}/hello)
+add_subdirectory(${TERRA_TOP_LEVEL_DIR}/hello ${CMAKE_BINARY_DIR}/hello-build)
+include_directories(${TERRA_TOP_LEVEL_DIR}/hello)
 
 # Optionally exclude VXL tests
 configure_file(${CMAKE_SOURCE_DIR}/CTestCustom.cmake ${CMAKE_BINARY_DIR})

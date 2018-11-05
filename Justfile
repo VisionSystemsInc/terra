@@ -24,7 +24,7 @@ function caseify()
       else
         (justify build_recipes gosu tini vsi pipenv)
         Docker-compose build
-        (justify clean venv)
+        (justify docker-compose clean venv)
         (justify _post_build)
       fi
       ;;
@@ -44,15 +44,15 @@ function caseify()
     test) # Run unit tests
       Just-docker-compose run -w "${VXL_BUILD_DIR_DOCKER}" vxl ctest ${@+"${@}"}
       ;;
-    setup) # Run any special command to set up the environment for the first \
-           # time after checking out the repo. Usually population of volumes/databases \
-           # go here.
-      (justify _sync)
-      ;;
     sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
+      if [ ! -e "${VXL_CWD}/.just_synced" ]; then
+        # Add any commands here, like initializing a database, etc... that need
+        # to be run the first time sync is run.
+        touch "${VXL_CWD}/.just_synced"
+      fi
       (justify _sync)
-      # Add any extra steps run when syncing when not installing
+      # Add any extra steps run when syncing everytime
       ;;
     _sync)
       Docker-compose down
@@ -61,16 +61,7 @@ function caseify()
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
-      (justify clean venv)
-      ;;
-    clean_venv) # Delete the virtual environment volume. The next container \
-                # to use this volume will automatically copy the contents from \
-                # the image.
-      if docker volume inspect "${COMPOSE_PROJECT_NAME}_venv" &> /dev/null; then
-        Docker volume rm "${COMPOSE_PROJECT_NAME}_venv"
-      else
-        echo "${COMPOSE_PROJECT_NAME}_venv already removed" >&2
-      fi
+      (justify docker-compose clean venv)
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}
