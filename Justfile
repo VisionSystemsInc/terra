@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then # If being sourced
-  set -euE
-fi
 source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'vxl'.env
 cd "${VXL_CWD}"
 
@@ -51,10 +48,6 @@ function caseify()
         # to be run the first time sync is run.
         touch "${VXL_CWD}/.just_synced"
       fi
-      (justify _sync)
-      # Add any extra steps run when syncing everytime
-      ;;
-    _sync)
       Docker-compose down
       (justify git_submodule-update) # For those users who don't remember!
       (justify build)

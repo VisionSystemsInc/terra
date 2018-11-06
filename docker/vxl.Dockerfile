@@ -29,9 +29,8 @@ FROM dep_stage as pipenv_cache
 
 ADD Pipfile Pipfile.lock /src/
 
-RUN \
     # Install all packages into the image
-    pipenv install --keep-outdated; \
+RUN pipenv install --keep-outdated; \
     # Copy the lock file, so that it can be copied out of the image in "just _post_build"
     cp /src/Pipfile.lock /venv; \
     # Cleanup and make way for the real /src that will be mounted at runtime
