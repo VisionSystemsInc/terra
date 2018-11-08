@@ -14,6 +14,11 @@ jobs:
             git submodule sync
             git submodule update --init --recursive
 
+      - run:
+          name: Additional setup
+          command: |
+            touch local.env
+
       # - run:
       #     name: Checkout test data (git-lfs)
       #     command: |
