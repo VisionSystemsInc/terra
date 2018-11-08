@@ -1,6 +1,6 @@
 *
 !docker
 !external/vsi_common
-!vxl.env
+!terra.env
 !Pipfile
 !Pipfile.lock

@@ -5,13 +5,15 @@ FROM vsiri/recipe:ninja as ninja
 FROM vsiri/recipe:cmake as cmake
 FROM vsiri/recipe:pipenv as pipenv
 
+###############################################################################
+
 FROM debian:stretch as dep_stage
 SHELL ["/usr/bin/env", "bash", "-euxvc"]
 
 # Install any runtime dependencies
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      python3; \
+      python3 libgeotiff2 libgomp1; \
     rm -r /var/lib/apt/lists/*
 
 ENV WORKON_HOME=/venv \
@@ -25,6 +27,8 @@ ENV WORKON_HOME=/venv \
 COPY --from=pipenv /tmp/pipenv /tmp/pipenv
 RUN /tmp/pipenv/get-pipenv; rm -rf /tmp/pipenv || :
 
+###############################################################################
+
 FROM dep_stage as pipenv_cache
 
 ADD Pipfile Pipfile.lock /src/
@@ -36,7 +40,9 @@ RUN pipenv install --keep-outdated; \
     # Cleanup and make way for the real /src that will be mounted at runtime
     rm -rf /src/* /tmp/pip*
 
-FROM dep_stage
+###############################################################################
+
+FROM dep_stage as compile
 
 # Install any additional packages
 RUN apt-get update; \
@@ -47,6 +53,24 @@ RUN apt-get update; \
 
 COPY --from=ninja /usr/local/bin/ninja /usr/local/bin/ninja
 COPY --from=cmake /cmake /usr/local/
+COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
+RUN chmod u+s /usr/local/bin/gosu
+
+# COPY --from=pipenv_cache /venv /venv
+
+COPY --from=vsi /vsi /vsi
+
+ADD docker/terra_entrypoint.bsh /
+ADD terra.env /src/
+
+ENTRYPOINT ["/usr/bin/env", "--", "bash", "/terra_entrypoint.bsh"]
+
+CMD ["compile"]
+
+###############################################################################
+
+FROM dep_stage
+
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 # Allow non-privileged to run gosu (remove this to take root away from user)
@@ -55,9 +79,9 @@ RUN chmod u+s /usr/local/bin/gosu
 COPY --from=pipenv_cache /venv /venv
 
 COPY --from=vsi /vsi /vsi
-ADD docker/vxl_entrypoint.bsh /
-ADD vxl.env /src/
+ADD docker/terra_entrypoint.bsh /
+ADD terra.env /src/
 
-ENTRYPOINT ["/usr/local/bin/tini", "/usr/bin/env", "--", "bash", "/vxl_entrypoint.bsh"]
+ENTRYPOINT ["/usr/local/bin/tini", "/usr/bin/env", "--", "bash", "/terra_entrypoint.bsh"]
 
-CMD ["vxl"]
+CMD ["bash"]

@@ -5,5 +5,5 @@ Terra project from VSI
 ```
 source 'setup.env'
 just sync
-just run vxl
+just run terra
 ```

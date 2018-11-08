@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'vxl'.env
-cd "${VXL_CWD}"
+source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra'.env
+cd "${TERRA_CWD}"
 
 # Plugins
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
@@ -26,27 +26,31 @@ function caseify()
       fi
       ;;
     _post_build)
-      image_name=$(docker create ${VXL_DOCKER_REPO}:vxl_${VXL_USERNAME})
-      docker cp ${image_name}:/venv/Pipfile.lock "${VXL_CWD}/Pipfile.lock"
+      image_name=$(docker create ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME})
+      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
       docker rm ${image_name}
       ;;
-    run_vxl) # Run vxl
-      Just-docker-compose run vxl ${@+"${@}"}
+    run_terra) # Run terra
+      Just-docker-compose run terra ${@+"${@}"}
       extra_args+=$#
       ;;
-    compile) # Compile vxl
-      Just-docker-compose run vxl compile ${@+"${@}"}
+    run_compile) # Run compiler
+      Just-docker-compose run compile nopipenv ${@+"${@}"}
+      extra_args+=$#
+      ;;
+    compile) # Compile terra
+      Just-docker-compose run compile
       extra_args+=$#
       ;;
     test) # Run unit tests
-      Just-docker-compose run -w "${VXL_BUILD_DIR_DOCKER}" vxl ctest ${@+"${@}"}
+      Just-docker-compose run -w "${TERRA_BUILD_DIR_DOCKER}/${TERRA_BUILD_TYPE}" compile nopipenv ctest ${@+"${@}"}
       ;;
     sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
-      if [ ! -e "${VXL_CWD}/.just_synced" ]; then
+      if [ ! -e "${TERRA_CWD}/.just_synced" ]; then
         # Add any commands here, like initializing a database, etc... that need
         # to be run the first time sync is run.
-        touch "${VXL_CWD}/.just_synced"
+        touch "${TERRA_CWD}/.just_synced"
       fi
       Docker-compose down
       (justify git_submodule-update) # For those users who don't remember!

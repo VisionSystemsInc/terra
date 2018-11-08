@@ -6,7 +6,7 @@ if [ "${ALREADY_RUN_ONCE+set}" != "set" ]; then
   # create the user and associated groups and handle nfs symlinks
 
   (
-    source "${VSI_COMMON_DIR:-/vsi}/linux/just_env" "${VXL_SOURCE_DIR-/src}/vxl.env"
+    source "${VSI_COMMON_DIR:-/vsi}/linux/just_env" "${TERRA_SOURCE_DIR-/src}/terra.env"
     # Setup the container to be more friendly to non-root users and
     # add other advanced J.U.S.T. features
     JUST_DOCKER_ENTRYPOINT_CHOWN_DIRS="${JUST_DOCKER_ENTRYPOINT_INTERNAL_VOLUMES-}" \
@@ -29,7 +29,7 @@ if [ "${ALREADY_RUN_ONCE+set}" != "set" ]; then
   ALREADY_RUN_ONCE=1 exec gosu ${DOCKER_USERNAME} /usr/bin/env bash $0 ${@+"${@}"}
 fi
 
-source "${VSI_COMMON_DIR:-/vsi}/linux/just_env" "${VXL_SOURCE_DIR-/src}/vxl.env"
+source "${VSI_COMMON_DIR:-/vsi}/linux/just_env" "${TERRA_SOURCE_DIR-/src}/terra.env"
 
 function sudo()
 {
@@ -38,24 +38,34 @@ function sudo()
 export -f sudo
 
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
-# Remove duplicate VXL_*_DOCKER variables
+# Remove duplicate TERRA_*_DOCKER variables
 filter_docker_variables
+docker_convert_paths
 
-
-# default CMD
-if [ "$1" == "compile" ]; then
-  pushd ${VXL_BUILD_DIR}
-    if [ ! -f cmake_successfully_generated ] || [ "${VXL_FORCE_RUN_CMAKE-}" == "1" ]; then
-      cmake -G Ninja ${VXL_SOURCE_DIR} -DCMAKE_BUILD_TYPE=${VXL_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${VXL_INSTALL_DIR}
-      touch cmake_successfully_generated # Mark that the build files have successfully been created
-    fi
-    ninja
-  popd
-elif [ "$1" == "test" ]; then
-  :
-elif [ "$1" == "nopipenv" ]; then
-  shift 1
-  exec "${@}"
-else
-  exec pipenv run "${@}"
-fi
+case "$1" in
+  # default CMD
+  compile)
+    mkdir -p "${TERRA_BUILD_DIR}/${TERRA_BUILD_TYPE}"
+    pushd "${TERRA_BUILD_DIR}/${TERRA_BUILD_TYPE}" &> /dev/null
+      if [ ! -f cmake_successfully_generated ] || [ "${TERRA_FORCE_RUN_CMAKE-}" == "1" ]; then
+        cmake -G Ninja "${TERRA_SOURCE_DIR}" \
+              "-DCMAKE_BUILD_TYPE=${TERRA_BUILD_TYPE}" \
+              "-DCMAKE_INSTALL_PREFIX=${TERRA_INSTALL_DIR}" \
+              "-DPYTHON_SITE=${TERRA_INSTALL_DIR}/lib/python3/site-packages"
+        touch cmake_successfully_generated # Mark that the build files have successfully been created
+      fi
+      ninja
+      ninja install
+    popd &> /dev/null
+    ;;
+  test)
+    :
+    ;;
+  nopipenv)
+    shift 1
+    exec "${@}"
+    ;;
+  *)
+    exec pipenv run "${@}"
+    ;;
+esac

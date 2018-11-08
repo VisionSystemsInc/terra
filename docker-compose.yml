@@ -1,41 +1,51 @@
 version: "2.3"
 
 services:
-  vxl: &vxl_anchor
-    build:
+  terra: &terra
+    build: &terra_build
       context: .
-      dockerfile: docker/vxl.Dockerfile
+      dockerfile: docker/terra.Dockerfile
     # prevent different users from clobbering each others images
-    image: ${VXL_DOCKER_REPO}:vxl_${VXL_USERNAME}
+    image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
     environment:
       # Variables for docker_entrypoint.bsh
-      - DOCKER_UID=${VXL_UID}
-      - DOCKER_GIDS=${VXL_GIDS}
-      - DOCKER_GROUP_NAMES=${VXL_GROUP_NAMES}
+      - DOCKER_UID=${TERRA_UID}
+      - DOCKER_GIDS=${TERRA_GIDS}
+      - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
-
-      #- DOCKER_HOME=${VXL_HOME}
-
       - DISPLAY
-#     cap_add:
-#       - SYS_PTRACE # Useful for gdb
+      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER}:${TERRA_INSTALL_DIR_DOCKER}/lib/python3/site-packages
+    cap_add:
+      - SYS_PTRACE # Useful for gdb
     volumes:
-      - type: ${VXL_SOURCE_DIR_TYPE}
-        source: ${VXL_SOURCE_DIR}
-        target: ${VXL_SOURCE_DIR_DOCKER}
+      - &terra_source_volume
+        type: ${TERRA_SOURCE_DIR_TYPE}
+        source: ${TERRA_SOURCE_DIR}
+        target: ${TERRA_SOURCE_DIR_DOCKER}
         read_only: true
-      - type: ${VXL_BUILD_DIR_TYPE}
-        source: ${VXL_BUILD_DIR}
-        target: ${VXL_BUILD_DIR_DOCKER}
-      - type: ${VXL_INSTALL_DIR_TYPE}
-        source: ${VXL_INSTALL_DIR}
-        target: ${VXL_INSTALL_DIR_DOCKER}
+      - &terra_install_volume
+        type: ${TERRA_INSTALL_DIR_TYPE}
+        source: ${TERRA_INSTALL_DIR}
+        target: ${TERRA_INSTALL_DIR_DOCKER}
       - type: volume
         source: venv
         target: /venv
-  vxl2:
-    <<: *vxl_anchor
+  compile:
+    <<: *terra
+    build:
+      <<: *terra_build
+      target: compile
+    image: ${TERRA_DOCKER_REPO}:terra_compile_${TERRA_USERNAME}
+    volumes:
+      - *terra_source_volume
+      - *terra_install_volume
+      - type: ${TERRA_BUILD_DIR_TYPE}
+        source: ${TERRA_BUILD_DIR}
+        target: ${TERRA_BUILD_DIR_DOCKER}
+
 volumes:
   venv:
-  vxl-install:
-  vxl-build:
+    labels:
+      com.vsi.just.clean_action: ask
+  terra-install:
+  terra-build:
