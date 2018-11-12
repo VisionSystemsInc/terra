@@ -27,7 +27,8 @@ services:
         type: ${TERRA_INSTALL_DIR_TYPE}
         source: ${TERRA_INSTALL_DIR}
         target: ${TERRA_INSTALL_DIR_DOCKER}
-      - type: volume
+      - &terra_venv_volume
+        type: volume
         source: venv
         target: /venv
   compile:
@@ -43,9 +44,18 @@ services:
         source: ${TERRA_BUILD_DIR}
         target: ${TERRA_BUILD_DIR_DOCKER}
 
+  test:
+    <<: *terra
+    volumes:
+      - <<: *terra_source_volume
+        read_only: false
+      - *terra_install_volume
+      - *terra_venv_volume
+
 volumes:
   venv:
     labels:
-      com.vsi.just.clean_action: ask
+      com.vsi.just.clean_action: delete
+      com.vsi.just.clean_setup: run terra nopipenv true
   terra-install:
   terra-build:

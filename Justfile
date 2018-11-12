@@ -44,6 +44,14 @@ function caseify()
       ;;
     test) # Run unit tests
       Just-docker-compose run -w "${TERRA_BUILD_DIR_DOCKER}/${TERRA_BUILD_TYPE}" compile nopipenv ctest ${@+"${@}"}
+      Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR}/terra"
+      ;;
+    pep8)
+      Just-docker-compose run test bash -c \
+          "if ! command -v autopep8 >& /dev/null; then
+             pipenv install --dev;
+           fi;
+           autopep8 --indent-size 2 --recursive --exit-code --diff /src/terra"
       ;;
     sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
@@ -58,7 +66,9 @@ function caseify()
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
-      (justify docker-compose clean venv)
+      (justify docker-compose clean venv
+               docker-compose clean terra-install
+               docker-compose clean terra-build)
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

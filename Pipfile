@@ -7,6 +7,8 @@ name = "pypi"
 # python_version = "*"
 
 [dev-packages]
+autopep8 = "*"
 
 [packages]
 numpy = "*"
+commentjson = "*"
