@@ -3,6 +3,7 @@ from unittest import TestCase, mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from terra import Settings, LazySettings, settings
 
+
 class TestSettings(TestCase):
 
   def setUp(self):
@@ -138,7 +139,6 @@ class TestSettings(TestCase):
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, "444")
     self.assertTrue(settings.configured)
-
 
   @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.global_settings', {'a': 11, 'b': 22})
