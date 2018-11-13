@@ -52,6 +52,10 @@ services:
       - *terra_install_volume
       - *terra_venv_volume
 
+  ipython-kernel:
+    <<: *terra
+    network_mode: host
+
 volumes:
   venv:
     labels:

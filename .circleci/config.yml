@@ -50,3 +50,9 @@ jobs:
           command: |
             source setup.env
             just test
+
+      - run:
+          name: Check pep8 compliance
+          command: |
+            source setup.env
+            just pep8

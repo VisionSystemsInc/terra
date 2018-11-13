@@ -10,6 +10,8 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
+# Place holder for "default settings"
+global_settings = {}
 
 # Mixture of django settings
 
@@ -82,7 +84,7 @@ class LazySettings(LazyObject):
       return '<LazySettings [Unevaluated]>'
     return '<LazySettings>'
 
-  def configure(self, default_settings={}, **options):
+  def configure(self, default_settings=global_settings, **options):
     """
     Called to manually configure the settings. The 'default_settings'
     parameter sets where to retrieve any unspecified values from (its
@@ -103,6 +105,7 @@ class LazySettings(LazyObject):
 
 class Settings(dict):
   def __init__(self, *args, **kwargs):
+    self.update(**global_settings)
     self.update(*args, **kwargs)
     for k in self.__class__.__dict__.keys():
       if not (k.startswith('__') and k.endswith('__')) and not k in ('update',

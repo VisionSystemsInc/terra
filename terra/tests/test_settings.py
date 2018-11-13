@@ -1,10 +1,16 @@
 import os
-import unittest
-from tempfile import TemporaryDirectory
+from unittest import TestCase, mock
+from tempfile import TemporaryDirectory, NamedTemporaryFile
 from terra import Settings, LazySettings, settings
 
+class TestSettings(TestCase):
 
-class TestSettings(unittest.TestCase):
+  def setUp(self):
+    self.temp_dir = TemporaryDirectory()
+
+  def tearDown(self):
+    self.temp_dir.cleanup()
+
   def test_basic(self):
     d = Settings({'foo': 3})
     self.assertEqual(d.foo, 3)
@@ -64,23 +70,84 @@ class TestSettings(unittest.TestCase):
 
     self.assertCountEqual(f.keys(), ['height', 'power'])
 
-  def test_lazy(self):
-    temp_dir = TemporaryDirectory()
-    json_file = os.path.join(temp_dir.name, 'config.json')
-    os.environ['TERRA_SETTINGS_FILE'] = json_file
-
-    with open(json_file, 'w') as fid:
+  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
+  @mock.patch.object(settings, '_wrapped', None)
+  def test_lazy_attribute(self):
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
 
-    self.assertEqual(settings._wrapped, None)
+    self.assertFalse(settings.configured)
     self.assertEqual(settings['a'], 15)
-    self.assertNotEqual(settings._wrapped, None)
+    self.assertTrue(settings.configured)
+
+    self.assertEqual(settings['b'], "22")
+    self.assertEqual(settings['c'], True)
+
+  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
+  @mock.patch.object(settings, '_wrapped', None)
+  def test_lazy_item(self):
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 15, "b":"22", "c": true}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
 
     settings._wrapped = None
     self.assertEqual(settings.a, 15)
-    self.assertNotEqual(settings._wrapped, None)
+    self.assertTrue(settings.configured)
 
     self.assertEqual(settings.b, "22")
     self.assertEqual(settings.c, True)
 
-    temp_dir.cleanup()
+  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
+  @mock.patch.object(settings, '_wrapped', None)
+  def test_comments(self):
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{\n'
+                '  "a": 15,\n'
+                '\n'
+                '  // b needs to be a string\n'
+                '  "b":"22",\n'
+                '  "c": true\n'
+                '}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    self.assertFalse(settings.configured)
+    self.assertEqual(settings.a, 15)
+    self.assertTrue(settings.configured)
+    self.assertEqual(settings.b, "22")
+    self.assertEqual(settings.c, True)
+
+  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch('terra.global_settings', {'a': 11, 'b': 22})
+  def test_global_settings(self):
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"b":"333", "c":"444"}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    self.assertFalse(settings.configured)
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, "333")
+    self.assertEqual(settings.c, "444")
+    self.assertTrue(settings.configured)
+
+
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch('terra.global_settings', {'a': 11, 'b': 22})
+  def test_configure(self):
+
+    self.assertFalse(settings.configured)
+    settings.configure(b="333", c=444)
+    self.assertTrue(settings.configured)
+
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, "333")
+    self.assertEqual(settings.c, 444)

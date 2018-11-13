@@ -40,13 +40,22 @@ function caseify()
       ;;
     compile) # Compile terra
       Just-docker-compose run compile
-      extra_args+=$#
       ;;
     test) # Run unit tests
       Just-docker-compose run -w "${TERRA_BUILD_DIR_DOCKER}/${TERRA_BUILD_TYPE}" compile nopipenv ctest ${@+"${@}"}
-      Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR}/terra"
+      Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
+      extra_args+=$#
       ;;
-    pep8)
+
+    # Start an ipython kernel for dev/notebook, keep target hidden
+    ipython-kernel)
+      kernel="$1"
+      shift 1
+      TERRA_IPYTHON_KERNEL_VOLUMES=("$(dirname "${kernel}"):/kernels")
+      Just-docker-compose run ipython-kernel python -m ipykernel_launcher -f /kernels/"$(basename "${kernel}")" ${@+"${@}"}
+      extra_args+=$#
+      ;;
+    pep8) # Check for pep8 compliance in ./terra
       Just-docker-compose run test bash -c \
           "if ! command -v autopep8 >& /dev/null; then
              pipenv install --dev;
