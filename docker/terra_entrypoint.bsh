@@ -42,7 +42,10 @@ source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 filter_docker_variables
 docker_convert_paths
 
-case "$1" in
+
+cmd="${1}"
+shift 1
+case "${cmd}" in
   # default CMD
   compile)
     mkdir -p "${TERRA_BUILD_DIR}/${TERRA_BUILD_TYPE}"
@@ -62,10 +65,9 @@ case "$1" in
     :
     ;;
   nopipenv)
-    shift 1
     exec "${@}"
     ;;
   *)
-    exec pipenv run "${@}"
+    exec pipenv run "${cmd}" ${@+"${@}"}
     ;;
 esac
