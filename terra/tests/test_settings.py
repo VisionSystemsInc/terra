@@ -1,37 +1,31 @@
 import os
 from unittest import TestCase, mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
-from terra import Settings, LazySettings, settings
+from terra import settings
+from terra.core.settings import ObjectDict
 
 
-class TestSettings(TestCase):
-
-  def setUp(self):
-    self.temp_dir = TemporaryDirectory()
-
-  def tearDown(self):
-    self.temp_dir.cleanup()
+class TestObjectDict(TestCase):
 
   def test_basic(self):
-    d = Settings({'foo': 3})
+    d = ObjectDict({'foo': 3})
     self.assertEqual(d.foo, 3)
     self.assertEqual(d['foo'], 3)
     with self.assertRaises(AttributeError):
       d.bar
 
   def test_corner_cases(self):
-    self.assertEqual(Settings({}), {})
-    self.assertEqual(Settings(None), {})
-    self.assertEqual(Settings(), {})
+    self.assertEqual(ObjectDict({}), {})
+    self.assertEqual(ObjectDict(), {})
 
-    with self.assertRaises(AssertionError):
-      Settings({'a': 1}, {'b': 5})
+    with self.assertRaises(TypeError):
+      ObjectDict({'a': 1}, {'b': 5})
 
     a = {'a': 1}
-    self.assertEqual(Settings(**a), {'a': 1})
+    self.assertEqual(ObjectDict(**a), {'a': 1})
 
   def test_attributes(self):
-    d = Settings()
+    d = ObjectDict()
     d.foo = 3
     self.assertEqual(d.foo, 3)
     d.bar = {'prop': 'value'}
@@ -41,35 +35,32 @@ class TestSettings(TestCase):
     self.assertEqual(d.bar.prop, 'newer')
 
   def test_extraction(self):
-    d = Settings({'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]})
+    d = ObjectDict({'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]})
 
     self.assertTrue(isinstance(d.bar, list))
 
     self.assertEqual([getattr(x, 'x') for x in d.bar], [1, 3])
     self.assertEqual([getattr(x, 'y') for x in d.bar], [2, 4])
 
-    d = Settings()
+    d = ObjectDict()
     self.assertEqual(list(d.keys()), [])
 
-    d = Settings(foo=3, bar=dict(x=1, y=2))
+    d = ObjectDict(foo=3, bar=dict(x=1, y=2))
     self.assertEqual(d.foo, 3)
     self.assertEqual(d.bar.x, 1)
 
-  def test_class(self):
-    o = Settings({'clean': True})
-    self.assertEqual(list(o.items()), [('clean', True)])
+  def test_multiple_lists(self):
+    d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
+    self.assertEqual(d.b[0][0].c, 'foo')
 
-    class Flower(Settings):
-      power = 1
 
-    f = Flower()
-    self.assertEqual(f.power, 1)
+class TestSettings(TestCase):
 
-    f = Flower({'height': 12})
-    self.assertEqual(f.height, 12)
-    self.assertEqual(f['power'], 1)
+  def setUp(self):
+    self.temp_dir = TemporaryDirectory()
 
-    self.assertCountEqual(f.keys(), ['height', 'power'])
+  def tearDown(self):
+    self.temp_dir.cleanup()
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
@@ -126,7 +117,7 @@ class TestSettings(TestCase):
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.global_settings', {'a': 11, 'b': 22})
+  @mock.patch('terra.core.settings.global_settings', {'a': 11, 'b': 22})
   def test_global_settings(self):
     with NamedTemporaryFile(mode='w',
                             dir=self.temp_dir.name,
@@ -141,7 +132,7 @@ class TestSettings(TestCase):
     self.assertTrue(settings.configured)
 
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.global_settings', {'a': 11, 'b': 22})
+  @mock.patch('terra.core.settings.global_settings', {'a': 11, 'b': 22})
   def test_configure(self):
 
     self.assertFalse(settings.configured)

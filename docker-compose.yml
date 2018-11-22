@@ -23,6 +23,11 @@ services:
         source: ${TERRA_SOURCE_DIR}
         target: ${TERRA_SOURCE_DIR_DOCKER}
         read_only: true
+      - &terra_vsi_volume
+        type: ${TERRA_SOURCE_DIR_TYPE}
+        source: ${TERRA_SOURCE_DIR}/external/vsi_common
+        target: /vsi
+        read_only: true
       - &terra_install_volume
         type: ${TERRA_INSTALL_DIR_TYPE}
         source: ${TERRA_INSTALL_DIR}
@@ -40,6 +45,7 @@ services:
     volumes:
       - *terra_source_volume
       - *terra_install_volume
+      - *terra_vsi_volume
       - type: ${TERRA_BUILD_DIR_TYPE}
         source: ${TERRA_BUILD_DIR}
         target: ${TERRA_BUILD_DIR_DOCKER}
@@ -51,6 +57,7 @@ services:
         read_only: false
       - *terra_install_volume
       - *terra_venv_volume
+      - *terra_vsi_volume
 
   ipython-kernel:
     <<: *terra

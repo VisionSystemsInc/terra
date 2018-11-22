@@ -19,10 +19,10 @@ function caseify()
         Docker-compose "${just_arg}" ${@+"${@}"}
         extra_args+=$#
       else
-        (justify build_recipes gosu tini vsi pipenv)
+        justify build_recipes gosu tini vsi pipenv
         Docker-compose build
-        (justify docker-compose clean venv)
-        (justify _post_build)
+        justify docker-compose clean venv
+        justify _post_build
       fi
       ;;
     _post_build)
@@ -70,14 +70,14 @@ function caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       Docker-compose down
-      (justify git_submodule-update) # For those users who don't remember!
-      (justify build)
+      justify git_submodule-update # For those users who don't remember!
+      justify build
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
-      (justify docker-compose clean venv
-               docker-compose clean terra-install
-               docker-compose clean terra-build)
+      justify docker-compose clean venv \
+              docker-compose clean terra-install \
+              docker-compose clean terra-build
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

@@ -7,13 +7,13 @@ FROM vsiri/recipe:pipenv as pipenv
 
 ###############################################################################
 
-FROM debian:stretch as dep_stage
+FROM debian:buster as dep_stage
 SHELL ["/usr/bin/env", "bash", "-euxvc"]
 
 # Install any runtime dependencies
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      python3 libgeotiff2 libgomp1; \
+      python3 python3-distutils libgeotiff2 libgomp1; \
     rm -r /var/lib/apt/lists/*
 
 ENV WORKON_HOME=/venv \
