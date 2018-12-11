@@ -4,12 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-# python_version = "*"
-
-[dev-packages]
-autopep8 = "*"
-ipykernel = "*"
+# python_version = "3.6,3.7,3.8"
 
 [packages]
-numpy = "*"
-commentjson = "*"
+"terra" = {path = ".", editable = true}

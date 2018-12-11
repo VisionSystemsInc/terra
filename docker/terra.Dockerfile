@@ -31,7 +31,7 @@ RUN /tmp/pipenv/get-pipenv; rm -rf /tmp/pipenv || :
 
 FROM dep_stage as pipenv_cache
 
-ADD Pipfile Pipfile.lock /src/
+ADD docker/Pipfile docker/Pipfile.lock /src/
 
     # Install all packages into the image
 RUN pipenv install --keep-outdated; \

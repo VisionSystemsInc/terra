@@ -1,5 +1,8 @@
 
-class BaseHardware:
+
+class BaseCompute:
+  ''' Base Computing Service Model
+  '''
 
   def create(self):
     pass

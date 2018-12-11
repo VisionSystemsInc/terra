@@ -1,5 +1,8 @@
 from terra.core.settings import LazySettings
 
-from _terra import *  # noqa
+try:
+  from _terra import *  # noqa
+except ImportError:
+  pass
 
 settings = LazySettings()

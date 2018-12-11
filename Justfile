@@ -23,11 +23,17 @@ function caseify()
         Docker-compose build
         justify docker-compose clean venv
         justify _post_build
+        justify build dsm-desktop
       fi
+      ;;
+    build_dsm-desktop) # Build the dsm desktop images
+      pushd "${TERRA_CWD}/external/dsm_desktop" > /dev/null
+        ./run build
+      popd > /dev/null
       ;;
     _post_build)
       image_name=$(docker create ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME})
-      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
+      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/docker/Pipfile.lock"
       docker rm ${image_name}
       ;;
     run_terra) # Run terra
@@ -72,6 +78,10 @@ function caseify()
       Docker-compose down
       justify git_submodule-update # For those users who don't remember!
       justify build
+
+      pushd "${TERRA_CWD}" > /dev/null
+        pipenv install --keep-outdated
+      popd > /dev/null
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n

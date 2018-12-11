@@ -9,7 +9,27 @@ except ImportError:
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
 # Place holder for "default settings"
-global_settings = {"processing_dir": os.getcwd()}
+global_settings = {
+  "processing_dir": os.getcwd(),
+  "params":{
+    "color_elev_thres": 6,
+    "azimuth_thres": 90.0,
+    "log_level": 10,
+    "VisualSFM": "VisualSFM",
+    "time_thres_days": 200,
+    "dem_res": 1.0,
+    "ground_elev": 30.0,
+    "dsm_max_height": 180.0,
+    "gpu_thread": 2,
+    "max_stereo_pair": 600,
+    "cpu_thread": 4,
+    "max_time": 120,
+    "num_active_disparity": 110,
+    "n_scene_tile": 64,
+    "min_disparity": -220,
+    "world_size": 500.0
+  }
+}
 
 # Mixture of django settings
 
