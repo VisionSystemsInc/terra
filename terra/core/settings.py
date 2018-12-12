@@ -1,6 +1,7 @@
 import os
 
 from terra.core.exceptions import ImproperlyConfigured
+from terra.core.utils import cached_property
 
 try:
   import commentjson as json
@@ -10,7 +11,6 @@ except ImportError:
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
 # Place holder for "default settings"
 global_settings = {
-  "processing_dir": os.getcwd(),
   "params":{
     "color_elev_thres": 6,
     "azimuth_thres": 90.0,
@@ -95,6 +95,7 @@ class LazySettings(LazyObject):
           % (desc, ENVIRONMENT_VARIABLE))
     with open(settings_file) as fid:
       self._wrapped = Settings(json.load(fid))
+    self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
 
   def __repr__(self):
     # Hardcode the class name as otherwise it yields 'Settings'.
@@ -171,6 +172,13 @@ class Settings(ObjectDict):
     self.update(**global_settings)
     super().__init__(*args, **kwargs)
 
-  @property
+  @cached_property
+  def processing_dir(self):
+    if hasattr(self, 'config_file'):
+      return os.path.dirname(self.config_file)
+    else:
+      return os.getcwd()
+
+  @cached_property
   def status_file(self):
     return os.path.join(self.processing_dir, 'status.json')

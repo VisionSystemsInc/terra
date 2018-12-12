@@ -1,8 +1,14 @@
 
 
+class BaseService:
+  pass
+
 class BaseCompute:
   ''' Base Computing Service Model
   '''
+
+  class DSMService(BaseService):
+    pass
 
   def create(self):
     pass

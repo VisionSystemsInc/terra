@@ -8,6 +8,12 @@ source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 
+function Pipenv()
+{
+  PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"}
+  return $?
+}
+
 # Main function
 function caseify()
 {
@@ -37,7 +43,8 @@ function caseify()
       docker rm ${image_name}
       ;;
     run_terra) # Run terra
-      Just-docker-compose run terra ${@+"${@}"}
+      # Just-docker-compose run terra ${@+"${@}"}
+      Pipenv run python -m terra.run ${@+"${@}"}
       extra_args+=$#
       ;;
     run_compile) # Run compiler
@@ -62,11 +69,10 @@ function caseify()
       extra_args+=$#
       ;;
     pep8) # Check for pep8 compliance in ./terra
-      Just-docker-compose run test bash -c \
-          "if ! command -v autopep8 >& /dev/null; then
-             pipenv install --dev;
-           fi;
-           autopep8 --indent-size 2 --recursive --exit-code --diff /src/terra"
+      if ! Pipenv run command -v autopep8 >& /dev/null; then
+        Pipenv install --dev
+      fi
+      Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff "${TERRA_SOURCE_DIR}/terra"
       ;;
     sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
@@ -79,9 +85,7 @@ function caseify()
       justify git_submodule-update # For those users who don't remember!
       justify build
 
-      pushd "${TERRA_CWD}" > /dev/null
-        pipenv install --keep-outdated
-      popd > /dev/null
+      Pipenv install --keep-outdated
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
