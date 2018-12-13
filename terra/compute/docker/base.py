@@ -59,7 +59,48 @@ class DSMService(BaseCompute.DSMService):
 
     self.project_dir = os.path.join(env['TERRA_SOURCE_DIR'],
                                     'external', 'dsm_desktop')
-    self.project = project_from_options(self.project_dir, {}, environment)
+    # self.project = project_from_options(self.project_dir, {}, environment)
+    # self.environment = environment
+    env.update(environment)
+
+from compose.cli.docopt_command import DocoptDispatcher
+from compose.cli.main import TopLevelCommand, perform_command
+from compose.cli.utils import get_version_info
+# import compose.cli.errors as errors
+import functools
+
+def dispatch(args):
+  # setup_logging()
+  dispatcher = DocoptDispatcher(
+    TopLevelCommand,
+    {'options_first': True, 'version': get_version_info('compose')})
+
+  options, handler, command_options = dispatcher.parse(args)
+  # setup_console_handler(console_handler,
+  #                       options.get('--verbose'),
+  #                       options.get('--no-ansi'),
+  #                       options.get("--log-level"))
+  # setup_parallel_logger(options.get('--no-ansi'))
+  if options.get('--no-ansi'):
+    command_options['--no-color'] = True
+  return functools.partial(perform_command, options, handler, command_options)
+
+# def perform_command(options, handler, command_options, project_dir='.', environment={}):
+#     if options['COMMAND'] in ('help', 'version'):
+#         # Skip looking up the compose file.
+#         handler(command_options)
+#         return
+
+#     if options['COMMAND'] == 'config':
+#         command = TopLevelCommand(None, options=options)
+#         handler(command, command_options)
+#         return
+
+#     print(environment)
+#     project = project_from_options(project_dir, options, environment)
+#     command = TopLevelCommand(project, options=options)
+#     with errors.handle_connection_errors(project.client):
+#         handler(command, command_options)
 
 
 class Compute(BaseCompute):
@@ -77,28 +118,37 @@ class Compute(BaseCompute):
   def run(self, service_class, options={}):
     service_info = service_class()
 
-    options['SERVICE'] = service_info.service_name
-    if hasattr(service_info, 'command'):
-      options['COMMAND'] = service_info.command
+    dispatch(['--file', service_info.project_dir+'/docker-compose.yml', 'run', service_info.service_name] + service_info.command)()
 
-    service = service_info.project.get_service(options['SERVICE'])
-    detach = options.get('--detach')
+  def config(self, service_class, options={}):
+    service_info = service_class()
 
-    if options.get('--publish', None) and options.get('--service-ports', None):
-        raise UserError(
-            'Service port mapping and manual port mapping '
-            'can not be used together'
-        )
+    # dispatch(['config'], service_info.project_dir, service_info.environment)()
+    dispatch(['--file', service_info.project_dir+'/docker-compose.yml', 'config'])()
 
-    if options['COMMAND'] is not None:
-        command = [options['COMMAND']] + options.get('ARGS', [])
-    elif options.get('--entrypoint', None) is not None:
-        command = []
-    else:
-        command = service.options.get('command')
 
-    container_options = build_container_options(options, detach, command)
-    run_one_off_container(
-        container_options, service_info.project, service, options,
-        {}, service_info.project_dir
-    )
+    # options['SERVICE'] = service_info.service_name
+    # if hasattr(service_info, 'command'):
+    #   options['COMMAND'] = service_info.command
+
+    # service = service_info.project.get_service(options['SERVICE'])
+    # detach = options.get('--detach')
+
+    # if options.get('--publish', None) and options.get('--service-ports', None):
+    #     raise UserError(
+    #         'Service port mapping and manual port mapping '
+    #         'can not be used together'
+    #     )
+
+    # if options['COMMAND'] is not None:
+    #     command = [options['COMMAND']] + options.get('ARGS', [])
+    # elif options.get('--entrypoint', None) is not None:
+    #     command = []
+    # else:
+    #     command = service.options.get('command')
+
+    # container_options = build_container_options(options, detach, command)
+    # run_one_off_container(
+    #     container_options, service_info.project, service, options,
+    #     {}, service_info.project_dir
+    # )
