@@ -2,6 +2,7 @@ import os
 import json
 import inspect
 from vsi.tools.python import BasicDecorator, args_to_kwargs
+import sys
 
 from terra.logger import getLogger
 logger = getLogger(__name__)

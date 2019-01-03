@@ -14,7 +14,7 @@ class ConnectionHandler:
     self._connection = None
 
   @cached_property
-  def compute(self):
+  def __compute(self):
     if self._compute is None:
       self._compute = settings.compute
     if self._compute == {}:
@@ -22,24 +22,41 @@ class ConnectionHandler:
 
     return self._compute
 
-  def __getitem__(self, key):
+  def __get_connection(self):
     if not self._connection:
-      backend = load_backend(self.compute.type)
+      backend = load_backend(self.__compute.type)
       self._connection = backend.Compute()
-    return getattr(self._connection, key)
-    # self.ensure_defaults(alias)
-    # self.prepare_test_settings(alias)
-    # db = self.databases[alias]
-    # backend = load_backend(db['ENGINE'])
-    # conn = backend.DatabaseWrapper(db, alias)
-    # setattr(self._connections, alias, conn)
-    # return self._connection
+    return self._connection
 
-  def __setitem__(self, key, value):
-    setattr(self._connection, key, value)
+  def __getattr__(self, name):
+    return getattr(self.__get_connection(), name)
 
-  def __delitem__(self, key):
-    delattr(self._connection, key)
+  def __setattr__(self, name, value):
+    if name in ('_connection', '_compute'):
+      return super().__setattr__(name, value)
+    return setattr(self.__get_connection(), name, value)
+
+  def __delattr__(self, name):
+    return delattr(self.__get_connection(), name)
+
+  # def __getitem__(self, key):
+  #   if not self._connection:
+  #     backend = load_backend(self.compute.type)
+  #     self._connection = backend.Compute()
+  #   return getattr(self._connection, key)
+  #   # self.ensure_defaults(alias)
+  #   # self.prepare_test_settings(alias)
+  #   # db = self.databases[alias]
+  #   # backend = load_backend(db['ENGINE'])
+  #   # conn = backend.DatabaseWrapper(db, alias)
+  #   # setattr(self._connections, alias, conn)
+  #   # return self._connection
+
+  # def __setitem__(self, key, value):
+  #   setattr(self._connection, key, value)
+
+  # def __delitem__(self, key):
+  #   delattr(self._connection, key)
 
   def close(self):
     if self._connection:

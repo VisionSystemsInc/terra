@@ -10,8 +10,9 @@ source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 
 function Pipenv()
 {
-  PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"}
-  return $?
+  local rv=0
+  PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
+  return $rv
 }
 
 # Main function

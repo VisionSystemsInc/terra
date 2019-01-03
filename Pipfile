@@ -10,4 +10,5 @@ name = "pypi"
 autopep8 = "*"
 
 [packages]
-"terra" = {path = ".", editable = true}
+terra = {path = ".",editable = true}
+envcontext = "*"
