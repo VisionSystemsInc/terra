@@ -2,6 +2,11 @@ import os
 
 class BaseService:
   env = os.environ
+  def pre_run(self):
+    pass
+
+  def post_run(self):
+    pass
 
 class DSMService(BaseService):
   name = "dsm"
