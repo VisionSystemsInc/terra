@@ -28,6 +28,7 @@ class Compute(BaseCompute):
   def remove(self, service_class):
     print("remove: " + service_class.name)
 
+
 class DummyService:
   def pre_run(self):
     print("pre run: " + self.name)
@@ -35,9 +36,11 @@ class DummyService:
   def post_run(self):
     print("post run: " + self.name)
 
+
 @Compute.register
 class DSMService(DummyService, BaseDSMService):
   pass
+
 
 @Compute.register
 class ViewAngleRetrieval(DummyService, BaseViewAngleRetrieval):

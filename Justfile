@@ -73,7 +73,9 @@ function caseify()
       if ! Pipenv run command -v autopep8 >& /dev/null; then
         Pipenv install --dev
       fi
-      Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff "${TERRA_SOURCE_DIR}/terra"
+      Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
+                          --global-config "${TERRA_CWD}/autopep8.ini" \
+                          "${TERRA_SOURCE_DIR}/terra"
       ;;
     sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"

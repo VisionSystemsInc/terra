@@ -42,8 +42,8 @@ global_templates = [
     }
   ),
   (
-    {"compute": {"type": "terra.compute.dummy"}}, # Pattern
-    {"compute": {"value1": "100", "value3": {"value2": "200"}}} # Defaults
+    {"compute": {"type": "terra.compute.dummy"}},  # Pattern
+    {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
   )
 ]
 
@@ -156,14 +156,17 @@ class ObjectDict(dict):
     self.update([(name, value)])
 
   def update(self, *args, **kwargs):
-    # function to patch dict->ObjectDict
+
     def patch(self, key):
+      ''' Function to patch dict->ObjectDict '''
       value = self[key]
-      # List/tuple handler'
+
       def patch_list(value):
+        ''' List/tuple handler '''
         return [__class__(x) if isinstance(x, dict)
                 else patch_list(x) if isinstance(value, (list, tuple))
                 else x for x in value]
+
       if isinstance(value, (list, tuple)):
         self[key] = patch_list(value)
       elif isinstance(value, dict) and not isinstance(value, __class__):
@@ -177,7 +180,7 @@ class ObjectDict(dict):
     if args:
       # Handle dict and zipped
       for (key, value) in args[0].items() \
-          if isinstance(args[0], dict) else args[0]:  # noqa
+          if isinstance(args[0], dict) else args[0]:
         patch(self, key)
 
     if kwargs:
@@ -192,7 +195,7 @@ class Settings(ObjectDict):
       if nested_in_dict(pattern, self):
         # Not the most efficient way to do this, but insignificant
         # "preupdate"
-        d={}
+        d = {}
         nested_update(d, settings)
         nested_update(d, self)
         nested_update(self, d)

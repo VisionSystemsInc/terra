@@ -3,6 +3,7 @@ from importlib import import_module
 from terra.core.utils import cached_property
 from terra import settings
 
+
 class ConnectionHandler:
   def __init__(self, compute=None):
     """
@@ -62,8 +63,9 @@ class ConnectionHandler:
     if self._connection:
       self._connection.close()
 
+
 def load_backend(backend_name):
   # try:
-    return import_module(f'{backend_name}.base')
+  return import_module(f'{backend_name}.base')
   # except ImportError:
-    # return import_module(f'terra.compute.{backend_name}.base')
+  #   return import_module(f'terra.compute.{backend_name}.base')

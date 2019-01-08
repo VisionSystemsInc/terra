@@ -1,4 +1,3 @@
-# django.utils.functional.cached_property
 class cached_property:
   """
   Decorator that converts a method with a single self argument into a
@@ -7,6 +6,7 @@ class cached_property:
   Optional ``name`` argument allows you to make cached properties of other
   methods. (e.g.  url = cached_property(get_absolute_url, name='url') )
   """
+
   def __init__(self, func, name=None):
     self.func = func
     self.__doc__ = getattr(func, '__doc__')
@@ -19,6 +19,6 @@ class cached_property:
     instead of calling cached_property.__get__().
     """
     if instance is None:
-        return self
+      return self
     res = instance.__dict__[self.name] = self.func(instance)
     return res

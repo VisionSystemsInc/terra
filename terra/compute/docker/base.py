@@ -1,8 +1,4 @@
-from terra.compute.base.base import (
-    BaseCompute, DSMService as BaseDSMService,
-    ViewAngleRetrieval as BaseViewAngleRetrieval
-)
-
+from envcontext import EnvironmentContext
 import compose
 import os
 from os import environ as env
@@ -11,11 +7,13 @@ from subprocess import Popen
 
 from shlex import quote
 
+from terra.compute.base.base import (
+    BaseCompute, DSMService as BaseDSMService,
+    ViewAngleRetrieval as BaseViewAngleRetrieval
+)
+from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
-from terra import settings
-
-from envcontext import EnvironmentContext
 
 
 class Compute(BaseCompute):
@@ -24,10 +22,10 @@ class Compute(BaseCompute):
 
   def just(self, *args, env={}):
     logger.debug('Running: ' + ' '.join(
-        [quote(f'{k}={v}') for k,v in env.items()] +
+        [quote(f'{k}={v}') for k, v in env.items()] +
         [quote(x) for x in ('just',) + args]))
     with EnvironmentContext(**env):
-      Popen(('just',)+args).wait()
+      Popen(('just',) + args).wait()
 
   def run(self, service_class):
     service_info = service_class()
@@ -48,6 +46,7 @@ class Compute(BaseCompute):
               'config',
               env=service_info.env)
 
+
 @Compute.register
 class DSMService(BaseDSMService):
 
@@ -55,8 +54,8 @@ class DSMService(BaseDSMService):
     self.command = ['python', '-m', 'source.tasks.generate_dsm']
     self.env = {
       'DSM_SOURCE_DIR': os.path.join(env['TERRA_SOURCE_DIR'], 'external',
-                                      'dsm_desktop'),
-      'DSM_SOURCE_DIR_DOCKER':'/vsi/source',
+                                     'dsm_desktop'),
+      'DSM_SOURCE_DIR_DOCKER': '/vsi/source',
       'DSM_VXL_SOURCE_DIR_DOCKER': '/vxl',
       'DSM_J2K_SOURCE_DIR_DOCKER': '/vxl/v3p/j2k',
       'DSM_BUILD_DIR_DOCKER': '/vsi/build',
@@ -74,8 +73,8 @@ class DSMService(BaseDSMService):
         os.path.join(self.env['DSM_BUILD_DIR'], 'vxl-build')
 
     self.compose_file = os.path.join(env['TERRA_SOURCE_DIR'],
-                                    'external', 'dsm_desktop',
-                                    'docker-compose.yml')
+                                     'external', 'dsm_desktop',
+                                     'docker-compose.yml')
 
     self.env['TERRA_DSM_VOLUME_1'] = os.path.abspath(settings.processing_dir) \
         + ':/dem/output'
@@ -88,8 +87,7 @@ class DSMService(BaseDSMService):
 
     self.param_file = os.path.abspath(os.path.join(settings.processing_dir,
                                                    'params.json'))
-    self.env['TERRA_DSM_VOLUME_5'] = self.param_file+':/dem/config.json'
-
+    self.env['TERRA_DSM_VOLUME_5'] = self.param_file + ':/dem/config.json'
 
     self.service_name = 'dsm'
 
@@ -97,6 +95,7 @@ class DSMService(BaseDSMService):
     import json
     with open(self.param_file, 'w') as fid:
       json.dump(settings.params, fid)
+
 
 @Compute.register
 class ViewAngleRetrieval(BaseViewAngleRetrieval):
@@ -106,7 +105,7 @@ class ViewAngleRetrieval(BaseViewAngleRetrieval):
     self.env = {
       'DSM_SOURCE_DIR': os.path.join(env['TERRA_SOURCE_DIR'], 'external',
                                      'dsm_desktop'),
-      'DSM_SOURCE_DIR_DOCKER':'/vsi/source',
+      'DSM_SOURCE_DIR_DOCKER': '/vsi/source',
       'DSM_VXL_SOURCE_DIR_DOCKER': '/vxl',
       'DSM_J2K_SOURCE_DIR_DOCKER': '/vxl/v3p/j2k',
       'DSM_BUILD_DIR_DOCKER': '/vsi/build',
@@ -123,7 +122,7 @@ class ViewAngleRetrieval(BaseViewAngleRetrieval):
         os.path.join(self.env['DSM_BUILD_DIR'], 'vxl-build')
 
     self.compose_file = os.path.join(env['TERRA_SOURCE_DIR'],
-                                    'external', 'dsm_desktop',
-                                    'docker-compose.yml')
+                                     'external', 'dsm_desktop',
+                                     'docker-compose.yml')
 
     self.service_name = 'dsm'

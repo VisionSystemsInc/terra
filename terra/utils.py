@@ -4,11 +4,11 @@ import inspect
 from vsi.tools.python import BasicDecorator, args_to_kwargs
 import sys
 
+from terra.core.settings import ObjectDict
+from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
-from terra.core.settings import ObjectDict
-from terra import settings
 
 class resumable(BasicDecorator):
   def __inner_call__(self, *args, **kwargs):
@@ -47,7 +47,7 @@ class resumable(BasicDecorator):
     stage_self.status.stage_status = "done"
     logger.debug(f"Finished: {stage_name}")
 
-    os.rename(settings.status_file, settings.status_file+'.bak')
+    os.rename(settings.status_file, settings.status_file + '.bak')
     with open(settings.status_file, 'w') as fid:
       json.dump(stage_self.status, fid)
 
