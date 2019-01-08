@@ -2,6 +2,7 @@ import os
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.utils import cached_property
+from vsi.tools.python import nested_update, nested_in_dict
 
 try:
   import commentjson as json
@@ -9,27 +10,42 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
-# Place holder for "default settings"
-global_settings = {
-  "params":{
-    "color_elev_thres": 6,
-    "azimuth_thres": 90.0,
-    "log_level": 10,
-    "VisualSFM": "VisualSFM",
-    "time_thres_days": 200,
-    "dem_res": 1.0,
-    "ground_elev": 30.0,
-    "dsm_max_height": 180.0,
-    "gpu_thread": 2,
-    "max_stereo_pair": 600,
-    "cpu_thread": 4,
-    "max_time": 120,
-    "num_active_disparity": 110,
-    "n_scene_tile": 64,
-    "min_disparity": -220,
-    "world_size": 500.0
-  }
-}
+
+# Templates are how we conditionally assign default values. It is a list of 2
+# length tuples, where the first in the tuple is a "pattern" and the second
+# is the default values. If the pattern is in in the settings, then the default
+# values are set for any unset values.
+
+global_templates = [
+  (
+    # Global Defaults
+    {},
+    {
+      "params": {
+        "color_elev_thres": 6,
+        "azimuth_thres": 90.0,
+        "log_level": 10,
+        "VisualSFM": "VisualSFM",
+        "time_thres_days": 200,
+        "dem_res": 1.0,
+        "ground_elev": 30.0,
+        "dsm_max_height": 180.0,
+        "gpu_thread": 2,
+        "max_stereo_pair": 600,
+        "cpu_thread": 4,
+        "max_time": 120,
+        "num_active_disparity": 110,
+        "n_scene_tile": 64,
+        "min_disparity": -220,
+        "world_size": 500.0
+      }
+    }
+  ),
+  (
+    {"compute": {"type": "terra.compute.dummy"}}, # Pattern
+    {"compute": {"value1": "100", "value3": {"value2": "200"}}} # Defaults
+  )
+]
 
 # Mixture of django settings
 
@@ -101,9 +117,9 @@ class LazySettings(LazyObject):
     # Hardcode the class name as otherwise it yields 'Settings'.
     if self._wrapped is None:
       return '<LazySettings [Unevaluated]>'
-    return '<LazySettings>'
+    return str(self._wrapped)
 
-  def configure(self, default_settings=global_settings, **options):
+  def configure(self, default_settings={}, **options):
     """
     Called to manually configure the settings. The 'default_settings'
     parameter sets where to retrieve any unspecified values from (its
@@ -111,10 +127,8 @@ class LazySettings(LazyObject):
     """
     if self._wrapped is not None:
       raise RuntimeError('Settings already configured.')
-    holder = Settings(default_settings)
-    for name, value in options.items():
-      setattr(holder, name, value)
-    self._wrapped = holder
+    self._wrapped = Settings(default_settings)
+    self._wrapped.update(options)
 
   @property
   def configured(self):
@@ -142,7 +156,10 @@ class ObjectDict(dict):
     self.update([(name, value)])
 
   def update(self, *args, **kwargs):
-    def patch(self, key, value):
+    # function to patch dict->ObjectDict
+    def patch(self, key):
+      value = self[key]
+      # List/tuple handler'
       def patch_list(value):
         return [__class__(x) if isinstance(x, dict)
                 else patch_list(x) if isinstance(value, (list, tuple))
@@ -152,25 +169,35 @@ class ObjectDict(dict):
       elif isinstance(value, dict) and not isinstance(value, __class__):
         self[key] = __class__(value)
 
-    # Run super update first, like normal
-    super().update(*args, **kwargs)
+    # Run nested update first
+    nested_update(self, *args, **kwargs)
 
-    # Then search through all the data, for things to patch
+    # Then search through all the data, for things to patch. And new dicts need
+    # to be turned into ObjectDicts
     if args:
       # Handle dict and zipped
       for (key, value) in args[0].items() \
           if isinstance(args[0], dict) else args[0]:  # noqa
-        patch(self, key, value)
+        patch(self, key)
 
     if kwargs:
       for (key, value) in kwargs.items():
-        patch(self, key, value)
+        patch(self, key)
 
 
 class Settings(ObjectDict):
   def __init__(self, *args, **kwargs):
-    self.update(**global_settings)
     super().__init__(*args, **kwargs)
+    for pattern, settings in global_templates:
+      if nested_in_dict(pattern, self):
+        # Not the most efficient way to do this, but insignificant
+        # "preupdate"
+        d={}
+        nested_update(d, settings)
+        nested_update(d, self)
+        nested_update(self, d)
+        # Run patch code
+        self.update({})
 
   @cached_property
   def processing_dir(self):

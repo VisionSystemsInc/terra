@@ -9,12 +9,8 @@ def get_parser():
   aa('config', type=str, help="config.json filename")
   return parser
 
-def parse_args(args=None):
-  parser = get_parser()
-  return parser.parse_args(args)
-
 def main(args=None):
-  args = parse_args(args)
+  args = get_parser().parse_args(args)
   env['TERRA_SETTINGS_FILE'] = args.config
   dsm = GenerateDsm()
   dsm.generate_dsm()

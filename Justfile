@@ -45,7 +45,7 @@ function caseify()
       ;;
     run_terra) # Run terra
       # Just-docker-compose run terra ${@+"${@}"}
-      Pipenv run python -m terra.run ${@+"${@}"}
+      Pipenv run python -m terra.run.dsm ${@+"${@}"}
       extra_args+=$#
       ;;
     run_compile) # Run compiler

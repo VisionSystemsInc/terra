@@ -1,4 +1,5 @@
 import os
+import inspect
 
 class BaseService:
   env = os.environ
@@ -25,31 +26,20 @@ class AlreadyRegisteredException(Exception):
 # every child
 class MetaCompute(type):
   def __new__(mc1, name, bases, nmspc):
-    nmspc.update({'services': MetaCompute.services})
+    nmspc.update({'services': MetaCompute.services, '_services': {}})
     return super(MetaCompute, mc1).__new__(mc1, name, bases, nmspc)
 
   @property
   def services(cls):
-    # Might as well use python's mangling pattern
-    try:
-      name = '_'+cls.__name__+'__services'
-    except AttributeError:
-      # For the case where cls is an instance
-      name = '_'+cls.__class__.__name__+'__services'
-    # If the var isn't already defined
-    if not hasattr(cls, name):
-      # Set to an empty dict
-      setattr(cls, name, {})
-    return getattr(cls, name)
+    if not inspect.isclass(cls):
+      cls = type(cls)
+    return cls._services
 
   @services.setter
   def services(cls, val):
-    try:
-      name = '_'+cls.__name__+'__services'
-    except AttributeError:
-      name = '_'+cls.__class__.__name__+'__services'
-
-    setattr(cls, name, val)
+    if not inspect.isclass(cls):
+      cls = type(cls)
+    cls._services = val
 
   @property
   def register(cls):
