@@ -8,7 +8,10 @@ name = "pypi"
 
 [dev-packages]
 autopep8 = "*"
+pylint = "*"
+ipykernel = "*"
 
 [packages]
 terra = {path = ".",editable = true}
 envcontext = "*"
+vsi-common = {editable = true, path = "./external/vsi_common"}
