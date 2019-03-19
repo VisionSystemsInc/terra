@@ -1,4 +1,5 @@
 import os
+from inspect import isfunction
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.utils import cached_property
@@ -10,6 +11,25 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
+
+from functools import wraps
+def setting_property(func):
+  @wraps(func)
+  def wrapper(*args, **kwargs):
+    return func(*args, **kwargs)
+  setattr(wrapper, 'setting_property', True)
+  return wrapper
+
+@setting_property
+def status_file(self):
+  return os.path.join(self.processing_dir, 'status.json')
+
+@setting_property
+def processing_dir(self):
+  if hasattr(self, 'config_file'):
+    return os.path.dirname(self.config_file)
+  else:
+    return os.getcwd()
 
 # Templates are how we conditionally assign default values. It is a list of 2
 # length tuples, where the first in the tuple is a "pattern" and the second
@@ -38,7 +58,9 @@ global_templates = [
         "n_scene_tile": 64,
         "min_disparity": -220,
         "world_size": 500.0
-      }
+      },
+      'status_file': status_file,
+      'processing_dir': processing_dir
     }
   ),
   (
@@ -53,7 +75,7 @@ global_templates = [
 class LazyObject():
   _wrapped = None
 
-  def _setup():
+  def _setup(self):
     """
     Must be implemented by subclasses to initialize the wrapped object.
     """
@@ -72,6 +94,11 @@ class LazyObject():
     if self._wrapped is None:
       self._setup()
     return self._wrapped[name]
+
+  def __contains__(self, name):
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__contains__(name)
 
   def __setattr__(self, name, value):
     if name == "_wrapped":
@@ -156,7 +183,6 @@ class ObjectDict(dict):
     self.update([(name, value)])
 
   def update(self, *args, **kwargs):
-
     def patch(self, key):
       ''' Function to patch dict->ObjectDict '''
       value = self[key]
@@ -187,28 +213,26 @@ class ObjectDict(dict):
       for (key, value) in kwargs.items():
         patch(self, key)
 
-
 class Settings(ObjectDict):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     for pattern, settings in global_templates:
       if nested_in_dict(pattern, self):
-        # Not the most efficient way to do this, but insignificant
-        # "preupdate"
+        # Not the most efficient way to do this, but insignificant "preupdate"
         d = {}
         nested_update(d, settings)
         nested_update(d, self)
-        nested_update(self, d)
-        # Run patch code
-        self.update({})
+        # Nested update and run patch code
+        self.update(d)
 
-  @cached_property
-  def processing_dir(self):
-    if hasattr(self, 'config_file'):
-      return os.path.dirname(self.config_file)
-    else:
-      return os.getcwd()
-
-  @cached_property
-  def status_file(self):
-    return os.path.join(self.processing_dir, 'status.json')
+  def __getattr__(self, name):
+    # Write a special getattr that will evaluate @setting_property functions
+    try:
+      val = self[name]
+      if isfunction(val) and getattr(val, 'setting_property', None):
+        val = val(self)
+        self[name] = val
+      return val
+    except KeyError:
+      raise AttributeError("'{}' object has no attribute '{}'".format(
+          self.__class__.__name__, name))

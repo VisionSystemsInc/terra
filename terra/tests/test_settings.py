@@ -2,7 +2,7 @@ import os
 from unittest import TestCase, mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from terra import settings
-from terra.core.settings import ObjectDict
+from terra.core.settings import ObjectDict, setting_property
 
 
 class TestObjectDict(TestCase):
@@ -117,8 +117,8 @@ class TestSettings(TestCase):
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.core.settings.global_settings', {'a': 11, 'b': 22})
-  def test_global_settings(self):
+  @mock.patch('terra.core.settings.global_templates', [({},{'a': 11, 'b': 22, 'q': {'x':33, 'y':44}}), ({'c': {'d': 14}}, {'e':15})])
+  def test_global_templates(self):
     with NamedTemporaryFile(mode='w',
                             dir=self.temp_dir.name,
                             delete=False) as fid:
@@ -129,10 +129,66 @@ class TestSettings(TestCase):
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, "444")
+    self.assertIsNone(settings.e)
+    self.assertFalse('e' in settings)
+    self.assertTrue(settings.configured)
+
+  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch('terra.core.settings.global_templates', [({},{'a': 11, 'b': 22}), ({'c': {'d': 14}}, {'e': {'f': 15}})])
+  def test_global_templates2(self):
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"c": {"d": 14}}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    self.assertFalse(settings.configured)
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, 22)
+    self.assertEqual(settings.c.d, 14)
+    self.assertTrue('e' in settings)
+    self.assertEqual(settings.e.f, 15)
+    self.assertTrue(settings.configured)
+
+  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch('terra.core.settings.global_templates', [({},{})])
+  def test_setting_property(self):
+    import terra.core.settings
+    @setting_property
+    def a(self):
+      return self.c + 1
+
+    b = lambda self: 13.1
+
+    def c(self):
+      return self.b - 2
+
+    def d(self):
+      return 3
+
+    terra.core.settings.global_templates[0][1]['a'] = a
+    terra.core.settings.global_templates[0][1]['b'] = setting_property(b)
+    terra.core.settings.global_templates[0][1]['c'] = setting_property(c)
+    terra.core.settings.global_templates[0][1]['d'] = d
+
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    self.assertFalse(settings.configured)
+    self.assertEqual(settings.a, 12.1)
+    self.assertEqual(settings.c, 11.1)
+    self.assertEqual(settings.b, 13.1)
+    self.assertEqual(settings.d, d)
+    self.assertEqual(settings.d(None), 3)
     self.assertTrue(settings.configured)
 
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.core.settings.global_settings', {'a': 11, 'b': 22})
+  @mock.patch('terra.core.settings.global_templates', [({},{'a': 11, 'b': 22})])
   def test_configure(self):
 
     self.assertFalse(settings.configured)
