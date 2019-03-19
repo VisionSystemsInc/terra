@@ -90,6 +90,9 @@ function caseify()
 
       Pipenv install --keep-outdated
       ;;
+    dev_sync) # Developer's extra sync
+      Pipenv install --dev --keep-outdated
+      ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
       justify docker-compose clean venv \
