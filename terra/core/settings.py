@@ -1,5 +1,6 @@
 import os
 from inspect import isfunction
+from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.utils import cached_property
@@ -12,7 +13,7 @@ except ImportError:
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
 
-from functools import wraps
+
 def setting_property(func):
   @wraps(func)
   def wrapper(*args, **kwargs):
@@ -20,9 +21,11 @@ def setting_property(func):
   setattr(wrapper, 'setting_property', True)
   return wrapper
 
+
 @setting_property
 def status_file(self):
   return os.path.join(self.processing_dir, 'status.json')
+
 
 @setting_property
 def processing_dir(self):
@@ -31,11 +34,11 @@ def processing_dir(self):
   else:
     return os.getcwd()
 
+
 # Templates are how we conditionally assign default values. It is a list of 2
 # length tuples, where the first in the tuple is a "pattern" and the second
 # is the default values. If the pattern is in in the settings, then the default
 # values are set for any unset values.
-
 global_templates = [
   (
     # Global Defaults
@@ -212,6 +215,7 @@ class ObjectDict(dict):
     if kwargs:
       for (key, value) in kwargs.items():
         patch(self, key)
+
 
 class Settings(ObjectDict):
   def __init__(self, *args, **kwargs):

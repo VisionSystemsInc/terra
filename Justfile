@@ -70,6 +70,15 @@ function caseify()
       extra_args+=$#
       ;;
     pep8) # Check for pep8 compliance in ./terra
+         Just-docker-compose run test bash -c \
+          "if ! command -v autopep8 >& /dev/null; then
+             pipenv install --dev;
+           fi;
+           autopep8 --indent-size 2 --recursive --exit-code --diff \
+                    --global-config /src/autopep8.ini \
+                    /src/terra"
+      ;;
+    pep8_local) # Check pep8 compliance without using docker
       if ! Pipenv run command -v autopep8 >& /dev/null; then
         Pipenv install --dev
       fi
