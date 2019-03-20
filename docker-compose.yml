@@ -14,7 +14,7 @@ services:
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
       - DISPLAY
-      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER}:${TERRA_INSTALL_DIR_DOCKER}/lib/python3/site-packages
+      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER}:${TERRA_INSTALL_DIR_DOCKER}/lib/python3/site-packages:${TERRA_SOURCE_DIR_DOCKER}/external/vsi_common/python
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
