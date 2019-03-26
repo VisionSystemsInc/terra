@@ -7,6 +7,7 @@ cd "${TERRA_CWD}"
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/colors.bsh"
 
 function Pipenv()
 {
@@ -43,10 +44,14 @@ function caseify()
       docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/docker/Pipfile.lock"
       docker rm ${image_name}
       ;;
-    run_terra) # Run terra
+    run_dsm) # Run dsm
       # Just-docker-compose run terra ${@+"${@}"}
-      Pipenv run python -m terra.run.dsm ${@+"${@}"}
+      Pipenv run python -m terra.apps.run.dsm ${@+"${@}"}
       extra_args+=$#
+      ;;
+    run_view-angle) # Run view angle
+      Pipenv run python -m terra.apps.run.viewangle "${1}"
+      extra_args+=1
       ;;
     run_compile) # Run compiler
       Just-docker-compose run compile nopipenv ${@+"${@}"}
@@ -56,7 +61,9 @@ function caseify()
       Just-docker-compose run compile
       ;;
     test) # Run unit tests
+      echo "${YELLOW}Running ${GREEN}C++ ${YELLOW}Tests${NC}"
       Just-docker-compose run -w "${TERRA_BUILD_DIR_DOCKER}/${TERRA_BUILD_TYPE}" compile nopipenv ctest ${@+"${@}"}
+      echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
       Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
       extra_args+=$#
       ;;

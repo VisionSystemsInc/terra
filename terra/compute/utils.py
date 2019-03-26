@@ -4,7 +4,7 @@ from terra.core.utils import cached_property
 from terra import settings
 
 
-class ConnectionHandler:
+class ComputeHandler:
   def __init__(self, compute=None):
     """
     databases is an optional dictionary of compute definitions (structured
@@ -40,6 +40,8 @@ class ConnectionHandler:
   def __delattr__(self, name):
     return delattr(self.__get_connection(), name)
 
+  # Incase this needs multiple computes simultaneously...
+
   # def __getitem__(self, key):
   #   if not self._connection:
   #     backend = load_backend(self.compute.type)
@@ -62,6 +64,7 @@ class ConnectionHandler:
   def close(self):
     if self._connection:
       self._connection.close()
+compute = ComputeHandler()
 
 
 def load_backend(backend_name):
@@ -69,3 +72,12 @@ def load_backend(backend_name):
   return import_module(f'{backend_name}.base')
   # except ImportError:
   #   return import_module(f'terra.compute.{backend_name}.base')
+
+
+def load_service(name_or_class):
+  if not isinstance(name_or_class, str):
+    name_or_class = f'{name_or_class.__module__}.{name_or_class.__name__}'
+  else:
+    module = name_or_class.rsplit('.', 1)[0]
+    import_module(module)
+  return compute.services[name_or_class]

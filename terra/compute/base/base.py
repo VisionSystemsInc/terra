@@ -1,24 +1,16 @@
 import os
 from inspect import isclass
 from functools import partial
-
+from copy import copy
 
 class BaseService:
-  env = os.environ
+  env = copy(os.environ)
 
   def pre_run(self):
     pass
 
   def post_run(self):
     pass
-
-
-class DSMService(BaseService):
-  name = "dsm"
-
-
-class ViewAngleRetrieval(BaseService):
-  name = "ViewAngleRetrieval"
 
 
 class AlreadyRegisteredException(Exception):
@@ -47,36 +39,51 @@ class MetaCompute(type):
       cls = type(cls)
     cls._services = val
 
+  # Using a metaclass property was important for getting the right services
+  # dict, otherwise BaseCompute. A metaclass property is defined every time the
+  # class inherits, so the last inheritance child will get services set for it,
+  # and the right services will be used, instead of the BaseCompute's services.
+  # The ``register`` decorator now takes one argument,
+  # the Service class (identifier) being registered against
   @property
   def register(cls):
-    return partial(cls._register, services=cls.services)
+    ''' Register a function for a particular service using a specific compute
+    '''
+    def wrapper(fun):
+      return partial(cls._register,
+                     service_name=f'{fun.__module__}.{fun.__name__}',
+                     services=cls.services)
+    return wrapper
 
 
 class BaseCompute(metaclass=MetaCompute):
   ''' Base Computing Service Model
   '''
 
-  # The actual register service decorator
+  # The actual register service decorator. Unlike normal decorators that run
+  # everytime a function is called, this is only run when a function is
+  # decorated, and not when run. The end function is undecorated, resulting in
+  # no need for functools.wraps
   @classmethod
-  def _register(cls, service, services):
-    if service.name in services:
-      raise(AlreadyRegisteredException(f'Service {service.name} already '
+  def _register(cls, service, service_name, services):
+    if service_name in services:
+      raise(AlreadyRegisteredException(f'Service {service_name} already '
                                        'registered'))
-    services[service.name] = service
+    services[service_name] = service
     return service
 
-  def create(self):
+  def create(self, *args, **kwargs):
     pass
 
-  def start(self):
+  def start(self, *args, **kwargs):
     pass
 
-  def run(self):
-    self.create()
-    self.start()
+  def run(self, *args, **kwargs):
+    self.create(*args, **kwargs)
+    self.start(*args, **kwargs)
 
-  def stop(self):
+  def stop(self, *args, **kwargs):
     pass
 
-  def remove(self):
+  def remove(self, *args, **kwargs):
     pass

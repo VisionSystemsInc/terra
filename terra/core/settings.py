@@ -18,7 +18,7 @@ def setting_property(func):
   @wraps(func)
   def wrapper(*args, **kwargs):
     return func(*args, **kwargs)
-  setattr(wrapper, 'setting_property', True)
+  wrapper.setting_property = True
   return wrapper
 
 
@@ -37,7 +37,7 @@ def processing_dir(self):
 
 # Templates are how we conditionally assign default values. It is a list of 2
 # length tuples, where the first in the tuple is a "pattern" and the second
-# is the default values. If the pattern is in in the settings, then the default
+# is the default values. If the pattern is in the settings, then the default
 # values are set for any unset values.
 global_templates = [
   (

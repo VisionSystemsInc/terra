@@ -9,9 +9,19 @@ from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+class AlreadyRunException(Exception):
+  pass
 
 class resumable(BasicDecorator):
   def __inner_call__(self, *args, **kwargs):
+    try:
+      if self.fun.already_run:
+        raise AlreadyRunException("Already run")
+    except AttributeError:
+      pass
+
+    self.fun.already_run = True
+
     all_kwargs = args_to_kwargs(self.fun, args, kwargs)
     stage_self = all_kwargs['self']
 

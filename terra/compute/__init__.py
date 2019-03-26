@@ -1,4 +1,9 @@
 
-from terra.compute.utils import ConnectionHandler
+from terra.compute.utils import compute
 
-connection = ConnectionHandler()
+try:
+  from _terra import *
+except ImportError:
+  pass
+
+__all__ = ['compute']
