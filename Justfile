@@ -111,7 +111,7 @@ function caseify()
       Docker-compose down
       justify git_submodule-update # For those users who don't remember!
       justify build
-
+      justify compile
       Pipenv install --keep-outdated
       ;;
     dev_sync) # Developer's extra sync
