@@ -44,14 +44,22 @@ function caseify()
       docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/docker/Pipfile.lock"
       docker rm ${image_name}
       ;;
-    run_dsm) # Run dsm
+    run) # Run terra cli (first argument is which cli, "dsm" for example)
       # Just-docker-compose run terra ${@+"${@}"}
-      Pipenv run python -m terra.apps.run.dsm ${@+"${@}"}
+      Pipenv run python -m terra.apps.cli ${@+"${@}"}
       extra_args+=$#
       ;;
-    run_view-angle) # Run view angle
-      Pipenv run python -m terra.apps.run.viewangle "${1}"
-      extra_args+=1
+    # run_dsm) # Run dsm
+    #   # Just-docker-compose run terra ${@+"${@}"}
+    #   Pipenv run python -m terra.apps.run.dsm ${@+"${@}"}
+    #   extra_args+=$#
+    #   ;;
+    # run_view-angle) # Run view angle
+    #   Pipenv run python -m terra.apps.run.viewangle "${1}"
+    #   extra_args+=1
+    #   ;;
+    run_bash) # Run bash in terra image
+      Just-docker-compose run terra bash ${@+"${@}"}
       ;;
     run_compile) # Run compiler
       Just-docker-compose run compile nopipenv ${@+"${@}"}
