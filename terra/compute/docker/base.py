@@ -28,7 +28,7 @@ class Compute(BaseCompute):
     service_info = load_service(service_class)()
     service_info.pre_run()
 
-    self.just("docker-compose",
+    self.just("Just-docker-compose",
               '-f', service_info.compose_file,
               'run', service_info.compose_service_name,
               *(service_info.command),
@@ -38,7 +38,7 @@ class Compute(BaseCompute):
 
   def config(self, service_class):
     service_info = load_service(service_class)()
-    self.just("docker-compose",
+    self.just("Just-docker-compose",
               '-f', service_info.compose_file,
               'config',
               env=service_info.env)

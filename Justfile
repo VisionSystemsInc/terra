@@ -49,15 +49,6 @@ function caseify()
       Pipenv run python -m terra.apps.cli ${@+"${@}"}
       extra_args+=$#
       ;;
-    # run_dsm) # Run dsm
-    #   # Just-docker-compose run terra ${@+"${@}"}
-    #   Pipenv run python -m terra.apps.run.dsm ${@+"${@}"}
-    #   extra_args+=$#
-    #   ;;
-    # run_view-angle) # Run view angle
-    #   Pipenv run python -m terra.apps.run.viewangle "${1}"
-    #   extra_args+=1
-    #   ;;
     run_bash) # Run bash in terra image
       Just-docker-compose run terra bash ${@+"${@}"}
       ;;
