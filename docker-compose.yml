@@ -59,9 +59,15 @@ services:
       - *terra_venv_volume
       - *terra_vsi_volume
 
-  ipython-kernel:
+  ipykernel:
     <<: *terra
-    network_mode: host
+    ports:
+      - "${JUPYTER_CONTROL_PORT_HOST-10001}:${JUPYTER_CONTROL_PORT-10001}"
+      - "${JUPYTER_HB_PORT_HOST-10002}:${JUPYTER_HB_PORT-10002}"
+      - "${JUPYTER_IOPUB_PORT_HOST-10003}:${JUPYTER_IOPUB_PORT-10003}"
+      - "${JUPYTER_SHELL_PORT_HOST-10004}:${JUPYTER_SHELL_PORT-10004}"
+      - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
+    # command: bash -c "declare -i x=1000; while (( x )); do if pgrep python; then x=1000; else x=x-15; fi; declare -p x; sleep 15; done"
 
 volumes:
   venv:
