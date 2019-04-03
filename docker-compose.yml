@@ -69,10 +69,6 @@ services:
       - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
     # command: bash -c "declare -i x=1000; while (( x )); do if pgrep python; then x=1000; else x=x-15; fi; declare -p x; sleep 15; done"
 
-  ipython-kernel:
-    <<: *terra
-    network_mode: host
-
 volumes:
   venv:
     labels:
