@@ -42,7 +42,6 @@ source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 filter_docker_variables
 docker_convert_paths
 
-
 cmd="${1}"
 shift 1
 case "${cmd}" in
@@ -54,7 +53,11 @@ case "${cmd}" in
         cmake -G Ninja "${TERRA_SOURCE_DIR}" \
               "-DCMAKE_BUILD_TYPE=${TERRA_BUILD_TYPE}" \
               "-DCMAKE_INSTALL_PREFIX=${TERRA_INSTALL_DIR}" \
-              "-DPYTHON_SITE=${TERRA_INSTALL_DIR}/lib/python3/site-packages"
+              "-DPYTHON_SITE=${TERRA_INSTALL_DIR}/lib/python3/site-packages" \
+              "-DPYVXL_CONTRIB_MAKE_ALL=TRUE" \
+              "-DVXL_BUILD_BRL=ON" \
+              "-DVXL_BUILD_CORE_VIDEO=ON" \
+              "-DVXL_BUILD_CONTRIB=ON"
         touch cmake_successfully_generated # Mark that the build files have successfully been created
       fi
       ninja

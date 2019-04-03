@@ -75,15 +75,6 @@ function caseify()
       Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
       extra_args+=$#
       ;;
-
-    # Start an ipython kernel for dev/notebook, keep target hidden
-    ipython-kernel)
-      kernel="$1"
-      shift 1
-      TERRA_IPYTHON_KERNEL_VOLUMES=("$(dirname "${kernel}"):/kernels")
-      Just-docker-compose run ipython-kernel python -m ipykernel_launcher -f /kernels/"$(basename "${kernel}")" ${@+"${@}"}
-      extra_args+=$#
-      ;;
     pep8) # Check for pep8 compliance in ./terra
          Just-docker-compose run test bash -c \
           "if ! command -v autopep8 >& /dev/null; then
@@ -122,6 +113,22 @@ function caseify()
       justify docker-compose clean venv \
               docker-compose clean terra-install \
               docker-compose clean terra-build
+      ;;
+    ipykernel) # Start a jupyter kernel in runserver
+      # Example kernel.json
+      # {
+      # "display_name": "terra",
+      # "argv": [
+      #  "python", "-m", "docker_proxy_kernel",
+      #  "-f", "{connection_file}",
+      #  "--cmd", "['/home/noah/git/terra/external/vsi_common/linux/just', 'ipykernel']"
+      # ],
+      # "env": {"JUSTFILE": "/home/noah/git/terra/Justfile"},
+      # "language": "python"
+      # }
+      Just-docker-compose run -T --service-ports ipykernel \
+          pipenv run python -m ipykernel_launcher ${@+"${@}"} > /dev/null
+      extra_args+=$#
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}
