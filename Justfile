@@ -44,6 +44,10 @@ function caseify()
       docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/docker/Pipfile.lock"
       docker rm ${image_name}
       ;;
+    python) # Run host terra python
+      Pipenv run python ${@+"${@}"}
+      extra_args+=$#
+      ;;
     run) # Run terra cli (first argument is which cli, "dsm" for example)
       # Just-docker-compose run terra ${@+"${@}"}
       Pipenv run python -m terra.apps.cli ${@+"${@}"}

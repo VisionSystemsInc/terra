@@ -2,17 +2,21 @@ import os
 import json
 import inspect
 from vsi.tools.python import BasicDecorator, args_to_kwargs
-import sys
 
 from terra.core.settings import ObjectDict
 from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+
 class AlreadyRunException(Exception):
   pass
 
+
 class resumable(BasicDecorator):
+  '''
+  Decorate for setting up a resumable stage in a workflow
+  '''
   def __inner_call__(self, *args, **kwargs):
     try:
       if self.fun.already_run:

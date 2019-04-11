@@ -14,4 +14,4 @@ ipykernel = "*"
 [packages]
 terra = {path = ".",editable = true}
 envcontext = "*"
-vsi-common = {editable = true, path = "./external/vsi_common"}
+vsi-common = {editable = true,path = "./external/vsi_common"}

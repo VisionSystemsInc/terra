@@ -10,6 +10,16 @@ set(CMAKE_POSITION_INDEPENDENT_CODE on)
 set(TERRA_EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
 set(TERRA_TOP_LEVEL_DIR ${CMAKE_SOURCE_DIR})
 
+# Some defaults for the external dirs to be added
+set(PYVXL_CONTRIB_MAKE_ALL TRUE CACHE BOOL "Default pyvxl build all")
+set(VXL_BUILD_CONTRIB TRUE CACHE BOOL "Default build contrib")
+set(VXL_BUILD_BRL TRUE CACHE BOOL "Default build BRL")
+# Neede for bpgl
+set(VXL_BUILD_CORE_VIDEO TRUE CACHE BOOL "Default build core video")
+# Ease of debugging compile errors
+set(CMAKE_CXX_FLAGS -fdiagnostics-color=always CACHE STRING "Color flags")
+set(CMAKE_C_FLAGS -fdiagnostics-color=always CACHE STRING "Color flags")
+
 # Include the base directory, so include files can be found, like "hello/hi.h"
 include_directories(${CMAKE_SOURCE_DIR})
 

@@ -1,10 +1,39 @@
+# Copyright (c) Django Software Foundation and individual contributors.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright notice,
+#        this list of conditions and the following disclaimer.
+#
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#
+#     3. Neither the name of Django nor the names of its contributors may be used
+#        to endorse or promote products derived from this software without
+#        specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import os
 from inspect import isfunction
 from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
-from terra.core.utils import cached_property
 from vsi.tools.python import nested_update, nested_in_dict
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 try:
   import commentjson as json
@@ -12,7 +41,6 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
-
 
 def setting_property(func):
   @wraps(func)
@@ -44,6 +72,12 @@ global_templates = [
     # Global Defaults
     {},
     {
+      "logging": {
+        "level": "ERROR",
+        "format": "%(asctime)s : %(levelname)s - %(message)s",
+        "date_format": None,
+        "style": "%"
+      },
       "params": {
         "color_elev_thres": 6,
         "azimuth_thres": 90.0,
@@ -72,9 +106,8 @@ global_templates = [
   )
 ]
 
+
 # Mixture of django settings
-
-
 class LazyObject():
   _wrapped = None
 
@@ -131,6 +164,8 @@ class LazyObject():
 
 class LazySettings(LazyObject):
   def _setup(self, name=None):
+    from terra.core.signals import post_settings_configured
+
     settings_file = os.environ.get(ENVIRONMENT_VARIABLE)
     if not settings_file:
       desc = ("setting %s" % name) if name else "settings"
@@ -139,9 +174,13 @@ class LazySettings(LazyObject):
           "You must either define the environment variable %s "
           "or call settings.configure() before accessing settings."
           % (desc, ENVIRONMENT_VARIABLE))
+    logger.debug2('Pre settings setup')
     with open(settings_file) as fid:
       self._wrapped = Settings(json.load(fid))
     self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
+
+    post_settings_configured.send(sender=self)
+    logger.debug2('Post settings setup')
 
   def __repr__(self):
     # Hardcode the class name as otherwise it yields 'Settings'.
@@ -155,10 +194,15 @@ class LazySettings(LazyObject):
     parameter sets where to retrieve any unspecified values from (its
     argument must support attribute access (__getattr__)).
     """
+    from terra.core.signals import post_settings_configured
+
     if self._wrapped is not None:
       raise RuntimeError('Settings already configured.')
+    logger.debug2('Pre settings configure')
     self._wrapped = Settings(default_settings)
     self._wrapped.update(options)
+    post_settings_configured.send(sender=self)
+    logger.debug2('Post settings configure')
 
   @property
   def configured(self):
