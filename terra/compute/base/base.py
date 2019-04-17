@@ -4,24 +4,41 @@ from functools import partial
 from copy import copy
 
 class BaseService:
-  env = copy(os.environ)
+  '''
+  The base class for all Terra Service definitions
+
+  ``super().__init__ should`` be called when inheriting a :class:`BaseService`
+  class's ``__init__``
+  '''
+
+  def __init__(self):
+    self.env = copy(os.environ)
+    ''' A copy of the processes environment variables local to a service '''
 
   def pre_run(self):
-    pass
+    '''
+    Place holder for code to run before ``run``
+    '''
 
   def post_run(self):
-    pass
+    '''
+    Place holder for code to run after ``run``
+    '''
 
 
 class AlreadyRegisteredException(Exception):
-  pass
+  '''
+  Exception thrown if a function has already been registered
+  '''
 
 
 class MetaCompute(type):
-  # Define a class level property that is a different dictionary for every child
-  # class. The reason for this is so that every Compute model has a separate
-  # registered services list, but I don't want to repeat this identical code in
-  # every child
+  '''
+  Define a class level property (:data:`services`) that is a different
+  dictionary for every child class. The reason for this is so that every
+  :class:`BaseCompute` model has a separate registered services list, but I
+  don't want to repeat this identical code in every child
+  '''
 
   def __new__(mc1, name, bases, nmspc):
     nmspc.update({'services': MetaCompute.services, '_services': {}})
@@ -29,6 +46,10 @@ class MetaCompute(type):
 
   @property
   def services(cls):
+    '''
+    ``@property`` getter and setter used to access each child classes' separate
+    ``_services`` :class:`dict`.
+    '''
     if not isclass(cls):
       cls = type(cls)
     return cls._services
@@ -47,7 +68,9 @@ class MetaCompute(type):
   # the Service class (identifier) being registered against
   @property
   def register(cls):
-    ''' Register a function for a particular service using a specific compute
+    '''
+    Used to register a function for a particular service using a specific
+    compute
     '''
     def wrapper(fun):
       return partial(cls._register,
@@ -57,7 +80,8 @@ class MetaCompute(type):
 
 
 class BaseCompute(metaclass=MetaCompute):
-  ''' Base Computing Service Model
+  '''
+  The base class for all Terra Service Compute Types
   '''
 
   # The actual register service decorator. Unlike normal decorators that run
@@ -73,17 +97,30 @@ class BaseCompute(metaclass=MetaCompute):
     return service
 
   def create(self, *args, **kwargs):
-    pass
+    '''
+    Place holder for code to create an instance in the compute
+    '''
 
   def start(self, *args, **kwargs):
-    pass
+    '''
+    Place holder for code to create an instance in the compute
+    '''
 
   def run(self, *args, **kwargs):
+    '''
+    Place holder for code to run an instance in the compute. Runs
+    :func:`create` and then :func:`start` by default
+    '''
+
     self.create(*args, **kwargs)
     self.start(*args, **kwargs)
 
   def stop(self, *args, **kwargs):
-    pass
+    '''
+    Place holder for code to stop an instance in the compute
+    '''
 
   def remove(self, *args, **kwargs):
-    pass
+    '''
+    Place holder for code to remove an instance from the compute
+    '''

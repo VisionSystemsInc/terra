@@ -188,7 +188,7 @@ class Signal:
     ----------
     sender : object
         The sender of the signal. Either a specific object or None.
-    named : kwargs
+    **named :
         Named arguments which will be passed to receivers.
 
     Returns
@@ -215,7 +215,7 @@ class Signal:
         The sender of the signal. Can be any Python object (normally one
         registered with a connect if you actually want something to
         occur).
-    named : kwargs
+    **named :
         Named arguments which will be passed to receivers. These
         arguments must be a subset of the argument names defined in
         providing_args.
@@ -312,7 +312,7 @@ def receiver(signal, **kwargs):
   ---------
   signal : Signal
       The signal registering against
-  kwargs : kwargs
+  **kwargs :
       Additional arguments to send to the :func:`Signal.connect` function
 
   Examples

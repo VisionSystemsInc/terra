@@ -93,7 +93,7 @@ to a settings file for each file.
 In these cases, you can configure Terra's settings manually. Do this by
 calling:
 
-:func:`terra.settings.LazySettings.configure`
+:func:`LazySettings.configure`
 
 .. rubric:: Example:
 
@@ -103,18 +103,20 @@ calling:
 
     settings.configure(logging={'level': 40})
 
-Pass :func:`terra.settings.LazySettings.configure` the same arguments you would
-pass to a :class:`dict`, such as keyword arguments as in this example, or a :class:`dict`, with each keyword
-argument representing a setting and its value. Each argument name should be the
-same name as the settings. If a particular setting is not passed to configure()
-and is needed at some later point, Terra will use the default setting value.
+Pass :func:`setting.configure()<LazySettings.configure>` the same arguments you
+would pass to a :class:`dict`, such as keyword arguments as in this example
+where each keyword argument represents a setting and its value, or a
+:class:`dict`. Each argument name should be the same name as the settings. If a
+particular setting is not passed to
+:func:`settings.configure()<LazySettings.configure>` and is needed at some
+later point, Terra will use the default setting value.
 
-Configuring Django in this fashion is mostly necessary – and, indeed, recommended – when you’re using a piece of the framework inside a larger application.
-
-Consequently, when configured via settings.configure(), Django will not make any modifications to the process environment variables (see the documentation of TIME_ZONE for why this would normally occur). It’s assumed that you’re already in full control of your environment in these cases.
-
+Configuring Terra in this fashion is mostly necessary - and, indeed,
+recommended - when you’re using are running a trivial transient app in the
+framework instead of a larger application.
 
 '''
+
 # Copyright (c) Django Software Foundation and individual contributors.
 # All rights reserved.
 #
@@ -203,6 +205,7 @@ def processing_dir(self):
   if hasattr(self, 'config_file'):
     return os.path.dirname(self.config_file)
   else:
+    logger.warning('No config file found, and processing dir unset. Using cwd')
     return os.getcwd()
 
 global_templates = [
@@ -387,9 +390,9 @@ class LazySettings(LazyObject):
 
     Arguments
     ---------
-    args :
+    *args :
         Passed along to :class:`Settings`
-    kwargs :
+    **kwargs :
         Passed along to :class:`Settings`
 
     Raises

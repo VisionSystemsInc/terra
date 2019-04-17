@@ -3,7 +3,9 @@ from terra.compute.base.base import BaseCompute
 from terra.compute.utils import load_service
 
 class Compute(BaseCompute):
-  ''' Dummy Computing Service Model
+  '''
+  Dummy computing model. Prints messages instead of running any actual
+  services
   '''
 
   def create(self, service_class):
@@ -29,6 +31,9 @@ class Compute(BaseCompute):
 
 
 class DummyService:
+  '''
+  Dummy service class, prints pre_run and post_run steps
+  '''
   def pre_run(self):
     print("pre run: " + str(self))
 

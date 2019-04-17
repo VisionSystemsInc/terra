@@ -14,10 +14,20 @@ logger = getLogger(__name__)
 
 
 class Compute(BaseCompute):
-  ''' Using docker for the computer service model, specifically docker-compose
+  '''
+  Docker compute model, specifically ``docker-compose``
   '''
 
   def just(self, *args, env={}):
+    '''
+    Run a ``just`` command. Primarily used to run
+    ``--wrap Just-docker-compose``
+
+    Arguments
+    ---------
+    *args :
+        List of arguments to be pass to ``just``
+    '''
     logger.debug('Running: ' + ' '.join(
         [quote(f'{k}={v}') for k, v in env.items()] +
         [quote(x) for x in ('just',) + args]))
@@ -25,6 +35,17 @@ class Compute(BaseCompute):
       Popen(('just',) + args).wait()
 
   def run(self, service_class):
+    '''
+    Use the service class information to run the service runner in a docker
+    using
+
+    .. code-block:: bash
+
+        just --wrap Just-docker-compose \\
+            -f {service_info.compose_file} \\
+            run {service_info.compose_service_name} \\
+            {service_info.command}
+    '''
     service_info = load_service(service_class)()
     service_info.pre_run()
 
@@ -37,6 +58,9 @@ class Compute(BaseCompute):
     service_info.post_run()
 
   def config(self, service_class):
+    '''
+    Prints out the ``docker-compose config`` output
+    '''
     service_info = load_service(service_class)()
     self.just("Just-docker-compose",
               '-f', service_info.compose_file,
@@ -45,4 +69,6 @@ class Compute(BaseCompute):
 
 
 class DockerService:
-  pass
+  '''
+  Base docker service class
+  '''

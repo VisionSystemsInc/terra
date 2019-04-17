@@ -88,7 +88,6 @@ nitpick_ignore = [('py:class', 'bool'),
                   ('py:class', 'array_like'),
                   ('py:class', 'object'),
                   ('py:class', 'str'),
-                  ('py:class', 'string'),
                   ('py:class', 'int'),
                   ('py:class', 'float'),
                   ('py:class', 'func'),
@@ -100,7 +99,6 @@ nitpick_ignore = [('py:class', 'bool'),
                   ('py:class', 'module'),
                   ('py:class', 'var'),
                   ('py:class', 'file_like'),
-                  ('py:class', 'kwargs'),
                   ('py:class', 'Exception'),
                   ('py:class', 'type'),
 
@@ -108,6 +106,7 @@ nitpick_ignore = [('py:class', 'bool'),
                   ('py:class', 'vsi.tools.python.BasicDecorator'),
 
                   ('py:mod',   'django.conf'),
+                  ('py:class', 'django.db.utils.ConnectionHandler'),
 
                   ('py:class', 'weakref.WeakKeyDictionary'),
 
