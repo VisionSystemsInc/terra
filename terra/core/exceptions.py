@@ -1,4 +1,5 @@
 
 class ImproperlyConfigured(Exception):
-  """Terra is somehow improperly configured"""
-  pass
+  """
+  Exception for Terra is somehow improperly configured
+  """

@@ -3,3 +3,5 @@ local_post.env
 .just_synced
 *.pyc
 terra.egg-info
+docs/python
+docs/_build

@@ -6,3 +6,4 @@ except ImportError:
   pass
 
 settings = LazySettings()
+'''LazySettings: The setting object to use through out all of terra'''

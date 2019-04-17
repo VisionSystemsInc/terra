@@ -1,3 +1,13 @@
+'''
+A "signal dispatcher" class which helps allow decoupled componets get notified
+when actions occur elsewhere in the framework. In a nutshell, signals allow
+certain senders to notify a set of receivers that some action has taken place.
+They're especially useful when many pieces of code may be interested in the
+same events.
+
+See https://docs.djangoproject.com/en/2.2/topics/signals/ for more info
+'''
+
 # Copyright (c) Django Software Foundation and individual contributors.
 # All rights reserved.
 #
@@ -47,54 +57,65 @@ NO_RECEIVERS = object()
 class Signal:
   """
   Base class for all signals
-  Internal attributes:
-      receivers
-          { receiverkey (id) : weakref(receiver) }
+
+  Arguments
+  ---------
+  providing_args : list
+      A list of the arguments this signal can pass along in a :func:`send`
+      call.
+  use_caching : bool
+      If use_caching is ``True``, then for each distinct sender we cache the
+      receivers that sender has in :data:`sender_receivers_cache`. The cache is
+      cleaned when :func:`connect` or :func:`disconnect` is called and
+      populated on :func:`send`.
   """
+
   def __init__(self, providing_args=None, use_caching=False):
-    """
-    Create a new signal.
-    providing_args
-      A list of the arguments this signal can pass along in a send() call.
-    """
     self.receivers = []
+    '''dict: The internal map of all signals that are connected to receivers'''
     if providing_args is None:
       providing_args = []
     self.providing_args = set(providing_args)
     self.lock = threading.Lock()
     self.use_caching = use_caching
+    '''bool: Set if caching was turned on'''
     # For convenience we create empty caches even if they are not used.
     # A note about caching: if use_caching is defined, then for each
     # distinct sender we cache the receivers that sender has in
     # 'sender_receivers_cache'. The cache is cleaned when .connect() or
     # .disconnect() is called and populated on send().
-    self.sender_receivers_cache = weakref.WeakKeyDictionary() if use_caching else {}
+    self.sender_receivers_cache = weakref.WeakKeyDictionary() if use_caching \
+                                                              else {}
+    '''weakref.WeakKeyDictionary: Stores receivers for a sender if
+    :data:`use_caching` is on'''
     self._dead_receivers = False
 
   def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
     """
     Connect receiver to sender for signal.
-    Arguments:
-        receiver
-            A function or an instance method which is to receive signals.
-            Receivers must be hashable objects.
-            If weak is True, then receiver must be weak referenceable.
-            Receivers must be able to accept keyword arguments.
-            If a receiver is connected with a dispatch_uid argument, it
-            will not be added if another receiver was already connected
-            with that dispatch_uid.
-        sender
-            The sender to which the receiver should respond. Must either be
-            a Python object, or None to receive events from any sender.
-        weak
-            Whether to use weak references to the receiver. By default, the
-            module will attempt to use weak references to the receiver
-            objects. If this parameter is false, then strong references will
-            be used.
-        dispatch_uid
-            An identifier used to uniquely identify a particular instance of
-            a receiver. This will usually be a string, though it may be
-            anything hashable.
+
+    Parameters
+    ----------
+    receiver : func
+        A function or an instance method which is to receive signals.
+        Receivers must be hashable objects.
+        If weak is True, then receiver must be weak referenceable.
+        Receivers must be able to accept keyword arguments.
+        If a receiver is connected with a dispatch_uid argument, it
+        will not be added if another receiver was already connected
+        with that dispatch_uid.
+    sender : object
+        The sender to which the receiver should respond. Must either be
+        a Python object, or None to receive events from any sender.
+    weak : bool
+        Whether to use weak references to the receiver. By default, the
+        module will attempt to use weak references to the receiver
+        objects. If this parameter is false, then strong references will
+        be used.
+    dispatch_uid : str
+        An identifier used to uniquely identify a particular instance of
+        a receiver. This will usually be a string, though it may be
+        anything hashable.
     """
 
     if dispatch_uid:
@@ -121,16 +142,19 @@ class Signal:
   def disconnect(self, receiver=None, sender=None, dispatch_uid=None):
     """
     Disconnect receiver from sender for signal.
+
     If weak references are used, disconnect need not be called. The receiver
     will be removed from dispatch automatically.
-    Arguments:
-        receiver
-            The registered receiver to disconnect. May be none if
-            dispatch_uid is specified.
-        sender
-            The registered sender to disconnect
-        dispatch_uid
-            the unique identifier of the receiver to disconnect
+
+    Parameters
+    ----------
+    receiver : func
+        The registered receiver to disconnect. May be none if
+        dispatch_uid is specified.
+    sender : object
+        The registered sender to disconnect
+    dispatch_uid : str
+        the unique identifier of the receiver to disconnect
     """
     if dispatch_uid:
       lookup_key = (dispatch_uid, _make_id(sender))
@@ -155,17 +179,25 @@ class Signal:
   def send(self, sender, **named):
     """
     Send signal from sender to all connected receivers.
+
     If any receiver raises an error, the error propagates back through send,
     terminating the dispatch loop. So it's possible that all receivers
     won't be called if an error is raised.
-    Arguments:
-        sender
-            The sender of the signal. Either a specific object or None.
-        named
-            Named arguments which will be passed to receivers.
-    Return a list of tuple pairs [(receiver, response), ... ].
+
+    Parameters
+    ----------
+    sender : object
+        The sender of the signal. Either a specific object or None.
+    named : kwargs
+        Named arguments which will be passed to receivers.
+
+    Returns
+    -------
+    list
+        Return a list of tuple pairs [(receiver, response), ... ].
     """
-    if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+    if not self.receivers or \
+       self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
       return []
 
     return [
@@ -176,20 +208,27 @@ class Signal:
   def send_robust(self, sender, **named):
     """
     Send signal from sender to all connected receivers catching errors.
-    Arguments:
-        sender
-            The sender of the signal. Can be any Python object (normally one
-            registered with a connect if you actually want something to
-            occur).
-        named
-            Named arguments which will be passed to receivers. These
-            arguments must be a subset of the argument names defined in
-            providing_args.
-    Return a list of tuple pairs [(receiver, response), ... ].
-    If any receiver raises an error (specifically any subclass of
-    Exception), return the error instance as the result for that receiver.
+
+    Parameters
+    ----------
+    sender : object
+        The sender of the signal. Can be any Python object (normally one
+        registered with a connect if you actually want something to
+        occur).
+    named : kwargs
+        Named arguments which will be passed to receivers. These
+        arguments must be a subset of the argument names defined in
+        providing_args.
+
+    Returns
+    -------
+    list
+        Return a list of tuple pairs [(receiver, response), ... ].
+        If any receiver raises an error (specifically any subclass of
+        Exception), return the error instance as the result for that receiver.
     """
-    if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+    if not self.receivers or \
+       self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
       return []
 
     # Call each receiver with whatever arguments it can accept.
@@ -216,6 +255,7 @@ class Signal:
   def _live_receivers(self, sender):
     """
     Filter sequence of receivers to get resolved, live receivers.
+
     This checks for weak references and resolves them, then returning only
     live receivers.
     """
@@ -223,7 +263,8 @@ class Signal:
     if self.use_caching and not self._dead_receivers:
       receivers = self.sender_receivers_cache.get(sender)
       # We could end up here with NO_RECEIVERS even if we do check this case in
-      # .send() prior to calling _live_receivers() due to concurrent .send() call.
+      # .send() prior to calling _live_receivers() due to concurrent .send()
+      # call.
       if receivers is NO_RECEIVERS:
         return []
     if receivers is None:
@@ -262,14 +303,28 @@ class Signal:
 
 def receiver(signal, **kwargs):
   """
-  A decorator for connecting receivers to signals. Used by passing in the
-  signal (or list of signals) and keyword arguments to connect::
-      @receiver(post_save, sender=MyModel)
-      def signal_receiver(sender, **kwargs):
-          ...
-      @receiver([post_save, post_delete], sender=MyModel)
-      def signals_receiver(sender, **kwargs):
-          ...
+  A decorator for connecting receivers to signals.
+
+  Used by passing in the signal (or list of signals) and keyword arguments to
+  connect:
+
+  Arguments
+  ---------
+  signal : Signal
+      The signal registering against
+  kwargs : kwargs
+      Additional arguments to send to the :func:`Signal.connect` function
+
+  Examples
+  --------
+
+  >>> @receiver(post_save, sender=MyModel)
+  ... def signal_receiver(sender, **kwargs):
+  ...     stuff()
+
+  >>> @receiver([post_save, post_delete], sender=MyModel)
+  ... def signals_receiver(sender, **kwargs):
+  ...     stuff()
   """
   def _decorator(func):
     if isinstance(signal, (list, tuple)):
@@ -284,8 +339,14 @@ __all__ = ['Signal', 'receiver', 'post_settings_configured']
 
 # a signal for settings done being loaded
 post_settings_configured = Signal()
+'''Signal:
+Sent after settings has been configured. This will either happen after
+:func:`terra.core.settings.LazySettings._setup` is trigger by accessing any
+element in the settings (which is done automatically), or in rare cases after a
+manual call to :func:`terra.core.settings.LazySettings.configure`.
+'''
 
-# Must be at the end to prevent circular import errors. Just can't use logger
-# during import (global scope)
+# Must be after post_settings_configured to prevent circular import errors.
+# Just can't use logger during import (global scope)
 from terra.logger import getLogger
 logger = getLogger(__name__)

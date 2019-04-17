@@ -1,3 +1,120 @@
+'''
+
+A Terra settings file contains all the configuration of your app run. This
+document explains how settings work.
+
+The basics
+----------
+
+A settings file is just a json file with all your configurations set
+
+.. rubric:: Example
+
+.. code-block:: json
+
+    {
+      "compute": {
+        "type": "terra.compute.dummy"
+      },
+      "logging": {
+        "level": "DEBUG3"
+      }
+    }
+
+Designating the settings
+------------------------
+
+.. envvar:: TERRA_SETTINGS_FILE
+
+    When you run a Terra App, you have to tell it which settings you’re using.
+    Do this by using an environment variable, :envvar:`TERRA_SETTINGS_FILE`.
+
+Default settings
+----------------
+
+A Terra settings file doesn’t have to define any settings if it doesn’t need
+to. Each setting has a sensible default value. These defaults live in
+:data:`global_templates`.
+
+Here’s the algorithm terra uses in compiling settings:
+
+* Load settings from global_settings.py.
+* Load settings from the specified settings file, overriding the global
+  settings as necessary, in a nested update.
+
+Using settings in Python code
+-----------------------------
+
+In your Terra apps, use settings by importing the object
+:data:`terra.settings`.
+
+.. rubric:: Example
+
+.. code-block:: python
+
+    from terra import settings
+
+    if settings.params.max_time > 15:
+        # Do something
+
+Note that :data:`terra.settings` isn’t a module – it’s an object. So importing
+individual settings is not possible:
+
+.. code-block: python
+
+    from terra.settings import params  # This won't work.
+
+Altering settings at runtime
+----------------------------
+
+You shouldn’t alter settings in your applications at runtime. For example,
+don’t do this in an app:
+
+.. code-block:: python
+
+    from django.conf import settings
+
+    settings.DEBUG = True   # Don't do this!
+
+Available settings
+------------------
+
+For a full list of available settings, see the
+:ref:`settings reference<settings>`.
+
+Using settings without setting TERRA_SETTINGS_FILE
+--------------------------------------------------
+
+In some cases, you might want to bypass the :envvar:`TERRA_SETTINGS_FILE`
+environment variable. For example, if you are writing a simple metadata parse
+app, you likely don’t want to have to set up an environment variable pointing
+to a settings file for each file.
+
+In these cases, you can configure Terra's settings manually. Do this by
+calling:
+
+:func:`terra.settings.LazySettings.configure`
+
+.. rubric:: Example:
+
+.. code-block:: python
+
+    from django.conf import settings
+
+    settings.configure(logging={'level': 40})
+
+Pass :func:`terra.settings.LazySettings.configure` the same arguments you would
+pass to a :class:`dict`, such as keyword arguments as in this example, or a :class:`dict`, with each keyword
+argument representing a setting and its value. Each argument name should be the
+same name as the settings. If a particular setting is not passed to configure()
+and is needed at some later point, Terra will use the default setting value.
+
+Configuring Django in this fashion is mostly necessary – and, indeed, recommended – when you’re using a piece of the framework inside a larger application.
+
+Consequently, when configured via settings.configure(), Django will not make any modifications to the process environment variables (see the documentation of TIME_ZONE for why this would normally occur). It’s assumed that you’re already in full control of your environment in these cases.
+
+
+'''
 # Copyright (c) Django Software Foundation and individual contributors.
 # All rights reserved.
 #
@@ -41,32 +158,53 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
+'''
+The environment variable that store the file name of the configuration file
+'''
 
-def setting_property(func):
+def settings_property(func):
+  '''
+  Functions wrapped with this decorator will only be called once, and the value
+  from the call will be cached, and replace the function altogether in the
+  settings structure, similar to a cached lazy evaluation
+
+  One settings_property can safely reference another settings property, using
+  ``self``, which will refer to the :class:`Settings` object
+
+  Arguments
+  ---------
+  func : func
+      Function being decorated
+  '''
   @wraps(func)
   def wrapper(*args, **kwargs):
     return func(*args, **kwargs)
-  wrapper.setting_property = True
+  wrapper.settings_property = True
   return wrapper
 
 
-@setting_property
+@settings_property
 def status_file(self):
+  '''
+  The default :func:`settings_property` for the status_file. The default is
+  :func:`processing_dir/status.json<processing_dir>`
+  '''
   return os.path.join(self.processing_dir, 'status.json')
 
 
-@setting_property
+@settings_property
 def processing_dir(self):
+  '''
+  The default :func:`settings_property` for the processing directory. If not
+  set in your configuration, it will default to the directory where the config
+  file is stored. If this is not possible, it will use the current working
+  directory
+  '''
   if hasattr(self, 'config_file'):
     return os.path.dirname(self.config_file)
   else:
     return os.getcwd()
 
-
-# Templates are how we conditionally assign default values. It is a list of 2
-# length tuples, where the first in the tuple is a "pattern" and the second
-# is the default values. If the pattern is in the settings, then the default
-# values are set for any unset values.
 global_templates = [
   (
     # Global Defaults
@@ -105,15 +243,38 @@ global_templates = [
     {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
   )
 ]
+''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we conditionally assign default values. It is a list
+of pair tuples, where the first in the tuple is a "pattern" and the second
+is the default values. If the pattern is in the settings, then the default
+values are set for any unset values.
+
+Values are copies recursively, but only if not already set by your settings.'''
 
 
-# Mixture of django settings
 class LazyObject():
+  '''
+  A wrapper class that lazily evaluates (calls :func:`LazyObject._setup`)
+
+  :class:`LazyObject` remains unevaluated until one of the supported magic
+  functions are called.
+
+  Based off of Django's LazyObject
+  '''
+
   _wrapped = None
+  '''
+  The internal object being wrapped
+  '''
 
   def _setup(self):
     """
-    Must be implemented by subclasses to initialize the wrapped object.
+    Abstract. Must be implemented by subclasses to initialize the wrapped
+    object.
+
+    Raises
+    ------
+    NotImplementedError
+        Will throw this exception unless a subclass redefines :func:`_setup`
     """
     raise NotImplementedError(
         'subclasses of LazyObject must provide a _setup() method')
@@ -122,21 +283,25 @@ class LazyObject():
     self._wrapped = None
 
   def __getattr__(self, name, default=None):
+    '''Supported'''
     if self._wrapped is None:
       self._setup()
     return getattr(self._wrapped, name, default)
 
   def __getitem__(self, name):
+    '''Supported'''
     if self._wrapped is None:
       self._setup()
     return self._wrapped[name]
 
   def __contains__(self, name):
+    '''Supported'''
     if self._wrapped is None:
       self._setup()
     return self._wrapped.__contains__(name)
 
   def __setattr__(self, name, value):
+    '''Supported'''
     if name == "_wrapped":
       # Assign to __dict__ to avoid infinite __setattr__ loops.
       self.__dict__["_wrapped"] = value
@@ -146,6 +311,7 @@ class LazyObject():
       setattr(self._wrapped, name, value)
 
   def __setitem__(self, name, value):
+    '''Supported'''
     if name == "_wrapped":
       # Assign to __dict__ to avoid infinite __setattr__ loops.
       self.__dict__["_wrapped"] = value
@@ -155,6 +321,7 @@ class LazyObject():
       self._wrapped[name] = value
 
   def __delattr__(self, name):
+    '''Supported'''
     if name == "_wrapped":
       raise TypeError("can't delete _wrapped.")
     if self._wrapped is None:
@@ -163,7 +330,31 @@ class LazyObject():
 
 
 class LazySettings(LazyObject):
+  '''
+  A :class:`LazyObject` proxy for either global Terra settings or a custom
+  settings object. The user can manually configure settings prior to using
+  them. Otherwise, Terra uses the config file pointed to by
+  :envvar:`TERRA_SETTINGS_FILE`
+
+  Based off of :mod:`django.conf`
+  '''
   def _setup(self, name=None):
+    """
+    Load the config json file pointed to by the environment variable. This is
+    used the first time settings are needed, if the user hasn't configured
+    settings manually.
+
+    Arguments
+    ---------
+    name : :class:`str`, optional
+        The name used to describe the settings object. Defaults to ``settings``
+
+    Raises
+    ------
+    ImproperlyConfigured
+        If the settings has already been configured, will throw an error. Under
+        normal circumstances, :func:`_setup` will not be called a second time.
+    """
     from terra.core.signals import post_settings_configured
 
     settings_file = os.environ.get(ENVIRONMENT_VARIABLE)
@@ -188,38 +379,62 @@ class LazySettings(LazyObject):
       return '<LazySettings [Unevaluated]>'
     return str(self._wrapped)
 
-  def configure(self, default_settings={}, **options):
+  def configure(self, *args, **kwargs):
     """
     Called to manually configure the settings. The 'default_settings'
     parameter sets where to retrieve any unspecified values from (its
-    argument must support attribute access (__getattr__)).
+    argument should be a :class:`dict`).
+
+    Arguments
+    ---------
+    args :
+        Passed along to :class:`Settings`
+    kwargs :
+        Passed along to :class:`Settings`
+
+    Raises
+    ------
+    ImproperlyConfigured
+        If settings is already configured, will throw this exception
     """
     from terra.core.signals import post_settings_configured
 
     if self._wrapped is not None:
-      raise RuntimeError('Settings already configured.')
+      raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
-    self._wrapped = Settings(default_settings)
-    self._wrapped.update(options)
+    self._wrapped = Settings(*args, **kwargs)
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
 
   @property
   def configured(self):
-    """Return True if the settings have already been configured."""
+    """
+    Check if the settings have already been configured
+
+    Returns
+    -------
+    bool
+      Return ``True`` if has already been configured
+    """
     return self._wrapped is not None
 
 
 class ObjectDict(dict):
+  '''
+  An object dictionary, that accesses dictionary keys using attributes (``.``)
+  rather than items (``[]``).
+  '''
   def __init__(self, *args, **kwargs):
     self.update(*args, **kwargs)
 
   def __dir__(self):
+    """ Supported """
     d = super().__dir__()
     return list(set(d + [x for x in self.keys()
                          if isinstance(x, str) and x.isidentifier()]))
 
   def __getattr__(self, name):
+    """ Supported """
     try:
       return self[name]
     except KeyError:
@@ -227,9 +442,11 @@ class ObjectDict(dict):
           self.__class__.__name__, name))
 
   def __setattr__(self, name, value):
+    """ Supported """
     self.update([(name, value)])
 
   def update(self, *args, **kwargs):
+    """ Supported """
     def patch(self, key):
       ''' Function to patch dict->ObjectDict '''
       value = self[key]
@@ -262,6 +479,9 @@ class ObjectDict(dict):
 
 
 class Settings(ObjectDict):
+  '''
+  The terra settings object
+  '''
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     for pattern, settings in global_templates:
@@ -274,10 +494,13 @@ class Settings(ObjectDict):
         self.update(d)
 
   def __getattr__(self, name):
-    # Write a special getattr that will evaluate @setting_property functions
+    '''
+    ``__getattr__`` that will evaluate @settings_property functions, and cache
+    the values
+    '''
     try:
       val = self[name]
-      if isfunction(val) and getattr(val, 'setting_property', None):
+      if isfunction(val) and getattr(val, 'settings_property', None):
         val = val(self)
         self[name] = val
       return val

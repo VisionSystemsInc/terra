@@ -2,7 +2,7 @@ import os
 from unittest import TestCase, mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from terra import settings
-from terra.core.settings import ObjectDict, setting_property
+from terra.core.settings import ObjectDict, settings_property
 
 
 class TestObjectDict(TestCase):
@@ -158,9 +158,9 @@ class TestSettings(TestCase):
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates', [({}, {})])
-  def test_setting_property(self):
+  def test_settings_property(self):
     import terra.core.settings
-    @setting_property
+    @settings_property
     def a(self):
       return self.c + 1
 
@@ -171,9 +171,9 @@ class TestSettings(TestCase):
       return 3
 
     terra.core.settings.global_templates[0][1]['a'] = a
-    terra.core.settings.global_templates[0][1]['b'] = setting_property(
+    terra.core.settings.global_templates[0][1]['b'] = settings_property(
         lambda self: 13.1)
-    terra.core.settings.global_templates[0][1]['c'] = setting_property(c)
+    terra.core.settings.global_templates[0][1]['c'] = settings_property(c)
     terra.core.settings.global_templates[0][1]['d'] = d
 
     with NamedTemporaryFile(mode='w',

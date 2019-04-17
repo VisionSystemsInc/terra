@@ -1,3 +1,7 @@
+'''
+Utilities that will be used by apps
+'''
+
 import os
 import json
 import inspect
@@ -10,12 +14,32 @@ logger = getLogger(__name__)
 
 
 class AlreadyRunException(Exception):
-  pass
+  '''
+  Exception thrown when a stage is run more than once. Stages are designed to
+  be run only once
+  '''
 
 
 class resumable(BasicDecorator):
   '''
   Decorate for setting up a resumable stage in a workflow
+
+  Simply using this decorator on a function makes that function a "stage" in
+  the workflow. Stage execution is tracked in the
+  :func:`terra.core.settings.status_file` and when using the
+  ``settings.resume`` flag, will skip already run stages to attempt to pick up
+  where a workflow left off.
+
+  Resuming stages is good for failure cases, or situations where you want to
+  skip the begining of a workflow
+
+  Not every function in a workflow has to be a stage. These non-stage functions
+  will always be run
+
+  Raises
+  ------
+  AlreadyRunException
+      Thrown when function attempts to run a second time.
   '''
   def __inner_call__(self, *args, **kwargs):
     try:
