@@ -104,6 +104,7 @@ nitpick_ignore = [('py:class', 'bool'),
 
                   ('py:class', 'argparse.Action'),
                   ('py:class', 'vsi.tools.python.BasicDecorator'),
+                  ('py:func',  'vsi.tools.python.nested_update'),
 
                   ('py:mod',   'django.conf'),
                   ('py:class', 'django.db.utils.ConnectionHandler'),

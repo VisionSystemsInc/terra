@@ -19,13 +19,14 @@ Everything in a terra app should be controlled by one main json file. This file 
   settings.my_settings
   settings.something.else.here
 
-The settings file used is controlled by the environment variable ``TERRA_SETTINGS_FILE`` and is usually set by the cli.
+The settings file used is controlled by the environment variable :envvar:`TERRA_SETTINGS_FILE` and is usually set by the cli.
 
 While, underneath the hood the settings is a nested dictionary, it will be accessed via attributes instead of indexing, for ease of use.
 
 .. rubric:: Templating
 
-Default values of settings are prepopulated by :py:data:`terra.core.settings.global_templates`
+Default values of settings are prepopulated by :py:data:`terra.core.settings.global_templates`. This data structure is a list of tuple pair of :class:`dict`. Within the pair, the first :class:`dict` represents a *pattern*, and the second is the *default* values. When values of *pattern* match the configuration, then the *defaults* of that pattern are applied. These *defaults* are applied in order, where the last *default* overrides the earlier ones, but by combining all of the dictionaries into one, using :func:`vsi.tools.python.nested_update`
 
 .. rubric:: Advanced usage
 
+Todo
