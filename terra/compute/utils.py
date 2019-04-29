@@ -28,98 +28,90 @@
 
 from threading import local
 from importlib import import_module
-from terra.core.utils import cached_property
+from terra.core.utils import Handler
 from terra import settings
 
 
-class ComputeHandler:
+class ComputeHandler(Handler):
   '''
   The :class:`ComputeHandler` class gives a single entrypoint to interact with
-  the compute, no matter what type it is. A standard way to call ``run``,
-  etc...
-
-  Based loosly on :class:`django.db.utils.ConnectionHandler`
+  the compute architecture, no matter what arch type it is. A standard way to
+  call ``run``, etc...
   '''
-  def __init__(self, compute=None):
-    """
-    databases is an optional dictionary of compute definitions (structured
-    like settings.settings.compute).
-    """
-    self._compute = compute
-    # self._connections = local()
-    self._connection = None
 
-  @cached_property
-  def __compute(self):
-    if self._compute is None:
-      self._compute = settings.compute
-    if self._compute == {}:
-      self._compute = {'type': 'terra.compute.dummy'}
+  def _connect_backend(self):
+    '''
+    Loads the compute's backend's base module, given either a fully qualified
+    compute backend name, or a partial (``terra.compute.{partial}.base``), and
+    then returns a connection to the backend
 
-    return self._compute
+    Parameters
+    ----------
+    self._overrite_type : :class:`str`, optional
+        If not ``None``, override the name of the backend to load.
+    '''
 
-  def __get_connection(self):
-    if not self._connection:
-      backend = load_backend(self.__compute.type)
-      self._connection = backend.Compute()
-    return self._connection
+    backend_name = self._overrite_type
 
-  def __getattr__(self, name):
-    return getattr(self.__get_connection(), name)
+    if backend_name is None:
+      backend_name = settings.compute.arch
+    if backend_name == {}:
+      backend_name = 'terra.compute.dummy'
 
-  def __setattr__(self, name, value):
-    if name in ('_connection', '_compute'):
-      return super().__setattr__(name, value)
-    return setattr(self.__get_connection(), name, value)
+    try:
+      module = import_module(f'{backend_name}.base')
+    except ImportError:
+      module = import_module(f'terra.compute.{backend_name}.base')
 
-  def __delattr__(self, name):
-    return delattr(self.__get_connection(), name)
-
-  # Incase this needs multiple computes simultaneously...
-
-  # def __getitem__(self, key):
-  #   if not self._connection:
-  #     backend = load_backend(self.compute.type)
-  #     self._connection = backend.Compute()
-  #   return getattr(self._connection, key)
-  #   # self.ensure_defaults(alias)
-  #   # self.prepare_test_settings(alias)
-  #   # db = self.databases[alias]
-  #   # backend = load_backend(db['ENGINE'])
-  #   # conn = backend.DatabaseWrapper(db, alias)
-  #   # setattr(self._connections, alias, conn)
-  #   # return self._connection
-
-  # def __setitem__(self, key, value):
-  #   setattr(self._connection, key, value)
-
-  # def __delitem__(self, key):
-  #   delattr(self._connection, key)
-
-  def close(self):
-    if self._connection:
-      self._connection.close()
+    return module.Compute()
 compute = ComputeHandler()
 '''ComputeHandler: The compute handler that all apps will be interfacing with.
 For the most part, workflows will be interacting with :data:`compute` to
 ``run`` services. Easier access via ``terra.compute.compute``
 '''
 
-def load_backend(backend_name):
+class ExecutorHandler(Handler):
   '''
-  Loads the compute's backend's base module, given either a fully qualified
-  compute backend name, or a partial (``terra.compute.{partial}.base``)
-
-  Parameters
-  ----------
-  backend_name : str
-      Backend name
+  The :class:`ComputeHandler` class gives a single entrypoint to interact with
+  the ``concurrent.futures`` executor.
   '''
-  try:
-    return import_module(f'{backend_name}.base')
-  except ImportError:
-    return import_module(f'terra.compute.{backend_name}.base')
 
+  def _connect_backend(self):
+    '''
+    Loads the compute's backend's base module, given either a fully qualified
+    compute backend name, or a partial (``terra.compute.{partial}.base``), and
+    then returns a connection to the backend
+
+    Parameters
+    ----------
+    self._overrite_type : :class:`str`, optional
+        If not ``None``, override the name of the backend to load.
+    '''
+
+    backend_name = self._overrite_type
+
+    if backend_name is None:
+      backend_name = settings.executor.type
+    if backend_name == {}:
+      backend_name = 'terra.compute.dummy'
+
+    if backend_name == "ThreadPoolExecutor":
+      import concurrent.futures
+      return concurrent.futures.ThreadPoolExecutor
+    elif backend_name == "ProcessPoolExecutor":
+      import concurrent.futures
+      return concurrent.futures.ProcessPoolExecutor
+    elif backend_name == "CeleryExecutor":
+      import celery_executor.executors
+      return celery_executor.executors.CeleryExecutor
+    else:
+      module_name = backend_name.rsplit('.', 1)
+      module = import_module(f'{module_name[0]}')
+      return getattr(module, module_name[1])
+Executor = ExecutorHandler()
+'''ExecutorHandler: The executor handler that all services will be interfacing
+with when running parallel computation tasks.
+'''
 
 def load_service(name_or_class):
   '''

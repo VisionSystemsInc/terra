@@ -81,7 +81,7 @@ class MetaCompute(type):
 
 class BaseCompute(metaclass=MetaCompute):
   '''
-  The base class for all Terra Service Compute Types
+  The base class for all Terra Service Compute Arches
   '''
 
   # The actual register service decorator. Unlike normal decorators that run
