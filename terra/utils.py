@@ -3,6 +3,7 @@ Utilities that will be used by apps
 '''
 
 import os
+import shutil
 import json
 import inspect
 from vsi.tools.python import BasicDecorator, args_to_kwargs
@@ -85,7 +86,7 @@ class resumable(BasicDecorator):
     stage_self.status.stage_status = "done"
     logger.debug(f"Finished: {stage_name}")
 
-    os.rename(settings.status_file, settings.status_file + '.bak')
+    shutil.move(settings.status_file, settings.status_file + '.bak')
     with open(settings.status_file, 'w') as fid:
       json.dump(stage_self.status, fid)
 
