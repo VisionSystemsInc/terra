@@ -2,11 +2,13 @@
 
 set -eu
 
+: ${VSI_COMMON_DIR:=/vsi}
+
 if [ "${ALREADY_RUN_ONCE+set}" != "set" ]; then
   # create the user and associated groups and handle nfs symlinks
 
   (
-    source "${VSI_COMMON_DIR:-/vsi}/linux/just_env" "${TERRA_SOURCE_DIR-/src}/terra.env"
+    source "${VSI_COMMON_DIR}/linux/just_env" "${TERRA_SOURCE_DIR-/src}/terra.env"
     # Setup the container to be more friendly to non-root users and
     # add other advanced J.U.S.T. features
     JUST_DOCKER_ENTRYPOINT_CHOWN_DIRS="${JUST_DOCKER_ENTRYPOINT_INTERNAL_VOLUMES-}" \
@@ -29,7 +31,7 @@ if [ "${ALREADY_RUN_ONCE+set}" != "set" ]; then
   ALREADY_RUN_ONCE=1 exec gosu ${DOCKER_USERNAME} /usr/bin/env bash $0 ${@+"${@}"}
 fi
 
-source "${VSI_COMMON_DIR:-/vsi}/linux/just_env" "${TERRA_SOURCE_DIR-/src}/terra.env"
+source "${VSI_COMMON_DIR}/linux/just_env" "${TERRA_SOURCE_DIR-/src}/terra.env"
 
 function sudo()
 {
