@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  redis:
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          # - node.role == manager
+          - node.role == worker
+      restart_policy:
+        condition: any
+        delay: 5s
+
+    # secrets:
+    #   - source: redis_secret
+    #     target: redis_password
+    #     uid: ${TERRA_UID}
+    #     gid: ${TERRA_GID}
+    #     mode: 0440
+
+# secrets:
+#   redis_secret:
+#     external: true
+#     name: redis_secret
+
+networks:
+  terra:

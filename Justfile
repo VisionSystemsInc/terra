@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra'.env
+source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
 cd "${TERRA_CWD}"
 
 # Plugins
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_docs_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/colors.bsh"
 
 function Pipenv()
@@ -61,6 +61,20 @@ function caseify()
       Just-docker-compose run compile nopipenv ${@+"${@}"}
       extra_args+=$#
       ;;
+
+    run_redis) # Run redis
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
+      extra_args+=$#
+      ;;
+    up) # Start redis (and any other services) in the background.
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" up -d
+      ;;
+    deploy) # Deploy services on a swarm
+      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" \
+                     -f "${TERRA_CWD}/docker-compose-swarm.yml" config | \
+          Docker stack deploy -c - terra
+      ;;
+
     compile) # Compile terra
       Just-docker-compose run compile
       ;;

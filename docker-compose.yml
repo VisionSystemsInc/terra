@@ -1,93 +1,36 @@
-version: "2.3"
+version: "3.7"
 
 services:
-  terra: &terra
-    build: &terra_build
+  redis:
+    image:
+      ${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}
+    build:
       context: .
-      dockerfile: docker/terra.Dockerfile
-    # prevent different users from clobbering each others images
-    image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
+      dockerfile: docker/redis.Dockerfile
     environment:
-      # Variables for docker_entrypoint.bsh
       - DOCKER_UID=${TERRA_UID}
       - DOCKER_GIDS=${TERRA_GIDS}
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
-      - DISPLAY
-      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER}:${TERRA_INSTALL_DIR_DOCKER}/lib/python3/site-packages:${TERRA_SOURCE_DIR_DOCKER}/external/vsi_common/python
-    cap_add:
-      - SYS_PTRACE # Useful for gdb
     volumes:
-      # source code
-      - &terra_source_volume
-        type: ${TERRA_SOURCE_DIR_TYPE}
-        source: ${TERRA_SOURCE_DIR}
-        target: ${TERRA_SOURCE_DIR_DOCKER}
-        read_only: true
-      # vsi_common
-      - &terra_vsi_volume
-        type: ${TERRA_SOURCE_DIR_TYPE}
-        source: ${TERRA_SOURCE_DIR}/external/vsi_common
-        target: /vsi
-        read_only: true
-      # The compile binaries final location
-      - &terra_install_volume
-        type: ${TERRA_INSTALL_DIR_TYPE}
-        source: ${TERRA_INSTALL_DIR}
-        target: ${TERRA_INSTALL_DIR_DOCKER}
-      # The storage location of the pipenv virtualenv and venv cache
-      - &terra_venv_volume
-        type: volume
-        source: venv
-        target: /venv
-      # The settings volume is used for settings files around
-      # - &terra_settings
-      #   type: bind
-      #   source: ${TERRA_SETTINGS_DIR-}
-      #   target: ${TERRA_SETTINGS_DIR_DOCKER}
-  compile:
-    <<: *terra
-    build:
-      <<: *terra_build
-      target: compile
-    image: ${TERRA_DOCKER_REPO}:terra_compile_${TERRA_USERNAME}
-    volumes:
-      - *terra_source_volume
-      - *terra_install_volume
-      - *terra_vsi_volume
-      # build artifiacts for incremental building
-      - type: ${TERRA_BUILD_DIR_TYPE}
-        source: ${TERRA_BUILD_DIR}
-        target: ${TERRA_BUILD_DIR_DOCKER}
-
-  test:
-    <<: *terra
-    volumes:
-      - <<: *terra_source_volume
-        read_only: false
-      - *terra_install_volume
-      - *terra_venv_volume
-      - *terra_vsi_volume
-
-  ipykernel:
-    <<: *terra
-    volumes:
-      - *terra_source_volume
-      - *terra_vsi_volume
-      - *terra_install_volume
-      - *terra_venv_volume
-      # No settings here
+      # # vsi_common
+      # - type: ${TERRA_SOURCE_DIR_TYPE}
+      #   source: ${TERRA_SOURCE_DIR}/external/vsi_common
+      #   target: /vsi
+      #   read_only: true
+      - type: ${TERRA_REDIS_DIR_TYPE}
+        source: ${TERRA_REDIS_DIR}
+        target: ${TERRA_REDIS_DIR_DOCKER}
     ports:
-      - "${JUPYTER_CONTROL_PORT_HOST-10001}:${JUPYTER_CONTROL_PORT-10001}"
-      - "${JUPYTER_HB_PORT_HOST-10002}:${JUPYTER_HB_PORT-10002}"
-      - "${JUPYTER_IOPUB_PORT_HOST-10003}:${JUPYTER_IOPUB_PORT-10003}"
-      - "${JUPYTER_SHELL_PORT_HOST-10004}:${JUPYTER_SHELL_PORT-10004}"
-      - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
+      - "${TERRA_REDIS_PORT}:${TERRA_REDIS_PORT_DOCKER}"
+    networks:
+      default:
+        aliases:
+          - terra-redis
+
+secrets:
+  redis_secret:
+    file: ${TERRA_REDIS_SECRET_FILE}
 
 volumes:
-  venv:
-    labels:
-      com.vsi.just.clean_action: delete
-      com.vsi.just.clean_setup: run terra nopipenv true
-  terra-install:
-  terra-build:
+  terra-redis:

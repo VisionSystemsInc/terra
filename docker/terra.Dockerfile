@@ -51,19 +51,18 @@ RUN apt-get update; \
       g++ python3-dev libgeotiff-dev; \
     rm -rf /var/lib/apt/lists/*
 
+# Recipes
+COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 COPY --from=ninja /usr/local/bin/ninja /usr/local/bin/ninja
 COPY --from=cmake /cmake /usr/local/
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 RUN chmod u+s /usr/local/bin/gosu
-
-# COPY --from=pipenv_cache /venv /venv
-
 COPY --from=vsi /vsi /vsi
 
-ADD docker/terra_entrypoint.bsh /
 ADD terra.env /src/
+ADD docker/terra.Justfile /src/docker/
 
-ENTRYPOINT ["/usr/bin/env", "--", "bash", "/terra_entrypoint.bsh"]
+ENTRYPOINT ["/usr/local/bin/tini", "/usr/bin/env", "--", "bash", "/vsi/linux/just_entrypoint.sh"]
 
 CMD ["compile"]
 
@@ -71,17 +70,18 @@ CMD ["compile"]
 
 FROM dep_stage
 
+# Recipes
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 # Allow non-privileged to run gosu (remove this to take root away from user)
 RUN chmod u+s /usr/local/bin/gosu
-
 COPY --from=pipenv_cache /venv /venv
-
 COPY --from=vsi /vsi /vsi
-ADD docker/terra_entrypoint.bsh /
-ADD terra.env /src/
 
-ENTRYPOINT ["/usr/local/bin/tini", "/usr/bin/env", "--", "bash", "/terra_entrypoint.bsh"]
+# Terra
+ADD terra.env /src/
+ADD docker/terra.Justfile /src/docker/
+
+ENTRYPOINT ["/usr/local/bin/tini", "/usr/bin/env", "--", "bash", "/vsi/linux/just_entrypoint.sh"]
 
 CMD ["bash"]
