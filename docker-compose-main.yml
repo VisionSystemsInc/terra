@@ -87,19 +87,48 @@ services:
       - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
 
   redis-browser:
-    build:
-      context: .
-      dockerfile: docker/redis-browser.Dockerfile
-    image: ${TERRA_DOCKER_REPO}:terra_redis_browser_${TERRA_USERNAME}
+    image: rediscommander/redis-commander
     ports:
       - "${TERRA_REDIS_BROWSER_PORT}:${TERRA_REDIS_BROWSER_PORT_DOCKER}"
     secrets:
       - source: redis_secret
         target: ${TERRA_REDIS_SECRET_DOCKER}
+      - source: redis_browser_secret
+        target: ${TERRA_REDIS_BROWSER_SECRET_FILE}
+    command: |
+      sh -c '
+        echo -n '"'"'{
+          "connections":[
+            {
+              "password": "'"'"' > /redis-commander/config/local-production.json
+        cat /run/secrets/redis_password | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+        echo -n '"'"'",
+              "host": "${TERRA_REDIS_HOSTNAME_DOCKER}",
+              "label": "terra",
+              "dbIndex": 0,
+              "connectionName": "redis-commander",
+              "port": "6379"
+            }
+          ],
+          "server": {
+            "address": "0.0.0.0",
+            "port": ${TERRA_REDIS_BROWSER_PORT_DOCKER},
+            "httpAuth": {
+              "username": "admin",
+              "passwordHash": "'"'"'>> /redis-commander/config/local-production.json
+          cat "/run/secrets/${TERRA_REDIS_BROWSER_SECRET_FILE}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+          echo '"'"'"
+            }
+          }
+        }'"'"' >> /redis-commander/config/local-production.json
+        /redis-commander/docker/entrypoint.sh'
+    # " Fix vscode syntax highlighting error
 
 secrets:
   redis_secret:
     file: ${TERRA_REDIS_SECRET_FILE}
+  redis_browser_secret:
+    file: ${TERRA_REDIS_BROWSER_SECRET_FILE}
 
 volumes:
   venv:

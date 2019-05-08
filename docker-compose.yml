@@ -30,7 +30,7 @@ services:
     networks:
       default:
         aliases:
-          - terra-redis
+          - ${TERRA_REDIS_HOSTNAME_DOCKER}
 
 secrets:
   redis_secret:

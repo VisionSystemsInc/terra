@@ -74,7 +74,24 @@ function caseify()
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
       extra_args=$#
       ;;
+
+    generate-redis-browser-hash) # Generate a redis browser hash
+      touch "${TERRA_REDIS_BROWSER_SECRET_FILE}"
+      Docker run -it --rm --mount type=bind,source="$(real_path "${TERRA_REDIS_BROWSER_SECRET_FILE}")",destination=/hash_file  python:3 sh -c "
+        pip install bcrypt
+        python -c 'if 1:
+          import bcrypt,getpass
+          pass1 = getpass.getpass(\"Enter a password: \")
+          hash1 = bcrypt.hashpw(pass1.encode(), bcrypt.gensalt(rounds=10))
+          with open(\"/hash_file\", \"wb\") as fid:
+            fid.write(hash1)
+        '
+      "
+      ;;
     run_redis-browser) # Run redis-browser
+      if [ ! -s "${TERRA_REDIS_BROWSER_SECRET_FILE}" ]; then
+        justify generate_redis_browser_hash
+      fi
       Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-browser
       ;;
 

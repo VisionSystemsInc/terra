@@ -1,3 +1,0 @@
-connections:
-  default:
-    url: redis://terra-redis:6379/0
