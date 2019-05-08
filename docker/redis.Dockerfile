@@ -11,6 +11,7 @@ COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 COPY --from=vsi /vsi /vsi
 
 ADD terra.env /src/
+ADD docker/redis.Justfile /src/docker/
 
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
 

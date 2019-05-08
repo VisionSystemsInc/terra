@@ -20,8 +20,6 @@ services:
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
-      - *terra_source_volume
-      - *terra_vsi_volume
       # source code
       - &terra_source_volume
         type: ${TERRA_SOURCE_DIR_TYPE}
@@ -87,6 +85,21 @@ services:
       - "${JUPYTER_IOPUB_PORT_HOST-10003}:${JUPYTER_IOPUB_PORT-10003}"
       - "${JUPYTER_SHELL_PORT_HOST-10004}:${JUPYTER_SHELL_PORT-10004}"
       - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
+
+  redis-browser:
+    build:
+      context: .
+      dockerfile: docker/redis-browser.Dockerfile
+    image: ${TERRA_DOCKER_REPO}:terra_redis_browser_${TERRA_USERNAME}
+    ports:
+      - "${TERRA_REDIS_BROWSER_PORT}:${TERRA_REDIS_BROWSER_PORT_DOCKER}"
+    secrets:
+      - source: redis_secret
+        target: ${TERRA_REDIS_SECRET_DOCKER}
+
+secrets:
+  redis_secret:
+    file: ${TERRA_REDIS_SECRET_FILE}
 
 volumes:
   venv:

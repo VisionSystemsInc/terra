@@ -26,12 +26,13 @@ function caseify()
     build) # Build Docker image
       if [ "$#" -gt "0" ]; then
         Docker-compose "${just_arg}" ${@+"${@}"}
-        extra_args+=$#
+        extra_args=$#
       else
         justify build_recipes gosu tini vsi pipenv
         Docker-compose build
         justify docker-compose clean venv
         justify _post_build
+        justify build services
         justify build dsm-desktop
       fi
       ;;
@@ -47,25 +48,36 @@ function caseify()
       ;;
     python) # Run host terra python
       Pipenv run python ${@+"${@}"}
-      extra_args+=$#
+      extra_args=$#
       ;;
     run) # Run terra cli (first argument is which cli, "dsm" for example)
       # Just-docker-compose run terra ${@+"${@}"}
       Pipenv run python -m terra.apps.cli ${@+"${@}"}
-      extra_args+=$#
+      extra_args=$#
       ;;
     run_bash) # Run bash in terra image
       Just-docker-compose run terra bash ${@+"${@}"}
       ;;
     run_compile) # Run compiler
       Just-docker-compose run compile nopipenv ${@+"${@}"}
-      extra_args+=$#
+      extra_args=$#
       ;;
 
+    build_redis) #
+      justify build services redis
+      ;;
+    build_services) # Build redis services
+      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" build ${@+"${@}"}
+      extra_args=$#
+      ;;
     run_redis) # Run redis
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
-      extra_args+=$#
+      extra_args=$#
       ;;
+    run_redis-browser) # Run redis-browser
+      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-browser
+      ;;
+
     up) # Start redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" up -d
       ;;
@@ -83,7 +95,7 @@ function caseify()
       Just-docker-compose run -w "${TERRA_BUILD_DIR_DOCKER}/${TERRA_BUILD_TYPE}" compile nopipenv ctest ${@+"${@}"}
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
       Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
-      extra_args+=$#
+      extra_args=$#
       ;;
     pep8) # Check for pep8 compliance in ./terra
          Just-docker-compose run test bash -c \
@@ -110,6 +122,7 @@ function caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       Docker-compose down
+      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" down
       justify git_submodule-update # For those users who don't remember!
       justify build
       justify compile
@@ -138,7 +151,7 @@ function caseify()
       # }
       Just-docker-compose run -T --service-ports ipykernel \
           pipenv run python -m ipykernel_launcher ${@+"${@}"} > /dev/null
-      extra_args+=$#
+      extra_args=$#
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

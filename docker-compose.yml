@@ -12,6 +12,7 @@ services:
       - DOCKER_GIDS=${TERRA_GIDS}
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
+      - JUSTFILE=${TERRA_SOURCE_DIR_DOCKER}/docker/redis.Justfile
     volumes:
       # # vsi_common
       # - type: ${TERRA_SOURCE_DIR_TYPE}
@@ -23,6 +24,9 @@ services:
         target: ${TERRA_REDIS_DIR_DOCKER}
     ports:
       - "${TERRA_REDIS_PORT}:${TERRA_REDIS_PORT_DOCKER}"
+    secrets:
+      - source: redis_secret
+        target: ${TERRA_REDIS_SECRET_DOCKER}
     networks:
       default:
         aliases:

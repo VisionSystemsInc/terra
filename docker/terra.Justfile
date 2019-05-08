@@ -5,8 +5,7 @@ function caseify()
   local cmd="${1}"
   shift 1
   case "${cmd}" in
-    # default CMD
-    compile)
+    compile) # Compile terra
       mkdir -p "${TERRA_BUILD_DIR}/${TERRA_BUILD_TYPE}"
       pushd "${TERRA_BUILD_DIR}/${TERRA_BUILD_TYPE}" &> /dev/null
         if [ ! -f cmake_successfully_generated ] || [ "${TERRA_FORCE_RUN_CMAKE-}" == "1" ]; then
