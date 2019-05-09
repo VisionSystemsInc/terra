@@ -12,3 +12,4 @@ ipykernel = "*"
 [packages]
 numpy = "*"
 commentjson = "*"
+celery = {extras = ["redis"],version = "*"}

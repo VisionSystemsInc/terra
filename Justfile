@@ -75,6 +75,11 @@ function caseify()
       extra_args=$#
       ;;
 
+    run_celery-local) # Run celery on the host
+      Pipenv run celery -A terra.executor.celery.app worker --loglevel=INFO -n local@%h
+      ;;
+
+
     generate-redis-browser-hash) # Generate a redis browser hash
       touch "${TERRA_REDIS_BROWSER_SECRET_FILE}"
       Docker run -it --rm --mount type=bind,source="$(real_path "${TERRA_REDIS_BROWSER_SECRET_FILE}")",destination=/hash_file  python:3 sh -c "
@@ -125,7 +130,7 @@ function caseify()
       ;;
     pep8_local) # Check pep8 compliance without using docker
       if ! Pipenv run command -v autopep8 >& /dev/null; then
-        Pipenv install --dev
+        Pipenv install --dev --keep-outdated
       fi
       Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
                           --global-config "${TERRA_CWD}/autopep8.ini" \
@@ -147,6 +152,9 @@ function caseify()
       ;;
     dev_sync) # Developer's extra sync
       Pipenv install --dev --keep-outdated
+      ;;
+    dev_update) # Developer: Update python packages
+      Pipenv install --dev
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n

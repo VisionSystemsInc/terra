@@ -26,7 +26,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from threading import local
 from importlib import import_module
 from terra.core.utils import Handler
 from terra import settings
@@ -70,48 +69,6 @@ For the most part, workflows will be interacting with :data:`compute` to
 ``run`` services. Easier access via ``terra.compute.compute``
 '''
 
-class ExecutorHandler(Handler):
-  '''
-  The :class:`ComputeHandler` class gives a single entrypoint to interact with
-  the ``concurrent.futures`` executor.
-  '''
-
-  def _connect_backend(self):
-    '''
-    Loads the compute's backend's base module, given either a fully qualified
-    compute backend name, or a partial (``terra.compute.{partial}.base``), and
-    then returns a connection to the backend
-
-    Parameters
-    ----------
-    self._overrite_type : :class:`str`, optional
-        If not ``None``, override the name of the backend to load.
-    '''
-
-    backend_name = self._overrite_type
-
-    if backend_name is None:
-      backend_name = settings.executor.type
-    if backend_name == {}:
-      backend_name = 'terra.compute.dummy'
-
-    if backend_name == "ThreadPoolExecutor":
-      import concurrent.futures
-      return concurrent.futures.ThreadPoolExecutor
-    elif backend_name == "ProcessPoolExecutor":
-      import concurrent.futures
-      return concurrent.futures.ProcessPoolExecutor
-    elif backend_name == "CeleryExecutor":
-      import celery_executor.executors
-      return celery_executor.executors.CeleryExecutor
-    else:
-      module_name = backend_name.rsplit('.', 1)
-      module = import_module(f'{module_name[0]}')
-      return getattr(module, module_name[1])
-Executor = ExecutorHandler()
-'''ExecutorHandler: The executor handler that all services will be interfacing
-with when running parallel computation tasks.
-'''
 
 def load_service(name_or_class):
   '''

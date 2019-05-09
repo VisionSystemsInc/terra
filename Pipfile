@@ -15,3 +15,5 @@ ipykernel = "*"
 terra = {path = ".",editable = true}
 envcontext = "*"
 vsi-common = {editable = true,path = "./external/vsi_common"}
+celery = {extras = ["redis"],version = "*"}
+flower = "*"
