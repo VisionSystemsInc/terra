@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7249ea3cd64fcc24a28186c3eea4aa72e381eb552f09b2f99924f677444659a4"
+            "sha256": "ecd52a35f6f9d6478ade96501dc8425c7cf02bacce8d936a85e7189ad0cc441b"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -82,10 +82,6 @@
             ],
             "index": "pypi",
             "version": "==4.3.0"
-        },
-        "celeryexecutor": {
-            "git": "https://github.com/getninjas/celery-executor.git",
-            "ref": "221811e0f8e8f38ea5a0d894349c4189da4ce1e5"
         },
         "certifi": {
             "hashes": [

@@ -79,6 +79,9 @@ function caseify()
       Pipenv run celery -A terra.executor.celery.app worker --loglevel=INFO -n local@%h
       ;;
 
+    run_celery-docker) # Run celery in the docker
+      justify run bash -c "celery -A terra.executor.celery.app worker --loglevel=INFO -n docker@%h"
+      ;;
 
     generate-redis-browser-hash) # Generate a redis browser hash
       touch "${TERRA_REDIS_BROWSER_SECRET_FILE}"
