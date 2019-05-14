@@ -2,6 +2,7 @@ local.env
 local_post.env
 .just_synced
 *.pyc
+*.secret
 terra.egg-info
 docs/python
 docs/_build

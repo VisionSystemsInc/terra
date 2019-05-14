@@ -208,6 +208,7 @@ def processing_dir(self):
     logger.warning('No config file found, and processing dir unset. Using cwd')
     return os.getcwd()
 
+# TODO: come up with a way for apps to extend this themselves
 global_templates = [
   (
     # Global Defaults
@@ -242,7 +243,7 @@ global_templates = [
     }
   ),
   (
-    {"compute": {"type": "terra.compute.dummy"}},  # Pattern
+    {"compute": {"arch": "terra.compute.dummy"}},  # Pattern
     {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
   )
 ]

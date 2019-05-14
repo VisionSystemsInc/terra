@@ -2,7 +2,7 @@
 What is Terra
 =============
 
-Terra in an infrastructure with the purpose of running algorithms in a compute type agnostic way. The goal is, once an algorithm (app) is setup, the same algorithm can be deployed on multiple compute types
+Terra in an infrastructure with the purpose of running algorithms in a compute architecture agnostic way. The goal is, once an algorithm (app) is setup, the same algorithm can be deployed on multiple compute arches
 
 Getting Started
 ===============
@@ -10,7 +10,7 @@ Getting Started
 Settings
 --------
 
-Everything in a terra app should be controlled by one main json file. This file will contain all the information from what compute type to use, any compute type settings, logging settings, input files, output, etc... Accessing the settings will be accomplished simply by
+Everything in a terra app should be controlled by one main json file. This file will contain all the information from what compute arch to use, any compute arch settings, logging settings, input files, output, etc... Accessing the settings will be accomplished simply by
 
 .. code-block:: python
 
