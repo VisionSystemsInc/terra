@@ -52,7 +52,7 @@ function caseify()
       Pipenv run python ${@+"${@}"}
       extra_args=$#
       ;;
-    run) # Run command (arguments) in terra container
+    run_terra) # Run command (arguments) in terra container
       local rv=0
       Just-docker-compose run terra ${@+"${@}"} || rv=$?
       extra_args=$#
