@@ -115,8 +115,8 @@ function caseify()
 
     test) # Run unit tests
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
-      # Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
-      Pipenv run bash -c 'python -m unittest discover "${TERRA_SOURCE_DIR}/terra"'
+      # Just-docker-compose run terra python -m unittest discover "${TERRA_TERRA_DIR_DOCKER}/terra"
+      Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       extra_args=$#
       ;;
     pep8) # Check for pep8 compliance in ./terra
@@ -125,8 +125,8 @@ function caseify()
              pipenv install --dev;
            fi;
            autopep8 --indent-size 2 --recursive --exit-code --diff \
-                    --global-config ${TERRA_SOURCE_DIR_DOCKER}/autopep8.ini \
-                    ${TERRA_SOURCE_DIR_DOCKER}/terra"
+                    --global-config ${TERRA_TERRA_DIR_DOCKER}/autopep8.ini \
+                    ${TERRA_TERRA_DIR_DOCKER}/terra"
       ;;
     pep8_local) # Check pep8 compliance without using docker
       if ! Pipenv run command -v autopep8 >& /dev/null; then
@@ -134,7 +134,7 @@ function caseify()
       fi
       Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
                           --global-config "${TERRA_CWD}/autopep8.ini" \
-                          "${TERRA_SOURCE_DIR}/terra"
+                          "${TERRA_TERRA_DIR}/terra"
       ;;
     sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"

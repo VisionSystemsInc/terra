@@ -14,21 +14,21 @@ services:
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
       - DISPLAY
-      - JUSTFILE=${TERRA_SOURCE_DIR_DOCKER}/docker/terra.Justfile
-      - JUST_SETTINGS=${TERRA_SOURCE_DIR_DOCKER}/terra.env
+      - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/terra.Justfile
+      - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
       # source code
       - &terra_source_volume
-        type: ${TERRA_SOURCE_DIR_TYPE}
-        source: ${TERRA_SOURCE_DIR}
-        target: ${TERRA_SOURCE_DIR_DOCKER}
+        type: ${TERRA_TERRA_DIR_TYPE}
+        source: ${TERRA_TERRA_DIR}
+        target: ${TERRA_TERRA_DIR_DOCKER}
         read_only: true
       # vsi_common
       - &terra_vsi_volume
-        type: ${TERRA_SOURCE_DIR_TYPE}
-        source: ${TERRA_SOURCE_DIR}/external/vsi_common
+        type: ${TERRA_TERRA_DIR_TYPE}
+        source: ${TERRA_TERRA_DIR}/external/vsi_common
         target: /vsi
         read_only: true
       # The storage location of the pipenv virtualenv and venv cache

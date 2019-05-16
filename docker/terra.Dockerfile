@@ -28,13 +28,11 @@ FROM dep_stage as pipenv_cache
 
 RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make
 
-ADD external/vsi_common/setup.py /vsi/
+ADD external/vsi_common/setup.py /terra/external/vsi_common/
 ADD setup.py Pipfile Pipfile.lock /terra/
 
     # Install all packages into the image
-RUN mkdir -p /terra/external; \
-    ln -s /vsi /terra/external/vsi_common; \
-    (cd /vsi; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
+RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
     (cd /terra; /usr/local/pipenv/bin/fake_package terra terra); \
     pipenv install --keep-outdated; \
     # Copy the lock file, so that it can be copied out of the image in "just _post_build"
