@@ -16,6 +16,7 @@ services:
       - DISPLAY
       - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/terra.Justfile
       - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
+      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER-/src}
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
