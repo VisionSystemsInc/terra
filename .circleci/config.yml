@@ -29,7 +29,7 @@ jobs:
 
       - run:
           name: Smuggle repo to remote docker
-          command: tar zc --exclude .git . | docker run -i -v /root/terra:/src -w /src alpine:3.6 tar zx
+          command: tar zc --exclude .git . | docker run -i -v /root/terra:/terra -w /terra alpine:3.6 tar zx
 
       - run:
           name: Build dockers

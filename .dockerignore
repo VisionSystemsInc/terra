@@ -4,3 +4,4 @@
 !terra.env
 !Pipfile
 !Pipfile.lock
+!setup.py

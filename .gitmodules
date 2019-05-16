@@ -1,15 +1,3 @@
 [submodule "external/vsi_common"]
 	path = external/vsi_common
 	url = https://github.com/VisionSystemsInc/vsi_common.git
-[submodule "external/vxl"]
-	path = external/vxl
-	url = ../vxl.git
-[submodule "external/pyvxl"]
-	path = external/pyvxl
-	url = https://github.com/VisionSystemsInc/pyvxl.git
-[submodule "external/pybind11"]
-	path = external/pybind11
-	url = https://github.com/pybind/pybind11.git
-[submodule "external/dsm_desktop"]
-	path = external/dsm_desktop
-	url = ../dsm_desktop.git

@@ -1,3 +1,4 @@
+import concurrent.futures
 from terra import settings
 from terra.core.utils import Handler
 from importlib import import_module
@@ -28,10 +29,8 @@ class ExecutorHandler(Handler):
       backend_name = 'terra.compute.dummy'
 
     if backend_name == "ThreadPoolExecutor":
-      import concurrent.futures
       return concurrent.futures.ThreadPoolExecutor
     elif backend_name == "ProcessPoolExecutor":
-      import concurrent.futures
       return concurrent.futures.ProcessPoolExecutor
     elif backend_name == "CeleryExecutor":
       import celery_executor.executors

@@ -13,8 +13,13 @@ source "${VSI_COMMON_DIR}/linux/colors.bsh"
 function Pipenv()
 {
   local rv=0
-  PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
-  return $rv
+  if [[ ${TERRA_LOCAL-} == 1 ]]; then
+    PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
+    return $rv
+  else
+    justify run pipenv ${@+"${@}"} || rv=$?
+    return $rv
+  fi
 }
 
 # Main function
@@ -23,45 +28,41 @@ function caseify()
   local just_arg=$1
   shift 1
   case ${just_arg} in
+    --local) # Run terra command locally
+      export TERRA_LOCAL=1
+      ;;
     build) # Build Docker image
       if [ "$#" -gt "0" ]; then
         Docker-compose "${just_arg}" ${@+"${@}"}
         extra_args=$#
       else
-        justify build_recipes gosu tini vsi pipenv
+        justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
         Docker-compose build
         justify docker-compose clean venv
         justify _post_build
         justify build services
-        justify build dsm-desktop
       fi
-      ;;
-    build_dsm-desktop) # Build the dsm desktop images
-      pushd "${TERRA_CWD}/external/dsm_desktop" > /dev/null
-        ./run build
-      popd > /dev/null
       ;;
     _post_build)
       image_name=$(docker create ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME})
-      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/docker/Pipfile.lock"
+      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
       docker rm ${image_name}
       ;;
     python) # Run host terra python
       Pipenv run python ${@+"${@}"}
       extra_args=$#
       ;;
-    run) # Run terra cli (first argument is which cli, "dsm" for example)
-      # Just-docker-compose run terra ${@+"${@}"}
-      Pipenv run python -m terra.apps.cli ${@+"${@}"}
+    run) # Run command (arguments) in terra container
+      local rv=0
+      Just-docker-compose run terra ${@+"${@}"} || rv=$?
       extra_args=$#
+      return $rv
       ;;
-    run_bash) # Run bash in terra image
-      Just-docker-compose run terra bash ${@+"${@}"}
-      ;;
-    run_compile) # Run compiler
-      Just-docker-compose run compile nopipenv ${@+"${@}"}
-      extra_args=$#
-      ;;
+    ## run) # Run terra cli (first argument is which cli, "dsm" for example)
+    #   # Just-docker-compose run terra ${@+"${@}"}
+    #   Pipenv run python -m terra.apps.cli ${@+"${@}"}
+    #   extra_args=$#
+    #   ;;
 
     build_redis) #
       justify build services redis
@@ -112,14 +113,10 @@ function caseify()
           Docker stack deploy -c - terra
       ;;
 
-    compile) # Compile terra
-      Just-docker-compose run compile
-      ;;
     test) # Run unit tests
-      echo "${YELLOW}Running ${GREEN}C++ ${YELLOW}Tests${NC}"
-      Just-docker-compose run -w "${TERRA_BUILD_DIR_DOCKER}/${TERRA_BUILD_TYPE}" compile nopipenv ctest ${@+"${@}"}
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
-      Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
+      # Just-docker-compose run terra python -m unittest discover "${TERRA_SOURCE_DIR_DOCKER}/terra"
+      Pipenv run bash -c 'python -m unittest discover "${TERRA_SOURCE_DIR}/terra"'
       extra_args=$#
       ;;
     pep8) # Check for pep8 compliance in ./terra
@@ -128,8 +125,8 @@ function caseify()
              pipenv install --dev;
            fi;
            autopep8 --indent-size 2 --recursive --exit-code --diff \
-                    --global-config /src/autopep8.ini \
-                    /src/terra"
+                    --global-config ${TERRA_SOURCE_DIR_DOCKER}/autopep8.ini \
+                    ${TERRA_SOURCE_DIR_DOCKER}/terra"
       ;;
     pep8_local) # Check pep8 compliance without using docker
       if ! Pipenv run command -v autopep8 >& /dev/null; then
@@ -146,11 +143,7 @@ function caseify()
         # to be run the first time sync is run.
         touch "${TERRA_CWD}/.just_synced"
       fi
-      Docker-compose down
-      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" down
-      justify git_submodule-update # For those users who don't remember!
       justify build
-      justify compile
       Pipenv install --keep-outdated
       ;;
     dev_sync) # Developer's extra sync
@@ -161,10 +154,28 @@ function caseify()
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
-      justify docker-compose clean venv \
-              docker-compose clean terra-install \
-              docker-compose clean terra-build
+      justify docker-compose clean venv
       ;;
+
+    # command: bash -c "touch /tmp/watchdog; while [ -e /tmp/watchdog ]; do rm /tmp/watchdog; sleep 1000; done"
+    # vscode) # Execute vscode magic in a vscode container
+    #   local container="$(docker ps -q -f "label=com.docker.compose.service=vscode" -f "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}")"
+    #   if [ -z "${container}" ]; then
+    #     Just-docker-compose -f "${C3D_CWD}/docker-compose.yml" up -d vscode
+    #     container="$(docker ps -q -f "label=com.docker.compose.service=vscode" -f "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}")"
+    #   fi
+    #   local flags=""
+    #   if [ -t 0 ]; then
+    #     flags="-t"
+    #   fi
+    #
+    #   # Keep the container going for another 1000 seconds and execute command
+    #   # specified. $1 is sent first to be $0
+    #   docker exec -u user -i ${flags} "${container}" bash -c 'touch /tmp/watchdog; ${@+"${@}"}' # ${@+"${1}"} ${@+"${@}"}
+    #
+    #   extra_args+=$#
+    #   ;;
+
     ipykernel) # Start a jupyter kernel in runserver
       # Example kernel.json
       # {

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import importlib
 from os import environ as env
 import os
 
@@ -13,4 +14,7 @@ task_serializer='pickle'
 accept_content=['json', 'pickle']
 result_expires=3600
 
-include=['terra.apps.task.viewangle']
+# App needs to define include
+celery_include = env.get('TERRA_CELERY_INCLUDE', None)
+if celery_include:
+  include = ast.literal_eval(celery_include)
