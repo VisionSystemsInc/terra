@@ -11,6 +11,9 @@ function caseify()
     nopipenv) # Run with out pipenv
       exec "${@}"
       ;;
+    pipenv) # Run pipenv command
+      exec "${cmd}" ${@+"${@}"}
+      ;;
     *)
       exec pipenv run "${cmd}" ${@+"${@}"}
       ;;
