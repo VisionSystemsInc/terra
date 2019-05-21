@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 
 source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
-cd "${TERRA_CWD}"
 
 # Plugins
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/colors.bsh"
+
+cd "${TERRA_CWD}"
+
+# Make a plugin
+JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
+JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
 
 function Pipenv()
 {
@@ -17,13 +21,24 @@ function Pipenv()
     PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
     return $rv
   else
-    justify run pipenv ${@+"${@}"} || rv=$?
+    Just-docker-compose run terra pipenv ${@+"${@}"} || rv=$?
     return $rv
   fi
 }
 
+# Allow terra to be run as a non-plugin too
+if ! declare -pf caseify &> /dev/null; then
+  function caseify()
+  {
+    terra_caseify ${@+"${@}"}
+    if [[ ${plugin_not_found} = 1 ]]; then
+      defaultify ${@+"${@}"}
+    fi
+  }
+fi
+
 # Main function
-function caseify()
+function terra_caseify()
 {
   local just_arg=$1
   shift 1
@@ -31,7 +46,7 @@ function caseify()
     --local) # Run terra command locally
       export TERRA_LOCAL=1
       ;;
-    build) # Build Docker image
+    build_terra) # Build Docker image
       if [ "$#" -gt "0" ]; then
         Docker-compose "${just_arg}" ${@+"${@}"}
         extra_args=$#
@@ -39,22 +54,22 @@ function caseify()
         justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
         Docker-compose build
         justify docker-compose clean venv
-        justify _post_build
+        justify _post_build_terra
         justify build services
       fi
       ;;
-    _post_build)
+    _post_build_terra)
       image_name=$(docker create ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME})
       docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
       docker rm ${image_name}
       ;;
-    python) # Run host terra python
-      Pipenv run python ${@+"${@}"}
-      extra_args=$#
-      ;;
-    run_terra) # Run command (arguments) in terra container
+    ## python) # Run host terra python
+    #   justify run terra python ${@+"${@}"}
+    #   extra_args=$#
+    #   ;;
+    run_terra) # Run command (arguments) in terra
       local rv=0
-      Just-docker-compose run terra ${@+"${@}"} || rv=$?
+      Pipenv run ${@+"${@}"} || rv=$?
       extra_args=$#
       return $rv
       ;;
@@ -113,7 +128,8 @@ function caseify()
           Docker stack deploy -c - terra
       ;;
 
-    test) # Run unit tests
+    test_terra) # Run unit tests
+      source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
       # Just-docker-compose run terra python -m unittest discover "${TERRA_TERRA_DIR_DOCKER}/terra"
       Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
@@ -136,14 +152,14 @@ function caseify()
                           --global-config "${TERRA_CWD}/autopep8.ini" \
                           "${TERRA_TERRA_DIR}/terra"
       ;;
-    sync) # Synchronize the many aspects of the project when new code changes \
+    sync_terra) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
       if [ ! -e "${TERRA_CWD}/.just_synced" ]; then
         # Add any commands here, like initializing a database, etc... that need
         # to be run the first time sync is run.
         touch "${TERRA_CWD}/.just_synced"
       fi
-      justify build
+      justify build terra
       Pipenv install --keep-outdated
       ;;
     dev_sync) # Developer's extra sync
@@ -176,7 +192,7 @@ function caseify()
     #   extra_args+=$#
     #   ;;
 
-    ipykernel) # Start a jupyter kernel in runserver
+    ipykernel_terra) # Start a jupyter kernel in runserver
       # Example kernel.json
       # {
       # "display_name": "terra",
@@ -193,9 +209,10 @@ function caseify()
       extra_args=$#
       ;;
     *)
-      defaultify "${just_arg}" ${@+"${@}"}
+      plugin_not_found=1
       ;;
   esac
+  return 0
 }
 
 if ! command -v justify &> /dev/null; then caseify ${@+"${@}"};fi
