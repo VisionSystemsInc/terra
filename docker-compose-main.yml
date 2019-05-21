@@ -20,11 +20,17 @@ services:
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
-      # source code
+      # terra source code
       - &terra_source_volume
         type: ${TERRA_TERRA_DIR_TYPE}
         source: ${TERRA_TERRA_DIR}
         target: ${TERRA_TERRA_DIR_DOCKER}
+        read_only: true
+      # app source code
+      - &terra_app_volume
+        type: ${TERRA_APP_DIR_TYPE}
+        source: ${TERRA_APP_DIR}
+        target: ${TERRA_APP_DIR_DOCKER}
         read_only: true
       # vsi_common
       - &terra_vsi_volume
