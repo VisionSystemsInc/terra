@@ -41,7 +41,7 @@ services:
       # The storage location of the pipenv virtualenv and venv cache
       - &terra_venv_volume
         type: volume
-        source: venv
+        source: terra-venv
         target: /venv
       # The settings volume is used for settings files around
       # - &terra_settings
@@ -67,7 +67,7 @@ services:
       - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
 
 volumes:
-  venv:
+  terra-venv:
     labels:
       com.vsi.just.clean_action: delete
       com.vsi.just.clean_setup: run terra nopipenv true

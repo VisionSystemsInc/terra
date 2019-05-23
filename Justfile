@@ -14,28 +14,27 @@ cd "${TERRA_CWD}"
 JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
 
-function Pipenv()
+function Terra_Pipenv()
 {
   local rv=0
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
     PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
     return $rv
   else
-    Just-docker-compose run terra pipenv ${@+"${@}"} || rv=$?
+    Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run terra pipenv ${@+"${@}"} || rv=$?
     return $rv
   fi
 }
 
-# Allow terra to be run as a non-plugin too
-if ! declare -pf caseify &> /dev/null; then
-  function caseify()
-  {
-    terra_caseify ${@+"${@}"}
-    if [[ ${plugin_not_found} = 1 ]]; then
-      defaultify ${@+"${@}"}
-    fi
-  }
-fi
+# Allow terra to be run as a non-plugin too. When called as a plugin, this
+# caseify is overridden by the main project
+function caseify()
+{
+  terra_caseify ${@+"${@}"}
+  if [[ ${plugin_not_found} = 1 ]]; then
+    defaultify ${@+"${@}"}
+  fi
+}
 
 # Main function
 function terra_caseify()
@@ -46,14 +45,16 @@ function terra_caseify()
     --local) # Run terra command locally
       export TERRA_LOCAL=1
       ;;
+
+    ### Building docker images ###
     build_terra) # Build Docker image
       if [ "$#" -gt "0" ]; then
-        Docker-compose "${just_arg}" ${@+"${@}"}
+        Docker-compose build ${@+"${@}"}
         extra_args=$#
       else
         justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
-        Docker-compose build
-        justify docker-compose clean venv
+        Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
+        COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         justify _post_build_terra
         justify build services
       fi
@@ -63,42 +64,37 @@ function terra_caseify()
       docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
       docker rm ${image_name}
       ;;
-    ## python) # Run host terra python
-    #   justify run terra python ${@+"${@}"}
-    #   extra_args=$#
-    #   ;;
-    run_terra) # Run command (arguments) in terra
-      local rv=0
-      Pipenv run ${@+"${@}"} || rv=$?
-      extra_args=$#
-      return $rv
-      ;;
-    ## run) # Run terra cli (first argument is which cli, "dsm" for example)
-    #   # Just-docker-compose run terra ${@+"${@}"}
-    #   Pipenv run python -m terra.apps.cli ${@+"${@}"}
-    #   extra_args=$#
-    #   ;;
-
-    build_redis) #
-      justify build services redis
-      ;;
-    build_services) # Build redis services
+    build_services) # Build services. Takes arguments that are passed to the \
+                    # docker-compose build command, such as "redis"
       Docker-compose -f "${TERRA_CWD}/docker-compose.yml" build ${@+"${@}"}
       extra_args=$#
+      ;;
+
+    ### Running containers ###
+    run) # Run python module/cli in terra
+    
+    run_terra) # Run command (arguments) in terra
+      local rv=0
+      Terra_Pipenv run ${@+"${@}"} || rv=$?
+      extra_args=$#
+      return $rv
       ;;
     run_redis) # Run redis
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
       extra_args=$#
       ;;
+    run_celery) # Starts a celery worker
+      local node_name
+      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+        node_name="local@%h"
+      else
+        node_name="docker@%h"
+      fi
 
-    run_celery-local) # Run celery on the host
-      Pipenv run celery -A terra.executor.celery.app worker --loglevel=INFO -n local@%h
+      Terra_Pipenv run celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
       ;;
 
-    run_celery-docker) # Run celery in the docker
-      justify run bash -c "celery -A terra.executor.celery.app worker --loglevel=INFO -n docker@%h"
-      ;;
-
+    ### Run Debugging containers ###
     generate-redis-browser-hash) # Generate a redis browser hash
       touch "${TERRA_REDIS_BROWSER_SECRET_FILE}"
       Docker run -it --rm --mount type=bind,source="$(real_path "${TERRA_REDIS_BROWSER_SECRET_FILE}")",destination=/hash_file  python:3 sh -c "
@@ -119,6 +115,7 @@ function terra_caseify()
       Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-browser
       ;;
 
+    ### Deploy command ###
     up) # Start redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" up -d
       ;;
@@ -128,15 +125,16 @@ function terra_caseify()
           Docker stack deploy -c - terra
       ;;
 
+
+    ### Testing ###
     test_terra) # Run unit tests
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
-      # Just-docker-compose run terra python -m unittest discover "${TERRA_TERRA_DIR_DOCKER}/terra"
-      Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+      Terra_Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       extra_args=$#
       ;;
     pep8) # Check for pep8 compliance in ./terra
-         Just-docker-compose run test bash -c \
+         Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run test bash -c \
           "if ! command -v autopep8 >& /dev/null; then
              pipenv install --dev;
            fi;
@@ -145,13 +143,15 @@ function terra_caseify()
                     ${TERRA_TERRA_DIR_DOCKER}/terra"
       ;;
     pep8_local) # Check pep8 compliance without using docker
-      if ! Pipenv run command -v autopep8 >& /dev/null; then
-        Pipenv install --dev --keep-outdated
+      if ! Terra_Pipenv run command -v autopep8 >& /dev/null; then
+        Terra_Pipenv install --dev --keep-outdated
       fi
-      Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
+      Terra_Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
                           --global-config "${TERRA_CWD}/autopep8.ini" \
                           "${TERRA_TERRA_DIR}/terra"
       ;;
+
+    ### Syncing ###
     sync_terra) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
       if [ ! -e "${TERRA_CWD}/.just_synced" ]; then
@@ -160,19 +160,20 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       justify build terra
-      Pipenv install --keep-outdated
+      Terra_Pipenv install --keep-outdated
       ;;
     dev_sync) # Developer's extra sync
-      Pipenv install --dev --keep-outdated
+      Terra_Pipenv install --dev --keep-outdated
       ;;
     dev_update) # Developer: Update python packages
-      Pipenv install --dev
+      Terra_Pipenv install --dev
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
-      justify docker-compose clean venv
+      COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean venv
       ;;
 
+    ### Other ###
     # command: bash -c "touch /tmp/watchdog; while [ -e /tmp/watchdog ]; do rm /tmp/watchdog; sleep 1000; done"
     # vscode) # Execute vscode magic in a vscode container
     #   local container="$(docker ps -q -f "label=com.docker.compose.service=vscode" -f "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}")"
@@ -204,7 +205,7 @@ function terra_caseify()
       # "env": {"JUSTFILE": "/home/noah/git/terra/Justfile"},
       # "language": "python"
       # }
-      Just-docker-compose run -T --service-ports ipykernel \
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run -T --service-ports ipykernel \
           pipenv run python -m ipykernel_launcher ${@+"${@}"} > /dev/null
       extra_args=$#
       ;;
