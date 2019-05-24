@@ -200,13 +200,26 @@ def processing_dir(self):
   The default :func:`settings_property` for the processing directory. If not
   set in your configuration, it will default to the directory where the config
   file is stored. If this is not possible, it will use the current working
-  directory
+  directory.
+
+  If the directory is not writeable, a temporary directory will be used instead
   '''
+
   if hasattr(self, 'config_file'):
-    return os.path.dirname(self.config_file)
+    processing_dir = os.path.dirname(self.config_file)
   else:
-    logger.warning('No config file found, and processing dir unset. Using cwd')
-    return os.getcwd()
+    processing_dir = os.getcwd()
+    logger.warning('No config file found, and processing dir unset. '
+                   f'Using cwd: {processing_dir}')
+
+  if not os.access(processing_dir, os.W_OK):
+    import tempfile
+    bad_dir = processing_dir
+    processing_dir = tempfile.mkdtemp(prefix="terra_")
+    logger.error(f'You do not have access to processing dir: "{bad_dir}". '
+                 f'Using "{processing_dir}" instead')
+
+  return processing_dir
 
 # TODO: come up with a way for apps to extend this themselves
 global_templates = [

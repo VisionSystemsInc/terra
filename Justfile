@@ -72,7 +72,9 @@ function terra_caseify()
 
     ### Running containers ###
     run) # Run python module/cli in terra
-    
+      Terra_Pipenv run python -m ${@+"${@}"}
+      extra_args=$#
+      ;;
     run_terra) # Run command (arguments) in terra
       local rv=0
       Terra_Pipenv run ${@+"${@}"} || rv=$?

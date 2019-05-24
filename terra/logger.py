@@ -83,7 +83,7 @@ class _SetupTerraLogger():
   after :data:`terra.settings` is configured
   '''
   default_formatter = logging.Formatter('%(asctime)s : %(levelname)s - %(message)s')
-  default_stderr_handler_level = logging.ERROR
+  default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
   default_log_prefix = "terra_log_"
 

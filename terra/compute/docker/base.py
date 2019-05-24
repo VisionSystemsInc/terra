@@ -29,8 +29,9 @@ class Compute(BaseCompute):
         List of arguments to be pass to ``just``
     '''
     logger.debug('Running: ' + ' '.join(
-        [quote(f'{k}={v}') for k, v in env.items()] +
+        # [quote(f'{k}={v}') for k, v in env.items()] +
         [quote(x) for x in ('just',) + args]))
+    env['JUSTFILE'] = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
     with EnvironmentContext(**env):
       Popen(('just',) + args).wait()
 
