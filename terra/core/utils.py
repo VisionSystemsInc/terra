@@ -109,7 +109,7 @@ class Handler:
     return self._connect_backend()
 
   def __getattr__(self, name):
-    return getattr(super().__getattribute__(self, "_connection"), name)
+    return getattr(super().__getattribute__("_connection"), name)
     # This was "return getattr(self._connection, name)", but if `_connection()`
     # throws an AttributeError while evaluating the "." in `self._connection`,
     # then __getattr__ is called on on "_connection" and you get an infinite
@@ -148,64 +148,18 @@ class Handler:
     if hasattr(self._connection, 'close'):
       self._connection.close()
 
-# class ClassHandler(Handler):
-#   '''
-#   The :class:`ClassHandler` is a generic handler class for abstracting specific
-#   type of class and the base class, essentially letting you to make calls on a
-#   "base" class easily, without any complications.
 
-#   Like :class:`Handler`, except operates on a class instead of an instance of a
-#   class.
+class ClassHandler(Handler):
+  '''
+  The :class:`ClassHandler` is a generic handler class for abstracting specific
+  type of class and the base class, essentially letting you to make calls on a
+  "base" class easily, without any complications.
 
-#   Based loosly on :class:`django.db.utils.ConnectionHandler`
-#   '''
+  Like :class:`Handler`, except operates on a class instead of an instance of a
+  class.
 
-#   def _connect_backend(self):
-#     '''
-#     Overload this function in children classes
-#     '''
-#     if self._overrite_type:
-#       _type = self._overrite_type
-#     else:
-#       _type = int
-#     return _type()
+  Based loosly on :class:`django.db.utils.ConnectionHandler`
+  '''
 
-#   @cached_property
-#   def _connection(self):
-#     return self._connect_backend()
-
-#   def __getattr__(self, name):
-#     return getattr(self._connection, name)
-
-#   def __setattr__(self, name, value):
-#     if name in ('_overrite_type'):
-#       return super().__setattr__(name, value)
-#     return setattr(self._connection, name, value)
-
-#   def __delattr__(self, name):
-#     return delattr(self._connection, name)
-
-#   # Incase this needs multiple computes simultaneously...
-
-#   # def __getitem__(self, key):
-#   #   if not self._connection:
-#   #     backend = load_backend(self.compute.arch)
-#   #     self._connection = backend.Compute()
-#   #   return getattr(self._connection, key)
-#   #   # self.ensure_defaults(alias)
-#   #   # self.prepare_test_settings(alias)
-#   #   # db = self.databases[alias]
-#   #   # backend = load_backend(db['ENGINE'])
-#   #   # conn = backend.DatabaseWrapper(db, alias)
-#   #   # setattr(self._connections, alias, conn)
-#   #   # return self._connection
-
-#   # def __setitem__(self, key, value):
-#   #   setattr(self._connection, key, value)
-
-#   # def __delitem__(self, key):
-#   #   delattr(self._connection, key)
-
-#   def close(self):
-#     if hasattr(self._connection, 'close'):
-#       self._connection.close()
+  def __call__(self, *args, **kwargs):
+    return self._connection(*args, **kwargs)

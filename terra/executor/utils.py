@@ -1,18 +1,18 @@
 import concurrent.futures
 from terra import settings
-from terra.core.utils import Handler
+from terra.core.utils import ClassHandler
 from importlib import import_module
 
-class ExecutorHandler(Handler):
+class ExecutorHandler(ClassHandler):
   '''
-  The :class:`ComputeHandler` class gives a single entrypoint to interact with
-  the ``concurrent.futures`` executor.
+  The :class:`ExecutorHandler` class gives a single entrypoint to interact with
+  the ``concurrent.futures`` executor class.
   '''
 
   def _connect_backend(self):
     '''
-    Loads the compute's backend's base module, given either a fully qualified
-    compute backend name, or a partial (``terra.compute.{partial}.base``), and
+    Loads the executor backend's base module, given either a fully qualified
+    compute backend name, or a partial (``terra.executor.{partial}.executor``), and
     then returns a connection to the backend
 
     Parameters
@@ -25,8 +25,8 @@ class ExecutorHandler(Handler):
 
     if backend_name is None:
       backend_name = settings.executor.type
-    if backend_name == {}:
-      backend_name = 'terra.compute.dummy'
+    if not backend_name:
+      backend_name = 'ThreadPoolExecutor'
 
     if backend_name == "ThreadPoolExecutor":
       return concurrent.futures.ThreadPoolExecutor
@@ -39,6 +39,7 @@ class ExecutorHandler(Handler):
       module_name = backend_name.rsplit('.', 1)
       module = import_module(f'{module_name[0]}')
       return getattr(module, module_name[1])
+
 Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.
