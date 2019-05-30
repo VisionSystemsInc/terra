@@ -13,7 +13,10 @@ ipykernel = "*"
 
 [packages]
 terra = {path = ".",editable = true}
-envcontext = "*"
 vsi-common = {editable = true,path = "./external/vsi_common"}
-celery = {extras = ["redis"],version = "*"}
+# Repeat this dependencies possibly due to a bug
+commentjson = "*"
+docker-compose = "*"
+envcontext = "*"
+celery = {extras = ["redis"], version = "*"}
 flower = "*"

@@ -43,10 +43,33 @@ class cached_property:
       ``url = cached_property(get_absolute_url, name='url')``)
   """
 
+
+  name = None
+  @staticmethod
+  def func(instance):
+    raise TypeError(
+        'Cannot use cached_property instance without calling '
+        '__set_name__() on it.'
+    )
+
   def __init__(self, func, name=None):
-    self.func = func
+    self.real_func = func
     self.__doc__ = getattr(func, '__doc__')
-    self.name = name or func.__name__
+
+  def __set_name__(self, owner, name):
+    if self.name is None:
+        self.name = name
+        self.func = self.real_func
+    elif name != self.name:
+        raise TypeError(
+            "Cannot assign the same cached_property to two different names "
+            "(%r and %r)." % (self.name, name)
+        )
+
+  # def __init__(self, func, name=None):
+  #   self.func = func
+  #   self.__doc__ = getattr(func, '__doc__')
+  #   self.name = name or func.__name__
 
   def __get__(self, instance, cls=None):
     """
@@ -86,7 +109,11 @@ class Handler:
     return self._connect_backend()
 
   def __getattr__(self, name):
-    return getattr(self._connection, name)
+    return getattr(super().__getattribute__("_connection"), name)
+    # This was "return getattr(self._connection, name)", but if `_connection()`
+    # throws an AttributeError while evaluating the "." in `self._connection`,
+    # then __getattr__ is called on on "_connection" and you get an infinite
+    # recursion loop.
 
   def __setattr__(self, name, value):
     if name in ('_overrite_type'):
@@ -120,3 +147,19 @@ class Handler:
   def close(self):
     if hasattr(self._connection, 'close'):
       self._connection.close()
+
+
+class ClassHandler(Handler):
+  '''
+  The :class:`ClassHandler` is a generic handler class for abstracting specific
+  type of class and the base class, essentially letting you to make calls on a
+  "base" class easily, without any complications.
+
+  Like :class:`Handler`, except operates on a class instead of an instance of a
+  class.
+
+  Based loosly on :class:`django.db.utils.ConnectionHandler`
+  '''
+
+  def __call__(self, *args, **kwargs):
+    return self._connection(*args, **kwargs)

@@ -6,10 +6,12 @@ from subprocess import Popen
 
 from shlex import quote
 
+from vsi.tools.diff import dict_diff
+
 from terra.compute.base.base import BaseCompute
 # from terra import settings
 from terra.compute.utils import load_service
-from terra.logger import getLogger
+from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
 
@@ -29,10 +31,15 @@ class Compute(BaseCompute):
         List of arguments to be pass to ``just``
     '''
     logger.debug('Running: ' + ' '.join(
-        [quote(f'{k}={v}') for k, v in env.items()] +
+        # [quote(f'{k}={v}') for k, v in env.items()] +
         [quote(x) for x in ('just',) + args]))
-    with EnvironmentContext(**env):
-      Popen(('just',) + args).wait()
+    env['JUSTFILE'] = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
+    if logger.getEffectiveLevel() <= DEBUG1:
+      dd = dict_diff(os.environ, env)[3]
+      if dd:
+        logger.debug1('Environment Modification:\n' + '\n'.join(dd))
+      with EnvironmentContext(**env):
+        Popen(('just',) + args).wait()
 
   def run(self, service_class):
     '''

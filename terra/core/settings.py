@@ -200,13 +200,26 @@ def processing_dir(self):
   The default :func:`settings_property` for the processing directory. If not
   set in your configuration, it will default to the directory where the config
   file is stored. If this is not possible, it will use the current working
-  directory
+  directory.
+
+  If the directory is not writeable, a temporary directory will be used instead
   '''
+
   if hasattr(self, 'config_file'):
-    return os.path.dirname(self.config_file)
+    processing_dir = os.path.dirname(self.config_file)
   else:
-    logger.warning('No config file found, and processing dir unset. Using cwd')
-    return os.getcwd()
+    processing_dir = os.getcwd()
+    logger.warning('No config file found, and processing dir unset. '
+                   f'Using cwd: {processing_dir}')
+
+  if not os.access(processing_dir, os.W_OK):
+    import tempfile
+    bad_dir = processing_dir
+    processing_dir = tempfile.mkdtemp(prefix="terra_")
+    logger.error(f'You do not have access to processing dir: "{bad_dir}". '
+                 f'Using "{processing_dir}" instead')
+
+  return processing_dir
 
 # TODO: come up with a way for apps to extend this themselves
 global_templates = [
@@ -220,24 +233,27 @@ global_templates = [
         "date_format": None,
         "style": "%"
       },
-      "params": {
-        "color_elev_thres": 6,
-        "azimuth_thres": 90.0,
-        "log_level": 10,
-        "VisualSFM": "VisualSFM",
-        "time_thres_days": 200,
-        "dem_res": 1.0,
-        "ground_elev": 30.0,
-        "dsm_max_height": 180.0,
-        "gpu_thread": 2,
-        "max_stereo_pair": 600,
-        "cpu_thread": 4,
-        "max_time": 120,
-        "num_active_disparity": 110,
-        "n_scene_tile": 64,
-        "min_disparity": -220,
-        "world_size": 500.0
+      "executor": {
+        "type": "ThreadPoolExecutor"
       },
+      # "params": {
+      #   "color_elev_thres": 6,
+      #   "azimuth_thres": 90.0,
+      #   "log_level": 10,
+      #   "VisualSFM": "VisualSFM",
+      #   "time_thres_days": 200,
+      #   "dem_res": 1.0,
+      #   "ground_elev": 30.0,
+      #   "dsm_max_height": 180.0,
+      #   "gpu_thread": 2,
+      #   "max_stereo_pair": 600,
+      #   "cpu_thread": 4,
+      #   "max_time": 120,
+      #   "num_active_disparity": 110,
+      #   "n_scene_tile": 64,
+      #   "min_disparity": -220,
+      #   "world_size": 500.0
+      # },
       'status_file': status_file,
       'processing_dir': processing_dir
     }
@@ -497,15 +513,16 @@ class Settings(ObjectDict):
         # Nested update and run patch code
         self.update(d)
 
-  def __getattr__(self, name):
+  def __getitem__(self, name):
     '''
-    ``__getattr__`` that will evaluate @settings_property functions, and cache
+    ``__getitem__`` that will evaluate @settings_property functions, and cache
     the values
     '''
     try:
-      val = self[name]
+      val = super().__getitem__(name)
       if isfunction(val) and getattr(val, 'settings_property', None):
         val = val(self)
+        logger.debug3(f'Evaluating settings {name}: {val}')
         self[name] = val
       return val
     except KeyError:

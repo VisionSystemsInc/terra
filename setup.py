@@ -5,6 +5,9 @@ setup(name="terra",
       description="Terra",
       install_requires=[
         "commentjson",
-        "docker-compose"
+        "docker-compose",
+        "envcontext",
+        "celery[redis]",
+        "flower"
       ]
 )

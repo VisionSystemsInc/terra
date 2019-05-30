@@ -54,7 +54,7 @@ class ComputeHandler(Handler):
 
     if backend_name is None:
       backend_name = settings.compute.arch
-    if backend_name == {}:
+    if not backend_name:
       backend_name = 'terra.compute.dummy'
 
     try:

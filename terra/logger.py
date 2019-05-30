@@ -17,9 +17,10 @@ crashes before it is even configured.
 
 After the :data:`terra.settings` are
 :data:`initialized<terra.core.signals.post_settings_configured>`, the
-``terra_initial_tmp_XXXXXXXX`` file is removed, and another log file is created
-according to the :ref:`settings_logging`, with a ``terra_log_XXXXXXXX``
-prefix in your :data:`terra.core.settings.processing_dir`.
+``terra_initial_tmp_XXXXXXXX`` file is removed, and another log file is used
+according to the :ref:`settings_logging`, named ``terra_log`` in your
+:data:`terra.core.settings.processing_dir`. The ``terra_log`` file is appended
+to if it already exists.
 
 All messages that are emitted before :data:`terra.settings` is configured are
 then replayed for the newly configured logger handlers so that any messages of
@@ -61,11 +62,13 @@ import logging.handlers
 import sys
 import tempfile
 import threading
+import pprint
 import os
 from terra.core.exceptions import ImproperlyConfigured
 
 from logging import (
-  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, getLogger
+  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, getLogger,
+  _acquireLock, _releaseLock
 )
 # Must be import signal after getLogger is defined... Currently this is imported
 # from logger. But if a custom getLogger is defined eventually, it will need to
@@ -77,15 +80,36 @@ __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
            'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3']
 
 
+class HandlerLoggingContext(object):
+  def __init__(self, logger, handlers):
+    self.handlers = handlers
+    self.logger = logger
+
+  def __enter__(self):
+    try:
+      _acquireLock()
+      self.old_handlers = self.logger.handlers
+      self.logger.handlers = self.handlers
+    finally:
+      _releaseLock()
+
+  def __exit__(self, et, ev, tb):
+    try:
+      _acquireLock()
+      self.logger.handlers = self.old_handlers
+    finally:
+      _releaseLock()
+    # implicit return of None => don't swallow exceptions
+
 class _SetupTerraLogger():
   '''
   A simple logger class used internally to configure the logger before and
   after :data:`terra.settings` is configured
   '''
   default_formatter = logging.Formatter('%(asctime)s : %(levelname)s - %(message)s')
-  default_stderr_handler_level = logging.ERROR
+  default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
-  default_log_prefix = "terra_log_"
+  default_log_prefix = "terra_log"
 
   def __init__(self):
     self._configured = False
@@ -138,10 +162,10 @@ class _SetupTerraLogger():
                                   style=settings.logging.style)
 
     # Setup log file for use in configure
-    self.log_file = tempfile.NamedTemporaryFile(mode="w+",
-                                                prefix=self.default_log_prefix,
-                                                dir=settings.processing_dir,
-                                                delete=False)
+    self.log_file = os.path.join(settings.processing_dir,
+                                 self.default_log_prefix)
+    self.log_file = open(self.log_file, 'a')
+
     self.file_handler = logging.StreamHandler(stream=self.log_file)
 
     # Configure log level
@@ -158,6 +182,10 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_file_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
+    # Log the settings only to the file handler
+    with HandlerLoggingContext(self.root_logger, [self.file_handler]):
+      self.root_logger.log(DEBUG1, "Settings:\n" +
+                           pprint.pformat(dict(settings)))
 
     # filter the stderr buffer
     self.preconfig_stderr_handler.buffer = \

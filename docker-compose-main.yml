@@ -14,71 +14,51 @@ services:
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
       - DISPLAY
-      - JUSTFILE=/src/docker/terra.Justfile
-      - JUST_SETTINGS=/src/terra.env
-      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER}:${TERRA_INSTALL_DIR_DOCKER}/lib/python3/site-packages:${TERRA_SOURCE_DIR_DOCKER}/external/vsi_common/python
+      - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/terra.Justfile
+      - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
+      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER-/src}
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
-      # source code
+      # terra source code
       - &terra_source_volume
-        type: ${TERRA_SOURCE_DIR_TYPE}
-        source: ${TERRA_SOURCE_DIR}
-        target: ${TERRA_SOURCE_DIR_DOCKER}
+        type: ${TERRA_TERRA_DIR_TYPE}
+        source: ${TERRA_TERRA_DIR}
+        target: ${TERRA_TERRA_DIR_DOCKER}
+        read_only: true
+      # app source code
+      - &terra_app_volume
+        type: ${TERRA_APP_DIR_TYPE}
+        source: ${TERRA_APP_DIR}
+        target: ${TERRA_APP_DIR_DOCKER}
         read_only: true
       # vsi_common
       - &terra_vsi_volume
-        type: ${TERRA_SOURCE_DIR_TYPE}
-        source: ${TERRA_SOURCE_DIR}/external/vsi_common
+        type: ${TERRA_TERRA_DIR_TYPE}
+        source: ${TERRA_TERRA_DIR}/external/vsi_common
         target: /vsi
         read_only: true
-      # The compile binaries final location
-      - &terra_install_volume
-        type: ${TERRA_INSTALL_DIR_TYPE}
-        source: ${TERRA_INSTALL_DIR}
-        target: ${TERRA_INSTALL_DIR_DOCKER}
       # The storage location of the pipenv virtualenv and venv cache
       - &terra_venv_volume
         type: volume
-        source: venv
+        source: terra-venv
         target: /venv
       # The settings volume is used for settings files around
       # - &terra_settings
       #   type: bind
       #   source: ${TERRA_SETTINGS_DIR-}
       #   target: ${TERRA_SETTINGS_DIR_DOCKER}
-  compile:
-    <<: *terra
-    build:
-      <<: *terra_build
-      target: compile
-    image: ${TERRA_DOCKER_REPO}:terra_compile_${TERRA_USERNAME}
-    volumes:
-      - *terra_source_volume
-      - *terra_install_volume
-      - *terra_vsi_volume
-      # build artifiacts for incremental building
-      - type: ${TERRA_BUILD_DIR_TYPE}
-        source: ${TERRA_BUILD_DIR}
-        target: ${TERRA_BUILD_DIR_DOCKER}
 
   test:
     <<: *terra
     volumes:
       - <<: *terra_source_volume
         read_only: false
-      - *terra_install_volume
       - *terra_venv_volume
       - *terra_vsi_volume
 
   ipykernel:
     <<: *terra
-    volumes:
-      - *terra_source_volume
-      - *terra_vsi_volume
-      - *terra_install_volume
-      - *terra_venv_volume
-      # No settings here
     ports:
       - "${JUPYTER_CONTROL_PORT_HOST-10001}:${JUPYTER_CONTROL_PORT-10001}"
       - "${JUPYTER_HB_PORT_HOST-10002}:${JUPYTER_HB_PORT-10002}"
@@ -86,54 +66,8 @@ services:
       - "${JUPYTER_SHELL_PORT_HOST-10004}:${JUPYTER_SHELL_PORT-10004}"
       - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
 
-  redis-browser:
-    image: rediscommander/redis-commander
-    ports:
-      - "${TERRA_REDIS_BROWSER_PORT}:${TERRA_REDIS_BROWSER_PORT_DOCKER}"
-    secrets:
-      - source: redis_secret
-        target: ${TERRA_REDIS_SECRET_DOCKER}
-      - source: redis_browser_secret
-        target: ${TERRA_REDIS_BROWSER_SECRET_FILE}
-    command: |
-      sh -c '
-        echo -n '"'"'{
-          "connections":[
-            {
-              "password": "'"'"' > /redis-commander/config/local-production.json
-        cat /run/secrets/redis_password | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
-        echo -n '"'"'",
-              "host": "${TERRA_REDIS_HOSTNAME_DOCKER}",
-              "label": "terra",
-              "dbIndex": 0,
-              "connectionName": "redis-commander",
-              "port": "6379"
-            }
-          ],
-          "server": {
-            "address": "0.0.0.0",
-            "port": ${TERRA_REDIS_BROWSER_PORT_DOCKER},
-            "httpAuth": {
-              "username": "admin",
-              "passwordHash": "'"'"'>> /redis-commander/config/local-production.json
-          cat "/run/secrets/${TERRA_REDIS_BROWSER_SECRET_FILE}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
-          echo '"'"'"
-            }
-          }
-        }'"'"' >> /redis-commander/config/local-production.json
-        /redis-commander/docker/entrypoint.sh'
-    # " Fix vscode syntax highlighting error
-
-secrets:
-  redis_secret:
-    file: ${TERRA_REDIS_SECRET_FILE}
-  redis_browser_secret:
-    file: ${TERRA_REDIS_BROWSER_SECRET_FILE}
-
 volumes:
-  venv:
+  terra-venv:
     labels:
       com.vsi.just.clean_action: delete
       com.vsi.just.clean_setup: run terra nopipenv true
-  terra-install:
-  terra-build:
