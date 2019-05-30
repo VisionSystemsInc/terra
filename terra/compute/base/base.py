@@ -1,7 +1,7 @@
 import os
 from inspect import isclass
 from functools import partial
-from copy import copy
+
 
 class BaseService:
   '''
@@ -12,7 +12,7 @@ class BaseService:
   '''
 
   def __init__(self):
-    self.env = copy(os.environ)
+    self.env = os.environ.copy()
     ''' A copy of the processes environment variables local to a service '''
 
   def pre_run(self):
