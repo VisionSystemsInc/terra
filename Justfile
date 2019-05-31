@@ -30,6 +30,7 @@ function Terra_Pipenv()
 # caseify is overridden by the main project
 function caseify()
 {
+  local plugin_not_found
   terra_caseify ${@+"${@}"}
   if [[ ${plugin_not_found-} = 1 ]]; then
     defaultify ${@+"${@}"}
