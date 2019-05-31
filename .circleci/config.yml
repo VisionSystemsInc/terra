@@ -42,10 +42,10 @@ jobs:
           # no_output_timeout: 30m
           command: |
             source setup.env
-            just test terra ${CIRCLE_CI_TEST_FLAGS-}
+            TERRA_LOCAL=0 just test terra ${CIRCLE_CI_TEST_FLAGS-}
 
       - run:
           name: Check pep8 compliance
           command: |
             source setup.env
-            just pep8
+            TERRA_LOCAL=0 just pep8
