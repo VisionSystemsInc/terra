@@ -31,7 +31,7 @@ function Terra_Pipenv()
 function caseify()
 {
   terra_caseify ${@+"${@}"}
-  if [[ ${plugin_not_found} = 1 ]]; then
+  if [[ ${plugin_not_found-} = 1 ]]; then
     defaultify ${@+"${@}"}
   fi
 }

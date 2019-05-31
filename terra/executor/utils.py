@@ -3,6 +3,7 @@ from terra import settings
 from terra.core.utils import ClassHandler
 from importlib import import_module
 
+
 class ExecutorHandler(ClassHandler):
   '''
   The :class:`ExecutorHandler` class gives a single entrypoint to interact with
@@ -39,6 +40,7 @@ class ExecutorHandler(ClassHandler):
       module_name = backend_name.rsplit('.', 1)
       module = import_module(f'{module_name[0]}')
       return getattr(module, module_name[1])
+
 
 Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing

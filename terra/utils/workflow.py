@@ -42,6 +42,7 @@ class resumable(BasicDecorator):
   AlreadyRunException
       Thrown when function attempts to run a second time.
   '''
+
   def __inner_call__(self, *args, **kwargs):
     try:
       if self.fun.already_run:

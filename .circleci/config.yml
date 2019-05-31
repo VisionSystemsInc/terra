@@ -35,21 +35,14 @@ jobs:
           name: Build dockers
           command: |
             source setup.env
-            just build
-
-      - run:
-          name: Build code
-          # no_output_timeout: 30m
-          command: |
-            source setup.env
-            just compile
+            just build terra
 
       - run:
           name: Running test code
           # no_output_timeout: 30m
           command: |
             source setup.env
-            just test ${CIRCLE_CI_TEST_FLAGS-}
+            just test terra ${CIRCLE_CI_TEST_FLAGS-}
 
       - run:
           name: Check pep8 compliance

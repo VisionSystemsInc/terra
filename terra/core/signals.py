@@ -43,6 +43,7 @@ import weakref
 # interdependencies with logger. Import after post_settings_configured at the
 # end of the file if you must...
 
+
 def _make_id(target):
   if hasattr(target, '__func__'):
     return (id(target.__self__), id(target.__func__))
@@ -85,7 +86,7 @@ class Signal:
     # 'sender_receivers_cache'. The cache is cleaned when .connect() or
     # .disconnect() is called and populated on send().
     self.sender_receivers_cache = weakref.WeakKeyDictionary() if use_caching \
-                                                              else {}
+        else {}
     '''weakref.WeakKeyDictionary: Stores receivers for a sender if
     :data:`use_caching` is on'''
     self._dead_receivers = False
@@ -301,6 +302,7 @@ class Signal:
     # self.lock.
     self._dead_receivers = True
 
+
 def receiver(signal, **kwargs):
   """
   A decorator for connecting receivers to signals.
@@ -335,6 +337,7 @@ def receiver(signal, **kwargs):
     return func
   return _decorator
 
+
 __all__ = ['Signal', 'receiver', 'post_settings_configured']
 
 # a signal for settings done being loaded
@@ -348,5 +351,5 @@ manual call to :func:`terra.core.settings.LazySettings.configure`.
 
 # Must be after post_settings_configured to prevent circular import errors.
 # Just can't use logger during import (global scope)
-from terra.logger import getLogger
+from terra.logger import getLogger  # noqa
 logger = getLogger(__name__)

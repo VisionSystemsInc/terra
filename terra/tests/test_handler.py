@@ -8,12 +8,12 @@ import inspect
 
 from terra.core.utils import cached_property
 
+
 class TestHandler(TestCase):
   def test_handler(self):
     handle = Handler()
     handle.real
     self.assertIsNotNone(handle._connection)
-
 
   @mock.patch.object(settings, '_wrapped', None)
   def test_compute_handler(self):

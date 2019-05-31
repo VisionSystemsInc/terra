@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 class cached_property:
   """
   Decorator that converts a method with a single self argument into a
@@ -43,7 +44,6 @@ class cached_property:
       ``url = cached_property(get_absolute_url, name='url')``)
   """
 
-
   name = None
   @staticmethod
   def func(instance):
@@ -58,18 +58,13 @@ class cached_property:
 
   def __set_name__(self, owner, name):
     if self.name is None:
-        self.name = name
-        self.func = self.real_func
+      self.name = name
+      self.func = self.real_func
     elif name != self.name:
-        raise TypeError(
-            "Cannot assign the same cached_property to two different names "
-            "(%r and %r)." % (self.name, name)
-        )
-
-  # def __init__(self, func, name=None):
-  #   self.func = func
-  #   self.__doc__ = getattr(func, '__doc__')
-  #   self.name = name or func.__name__
+      raise TypeError(
+          "Cannot assign the same cached_property to two different names "
+          "(%r and %r)." % (self.name, name)
+      )
 
   def __get__(self, instance, cls=None):
     """
@@ -91,6 +86,7 @@ class Handler:
 
   Based loosly on :class:`django.db.utils.ConnectionHandler`
   '''
+
   def __init__(self, override_type=None):
     self._overrite_type = override_type
 

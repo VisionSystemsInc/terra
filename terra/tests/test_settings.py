@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory, NamedTemporaryFile
 from terra import settings
 from terra.core.settings import ObjectDict, settings_property
 
+
 class TestObjectDict(TestCase):
 
   def test_basic(self):

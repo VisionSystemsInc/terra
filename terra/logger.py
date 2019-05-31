@@ -101,12 +101,14 @@ class HandlerLoggingContext(object):
       _releaseLock()
     # implicit return of None => don't swallow exceptions
 
+
 class _SetupTerraLogger():
   '''
   A simple logger class used internally to configure the logger before and
   after :data:`terra.settings` is configured
   '''
-  default_formatter = logging.Formatter('%(asctime)s : %(levelname)s - %(message)s')
+  default_formatter = logging.Formatter('%(asctime)s : %(levelname)s - '
+                                        '%(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
   default_log_prefix = "terra_log"
@@ -199,7 +201,6 @@ class _SetupTerraLogger():
     #                        if (x.levelno >= level)] and
     #                           (x.levelno < default_stderr_handler_level)]
 
-
     # Filter file buffer. Never remove default_stderr_handler_level message,
     # they won't be in the new output file
     self.preconfig_file_handler.buffer = \
@@ -222,10 +223,12 @@ class _SetupTerraLogger():
 
     self._configured = True
 
+
 class Logger(logging.Logger):
   '''
   Terra's :class:`logging.Logger`
   '''
+
   def debug1(self, msg, *args, **kwargs):
     '''
     Logs a message with level :data:`DEBUG1` on this logger. Same as ``debug``.
@@ -233,6 +236,7 @@ class Logger(logging.Logger):
     '''
     if self.isEnabledFor(DEBUG1):
       self._log(DEBUG1, msg, args, **kwargs)
+
   def debug2(self, msg, *args, **kwargs):
     '''
     Logs a message with level :data:`DEBUG2` on this logger. The arguments are
@@ -240,6 +244,7 @@ class Logger(logging.Logger):
     '''
     if self.isEnabledFor(DEBUG2):
       self._log(DEBUG2, msg, args, **kwargs)
+
   def debug3(self, msg, *args, **kwargs):
     '''
     Logs a message with level :data:`DEBUG3` on this logger. The arguments are

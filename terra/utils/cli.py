@@ -10,6 +10,7 @@ class FullPaths(argparse.Action):
   """
   Expand user home directory, and turns relative paths into absolute paths
   """
+
   def __call__(self, parser, namespace, values, option_string=None):
     setattr(namespace, self.dest, os.path.abspath(os.path.expanduser(values)))
 

@@ -164,6 +164,7 @@ ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
 The environment variable that store the file name of the configuration file
 '''
 
+
 def settings_property(func):
   '''
   Functions wrapped with this decorator will only be called once, and the value
@@ -221,6 +222,7 @@ def processing_dir(self):
 
   return processing_dir
 
+
 # TODO: come up with a way for apps to extend this themselves
 global_templates = [
   (
@@ -236,24 +238,6 @@ global_templates = [
       "executor": {
         "type": "ThreadPoolExecutor"
       },
-      # "params": {
-      #   "color_elev_thres": 6,
-      #   "azimuth_thres": 90.0,
-      #   "log_level": 10,
-      #   "VisualSFM": "VisualSFM",
-      #   "time_thres_days": 200,
-      #   "dem_res": 1.0,
-      #   "ground_elev": 30.0,
-      #   "dsm_max_height": 180.0,
-      #   "gpu_thread": 2,
-      #   "max_stereo_pair": 600,
-      #   "cpu_thread": 4,
-      #   "max_time": 120,
-      #   "num_active_disparity": 110,
-      #   "n_scene_tile": 64,
-      #   "min_disparity": -220,
-      #   "world_size": 500.0
-      # },
       'status_file': status_file,
       'processing_dir': processing_dir
     }
@@ -358,6 +342,7 @@ class LazySettings(LazyObject):
 
   Based off of :mod:`django.conf`
   '''
+
   def _setup(self, name=None):
     """
     Load the config json file pointed to by the environment variable. This is
@@ -444,6 +429,7 @@ class ObjectDict(dict):
   An object dictionary, that accesses dictionary keys using attributes (``.``)
   rather than items (``[]``).
   '''
+
   def __init__(self, *args, **kwargs):
     self.update(*args, **kwargs)
 
@@ -467,6 +453,7 @@ class ObjectDict(dict):
 
   def update(self, *args, **kwargs):
     """ Supported """
+
     def patch(self, key):
       ''' Function to patch dict->ObjectDict '''
       value = self[key]
@@ -502,6 +489,7 @@ class Settings(ObjectDict):
   '''
   The terra settings object
   '''
+
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     for pattern, settings in global_templates:

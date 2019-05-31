@@ -10,9 +10,9 @@ with open(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE']), 'r') a
 broker_url = f'redis://:{password}@{env["TERRA_REDIS_HOSTNAME"]}:{env["TERRA_REDIS_PORT"]}/0'
 result_backend = broker_url
 
-task_serializer='pickle'
-accept_content=['json', 'pickle']
-result_expires=3600
+task_serializer = 'pickle'
+accept_content = ['json', 'pickle']
+result_expires = 3600
 
 # App needs to define include
 celery_include = env.get('TERRA_CELERY_INCLUDE', None)
