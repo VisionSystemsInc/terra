@@ -27,14 +27,11 @@ function Terra_Pipenv()
 }
 
 # Allow terra to be run as a non-plugin too. When called as a plugin, this
-# caseify is overridden by the main project
+# caseify is overridden by the main project, since plugins are supposed to be
+# sourced at the begining of a Justfile, not after caseify is defined.
 function caseify()
 {
-  local plugin_not_found
-  terra_caseify ${@+"${@}"}
-  if [[ ${plugin_not_found-} = 1 ]]; then
-    defaultify ${@+"${@}"}
-  fi
+  defaultify ${@+"${@}"}
 }
 
 # Main function
