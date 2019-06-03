@@ -238,19 +238,23 @@ global_templates = [
       "executor": {
         "type": "ThreadPoolExecutor"
       },
+      "compute": {
+        "arch": "terra.compute.dummy"
+      },
       'status_file': status_file,
       'processing_dir': processing_dir
     }
-  ),
-  (
-    {"compute": {"arch": "terra.compute.dummy"}},  # Pattern
-    {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
-  )
+  ) #,
+  # (
+  #   {"compute": {"arch": "terra.compute.dummy"}},  # Pattern
+  #   {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
+  # )
 ]
-''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we conditionally assign default values. It is a list
-of pair tuples, where the first in the tuple is a "pattern" and the second
-is the default values. If the pattern is in the settings, then the default
-values are set for any unset values.
+''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we
+conditionally assign default values. It is a list of pair tuples, where the
+first in the tuple is a "pattern" and the second is the default values. If the
+pattern is in the settings, then the default values are set for any unset
+values.
 
 Values are copies recursively, but only if not already set by your settings.'''
 
@@ -422,6 +426,21 @@ class LazySettings(LazyObject):
       Return ``True`` if has already been configured
     """
     return self._wrapped is not None
+
+  def add_templates(self, templates):
+    """
+    Helper function to easily expose adding more defaults templates to
+    :var:`global_templates` specific for an application
+
+    Arguments
+    ---------
+    templates : list
+      A list of pairs of dictionaries just like :var:`global_templates`
+    """
+    # Pre-extend
+    offset = len(global_templates)
+    for template in templates:
+      global_templates.insert(-offset, template)
 
 
 class ObjectDict(dict):
