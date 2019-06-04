@@ -240,6 +240,7 @@ global_templates = [
       },
       "compute": {
         "arch": "terra.compute.dummy"
+        , 'processing_dir': processing_dir
       },
       'status_file': status_file,
       'processing_dir': processing_dir
@@ -479,14 +480,14 @@ class ObjectDict(dict):
 
       def patch_list(value):
         ''' List/tuple handler '''
-        return [__class__(x) if isinstance(x, dict)
+        return [self.__class__(dict(x)) if isinstance(x, dict) and not isinstance(x, self.__class__)
                 else patch_list(x) if isinstance(value, (list, tuple))
                 else x for x in value]
 
       if isinstance(value, (list, tuple)):
         self[key] = patch_list(value)
-      elif isinstance(value, dict) and not isinstance(value, __class__):
-        self[key] = __class__(value)
+      elif isinstance(value, dict) and not isinstance(value, self.__class__):
+        self[key] = self.__class__(dict(value))
 
     # Run nested update first
     nested_update(self, *args, **kwargs)
@@ -503,23 +504,7 @@ class ObjectDict(dict):
       for (key, value) in kwargs.items():
         patch(self, key)
 
-
-class Settings(ObjectDict):
-  '''
-  The terra settings object
-  '''
-
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    for pattern, settings in global_templates:
-      if nested_in_dict(pattern, self):
-        # Not the most efficient way to do this, but insignificant "preupdate"
-        d = {}
-        nested_update(d, settings)
-        nested_update(d, self)
-        # Nested update and run patch code
-        self.update(d)
-
+class SettingsObjectDict(ObjectDict):
   def __getitem__(self, name):
     '''
     ``__getitem__`` that will evaluate @settings_property functions, and cache
@@ -535,3 +520,49 @@ class Settings(ObjectDict):
     except KeyError:
       raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__name__, name))
+
+class Settings:
+  '''
+  The terra settings object
+  '''
+
+  def __init__(self, *args, **kwargs):
+    self._wrapped = SettingsObjectDict(*args, **kwargs)
+    for pattern, settings in global_templates:
+      if nested_in_dict(pattern, self._wrapped):
+        # Not the most efficient way to do this, but insignificant "preupdate"
+        d = {}
+        nested_update(d, settings)
+        nested_update(d, self._wrapped)
+        # Nested update and run patch code
+        self._wrapped.update(d)
+
+  def __getattr__(self, name, default=None):
+    '''Supported'''
+    return getattr(self._wrapped, name, default)
+
+  def __getitem__(self, name):
+    '''Supported'''
+    return self._wrapped[name]
+
+  def __contains__(self, name):
+    '''Supported'''
+    return self._wrapped.__contains__(name)
+
+  def __setattr__(self, name, value):
+    '''Supported'''
+    if name == "_wrapped":
+      # Assign to __dict__ to avoid infinite __setattr__ loops.
+      self.__dict__["_wrapped"] = value
+    else:
+      setattr(self._wrapped, name, value)
+
+  def __setitem__(self, name, value):
+    '''Supported'''
+    self._wrapped[name] = value
+
+  def __delattr__(self, name):
+    '''Supported'''
+    if name == "_wrapped":
+      raise TypeError("can't delete _wrapped.")
+    delattr(self._wrapped, name)
