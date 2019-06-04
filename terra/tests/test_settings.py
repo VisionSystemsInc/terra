@@ -161,21 +161,25 @@ class TestSettings(TestCase):
   @mock.patch('terra.core.settings.global_templates', [({}, {})])
   def test_settings_property(self):
     import terra.core.settings
+
     @settings_property
     def a(self):
-      return self.c + 1
+      return self.c.e + 1
 
-    def c(self):
+    def ce(self):
       return self.b - 2
 
     def d(self):
       return 3
 
-    terra.core.settings.global_templates[0][1]['a'] = a
-    terra.core.settings.global_templates[0][1]['b'] = settings_property(
-        lambda self: 13.1)
-    terra.core.settings.global_templates[0][1]['c'] = settings_property(c)
-    terra.core.settings.global_templates[0][1]['d'] = d
+    terra.core.settings.global_templates[0][1].update({
+        'a': a,
+        'c': {
+          'e': settings_property(ce),
+          'b': settings_property(lambda self: 13.1),
+        },
+        'd': d
+    })
 
     with NamedTemporaryFile(mode='w',
                             dir=self.temp_dir.name,
@@ -185,10 +189,11 @@ class TestSettings(TestCase):
 
     self.assertFalse(settings.configured)
     self.assertEqual(settings.a, 12.1)
-    self.assertEqual(settings.c, 11.1)
-    self.assertEqual(settings.b, 13.1)
+    self.assertEqual(settings.c.e, 11.1)
+    self.assertEqual(settings.c.b, 13.1)
     self.assertEqual(settings.d, d)
     self.assertEqual(settings.d(None), 3)
+    self.assertIsNone(settings.q)
     self.assertTrue(settings.configured)
 
   @mock.patch.object(settings, '_wrapped', None)

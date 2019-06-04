@@ -240,13 +240,12 @@ global_templates = [
       },
       "compute": {
         "arch": "terra.compute.dummy"
-        , 'processing_dir': processing_dir
       },
       'status_file': status_file,
       'processing_dir': processing_dir
     }
-  ) #,
-  # (
+  )
+  # , (
   #   {"compute": {"arch": "terra.compute.dummy"}},  # Pattern
   #   {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
   # )
@@ -337,6 +336,14 @@ class LazyObject():
       self._setup()
     delattr(self._wrapped, name)
 
+  def __hasattr__(self, name):
+    '''Supported'''
+    if name == "_wrapped":
+      return True
+    if self._wrapped is None:
+      self._setup()
+    return name in self._wrapped
+
 
 class LazySettings(LazyObject):
   '''
@@ -409,6 +416,16 @@ class LazySettings(LazyObject):
       raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
     self._wrapped = Settings(*args, **kwargs)
+
+    for pattern, settings in global_templates:
+      if nested_in_dict(pattern, self._wrapped):
+        # Not the most efficient way to do this, but insignificant "preupdate"
+        d = {}
+        nested_update(d, settings)
+        nested_update(d, self._wrapped)
+        # Nested update and run patch code
+        self._wrapped.update(d)
+
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
 
@@ -500,65 +517,20 @@ class ObjectDict(dict):
       for (key, value) in kwargs.items():
         patch(self, key)
 
-class SettingsObjectDict(ObjectDict):
-  def __getitem__(self, name):
+
+class Settings(ObjectDict):
+  def __getattr__(self, name):
     '''
     ``__getitem__`` that will evaluate @settings_property functions, and cache
     the values
     '''
+
     try:
-      val = super().__getitem__(name)
+      val = self[name]
       if isfunction(val) and getattr(val, 'settings_property', None):
         val = val(self)
-        logger.debug3(f'Evaluating settings {name}: {val}')
-        self[name] = val
       return val
     except KeyError:
-      raise AttributeError("'{}' object has no attribute '{}'".format(
+      # Throw a KeyError to prevent a recursive corner case
+      raise AttributeError(":-P '{}' object has no attribute '{}'".format(
           self.__class__.__name__, name))
-
-class Settings:
-  '''
-  The terra settings object
-  '''
-
-  def __init__(self, *args, **kwargs):
-    self._wrapped = SettingsObjectDict(*args, **kwargs)
-    for pattern, settings in global_templates:
-      if nested_in_dict(pattern, self._wrapped):
-        # Not the most efficient way to do this, but insignificant "preupdate"
-        d = {}
-        nested_update(d, settings)
-        nested_update(d, self._wrapped)
-        # Nested update and run patch code
-        self._wrapped.update(d)
-
-  def __getattr__(self, name, default=None):
-    '''Supported'''
-    return getattr(self._wrapped, name, default)
-
-  def __getitem__(self, name):
-    '''Supported'''
-    return self._wrapped[name]
-
-  def __contains__(self, name):
-    '''Supported'''
-    return self._wrapped.__contains__(name)
-
-  def __setattr__(self, name, value):
-    '''Supported'''
-    if name == "_wrapped":
-      # Assign to __dict__ to avoid infinite __setattr__ loops.
-      self.__dict__["_wrapped"] = value
-    else:
-      setattr(self._wrapped, name, value)
-
-  def __setitem__(self, name, value):
-    '''Supported'''
-    self._wrapped[name] = value
-
-  def __delattr__(self, name):
-    '''Supported'''
-    if name == "_wrapped":
-      raise TypeError("can't delete _wrapped.")
-    delattr(self._wrapped, name)
