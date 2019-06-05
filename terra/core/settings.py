@@ -290,11 +290,11 @@ class LazyObject():
   def __init__(self):
     self._wrapped = None
 
-  def __getattr__(self, name, default=None):
+  def __getattr__(self, name, *args, **kwargs):
     '''Supported'''
     if self._wrapped is None:
       self._setup()
-    return getattr(self._wrapped, name, default)
+    return getattr(self._wrapped, name, *args, **kwargs)
 
   def __getitem__(self, name):
     '''Supported'''
@@ -532,5 +532,5 @@ class Settings(ObjectDict):
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
-      raise AttributeError(":-P '{}' object has no attribute '{}'".format(
-          self.__class__.__name__, name))
+      raise AttributeError("O_o '{}' object has no attribute '{}'".format(
+          self.__class__.__name__, name)) from None
