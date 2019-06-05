@@ -500,7 +500,8 @@ class ObjectDict(dict):
 
       def patch_list(value):
         ''' List/tuple handler '''
-        return [self.__class__(dict(x)) if isinstance(x, dict) and not isinstance(x, self.__class__)
+        return [self.__class__(dict(x))
+                if isinstance(x, dict) and not isinstance(x, self.__class__)
                 else patch_list(x) if isinstance(value, (list, tuple))
                 else x for x in value]
 
@@ -562,10 +563,10 @@ class TerraJsonEncoder(JSONEncoder):
     if root is None:
       root = obj
 
-    return {k: TerraJsonEncoder.serializableSettings(v, root) if isinstance(v, dict) else
-            v(root) if isfunction(v) and hasattr(v, 'settings_property') else
-            v
-            for k, v in obj.items()}
+    return {k: TerraJsonEncoder.serializableSettings(v, root)
+            if isinstance(v, dict) else
+            v(root) if isfunction(v) and hasattr(v, 'settings_property')
+            else v for k, v in obj.items()}
 
   @staticmethod
   def dumps(obj):
