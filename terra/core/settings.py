@@ -151,6 +151,8 @@ from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from vsi.tools.python import nested_update, nested_in_dict
+import terra
+from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -528,9 +530,31 @@ class Settings(ObjectDict):
     try:
       val = self[name]
       if isfunction(val) and getattr(val, 'settings_property', None):
-        val = val(self)
+        val = val(terra.settings)
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
       raise AttributeError("O_o '{}' object has no attribute '{}'".format(
           self.__class__.__name__, name)) from None
+
+class TerraJsonEncoder(JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, LazySettings):
+      if obj._wrapped is None:
+        raise Exception('Settings not initialized')
+      return TerraJsonEncoder.serializableSettings(obj._wrapped)
+    return JSONEncoder.default(self, obj)
+
+  @staticmethod
+  def serializableSettings(obj, root=None):
+    if root is None:
+      root = obj
+
+    return {k:TerraJsonEncoder.serializableSettings(v, root) if isinstance(v, dict) else
+            v(root) if isfunction(v) and hasattr(v, 'settings_property') else
+            v
+          for k,v in obj.items()}
+
+  @staticmethod
+  def dumps(obj):
+    return json.dumps(obj, cls=TerraJsonEncoder)
