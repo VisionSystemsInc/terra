@@ -151,6 +151,7 @@ from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from vsi.tools.python import nested_update, nested_in_dict
+from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -290,11 +291,11 @@ class LazyObject():
   def __init__(self):
     self._wrapped = None
 
-  def __getattr__(self, name, default=None):
+  def __getattr__(self, name, *args, **kwargs):
     '''Supported'''
     if self._wrapped is None:
       self._setup()
-    return getattr(self._wrapped, name, default)
+    return getattr(self._wrapped, name, *args, **kwargs)
 
   def __getitem__(self, name):
     '''Supported'''
@@ -484,6 +485,12 @@ class ObjectDict(dict):
     """ Supported """
     self.update([(name, value)])
 
+  def __contains__(self, name):
+    if '.' in name:
+      first, rest = name.split('.', 1)
+      return self.__contains__(first) and (rest in self[first])
+    return super().__contains__(name)
+
   def update(self, *args, **kwargs):
     """ Supported """
 
@@ -493,7 +500,8 @@ class ObjectDict(dict):
 
       def patch_list(value):
         ''' List/tuple handler '''
-        return [self.__class__(dict(x)) if isinstance(x, dict) and not isinstance(x, self.__class__)
+        return [self.__class__(dict(x))
+                if isinstance(x, dict) and not isinstance(x, self.__class__)
                 else patch_list(x) if isinstance(value, (list, tuple))
                 else x for x in value]
 
@@ -528,9 +536,38 @@ class Settings(ObjectDict):
     try:
       val = self[name]
       if isfunction(val) and getattr(val, 'settings_property', None):
-        val = val(self)
+        # Ok this ONE line is a bit of a hack :( But I argue it's specific to
+        # this singleton implementation, so I approve!
+        val = val(settings)
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
-      raise AttributeError(":-P '{}' object has no attribute '{}'".format(
-          self.__class__.__name__, name))
+      raise AttributeError("O_o '{}' object has no attribute '{}'".format(
+          self.__class__.__name__, name)) from None
+
+
+settings = LazySettings()
+'''LazySettings: The setting object to use through out all of terra'''
+
+
+class TerraJsonEncoder(JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, LazySettings):
+      if obj._wrapped is None:
+        raise Exception('Settings not initialized')
+      return TerraJsonEncoder.serializableSettings(obj._wrapped)
+    return JSONEncoder.default(self, obj)
+
+  @staticmethod
+  def serializableSettings(obj, root=None):
+    if root is None:
+      root = obj
+
+    return {k: TerraJsonEncoder.serializableSettings(v, root)
+            if isinstance(v, dict) else
+            v(root) if isfunction(v) and hasattr(v, 'settings_property')
+            else v for k, v in obj.items()}
+
+  @staticmethod
+  def dumps(obj):
+    return json.dumps(obj, cls=TerraJsonEncoder)

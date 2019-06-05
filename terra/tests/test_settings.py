@@ -119,7 +119,7 @@ class TestSettings(TestCase):
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates', [
-      ({}, {'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44}}),
+      ({}, {'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44, 'foo': {'t': 15}}}),
       ({'c': {'d': 14}}, {'e': 15})])
   def test_global_templates(self):
     with NamedTemporaryFile(mode='w',
@@ -132,8 +132,18 @@ class TestSettings(TestCase):
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, "444")
-    self.assertIsNone(settings.e)
+    with self.assertRaises(AttributeError):
+      settings.e
+    with self.assertRaises(KeyError):
+      settings['e']
     self.assertFalse('e' in settings)
+    self.assertFalse('e.t' in settings)
+    self.assertFalse('q.z' in settings)
+    self.assertTrue('q.x' in settings)
+    self.assertTrue('q.foo' in settings)
+    self.assertTrue('q.foo.t' in settings)
+    self.assertTrue('q' in settings)
+    self.assertTrue('a' in settings)
     self.assertTrue(settings.configured)
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
@@ -167,7 +177,7 @@ class TestSettings(TestCase):
       return self.c.e + 1
 
     def ce(self):
-      return self.b - 2
+      return self.c.b - 2
 
     def d(self):
       return 3
@@ -193,7 +203,10 @@ class TestSettings(TestCase):
     self.assertEqual(settings.c.b, 13.1)
     self.assertEqual(settings.d, d)
     self.assertEqual(settings.d(None), 3)
-    self.assertIsNone(settings.q)
+    with self.assertRaises(AttributeError):
+      settings.q
+    with self.assertRaises(KeyError):
+      settings['q']
     self.assertTrue(settings.configured)
 
   @mock.patch.object(settings, '_wrapped', None)
