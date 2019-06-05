@@ -307,9 +307,6 @@ class LazyObject():
     '''Supported'''
     if self._wrapped is None:
       self._setup()
-    if '.' in name:
-      first, rest = name.split('.', 1)
-      return self._wrapped.__contains__(first) and self._wrapped[first].__contains__(rest)
     return self._wrapped.__contains__(name)
 
   def __setattr__(self, name, value):
@@ -487,6 +484,12 @@ class ObjectDict(dict):
   def __setattr__(self, name, value):
     """ Supported """
     self.update([(name, value)])
+
+  def __contains__(self, name):
+    if '.' in name:
+      first, rest = name.split('.', 1)
+      return self.__contains__(first) and (rest in self[first])
+    return super().__contains__(name)
 
   def update(self, *args, **kwargs):
     """ Supported """
