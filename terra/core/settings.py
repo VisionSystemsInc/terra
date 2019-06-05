@@ -151,7 +151,6 @@ from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from vsi.tools.python import nested_update, nested_in_dict
-import terra
 from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -308,6 +307,9 @@ class LazyObject():
     '''Supported'''
     if self._wrapped is None:
       self._setup()
+    if '.' in name:
+      first, rest = name.split('.', 1)
+      return self._wrapped.__contains__(first) and self._wrapped[first].__contains__(rest)
     return self._wrapped.__contains__(name)
 
   def __setattr__(self, name, value):
@@ -530,12 +532,19 @@ class Settings(ObjectDict):
     try:
       val = self[name]
       if isfunction(val) and getattr(val, 'settings_property', None):
-        val = val(terra.settings)
+        # Ok this ONE line is a bit of a hack :( But I argue it's specific to
+        # this singleton implementation, so I approve!
+        val = val(settings)
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
       raise AttributeError("O_o '{}' object has no attribute '{}'".format(
           self.__class__.__name__, name)) from None
+
+
+settings = LazySettings()
+'''LazySettings: The setting object to use through out all of terra'''
+
 
 class TerraJsonEncoder(JSONEncoder):
   def default(self, obj):
@@ -550,10 +559,10 @@ class TerraJsonEncoder(JSONEncoder):
     if root is None:
       root = obj
 
-    return {k:TerraJsonEncoder.serializableSettings(v, root) if isinstance(v, dict) else
+    return {k: TerraJsonEncoder.serializableSettings(v, root) if isinstance(v, dict) else
             v(root) if isfunction(v) and hasattr(v, 'settings_property') else
             v
-          for k,v in obj.items()}
+            for k, v in obj.items()}
 
   @staticmethod
   def dumps(obj):
