@@ -29,7 +29,9 @@ class Compute(BaseCompute):
 
     # Replace 'python' command with virtual environment python executable
     if settings.compute.get('venv_python', None):
-      service_info.command = [settings.compute.venv_python if el == 'python' else el for el in service_info.command]
+      service_info.command = [settings.compute.venv_python
+                              if el == 'python' else el
+                              for el in service_info.command]
 
     # run command -- command must be a list of strings
     subprocess.call(service_info.command)
@@ -49,9 +51,9 @@ class LocalService:
   '''
   Base service class, prints pre_run and post_run steps
   '''
+
   def pre_run(self):
     logger.debug("local pre run: " + str(self))
 
   def post_run(self):
     logger.debug("local post run: " + str(self))
-
