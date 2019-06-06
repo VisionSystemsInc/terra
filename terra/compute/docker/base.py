@@ -8,8 +8,7 @@ from shlex import quote
 
 from vsi.tools.diff import dict_diff
 
-from terra.compute.base.base import BaseCompute
-# from terra import settings
+from terra.compute.base.base import BaseService, BaseCompute
 from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
@@ -75,7 +74,7 @@ class Compute(BaseCompute):
               env=service_info.env)
 
 
-class DockerService:
+class Service(BaseService):
   '''
   Base docker service class
   '''

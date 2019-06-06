@@ -1,4 +1,4 @@
-from terra.compute.base.base import BaseCompute
+from terra.compute.base.base import BaseCompute, BaseService
 # from terra import settings
 from terra.compute.utils import load_service
 
@@ -31,12 +31,13 @@ class Compute(BaseCompute):
     print("remove: " + str(load_service(service_class)))
 
 
-class DummyService:
+class Service(BaseService):
   '''
   Dummy service class, prints pre_run and post_run steps
   '''
 
   def __init__(self):
+    super().__init__()
     print(f'Created on {str(self)}')
 
   def pre_run(self):
