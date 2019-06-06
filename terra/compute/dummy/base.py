@@ -36,8 +36,12 @@ class DummyService:
   Dummy service class, prints pre_run and post_run steps
   '''
 
+  def __init__(self):
+    print(f'Created on {str(self)}')
+
   def pre_run(self):
-    print("pre run: " + str(self))
+    print(f'Pre run: {str(self)}')
 
   def post_run(self):
-    print("post run: " + str(self))
+    print(f'Post run: {str(self)}')
+
