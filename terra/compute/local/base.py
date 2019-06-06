@@ -1,6 +1,6 @@
 import subprocess
 
-from terra.compute.base.base import BaseCompute
+from terra.compute.base.base import BaseService, BaseCompute
 from terra.compute.utils import load_service
 from terra.logger import getLogger
 from terra import settings
@@ -47,7 +47,7 @@ class Compute(BaseCompute):
     logger.debug("Local remove: " + str(load_service(service_class)))
 
 
-class LocalService:
+class Service(BaseService):
   '''
   Base service class, prints pre_run and post_run steps
   '''

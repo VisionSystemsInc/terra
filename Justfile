@@ -160,7 +160,13 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       justify build terra
+      justify sync pipenv-terra
+      ;;
+    sync_pipenv-terra) # Sync Terra core's pipenv without updating
       Terra_Pipenv install --keep-outdated
+      ;;
+    update_pipenv-terra) # Update Terra core's pipenv
+      Terra_Pipenv update
       ;;
     dev_sync) # Developer's extra sync
       Terra_Pipenv install --dev --keep-outdated

@@ -29,6 +29,9 @@
 from importlib import import_module
 from terra.core.utils import Handler
 from terra import settings
+from terra.compute.base.base import services as compute_services
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 
 class ComputeHandler(Handler):
@@ -72,6 +75,22 @@ For the most part, workflows will be interacting with :data:`compute` to
 '''
 
 
+def get_default_service(cls):
+  '''
+  Gets a compute class' default Service class from the class object.
+
+  Arguments
+  ---------
+  cls : type
+      The compute class whose service class you want
+
+  Since computes are name ``Compute`` in the base module, the class ``Service``
+  should be defined in the same file. This will return that ``Service`` class
+  '''
+  module = import_module(f'{cls.__module__}')
+  return module.Service
+
+
 def load_service(name_or_class):
   '''
   Get (and optionally import) a service by name. Also accepts the class itself
@@ -86,4 +105,17 @@ def load_service(name_or_class):
   else:
     module = name_or_class.rsplit('.', 1)[0]
     import_module(module)
-  return compute.services[name_or_class]
+
+  try:
+    services = compute_services[name_or_class]
+  except KeyError:
+    logger.fatal(f'{name_or_class} is not registered')
+    raise
+
+  cls = type(compute._connection)
+
+  if cls not in services:
+    logger.info('Using default {cls} compute handler for {name_of_class}')
+    return get_default_service(cls)
+
+  return services[cls]
