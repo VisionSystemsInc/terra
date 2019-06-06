@@ -29,6 +29,9 @@ class ExecutorHandler(ClassHandler):
     if not backend_name:
       backend_name = 'ThreadPoolExecutor'
 
+    if backend_name == "DummyExecutor":
+      from .dummy import DummyExecutor
+      return DummyExecutor
     if backend_name == "ThreadPoolExecutor":
       return concurrent.futures.ThreadPoolExecutor
     elif backend_name == "ProcessPoolExecutor":
