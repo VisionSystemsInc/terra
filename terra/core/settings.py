@@ -550,12 +550,12 @@ settings = LazySettings()
 '''LazySettings: The setting object to use through out all of terra'''
 
 
-class TerraJsonEncoder(JSONEncoder):
+class TerraJSONEncoder(JSONEncoder):
   def default(self, obj):
     if isinstance(obj, LazySettings):
       if obj._wrapped is None:
         raise Exception('Settings not initialized')
-      return TerraJsonEncoder.serializableSettings(obj._wrapped)
+      return TerraJSONEncoder.serializableSettings(obj._wrapped)
     return JSONEncoder.default(self, obj)
 
   @staticmethod
@@ -563,11 +563,11 @@ class TerraJsonEncoder(JSONEncoder):
     if root is None:
       root = obj
 
-    return {k: TerraJsonEncoder.serializableSettings(v, root)
+    return {k: TerraJSONEncoder.serializableSettings(v, root)
             if isinstance(v, dict) else
             v(root) if isfunction(v) and hasattr(v, 'settings_property')
             else v for k, v in obj.items()}
 
   @staticmethod
   def dumps(obj):
-    return json.dumps(obj, cls=TerraJsonEncoder)
+    return json.dumps(obj, cls=TerraJSONEncoder)
