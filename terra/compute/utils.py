@@ -33,6 +33,7 @@ from terra.compute.base.base import services as compute_services
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+
 class ComputeHandler(Handler):
   '''
   The :class:`ComputeHandler` class gives a single entrypoint to interact with
@@ -73,6 +74,7 @@ For the most part, workflows will be interacting with :data:`compute` to
 ``run`` services. Easier access via ``terra.compute.compute``
 '''
 
+
 def get_default_service(cls):
   '''
   Gets a compute class' default Service class from the class object.
@@ -87,6 +89,7 @@ def get_default_service(cls):
   '''
   module = import_module(f'{cls.__module__}')
   return module.Service
+
 
 def load_service(name_or_class):
   '''
@@ -108,7 +111,6 @@ def load_service(name_or_class):
   except KeyError:
     logger.fatal(f'{name_or_class} is not registered')
     raise
-
 
   cls = type(compute._connection)
 

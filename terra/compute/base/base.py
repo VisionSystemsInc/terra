@@ -43,7 +43,7 @@ class BaseCompute:
     compute
     '''
 
-    service_name=f'{service.__module__}.{service.__name__}'
+    service_name = f'{service.__module__}.{service.__name__}'
 
     def wrapper(impl):
       if service_name not in services:
@@ -84,5 +84,6 @@ class BaseCompute:
     '''
     Place holder for code to remove an instance from the compute
     '''
+
 
 services = {}

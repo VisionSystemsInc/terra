@@ -45,4 +45,3 @@ class Service(BaseService):
 
   def post_run(self):
     print(f'Post run: {str(self)}')
-
