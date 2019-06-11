@@ -29,7 +29,7 @@
 from importlib import import_module
 from terra.core.utils import Handler
 from terra import settings
-from terra.compute.base.base import services as compute_services
+from terra.compute.base import services as compute_services
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -44,8 +44,13 @@ class ComputeHandler(Handler):
   def _connect_backend(self):
     '''
     Loads the compute's backend's base module, given either a fully qualified
-    compute backend name, or a partial (``terra.compute.{partial}.base``), and
+    compute backend name, or a partial (``terra.compute.{partial}``), and
     then returns a connection to the backend
+
+    A Backend should have two classes defined:
+
+    * ``Compute`` based off of :class:`terra.compute.base.BaseCompute`
+    * ``Service`` based off of :class:`terra.compute.base.BaseService`
 
     Parameters
     ----------
@@ -61,9 +66,9 @@ class ComputeHandler(Handler):
       backend_name = 'terra.compute.dummy'
 
     try:
-      module = import_module(f'{backend_name}.base')
+      module = import_module(f'{backend_name}')
     except ImportError:
-      module = import_module(f'terra.compute.{backend_name}.base')
+      module = import_module(f'terra.compute.{backend_name}')
 
     return module.Compute()
 
@@ -115,7 +120,7 @@ def load_service(name_or_class):
   cls = type(compute._connection)
 
   if cls not in services:
-    logger.info('Using default {cls} compute handler for {name_of_class}')
+    logger.info(f'Using default {cls} compute handler for {name_or_class}')
     return get_default_service(cls)
 
   return services[cls]
