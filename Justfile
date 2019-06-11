@@ -10,9 +10,11 @@ source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
 
 cd "${TERRA_CWD}"
 
-# Make a plugin
+# Make a plugin if not the main Justfile
 JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
-JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
+if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
+  JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
+fi
 
 function Terra_Pipenv()
 {
