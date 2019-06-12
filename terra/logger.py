@@ -171,8 +171,8 @@ class _SetupTerraLogger():
     self.file_handler = logging.StreamHandler(stream=self.log_file)
 
     # Configure log level
-    self.stderr_handler.setLevel(settings.logging.level)
-    self.file_handler.setLevel(settings.logging.level)
+    self.stderr_handler.setLevel(settings.logging.level.upper())
+    self.file_handler.setLevel(settings.logging.level.upper())
 
     # Configure format
     self.file_handler.setFormatter(formatter)
