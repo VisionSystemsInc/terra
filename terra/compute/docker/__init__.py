@@ -4,6 +4,8 @@ from os import environ as env
 from subprocess import Popen, PIPE
 from shlex import quote
 import re
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import yaml
 
@@ -85,18 +87,23 @@ class Compute(BaseCompute):
 
     service_info.post_run(self)
 
-  def config(self, service_class):
+  def config(self, service_class, extra_compose_files=[]):
     '''
     Returns the ``docker-compose config`` output
     '''
+
     service_info = load_service(service_class)
-    pid = self.just("--wrap", "Just-docker-compose",
-                    '-f', service_info.compose_file,
-                    'config', stdout=PIPE,
+
+    args = ["--wrap", "Just-docker-compose",
+            '-f', service_info.compose_file] + \
+           sum([['-f', extra] for extra in extra_compose_files], []) + \
+           ['config']
+
+    pid = self.just(*args, stdout=PIPE,
                     env=service_info.env)
     return pid.communicate()[0]
 
-  def configuration_map(self, service_class):
+  def configuration_map(self, service_class, extra_compose_files=[]):
     '''
     Returns the mapping of volumes from the host to the container.
 
@@ -111,7 +118,7 @@ class Compute(BaseCompute):
     volume_map = []
 
     service_info = load_service(service_class)
-    config = yaml.load(self.config(service_info))
+    config = yaml.load(self.config(service_info, extra_compose_files))
 
     for volume in config['services'][service_info.compose_service_name].get('volumes', []):
       if isinstance(volume, dict):
@@ -124,7 +131,6 @@ class Compute(BaseCompute):
 
     return volume_map + service_info.volumes
 
-
 class Service(BaseService):
   '''
   Base docker service class
@@ -135,10 +141,31 @@ class Service(BaseService):
     self.volumes_flags = []
 
   def pre_run(self, compute): # Compute?
-    self.temp_dir = None
-    # TODO: Create temp config dir
-    # TODO: Write out docker-compose.yaml containing self.volumes. Use config_dir
-    volume_map = compute.configuration_map(self)
+    super().pre_run(compute)
+
+    self.temp_dir = TemporaryDirectory()
+
+    temp_dir = Path(self.temp_dir.name)
+
+    # Need to get the docker-compose version :-\
+    with open(self.compose_file, 'r') as fid:
+      docker_file = yaml.load(fid.read())
+
+    temp_compose = f'version: "{docker_file["version"]}"\n'
+    temp_compose += 'services:\n'
+    temp_compose +=f'  {self.compose_service_name}:\n'
+    temp_compose += '    volumes:\n'
+
+    for (volumue_host, volume_container), volume_flags in \
+        zip(self.volumes, self.volumes_flags):
+      temp_compose += f'      - {volumue_host}:{volume_container}\n' #), volume_flags}\n'
+
+    temp_compose_file = temp_dir / "docker-compose.yml"
+
+    with open(temp_compose_file, 'w') as fid:
+      fid.write(temp_compose)
+
+    volume_map = compute.configuration_map(self, [str(temp_compose_file)])
 
     # TODO: config -> dict
     # TODO: translate config dict:
@@ -147,8 +174,10 @@ class Service(BaseService):
     # TODO:   Only entried ending in _path, _file, _dir
     # TODO: Write config file
 
-  def post_run(self):
-    self.temp_dir = None # TODO: Delete temp_dir
+  def post_run(self, compute):
+    super().post_run(compute)
+
+    self.temp_dir = None # Delete temp_dir
 
   def add_volume(self, local, remote, flags=None):
     self.volumes.append([local, remote])
