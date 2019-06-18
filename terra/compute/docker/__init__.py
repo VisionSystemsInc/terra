@@ -1,4 +1,3 @@
-from envcontext import EnvironmentContext
 import os
 from os import environ as env
 from subprocess import Popen, PIPE
@@ -7,10 +6,13 @@ import re
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from envcontext import EnvironmentContext
 import yaml
 
 from vsi.tools.diff import dict_diff
 
+from terra import settings
+from terra.core.settings import TerraJSONEncoder
 from terra.compute.base import BaseService, BaseCompute
 from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
@@ -145,27 +147,41 @@ class Service(BaseService):
 
     self.temp_dir = TemporaryDirectory()
 
-    temp_dir = Path(self.temp_dir.name)
+    with open(temp_dir / 'config.json', 'w') as fid:
+      fid.write('{}')
 
-    # Need to get the docker-compose version :-\
-    with open(self.compose_file, 'r') as fid:
-      docker_file = yaml.load(fid.read())
+    # with open(self.compose_file, 'r') as fid:
+    #   docker_file = yaml.load(fid.read())
 
-    temp_compose = f'version: "{docker_file["version"]}"\n'
-    temp_compose += 'services:\n'
-    temp_compose +=f'  {self.compose_service_name}:\n'
-    temp_compose += '    volumes:\n'
+    # # Need to get the docker-compose version :-\
+    # with open(self.compose_file, 'r') as fid:
+    #   docker_file = yaml.load(fid.read())
 
-    for (volumue_host, volume_container), volume_flags in \
-        zip(self.volumes, self.volumes_flags):
-      temp_compose += f'      - {volumue_host}:{volume_container}\n' #), volume_flags}\n'
+    # temp_compose = f'version: "{docker_file["version"]}"\n'
+    # temp_compose += 'services:\n'
+    # temp_compose +=f'  {self.compose_service_name}:\n'
+    # temp_compose += '    volumes:\n'
 
-    temp_compose_file = temp_dir / "docker-compose.yml"
+    # for (volumue_host, volume_container), volume_flags in \
+    #     zip(self.volumes, self.volumes_flags):
+    #   temp_compose += f'      - {volumue_host}:{volume_container}\n' #), volume_flags}\n'
 
-    with open(temp_compose_file, 'w') as fid:
-      fid.write(temp_compose)
+    # temp_compose_file = temp_dir / "docker-compose.yml"
 
-    volume_map = compute.configuration_map(self, [str(temp_compose_file)])
+    # with open(temp_compose_file, 'w') as fid:
+    #   fid.write(temp_compose)
+
+    docker_config = TerraJSONEncoder.serializableSettings(settings)
+
+    self.env['TERRA_VOLUME_1'] = f'{str(temp_dir)}:/tmp_settings:rw'
+
+    for index, ((volumue_host, volume_container), volume_flags) in enumerate(zip(self.volumes, self.volumes_flags)):
+      self.env[f'TERRA_VOLUME_{index+1}'] = f'{volumue_host}:{volume_container}'
+      if volume_flags:
+        self.env[f'TERRA_VOLUME_{index+1}'] += f':{volume_flags}'
+
+    # volume_map = compute.configuration_map(self, [str(temp_compose_file)])
+    volume_map = compute.configuration_map(self)
 
     # TODO: config -> dict
     # TODO: translate config dict:
