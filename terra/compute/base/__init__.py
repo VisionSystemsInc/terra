@@ -2,6 +2,7 @@ import os
 from inspect import isclass
 from functools import wraps
 
+import terra.compute.utils
 
 class BaseService:
   '''
@@ -13,17 +14,21 @@ class BaseService:
 
   def __init__(self):
     self.env = os.environ.copy()
+    self.volumes = []
     ''' A copy of the processes environment variables local to a service '''
 
-  def pre_run(self):
+  def pre_run(self, compute):
     '''
     Place holder for code to run before ``run``
     '''
 
-  def post_run(self):
+  def post_run(self, compute):
     '''
     Place holder for code to run after ``run``
     '''
+
+  def add_volume(self, local, remote):
+    self.volumes.append([local, remote])
 
 
 class AlreadyRegisteredException(Exception):
@@ -85,8 +90,20 @@ class BaseCompute:
     Place holder for code to remove an instance from the compute
     '''
 
-  def configuration_map(self):
-    return {}
+  def configuration_map(self, service_class):
+    '''
+    Returns the mapping of volumes from the host to the remote
+
+    Returns
+    -------
+    list
+        Return a list of tuple pairs [(host, remote), ... ] of the volumes
+        mounted from the host to remote
+    '''
+
+    service_info = terra.compute.utils.load_service(service_class)
+
+    return service_info.volumes
 
 
 services = {}

@@ -99,13 +99,24 @@ def get_default_service(cls):
 def load_service(name_or_class):
   '''
   Get (and optionally import) a service by name. Also accepts the class itself
+  or an instance of a class.
 
   Parameters
   ----------
   name_or_class : :class:`str` or :class:`class`
       The service being loaded
+
+  Returns
+  -------
+    instance
+        Instead of the class specified. If ``name_or_class`` was already an
+        instance, the same instance is returned
   '''
+
   if not isinstance(name_or_class, str):
+    # If already instance, return it
+    if not isinstance(name_or_class, type):
+      return name_or_class
     name_or_class = f'{name_or_class.__module__}.{name_or_class.__name__}'
   else:
     module = name_or_class.rsplit('.', 1)[0]
@@ -123,4 +134,4 @@ def load_service(name_or_class):
     logger.info(f'Using default {cls} compute handler for {name_or_class}')
     return get_default_service(cls)
 
-  return services[cls]
+  return services[cls]()

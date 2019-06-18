@@ -12,16 +12,9 @@ class Compute(BaseCompute):
   local computing model
   '''
 
-  def create(self, service_class):
-    logger.debug("Local create: " + str(load_service(service_class)))
-
-  def start(self, service_class):
-    logger.debug("Local start: " + str(load_service(service_class)))
-
   # run the service locally with the subprocess module
   def run(self, service_class):
-    service = load_service(service_class)
-    service_info = service()
+    service_info = load_service(service_class)
 
     # pre run
     logger.debug2("pre-running %s ", str(service_info))
@@ -39,12 +32,6 @@ class Compute(BaseCompute):
     # post run
     logger.debug2("post-running %s ", str(service_info))
     service_info.post_run()
-
-  def stop(self, service_class):
-    logger.debug("Local stop: " + str(load_service(service_class)))
-
-  def remove(self, service_class):
-    logger.debug("Local remove: " + str(load_service(service_class)))
 
 
 class Service(BaseService):
