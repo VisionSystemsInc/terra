@@ -5,6 +5,7 @@ from shlex import quote
 import re
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import json
 
 from envcontext import EnvironmentContext
 import yaml
@@ -146,9 +147,7 @@ class Service(BaseService):
     super().pre_run(compute)
 
     self.temp_dir = TemporaryDirectory()
-
-    with open(temp_dir / 'config.json', 'w') as fid:
-      fid.write('{}')
+    temp_dir = Path(self.temp_dir.name)
 
     # with open(self.compose_file, 'r') as fid:
     #   docker_file = yaml.load(fid.read())
@@ -162,33 +161,56 @@ class Service(BaseService):
     # temp_compose +=f'  {self.compose_service_name}:\n'
     # temp_compose += '    volumes:\n'
 
-    # for (volumue_host, volume_container), volume_flags in \
+    # for (volume_host, volume_container), volume_flags in \
     #     zip(self.volumes, self.volumes_flags):
-    #   temp_compose += f'      - {volumue_host}:{volume_container}\n' #), volume_flags}\n'
+    #   temp_compose += f'      - {volume_host}:{volume_container}\n' #), volume_flags}\n'
 
     # temp_compose_file = temp_dir / "docker-compose.yml"
 
     # with open(temp_compose_file, 'w') as fid:
     #   fid.write(temp_compose)
 
-    docker_config = TerraJSONEncoder.serializableSettings(settings)
+    # Check to see if and are already defined, this will play nicely with
+    # external influences
+    env_volume_index = 1
+    while f'TERRA_VOLUME_{env_volume_index}' in self.env:
+      env_volume_index += 1
 
-    self.env['TERRA_VOLUME_1'] = f'{str(temp_dir)}:/tmp_settings:rw'
+    # Setup volumes for docker
+    self.env[f'TERRA_VOLUME_{env_volume_index}'] = \
+        f'{str(temp_dir)}:/tmp_settings:rw'
+    env_volume_index += 1
 
-    for index, ((volumue_host, volume_container), volume_flags) in enumerate(zip(self.volumes, self.volumes_flags)):
-      self.env[f'TERRA_VOLUME_{index+1}'] = f'{volumue_host}:{volume_container}'
+    for index, ((volume_host, volume_container), volume_flags) in \
+        enumerate(zip(self.volumes, self.volumes_flags)):
+      volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
-        self.env[f'TERRA_VOLUME_{index+1}'] += f':{volume_flags}'
+        volume_str += f':{volume_flags}'
+      self.env[f'TERRA_VOLUME_{env_volume_index}'] = volume_str
+      env_volume_index += 1
 
     # volume_map = compute.configuration_map(self, [str(temp_compose_file)])
     volume_map = compute.configuration_map(self)
 
-    # TODO: config -> dict
+    # Setup config file for docker
+    docker_config = TerraJSONEncoder.serializableSettings(settings)
+
+    if 'processing_dir' not in docker_config:
+      logger.warning('No processing dir set. Using "/tmp"')
+
+    docker_config['processing_dir'] = '/tmp'
+
+    with open(temp_dir / 'config.json', 'w') as fid:
+      json.dump(docker_config, fid)
+
+    self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
+
+    # TODONE: config -> dict
     # TODO: translate config dict:
     # TODO:   In reverse order
     # TODO:   Only tranlate once per entry
     # TODO:   Only entried ending in _path, _file, _dir
-    # TODO: Write config file
+    # TODONE: Write config file
 
   def post_run(self, compute):
     super().post_run(compute)

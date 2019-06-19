@@ -62,6 +62,7 @@ import logging.handlers
 import sys
 import tempfile
 import threading
+import platform
 import pprint
 import os
 from terra.core.exceptions import ImproperlyConfigured
@@ -107,7 +108,7 @@ class _SetupTerraLogger():
   A simple logger class used internally to configure the logger before and
   after :data:`terra.settings` is configured
   '''
-  default_formatter = logging.Formatter('%(asctime)s : %(levelname)s - '
+  default_formatter = logging.Formatter('%(asctime)s (preconfig) : %(levelname)s - '
                                         '%(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
@@ -187,7 +188,12 @@ class _SetupTerraLogger():
     # Log the settings only to the file handler
     with HandlerLoggingContext(self.root_logger, [self.file_handler]):
       self.root_logger.log(DEBUG1, "Settings:\n" +
-                           pprint.pformat(dict(settings)))
+                           pprint.pformat(dict(settings)),
+                           extra=extra_logger_variables)
+                           # For some reason python doesn't make the root
+                           # logger the designated class, so much add extra
+                           # manually here. Not even sure why I chose
+                           # root_logger here...
 
     # filter the stderr buffer
     self.preconfig_stderr_handler.buffer = \
@@ -223,11 +229,28 @@ class _SetupTerraLogger():
 
     self._configured = True
 
+from vsi.tools.python import args_to_kwargs
+
+extra_logger_variables = {'hostname': platform.node()}
+'''dict: Extra logger variables that can be reference in log messages'''
 
 class Logger(logging.Logger):
   '''
   Terra's :class:`logging.Logger`
   '''
+
+  def _log(self, *args, **kwargs):
+    kw = args_to_kwargs(logging.Logger._log, (None,)+args, kwargs)
+    kw.pop('self')
+
+    if kw['extra'] is None:
+      kw['extra'] = extra_logger_variables
+    else:
+      extra = extra_logger_variables.copy()
+      extra.update(kw['extra'])
+      kw['extra'] = extra
+
+    return super()._log(**kw)
 
   def debug1(self, msg, *args, **kwargs):
     '''
