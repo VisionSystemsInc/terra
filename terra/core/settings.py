@@ -165,9 +165,7 @@ ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
 file
 '''
 
-filename_suffixes = ['_file', '_files',
-                     '_dir',  '_dirs',
-                     '_path', '_paths']
+filename_suffixes = ['_file', '_files', '_dir', '_dirs', '_path', '_paths']
 '''list: The list key suffixes that are to be considered for volume translation
 '''
 
@@ -175,6 +173,7 @@ json_include_suffixes = ['_json_include', '_json_includes']
 '''list: The list key suffixes that are to be considered execututing json
 include replacement at load time.
 '''
+
 
 def settings_property(func):
   '''

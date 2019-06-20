@@ -20,7 +20,10 @@ from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
-docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)$'
+
+docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)' \
+                   r'((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|' \
+                   r':delegated|:cached|:consistent|:nocopy)*)$'
 '''str: A regular expression to parse old style docker volume strings
 
 RE Groups
@@ -33,12 +36,15 @@ RE Groups
 * 6: Junk - last flag
 '''
 
+
 class Compute(BaseCompute):
   '''
   Docker compute model, specifically ``docker-compose``
   '''
 
-  docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)$'
+  docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)' \
+                     r'((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|' \
+                     r':delegated|:cached|:consistent|:nocopy)*)$'
 
   def just(self, *args, **kwargs):
     '''
@@ -100,8 +106,8 @@ class Compute(BaseCompute):
 
     args = ["--wrap", "Just-docker-compose",
             '-f', service_info.compose_file] + \
-           sum([['-f', extra] for extra in extra_compose_files], []) + \
-           ['config']
+        sum([['-f', extra] for extra in extra_compose_files], []) + \
+        ['config']
 
     pid = self.just(*args, stdout=PIPE,
                     env=service_info.env)
@@ -135,6 +141,7 @@ class Compute(BaseCompute):
 
     return volume_map + service_info.volumes
 
+
 class Service(BaseService):
   '''
   Base docker service class
@@ -144,7 +151,7 @@ class Service(BaseService):
     super().__init__()
     self.volumes_flags = []
 
-  def pre_run(self, compute): # Compute?
+  def pre_run(self, compute):  # Compute?
     super().pre_run(compute)
 
     self.temp_dir = TemporaryDirectory()
@@ -183,7 +190,7 @@ class Service(BaseService):
     env_volume_index += 1
 
     for index, ((volume_host, volume_container), volume_flags) in \
-        enumerate(zip(self.volumes, self.volumes_flags)):
+        enumerate(zip(self.volumes, self.volumes_flags)):  # noqa bug
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
@@ -196,7 +203,6 @@ class Service(BaseService):
     # Setup config file for docker
     docker_config = TerraJSONEncoder.serializableSettings(settings)
 
-
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
     def patch_volume(value, volume_map):
@@ -204,18 +210,19 @@ class Service(BaseService):
         if isinstance(value, str) and value.startswith(vol_from):
           return value.replace(vol_from, vol_to, 1)
       return value
-    patch = lambda key, value: patch_volume(value, reversed(volume_map))
 
-    condition = lambda key, value: isinstance(key, str) and \
-                                   any(key.endswith(pattern)
-                                       for pattern in filename_suffixes)
-
-    docker_config = nested_patch(docker_config, condition, patch)
+    docker_config = nested_patch(
+        docker_config,
+        lambda key, value: (isinstance(key, str) and
+                            any(key.endswith(pattern)
+                            for pattern in filename_suffixes)),  # noqa bug
+        lambda key, value: patch_volume(value, reversed(volume_map))
+    )
 
     # This test doesn't work. It's already faked out long before this
     # if 'processing_dir' not in docker_config:
     #   logger.warning('No processing dir set. Using "/tmp"')
-    docker_config['processing_dir'] = '/tmp' # TODO: Remove/unhardcode this
+    docker_config['processing_dir'] = '/tmp'  # TODO: Remove/unhardcode this
 
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)
@@ -223,7 +230,7 @@ class Service(BaseService):
   def post_run(self, compute):
     super().post_run(compute)
 
-    self.temp_dir = None # Delete temp_dir
+    self.temp_dir = None  # Delete temp_dir
 
   def add_volume(self, local, remote, flags=None):
     self.volumes.append([local, remote])

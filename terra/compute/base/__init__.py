@@ -4,6 +4,7 @@ from functools import wraps
 
 import terra.compute.utils
 
+
 class BaseService:
   '''
   The base class for all Terra Service definitions
