@@ -161,10 +161,20 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
-'''
-The environment variable that store the file name of the configuration file
+'''str: The environment variable that store the file name of the configuration
+file
 '''
 
+filename_suffixes = ['_file', '_files',
+                     '_dir',  '_dirs',
+                     '_path', '_paths']
+'''list: The list key suffixes that are to be considered for volume translation
+'''
+
+json_include_suffixes = ['_json_include', '_json_includes']
+'''list: The list key suffixes that are to be considered execututing json
+include replacement at load time.
+'''
 
 def settings_property(func):
   '''
@@ -542,7 +552,7 @@ class Settings(ObjectDict):
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
-      raise AttributeError("O_o '{}' object has no attribute '{}'".format(
+      raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__name__, name)) from None
 
 

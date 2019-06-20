@@ -11,9 +11,10 @@ from envcontext import EnvironmentContext
 import yaml
 
 from vsi.tools.diff import dict_diff
+from vsi.tools.python import nested_patch
 
 from terra import settings
-from terra.core.settings import TerraJSONEncoder
+from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute.base import BaseService, BaseCompute
 from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
@@ -195,21 +196,35 @@ class Service(BaseService):
     # Setup config file for docker
     docker_config = TerraJSONEncoder.serializableSettings(settings)
 
-    if 'processing_dir' not in docker_config:
-      logger.warning('No processing dir set. Using "/tmp"')
 
-    docker_config['processing_dir'] = '/tmp'
+    self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
+
+    def patch_volume(value, volume_map):
+      for vol_from, vol_to in volume_map:
+        if isinstance(value, str) and value.startswith(vol_from):
+          return value.replace(vol_from, vol_to, 1)
+      return value
+    patch = lambda key, value: patch_volume(value, reversed(volume_map))
+
+    condition = lambda key, value: isinstance(key, str) and \
+                                   any(key.endswith(pattern)
+                                       for pattern in filename_suffixes)
+
+    docker_config = nested_patch(docker_config, condition, patch)
+
+    # This test doesn't work. It's already faked out long before this
+    # if 'processing_dir' not in docker_config:
+    #   logger.warning('No processing dir set. Using "/tmp"')
+    docker_config['processing_dir'] = '/tmp' # TODO: Remove/unhardcode this
 
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)
 
-    self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
-
     # TODONE: config -> dict
-    # TODO: translate config dict:
-    # TODO:   In reverse order
-    # TODO:   Only tranlate once per entry
-    # TODO:   Only entried ending in _path, _file, _dir
+    # TODONE: translate config dict:
+    # TODONE:   In reverse order
+    # TODONE:   Only tranlate once per entry
+    # TODONE:   Only entried ending in _path, _file, _dir
     # TODONE: Write config file
 
   def post_run(self, compute):
