@@ -220,13 +220,6 @@ class Service(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)
 
-    # TODONE: config -> dict
-    # TODONE: translate config dict:
-    # TODONE:   In reverse order
-    # TODONE:   Only tranlate once per entry
-    # TODONE:   Only entried ending in _path, _file, _dir
-    # TODONE: Write config file
-
   def post_run(self, compute):
     super().post_run(compute)
 
