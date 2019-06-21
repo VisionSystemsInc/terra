@@ -26,15 +26,20 @@ RUN /tmp/pipenv/get-pipenv; rm -rf /tmp/pipenv || :
 
 FROM dep_stage as pipenv_cache
 
-RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make
+RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers
 
 ADD external/vsi_common/setup.py /terra/external/vsi_common/
 ADD setup.py Pipfile Pipfile.lock /terra/
 
+ARG TERRA_PIPEVN_DEV=0
     # Install all packages into the image
 RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
     (cd /terra; /usr/local/pipenv/bin/fake_package terra terra); \
-    pipenv install --keep-outdated; \
+    if [ "${TERRA_PIPEVN_DEV}" = "1" ]; then \
+      pipenv install --dev --keep-outdated; \
+    else \
+      pipenv install --keep-outdated; \
+    fi; \
     # Copy the lock file, so that it can be copied out of the image in "just _post_build"
     cp /terra/Pipfile.lock /venv; \
     # Cleanup and make way for the real /terra that will be mounted at runtime

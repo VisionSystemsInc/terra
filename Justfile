@@ -138,22 +138,38 @@ function terra_caseify()
       Terra_Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       extra_args=$#
       ;;
-    pep8) # Check for pep8 compliance in ./terra
-         Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run test bash -c \
-          "if ! command -v autopep8 >& /dev/null; then
-             pipenv install --dev;
-           fi;
-           autopep8 --indent-size 2 --recursive --exit-code --diff \
-                    --global-config ${TERRA_TERRA_DIR_DOCKER}/autopep8.ini \
-                    ${TERRA_TERRA_DIR_DOCKER}/terra"
-      ;;
-    pep8_local) # Check pep8 compliance without using docker
-      if ! Terra_Pipenv run command -v autopep8 >& /dev/null; then
-        Terra_Pipenv install --dev --keep-outdated
+    # pep8) # Check for pep8 compliance in ./terra
+    #      Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run test bash -c \
+    #       "if ! command -v autopep8 >& /dev/null; then
+    #          pipenv install --dev;
+    #        fi;
+    #        autopep8 --indent-size 2 --recursive --exit-code --diff \
+    #                 --global-config ${TERRA_TERRA_DIR_DOCKER}/autopep8.ini \
+    #                 ${TERRA_TERRA_DIR_DOCKER}/terra"
+    #   ;;
+    pep8) # Check pep8 compliance in ./terra
+      echo "Checking for autopep8..."
+      if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
+        if [[ "${TERRA_LOCAL}" = "1" ]]; then
+          Terra_Pipenv install --dev --keep-outdated
+        else
+          # This is teadious, BUT neccessary since pipenv uses this special
+          # stage just to install things correctly
+          TERRA_PIPEVN_DEV=1 justify build terra
+        fi
       fi
+
+      local terra_dir
+      if [[ "${TERRA_LOCAL}" = "1" ]]; then
+        terra_dir="${TERRA_TERRA_DIR}"
+      else
+        terra_dir="${TERRA_TERRA_DIR_DOCKER}"
+      fi
+
+      echo "Running for autopep8..."
       Terra_Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
-                          --global-config "${TERRA_CWD}/autopep8.ini" \
-                          "${TERRA_TERRA_DIR}/terra"
+                          --global-config "${terra_dir}/autopep8.ini" \
+                          "${terra_dir}/terra"
       ;;
 
     ### Syncing ###

@@ -109,8 +109,8 @@ class _SetupTerraLogger():
   A simple logger class used internally to configure the logger before and
   after :data:`terra.settings` is configured
   '''
-  default_formatter = logging.Formatter('%(asctime)s (preconfig) : %(levelname)s - '
-                                        '%(message)s')
+  default_formatter = logging.Formatter('%(asctime)s (preconfig) : '
+                                        '%(levelname)s - %(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
   default_log_prefix = "terra_log"

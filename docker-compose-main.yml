@@ -5,6 +5,8 @@ services:
     build: &terra_build
       context: .
       dockerfile: docker/terra.Dockerfile
+      args:
+        - TERRA_PIPEVN_DEV=${TERRA_PIPEVN_DEV-0}
     # prevent different users from clobbering each others images
     image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
     environment:
