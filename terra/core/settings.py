@@ -150,7 +150,7 @@ from inspect import isfunction
 from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
-from vsi.tools.python import nested_update, nested_in_dict
+from vsi.tools.python import nested_patch_inplace, nested_update, nested_in_dict
 from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -161,8 +161,17 @@ except ImportError:
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
+'''str: The environment variable that store the file name of the configuration
+file
 '''
-The environment variable that store the file name of the configuration file
+
+filename_suffixes = ['_file', '_files', '_dir', '_dirs', '_path', '_paths']
+'''list: The list key suffixes that are to be considered for volume translation
+'''
+
+json_include_suffixes = ['_json']
+'''list: The list key suffixes that are to be considered execututing json
+include replacement at load time.
 '''
 
 
@@ -232,7 +241,7 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": "%(asctime)s : %(levelname)s - %(message)s",
+        "format": f"%(asctime)s (%(hostname)s): %(levelname)s - %(message)s",
         "date_format": None,
         "style": "%"
       },
@@ -427,6 +436,23 @@ class LazySettings(LazyObject):
         # Nested update and run patch code
         self._wrapped.update(d)
 
+    def read_json(json_file):
+      print('reading', json_file)
+
+      # In case json_file is an @settings_property function
+      if getattr(json_file, 'settings_property', None):
+        json_file = json_file(settings)
+
+      with open(json_file, 'r') as fid:
+        return json.load(fid)
+
+    nested_patch_inplace(
+        self._wrapped,
+        lambda key, value: (isinstance(key, str) and
+                            any(key.endswith(pattern)
+                            for pattern in json_include_suffixes)),  # noqa bug
+        lambda key, value: read_json(value))
+
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
 
@@ -542,7 +568,7 @@ class Settings(ObjectDict):
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
-      raise AttributeError("O_o '{}' object has no attribute '{}'".format(
+      raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__name__, name)) from None
 
 

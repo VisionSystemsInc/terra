@@ -49,6 +49,44 @@ services:
       #   source: ${TERRA_SETTINGS_DIR-}
       #   target: ${TERRA_SETTINGS_DIR_DOCKER}
 
+  redis-commander:
+    image: rediscommander/redis-commander
+    ports:
+      - "${TERRA_REDIS_COMMANDER_PORT}:${TERRA_REDIS_COMMANDER_PORT_DOCKER}"
+    secrets:
+      - source: redis_secret
+        target: ${TERRA_REDIS_SECRET_DOCKER}
+      - source: redis_commander_secret
+        target: ${TERRA_REDIS_COMMANDER_SECRET_FILE}
+    command: |
+      sh -c '
+        echo -n '"'"'{
+          "connections":[
+            {
+              "password": "'"'"' > /redis-commander/config/local-production.json
+        cat /run/secrets/redis_password | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+        echo -n '"'"'",
+              "host": "${TERRA_REDIS_HOSTNAME_DOCKER}",
+              "label": "terra",
+              "dbIndex": 0,
+              "connectionName": "redis-commander",
+              "port": "6379"
+            }
+          ],
+          "server": {
+            "address": "0.0.0.0",
+            "port": ${TERRA_REDIS_COMMANDER_PORT_DOCKER},
+            "httpAuth": {
+              "username": "admin",
+              "passwordHash": "'"'"'>> /redis-commander/config/local-production.json
+          cat "/run/secrets/${TERRA_REDIS_COMMANDER_SECRET_FILE}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+          echo '"'"'"
+            }
+          }
+        }'"'"' >> /redis-commander/config/local-production.json
+        /redis-commander/docker/entrypoint.sh'
+    # " Fix vscode syntax highlighting error
+
   test:
     <<: *terra
     volumes:
@@ -65,6 +103,12 @@ services:
       - "${JUPYTER_IOPUB_PORT_HOST-10003}:${JUPYTER_IOPUB_PORT-10003}"
       - "${JUPYTER_SHELL_PORT_HOST-10004}:${JUPYTER_SHELL_PORT-10004}"
       - "${JUPYTER_STDIN_PORT_HOST-10005}:${JUPYTER_STDIN_PORT-10005}"
+
+secrets:
+  redis_secret:
+    file: ${TERRA_REDIS_SECRET_FILE}
+  redis_commander_secret:
+    file: ${TERRA_REDIS_COMMANDER_SECRET_FILE}
 
 volumes:
   terra-venv:
