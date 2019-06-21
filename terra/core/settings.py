@@ -150,7 +150,7 @@ from inspect import isfunction
 from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
-from vsi.tools.python import nested_patch, nested_update, nested_in_dict
+from vsi.tools.python import nested_patch_inplace, nested_update, nested_in_dict
 from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -446,12 +446,12 @@ class LazySettings(LazyObject):
       with open(json_file, 'r') as fid:
         return json.load(fid)
 
-    self._wrapped.update(nested_patch(
+    nested_patch_inplace(
         self._wrapped,
         lambda key, value: (isinstance(key, str) and
                             any(key.endswith(pattern)
                             for pattern in json_include_suffixes)),  # noqa bug
-        lambda key, value: read_json(value)))
+        lambda key, value: read_json(value))
 
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
