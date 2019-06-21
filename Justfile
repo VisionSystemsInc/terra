@@ -112,7 +112,7 @@ function terra_caseify()
       ;;
     run_redis-browser) # Run redis-browser
       if [ ! -s "${TERRA_REDIS_BROWSER_SECRET_FILE}" ]; then
-        justify generate_redis_browser_hash
+        justify generate-redis-browser-hash
       fi
       Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-browser
       ;;
@@ -120,6 +120,9 @@ function terra_caseify()
     ### Deploy command ###
     up) # Start redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" up -d
+      ;;
+    down) # Stop redis (and any other services) in the background.
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" down
       ;;
     deploy) # Deploy services on a swarm
       Docker-compose -f "${TERRA_CWD}/docker-compose.yml" \
