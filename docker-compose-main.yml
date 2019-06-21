@@ -49,15 +49,15 @@ services:
       #   source: ${TERRA_SETTINGS_DIR-}
       #   target: ${TERRA_SETTINGS_DIR_DOCKER}
 
-  redis-browser:
+  redis-commander:
     image: rediscommander/redis-commander
     ports:
-      - "${TERRA_REDIS_BROWSER_PORT}:${TERRA_REDIS_BROWSER_PORT_DOCKER}"
+      - "${TERRA_REDIS_COMMANDER_PORT}:${TERRA_REDIS_COMMANDER_PORT_DOCKER}"
     secrets:
       - source: redis_secret
         target: ${TERRA_REDIS_SECRET_DOCKER}
-      - source: redis_browser_secret
-        target: ${TERRA_REDIS_BROWSER_SECRET_FILE}
+      - source: redis_commander_secret
+        target: ${TERRA_REDIS_COMMANDER_SECRET_FILE}
     command: |
       sh -c '
         echo -n '"'"'{
@@ -75,11 +75,11 @@ services:
           ],
           "server": {
             "address": "0.0.0.0",
-            "port": ${TERRA_REDIS_BROWSER_PORT_DOCKER},
+            "port": ${TERRA_REDIS_COMMANDER_PORT_DOCKER},
             "httpAuth": {
               "username": "admin",
               "passwordHash": "'"'"'>> /redis-commander/config/local-production.json
-          cat "/run/secrets/${TERRA_REDIS_BROWSER_SECRET_FILE}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+          cat "/run/secrets/${TERRA_REDIS_COMMANDER_SECRET_FILE}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
           echo '"'"'"
             }
           }
@@ -107,8 +107,8 @@ services:
 secrets:
   redis_secret:
     file: ${TERRA_REDIS_SECRET_FILE}
-  redis_browser_secret:
-    file: ${TERRA_REDIS_BROWSER_SECRET_FILE}
+  redis_commander_secret:
+    file: ${TERRA_REDIS_COMMANDER_SECRET_FILE}
 
 volumes:
   terra-venv:

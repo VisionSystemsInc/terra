@@ -97,9 +97,9 @@ function terra_caseify()
       ;;
 
     ### Run Debugging containers ###
-    generate-redis-browser-hash) # Generate a redis browser hash
-      touch "${TERRA_REDIS_BROWSER_SECRET_FILE}"
-      Docker run -it --rm --mount type=bind,source="$(real_path "${TERRA_REDIS_BROWSER_SECRET_FILE}")",destination=/hash_file  python:3 sh -c "
+    generate-redis-commander-hash) # Generate a redis commander hash
+      touch "${TERRA_REDIS_COMMANDER_SECRET_FILE}"
+      Docker run -it --rm --mount type=bind,source="$(real_path "${TERRA_REDIS_COMMANDER_SECRET_FILE}")",destination=/hash_file  python:3 sh -c "
         pip install bcrypt
         python -c 'if 1:
           import bcrypt,getpass
@@ -110,11 +110,11 @@ function terra_caseify()
         '
       "
       ;;
-    run_redis-browser) # Run redis-browser
-      if [ ! -s "${TERRA_REDIS_BROWSER_SECRET_FILE}" ]; then
-        justify generate-redis-browser-hash
+    run_redis-commander) # Run redis-commander
+      if [ ! -s "${TERRA_REDIS_COMMANDER_SECRET_FILE}" ]; then
+        justify generate-redis-commander-hash
       fi
-      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-browser
+      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-commander
       ;;
 
     ### Deploy command ###
