@@ -150,7 +150,7 @@ from inspect import isfunction
 from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
-from vsi.tools.python import nested_update, nested_in_dict
+from vsi.tools.python import nested_patch, nested_update, nested_in_dict
 from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -169,7 +169,7 @@ filename_suffixes = ['_file', '_files', '_dir', '_dirs', '_path', '_paths']
 '''list: The list key suffixes that are to be considered for volume translation
 '''
 
-json_include_suffixes = ['_json_include', '_json_includes']
+json_include_suffixes = ['_json']
 '''list: The list key suffixes that are to be considered execututing json
 include replacement at load time.
 '''
@@ -435,6 +435,23 @@ class LazySettings(LazyObject):
         nested_update(d, self._wrapped)
         # Nested update and run patch code
         self._wrapped.update(d)
+
+    def read_json(json_file):
+      print('reading', json_file)
+
+      # In case json_file is an @settings_property function
+      if getattr(json_file, 'settings_property', None):
+        json_file = json_file(settings)
+
+      with open(json_file, 'r') as fid:
+        return json.load(fid)
+
+    self._wrapped.update(nested_patch(
+        self._wrapped,
+        lambda key, value: (isinstance(key, str) and
+                            any(key.endswith(pattern)
+                            for pattern in json_include_suffixes)),  # noqa bug
+        lambda key, value: read_json(value)))
 
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
