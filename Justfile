@@ -75,6 +75,10 @@ function terra_caseify()
       Terra_Pipenv run python -m ${@+"${@}"}
       extra_args=$#
       ;;
+    run_pdb) # Run pdb module/cli in terra
+      Terra_Pipenv run python -m pdb -m ${@+"${@}"}
+      extra_args=$#
+      ;;
     run_terra) # Run command (arguments) in terra
       local rv=0
       Terra_Pipenv run ${@+"${@}"} || rv=$?
