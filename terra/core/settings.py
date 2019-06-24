@@ -156,7 +156,7 @@ from terra.logger import getLogger
 logger = getLogger(__name__)
 
 try:
-  import commentjson as json
+  import jstyleson as json
 except ImportError:
   import json
 

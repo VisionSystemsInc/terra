@@ -125,6 +125,7 @@ class Compute(BaseCompute):
     """
 
     '''
+    # TODO: Make an OrderedDict
     volume_map = []
 
     service_info = load_service(service_class)
@@ -133,13 +134,21 @@ class Compute(BaseCompute):
     for volume in config['services'][service_info.compose_service_name].get('volumes', []):
       if isinstance(volume, dict):
         if volume['type'] == 'bind':
-          volume_map.append([volume['source'], volume['target']])
+          volume_map.append((volume['source'], volume['target']))
       else:
         if volume.startswith('/'):
           ans = re.match(docker_volume_re, volume).groups()
-          volume_map.append([ans[0], ans[2]])
+          volume_map.append((ans[0], ans[2]))
 
-    return volume_map + service_info.volumes
+    volume_map = volume_map + service_info.volumes
+
+    slashes = '/'
+    if os.name == 'nt':
+      slashes += '\\'
+
+    # Strip trailing /'s to make things look better
+    return [(volume_host.rstrip(slashes), volume_remote.rstrip(slashes))
+            for volume_host, volume_remote in volume_map]
 
 
 class Service(BaseService):
@@ -200,16 +209,28 @@ class Service(BaseService):
     # volume_map = compute.configuration_map(self, [str(temp_compose_file)])
     volume_map = compute.configuration_map(self)
 
+    logger.debug3("Volume map: %s", volume_map)
+
     # Setup config file for docker
     docker_config = TerraJSONEncoder.serializableSettings(settings)
 
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
-    def patch_volume(value, volume_map):
-      for vol_from, vol_to in volume_map:
-        if isinstance(value, str) and value.startswith(vol_from):
-          return value.replace(vol_from, vol_to, 1)
-      return value
+    if os.name == "nt":
+      logger.warning("Windows volume mapping is experimental.")
+
+      def patch_volume(value, volume_map):
+        for vol_from, vol_to in volume_map:
+          if (isinstance(value, str)
+              and value.lower().startswith(vol_from.lower())):
+            return value.lower().replace(vol_from.lower(), vol_to.lower(), 1)
+        return value
+    else:
+      def patch_volume(value, volume_map):
+        for vol_from, vol_to in volume_map:
+          if isinstance(value, str) and value.startswith(vol_from):
+            return value.replace(vol_from, vol_to, 1)
+        return value
 
     docker_config = nested_patch(
         docker_config,

@@ -4,7 +4,7 @@ setup(name="terra",
       packages=["terra"],
       description="Terra",
       install_requires=[
-        "commentjson",
+        "jstyleson",
         "docker-compose",
         "envcontext",
         "celery[redis]",
