@@ -150,7 +150,9 @@ from inspect import isfunction
 from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
-from vsi.tools.python import nested_patch_inplace, nested_update, nested_in_dict
+from vsi.tools.python import (
+  nested_patch_inplace, nested_update, nested_in_dict
+)
 from json import JSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -520,36 +522,7 @@ class ObjectDict(dict):
   def update(self, *args, **kwargs):
     """ Supported """
 
-    def patch(self, key):
-      ''' Function to patch dict->ObjectDict '''
-      value = self[key]
-
-      def patch_list(value):
-        ''' List/tuple handler '''
-        return [self.__class__(dict(x))
-                if isinstance(x, dict) and not isinstance(x, self.__class__)
-                else patch_list(x) if isinstance(value, (list, tuple))
-                else x for x in value]
-
-      if isinstance(value, (list, tuple)):
-        self[key] = patch_list(value)
-      elif isinstance(value, dict) and not isinstance(value, self.__class__):
-        self[key] = self.__class__(dict(value))
-
-    # Run nested update first
     nested_update(self, *args, **kwargs)
-
-    # Then search through all the data, for things to patch. And new dicts need
-    # to be turned into ObjectDicts
-    if args:
-      # Handle dict and zipped
-      for (key, value) in args[0].items() \
-          if isinstance(args[0], dict) else args[0]:
-        patch(self, key)
-
-    if kwargs:
-      for (key, value) in kwargs.items():
-        patch(self, key)
 
 
 class Settings(ObjectDict):

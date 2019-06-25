@@ -5,6 +5,11 @@ from functools import wraps
 import terra.compute.utils
 
 
+class StageRunFailed(Exception):
+  ''' Exception thrown when a stage runner returns non-zero
+  '''
+
+
 class BaseService:
   '''
   The base class for all Terra Service definitions

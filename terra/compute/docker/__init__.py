@@ -15,7 +15,7 @@ from vsi.tools.python import nested_patch
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
-from terra.compute.base import BaseService, BaseCompute
+from terra.compute.base import BaseService, BaseCompute, StageRunFailed
 from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
@@ -89,11 +89,14 @@ class Compute(BaseCompute):
     service_info = load_service(service_class)
     service_info.pre_run(self)
 
-    self.just("--wrap", "Just-docker-compose",
-              '-f', service_info.compose_file,
-              'run', service_info.compose_service_name,
-              *(service_info.command),
-              env=service_info.env)
+    pid = self.just("--wrap", "Just-docker-compose",
+                    '-f', service_info.compose_file,
+                    'run', service_info.compose_service_name,
+                    *(service_info.command),
+                    env=service_info.env)
+
+    if pid.returncode != 0:
+      raise(StageRunFailed())
 
     service_info.post_run(self)
 
