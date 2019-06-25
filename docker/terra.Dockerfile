@@ -31,11 +31,11 @@ RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers
 ADD external/vsi_common/setup.py /terra/external/vsi_common/
 ADD setup.py Pipfile Pipfile.lock /terra/
 
-ARG TERRA_PIPEVN_DEV=0
+ARG TERRA_PIPENV_DEV=0
     # Install all packages into the image
 RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
     (cd /terra; /usr/local/pipenv/bin/fake_package terra terra); \
-    if [ "${TERRA_PIPEVN_DEV}" = "1" ]; then \
+    if [ "${TERRA_PIPENV_DEV}" = "1" ]; then \
       pipenv install --dev --keep-outdated; \
     else \
       pipenv install --keep-outdated; \

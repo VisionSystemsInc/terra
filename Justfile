@@ -159,7 +159,7 @@ function terra_caseify()
         else
           # This is teadious, BUT neccessary since pipenv uses this special
           # stage just to install things correctly
-          TERRA_PIPEVN_DEV=1 justify build terra
+          TERRA_PIPENV_DEV=1 justify build terra
         fi
       fi
 
