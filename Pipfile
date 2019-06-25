@@ -15,7 +15,7 @@ ipykernel = "*"
 terra = {path = ".",editable = true}
 vsi-common = {editable = true,path = "./external/vsi_common"}
 # Repeat this dependencies possibly due to a bug
-commentjson = "*"
+jstyleson = "*"
 docker-compose = "*"
 envcontext = "*"
 celery = {extras = ["redis"], version = "*"}
