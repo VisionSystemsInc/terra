@@ -357,6 +357,14 @@ class LazyObject():
       self._setup()
     return name in self._wrapped
 
+  def __dir__(self):
+    """ Supported """
+    d = super().__dir__()
+    if self._wrapped is not None:
+      return list(set(d + dir(self._wrapped)))
+    return d
+
+
 
 class LazySettings(LazyObject):
   '''
@@ -440,8 +448,6 @@ class LazySettings(LazyObject):
         self._wrapped.update(d)
 
     def read_json(json_file):
-      print('reading', json_file)
-
       # In case json_file is an @settings_property function
       if getattr(json_file, 'settings_property', None):
         json_file = json_file(settings)
