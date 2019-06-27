@@ -243,7 +243,7 @@ class Service(BaseService):
     # This test doesn't work. It's already faked out long before this
     # if 'processing_dir' not in docker_config:
     #   logger.warning('No processing dir set. Using "/tmp"')
-    docker_config['processing_dir'] = '/tmp'  # TODO: Remove/unhardcode this
+    # docker_config['processing_dir'] = '/tmp'  # TODO: Remove/unhardcode this
 
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)

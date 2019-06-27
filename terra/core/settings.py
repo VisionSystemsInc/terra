@@ -251,6 +251,7 @@ global_templates = [
       "compute": {
         "arch": "terra.compute.dummy"
       },
+      "resume": False,
       'status_file': status_file,
       'processing_dir': processing_dir
     }
