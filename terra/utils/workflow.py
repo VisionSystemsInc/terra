@@ -44,19 +44,22 @@ class resumable(BasicDecorator):
   '''
 
   def __inner_call__(self, *args, **kwargs):
+    # Stages can only be run once, handle that
     try:
       if self.fun.already_run:
         raise AlreadyRunException("Already run")
     except AttributeError:
       pass
-
     self.fun.already_run = True
 
+    # Get self of the wrapped function
     all_kwargs = args_to_kwargs(self.fun, args, kwargs)
     stage_self = all_kwargs['self']
 
+    # Create a unique name fot the function
     stage_name = f'{inspect.getfile(self.fun)}//{self.fun.__qualname__}'
 
+    # Load/create status file
     if not os.path.exists(settings.status_file):
       try:
         os.makedirs(os.path.dirname(settings.status_file))
@@ -68,6 +71,7 @@ class resumable(BasicDecorator):
     with open(settings.status_file, 'r') as fid:
       stage_self.status = ObjectDict(json.load(fid))
 
+    # If resume is turned on
     if settings.resume:
       try:
         if stage_self.status.stage != stage_name:
@@ -81,17 +85,23 @@ class resumable(BasicDecorator):
           return None
       except AttributeError:
         pass
+      # Set resume to false, so that this code isn't run again for this run.
+      # - The resuming is done, so no need for the resume flag
       settings.resume = False
 
+    # Log starting...
     stage_self.status.stage_status = "starting"
     stage_self.status.stage = stage_name
     logger.debug(f"Starting: {stage_name}")
 
+    # Run function
     result = self.fun(*args, **kwargs)
 
+    # Log done
     stage_self.status.stage_status = "done"
     logger.debug(f"Finished: {stage_name}")
 
+    # Smart update the file
     shutil.move(settings.status_file, settings.status_file + '.bak')
     with open(settings.status_file, 'w') as fid:
       json.dump(stage_self.status, fid)
