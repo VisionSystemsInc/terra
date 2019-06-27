@@ -15,6 +15,7 @@ from vsi.tools.python import nested_patch
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
+from terra.compute import compute
 from terra.compute.base import BaseService, BaseCompute, StageRunFailed
 from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
@@ -87,7 +88,7 @@ class Compute(BaseCompute):
             {service_info.command}
     '''
     service_info = load_service(service_class)
-    service_info.pre_run(self)
+    service_info.pre_run()
 
     pid = self.just("--wrap", "Just-docker-compose",
                     '-f', service_info.compose_file,
@@ -98,7 +99,7 @@ class Compute(BaseCompute):
     if pid.returncode != 0:
       raise(StageRunFailed())
 
-    service_info.post_run(self)
+    service_info.post_run()
 
   def config(self, service_class, extra_compose_files=[]):
     '''
@@ -163,8 +164,8 @@ class Service(BaseService):
     super().__init__()
     self.volumes_flags = []
 
-  def pre_run(self, compute):  # Compute?
-    super().pre_run(compute)
+  def pre_run(self):
+    super().pre_run()
 
     self.temp_dir = TemporaryDirectory()
     temp_dir = Path(self.temp_dir.name)
@@ -251,8 +252,8 @@ class Service(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)
 
-  def post_run(self, compute):
-    super().post_run(compute)
+  def post_run(self):
+    super().post_run()
 
     self.temp_dir = None  # Delete temp_dir
 

@@ -23,12 +23,12 @@ class BaseService:
     self.volumes = []
     ''' A copy of the processes environment variables local to a service '''
 
-  def pre_run(self, compute):
+  def pre_run(self):
     '''
     Place holder for code to run before ``run``
     '''
 
-  def post_run(self, compute):
+  def post_run(self):
     '''
     Place holder for code to run after ``run``
     '''
