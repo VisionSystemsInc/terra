@@ -561,6 +561,7 @@ class Settings(ObjectDict):
   def __enter__(self):
     import copy
     object.__setattr__(self, "_backup", copy.deepcopy(self))
+
   def __exit__(self, type_, value, traceback):
     self.clear()
     self.update(self._backup)

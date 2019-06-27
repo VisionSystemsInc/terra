@@ -4,6 +4,7 @@ from unittest import mock
 from terra.compute import base
 from .utils import TestCase
 
+
 class TestServiceBase(TestCase):
 
   @mock.patch.dict(os.environ, {'FOO': "BAR"})
@@ -17,7 +18,9 @@ class TestServiceBase(TestCase):
   def test_volumes(self):
     service = base.BaseService()
     service.add_volume("/local", "/remote")
-    self.assertIn(("/local", "/remote"),  service.volumes)
+    self.assertIn(("/local", "/remote"), service.volumes)
+
 
 class TestService(base.BaseService):
   def pre_run(self):
+    pass
