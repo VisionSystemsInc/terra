@@ -54,7 +54,7 @@ class BaseCompute:
     compute
     '''
 
-    service_name = f'{service.__module__}.{service.__name__}'
+    service_name = f'{service.__module__}.{service.__qualname__}'
 
     def wrapper(impl):
       if service_name not in services:

@@ -521,7 +521,7 @@ class ObjectDict(dict):
       return self[name]
     except KeyError:
       raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__name__, name))
+          self.__class__.__qualname__, name))
 
   def __setattr__(self, name, value):
     """ Supported """
@@ -556,7 +556,7 @@ class Settings(ObjectDict):
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
       raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__name__, name)) from None
+          self.__class__.__qualname__, name)) from None
 
   def __enter__(self):
     import copy

@@ -119,6 +119,7 @@ def load_service(name_or_class):
     # If already instance, return it
     if not isinstance(name_or_class, type):
       return name_or_class
+    # TODO: Not really designed for nested classes, so don't use __qualname__
     name_or_class = f'{name_or_class.__module__}.{name_or_class.__name__}'
   else:
     module = name_or_class.rsplit('.', 1)[0]
