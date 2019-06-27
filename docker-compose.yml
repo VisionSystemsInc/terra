@@ -13,6 +13,7 @@ services:
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
       - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/redis.Justfile
+      - TZ
     volumes:
       # # vsi_common
       # - type: ${TERRA_TERRA_DIR_TYPE}
