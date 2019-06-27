@@ -365,7 +365,6 @@ class LazyObject():
     return d
 
 
-
 class LazySettings(LazyObject):
   '''
   A :class:`LazyObject` proxy for either global Terra settings or a custom
