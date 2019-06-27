@@ -34,7 +34,7 @@ class BaseService:
     '''
 
   def add_volume(self, local, remote):
-    self.volumes.append([local, remote])
+    self.volumes.append((local, remote))
 
 
 class AlreadyRegisteredException(Exception):
