@@ -3,7 +3,7 @@ from unittest import mock
 from .utils import TestCase
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from terra import settings
-from terra.core.settings import ObjectDict, settings_property
+from terra.core.settings import ObjectDict, settings_property, Settings
 
 
 class TestObjectDict(TestCase):
@@ -54,6 +54,12 @@ class TestObjectDict(TestCase):
     d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
     self.assertEqual(d.b[0][0].c, 'foo')
 
+  def test_dir(self):
+    d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
+    self.assertIn('a', dir(d))
+    self.assertIn('b', dir(d))
+    self.assertNotIn('c', dir(d))
+
 
 class TestSettings(TestCase):
 
@@ -78,6 +84,11 @@ class TestSettings(TestCase):
 
     self.assertEqual(settings['b'], "22")
     self.assertEqual(settings['c'], True)
+
+    self.assertIn('a', dir(settings))
+    self.assertIn('b', dir(settings))
+    self.assertIn('c', dir(settings))
+    self.assertNotIn('22', dir(settings))
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
@@ -220,3 +231,62 @@ class TestSettings(TestCase):
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, 444)
+
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch('terra.core.settings.global_templates', [({}, {'a': 11, 'b': 22})])
+  def test_add_templates(self):
+    import terra.core.settings as s
+    self.assertEqual(s.global_templates, [({}, {'a': 11, 'b': 22})])
+    settings.add_templates([({'a': 11}, {'c': 33})])
+
+    settings.configure()
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, 22)
+    self.assertNotIn("c", settings)
+
+    settings._wrapped = None
+
+    # Demonstrate one of the possible complications/solutions.
+    settings.add_templates([({}, {'a': 11})])
+    self.assertEqual(s.global_templates, [({}, {'a': 11}),
+                                          ({'a': 11}, {'c': 33}),
+                                          ({}, {'a': 11, 'b': 22})])
+    settings.configure()
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, 22)
+    self.assertIn("c", settings)
+    self.assertEqual(settings.c, 33)
+
+  @mock.patch.object(settings, '_wrapped', Settings({'a': 11, 'b': 22}))
+  def test_with_context(self):
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, 22)
+    self.assertFalse(hasattr(settings, 'c'))
+
+    with settings:
+      settings.a = 12
+      settings.c = 3
+      self.assertEqual(settings.a, 12)
+      self.assertEqual(settings.b, 22)
+      self.assertEqual(settings.c, 3)
+
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b, 22)
+    self.assertFalse(hasattr(settings, 'c'))
+
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch('terra.core.settings.global_templates', [])
+  def test_json(self):
+    with NamedTemporaryFile(mode='w',
+                            dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 15, "b":"22", "c": true}')
+
+    settings.add_templates([({}, {'a': 11, 'b_json': fid.name})])
+
+    settings.configure({})
+
+    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.b_json.a, 15)
+    self.assertEqual(settings.b_json.b, "22")
+    self.assertEqual(settings.b_json.c, True)

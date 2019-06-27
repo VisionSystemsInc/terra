@@ -452,7 +452,7 @@ class LazySettings(LazyObject):
         json_file = json_file(settings)
 
       with open(json_file, 'r') as fid:
-        return json.load(fid)
+        return Settings(json.load(fid))
 
     nested_patch_inplace(
         self._wrapped,
@@ -490,6 +490,14 @@ class LazySettings(LazyObject):
     offset = len(global_templates)
     for template in templates:
       global_templates.insert(-offset, template)
+
+  def __enter__(self):
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__enter__()
+
+  def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+    return self._wrapped.__exit__(exc_type, exc_value, traceback)
 
 
 class ObjectDict(dict):
@@ -549,6 +557,14 @@ class Settings(ObjectDict):
       # Throw a KeyError to prevent a recursive corner case
       raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__name__, name)) from None
+
+  def __enter__(self):
+    import copy
+    object.__setattr__(self, "_backup", copy.deepcopy(self))
+  def __exit__(self, type_, value, traceback):
+    self.clear()
+    self.update(self._backup)
+    del self._backup
 
 
 settings = LazySettings()
