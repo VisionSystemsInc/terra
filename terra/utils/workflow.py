@@ -74,8 +74,8 @@ class resumable(BasicDecorator):
           logger.debug(f"Skipping {stage_name}... "
                        f"Resuming to {stage_self.status.stage}")
           return None
-        elif stage_self.status.stage == stage_name \
-            and stage_self.status.stage_status == "done":
+        elif (stage_self.status.stage == stage_name
+              and stage_self.status.stage_status == "done"):
           logger.debug(f"Skipping {stage_name}... "
                        f"Resuming after {stage_self.status.stage}")
           return None
