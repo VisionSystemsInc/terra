@@ -306,8 +306,10 @@ logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
 
-# Configure logging (pre configure)
-_logs = _SetupTerraLogger()
+# Disable log setup for unittests
+if os.environ.get('TERRA_UNITTEST', None) != "1":
+  # Configure logging (pre configure)
+  _logs = _SetupTerraLogger()
 
-# register post_configure with settings
-post_settings_configured.connect(_logs.configure_logger)
+  # register post_configure with settings
+  post_settings_configured.connect(_logs.configure_logger)

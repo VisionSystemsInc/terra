@@ -139,18 +139,10 @@ function terra_caseify()
     test_terra) # Run unit tests
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
-      Terra_Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+      # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
+      Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       extra_args=$#
       ;;
-    # pep8) # Check for pep8 compliance in ./terra
-    #      Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run test bash -c \
-    #       "if ! command -v autopep8 >& /dev/null; then
-    #          pipenv install --dev;
-    #        fi;
-    #        autopep8 --indent-size 2 --recursive --exit-code --diff \
-    #                 --global-config ${TERRA_TERRA_DIR_DOCKER}/autopep8.ini \
-    #                 ${TERRA_TERRA_DIR_DOCKER}/terra"
-    #   ;;
     pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
@@ -163,17 +155,10 @@ function terra_caseify()
         fi
       fi
 
-      local terra_dir
-      if [[ "${TERRA_LOCAL}" = "1" ]]; then
-        terra_dir="${TERRA_TERRA_DIR}"
-      else
-        terra_dir="${TERRA_TERRA_DIR_DOCKER}"
-      fi
-
       echo "Running for autopep8..."
-      Terra_Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
-                          --global-config "${terra_dir}/autopep8.ini" \
-                          "${terra_dir}/terra"
+      Terra_Pipenv run bash -c 'autopep8 --indent-size 2 --recursive --exit-code --diff \
+                          --global-config "${TERRA_TERRA_DIR}/autopep8.ini" \
+                          "${TERRA_TERRA_DIR}/terra"'
       ;;
 
     ### Syncing ###
