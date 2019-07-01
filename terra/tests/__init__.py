@@ -1,16 +1,3 @@
-# from .utils import TestCase
-
-# def setUpModule():
-#   print('set')
-# def tearDownModule():
-#   print('riiiiiip')
-
-# class TestFoo(TestCase):
-#   pass
-#   def test_registry(self):
-#     print('wtf')
-
-import unittest
 import os
 
 # Use this as a package level setup
