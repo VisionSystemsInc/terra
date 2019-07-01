@@ -306,7 +306,7 @@ logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
 
-# Disable log setup for unittests
+# Disable log setup for unittests. Can't use settings here ;)
 if os.environ.get('TERRA_UNITTEST', None) != "1":
   # Configure logging (pre configure)
   _logs = _SetupTerraLogger()

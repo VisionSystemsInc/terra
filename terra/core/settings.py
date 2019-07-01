@@ -234,6 +234,17 @@ def processing_dir(self):
 
   return processing_dir
 
+@settings_property
+def unittest(self):
+  '''
+  A :func:`settings_property` for determing if unittests are running or not
+
+  Checks the value of :env:`TERRA_UNITTEST` and returns True or False based off
+  of that.
+  '''
+
+  return os.environ.get('TERRA_UNITTEST', None) == "1"
+
 
 # TODO: come up with a way for apps to extend this themselves
 global_templates = [
@@ -255,7 +266,8 @@ global_templates = [
       },
       "resume": False,
       'status_file': status_file,
-      'processing_dir': processing_dir
+      'processing_dir': processing_dir,
+      'unittest': unittest
     }
   )
   # , (
