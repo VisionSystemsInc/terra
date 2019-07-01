@@ -8,20 +8,12 @@ from .utils import TestCase
 # Registration test
 class Foo:
   class TestService(base.BaseService):
-    def __init__(self):
-      super().__init__()
-      self.a = 11
-    def pre_run(self):
-      self.b = 22
-    def pre_run(self):
-      self.c = 33
+    pass
 
 
 @base.BaseCompute.register(Foo.TestService)
 class TestService_base(Foo.TestService, base.BaseService):
-  def __init__(self):
-    super().__init__()
-    self.d = 44
+  pass
 
 
 class TestServiceBase(TestCase):

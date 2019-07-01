@@ -135,6 +135,6 @@ def load_service(name_or_class):
 
   if cls not in services:
     logger.info(f'Using default {cls} compute handler for {name_or_class}')
-    return get_default_service(cls)
+    return get_default_service(cls)()
 
   return services[cls]()
