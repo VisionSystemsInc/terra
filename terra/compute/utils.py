@@ -68,7 +68,8 @@ class ComputeHandler(Handler):
     try:
       module = import_module(f'{backend_name}')
       if not hasattr(module, 'Compute'):
-        raise ImportError(f"module '{backend_name}' has no attribute 'Compute'")
+        raise ImportError(f"module '{backend_name}' has no attribute "
+                          "'Compute'")
     except ImportError:
       module = import_module(f'terra.compute.{backend_name}')
 

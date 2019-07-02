@@ -5,6 +5,7 @@ from terra import settings
 from terra.compute import base
 from .utils import TestCase
 
+
 # Registration test
 class Foo:
   class TestService(base.BaseService):
@@ -35,7 +36,7 @@ class TestServiceBase(TestCase):
     # Test configuration_map
     settings.configure({})
     self.assertEqual([("/local", "/remote")],
-        base.BaseCompute().configuration_map(service))
+                     base.BaseCompute().configuration_map(service))
 
   def test_registry(self):
     self.assertIn(Foo.TestService.__module__ + '.Foo.TestService',

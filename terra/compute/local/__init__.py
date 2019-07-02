@@ -21,10 +21,15 @@ class Compute(BaseCompute):
     service_info.pre_run()
 
     # Replace 'python' command with virtual environment python executable
-    if settings.compute.get('venv_python', None):
-      service_info.command = [settings.compute.venv_python
-                              if el == 'python' else el
-                              for el in service_info.command]
+    if settings.compute.get('virtualenv_dir', None):
+      self.env['PATH'] = settings.compute.virtualenv_dir + os.path.pathsep \
+        + self.env['PATH']
+      # TODO: Not sure if I want this or not
+      # if "_OLD_VIRTUAL_PATH" in self.env:
+      #   self.env['PATH'] = self.env["_OLD_VIRTUAL_PATH"]
+      # service_info.command = [settings.compute.venv_python
+      #                         if el == 'python' else el
+      #                         for el in service_info.command]
 
     # run command -- command must be a list of strings
     subprocess.call(service_info.command)

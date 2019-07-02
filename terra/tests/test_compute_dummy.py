@@ -6,6 +6,7 @@ from terra.compute import base
 from terra.compute import dummy
 from .utils import TestCase
 
+
 # Test Dummy
 class TestServiceManual(dummy.BaseService):
   # These implementations aren't actually even needed with assertLogs, however
@@ -13,9 +14,11 @@ class TestServiceManual(dummy.BaseService):
   def __init__(self):
     super().__init__()
     self.a = 11
+
   def pre_run(self):
     super().pre_run()
     self.b = 22
+
   def post_run(self):
     super().post_run()
     self.c = 33
@@ -26,6 +29,7 @@ class TestServiceManual_dummy(TestServiceManual, dummy.Service):
   def __init__(self):
     super().__init__()
     self.d = 44
+
 
 # Redundant tests left as implementation examples
 class TestDummyManual(TestCase):
@@ -43,13 +47,16 @@ class TestDummyManual(TestCase):
     self.assertEqual(foo.c, 33)
     self.assertEqual(foo.d, 44)
 
+
 class TestService(base.BaseService):
   pass
 
-#Normally you don't register to the base
+
+# Normally you don't register to the base
 @base.BaseCompute.register(TestService)
 class TestService_base(TestService, base.BaseService):
   pass  # No needs to register dummy even. Use default
+
 
 class TestServiceDummy(TestCase):
   test_service_name = TestService.__module__ + '.TestService'
@@ -88,5 +95,5 @@ class TestServiceDummy(TestCase):
     for phase in ['create', 'start', 'stop', 'remove']:
       with self.assertLogs(dummy.__name__, level="INFO") as cm:
         getattr(self.dummyCompute, phase)(self.test_service_name)
-      self.assertTrue(any('INFO:terra.compute.dummy:{}:'.format(phase.capitalize()) in o for o in cm.output))
-
+      self.assertTrue(any('INFO:terra.compute.dummy:{}:'.format(
+        phase.capitalize()) in o for o in cm.output))
