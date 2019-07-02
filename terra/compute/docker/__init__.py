@@ -96,7 +96,7 @@ class Compute(BaseCompute):
                     env=service_info.env)
 
     if pid.wait() != 0:
-      raise(ServiceRunFailed())
+      raise ServiceRunFailed()
 
     service_info.post_run()
 
@@ -134,7 +134,8 @@ class Compute(BaseCompute):
     service_info = load_service(service_class)
     config = yaml.load(self.config(service_info, extra_compose_files))
 
-    for volume in config['services'][service_info.compose_service_name].get('volumes', []):
+    for volume in config['services'][service_info.compose_service_name].get(
+        'volumes', []):  # noqa: autopep8 bug
       if isinstance(volume, dict):
         if volume['type'] == 'bind':
           volume_map.append((volume['source'], volume['target']))
@@ -202,7 +203,7 @@ class Service(BaseService):
     env_volume_index += 1
 
     for index, ((volume_host, volume_container), volume_flags) in \
-        enumerate(zip(self.volumes, self.volumes_flags)):  # noqa bug
+        enumerate(zip(self.volumes, self.volumes_flags)):  # noqa autopep8 bug
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
@@ -239,7 +240,7 @@ class Service(BaseService):
         docker_config,
         lambda key, value: (isinstance(key, str) and
                             any(key.endswith(pattern)
-                            for pattern in filename_suffixes)),  # noqa bug
+                            for pattern in filename_suffixes)),  # noqa
         lambda key, value: patch_volume(value, reversed(volume_map))
     )
 

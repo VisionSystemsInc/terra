@@ -5,7 +5,6 @@ from threading import Lock
 
 
 class DummyExecutor(Executor):
-
   def __init__(self, *arg, **kwargs):
     self._shutdown = False
     self._shutdownLock = Lock()

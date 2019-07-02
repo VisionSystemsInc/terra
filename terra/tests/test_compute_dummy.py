@@ -34,8 +34,7 @@ class TestServiceManual_dummy(TestServiceManual, dummy.Service):
 # Redundant tests left as implementation examples
 class TestDummyManual(TestCase):
   def test_registry(self):
-    self.assertIn(TestService.__module__ + '.TestService',
-                  base.services)
+    self.assertIn(TestService.__module__ + '.TestService', base.services)
 
   def test_manual_service(self):
     dummyCompute = dummy.Compute()
@@ -72,16 +71,15 @@ class TestServiceDummy(TestCase):
     with self.assertLogs(dummy.__name__, level="INFO") as cm:
       self.dummyCompute.run(self.test_service_name)
 
-    run = [
-      'INFO:terra.compute.dummy:Run:' in o for o in cm.output].index(True)
-    pre_run = [
-      'INFO:terra.compute.dummy:Pre run:' in o for o in cm.output].index(True)
-    create = [
-      'INFO:terra.compute.dummy:Create:' in o for o in cm.output].index(True)
-    start = [
-      'INFO:terra.compute.dummy:Start:' in o for o in cm.output].index(True)
-    post_run = [
-      'INFO:terra.compute.dummy:Post run:' in o for o in cm.output].index(True)
+    run = ['INFO:terra.compute.dummy:Run:' in o for o in cm.output].index(True)
+    pre_run = ['INFO:terra.compute.dummy:Pre run:' in o
+               for o in cm.output].index(True)
+    create = ['INFO:terra.compute.dummy:Create:' in o
+              for o in cm.output].index(True)
+    start = ['INFO:terra.compute.dummy:Start:' in o
+             for o in cm.output].index(True)
+    post_run = ['INFO:terra.compute.dummy:Post run:' in o
+                for o in cm.output].index(True)
 
     self.assertLess(run, pre_run)
     self.assertLess(pre_run, create)
@@ -96,4 +94,4 @@ class TestServiceDummy(TestCase):
       with self.assertLogs(dummy.__name__, level="INFO") as cm:
         getattr(self.dummyCompute, phase)(self.test_service_name)
       self.assertTrue(any('INFO:terra.compute.dummy:{}:'.format(
-        phase.capitalize()) in o for o in cm.output))
+          phase.capitalize()) in o for o in cm.output))

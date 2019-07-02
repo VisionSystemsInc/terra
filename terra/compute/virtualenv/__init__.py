@@ -39,7 +39,7 @@ class Compute(BaseCompute):
       pid = subprocess.Popen(service_info.command, env=service_info.env)
 
     if pid.wait() != 0:
-      raise(ServiceRunFailed())
+      raise ServiceRunFailed()
 
     # post run
     logger.debug2("post-running %s ", str(service_info))

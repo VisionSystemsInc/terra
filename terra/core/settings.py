@@ -151,7 +151,7 @@ from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from vsi.tools.python import (
-  nested_patch_inplace, nested_update, nested_in_dict
+    nested_patch_inplace, nested_update, nested_in_dict
 )
 from json import JSONEncoder
 from terra.logger import getLogger
@@ -191,9 +191,11 @@ def settings_property(func):
   func : func
       Function being decorated
   '''
+
   @wraps(func)
   def wrapper(*args, **kwargs):
     return func(*args, **kwargs)
+
   wrapper.settings_property = True
   return wrapper
 
@@ -413,8 +415,8 @@ class LazySettings(LazyObject):
       raise ImproperlyConfigured(
           "Requested %s, but settings are not configured. "
           "You must either define the environment variable %s "
-          "or call settings.configure() before accessing settings."
-          % (desc, ENVIRONMENT_VARIABLE))
+          "or call settings.configure() before accessing settings." %
+          (desc, ENVIRONMENT_VARIABLE))
     with open(settings_file) as fid:
       self.configure(json.load(fid))
     self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
@@ -471,7 +473,7 @@ class LazySettings(LazyObject):
         self._wrapped,
         lambda key, value: (isinstance(key, str) and
                             any(key.endswith(pattern)
-                            for pattern in json_include_suffixes)),  # noqa bug
+                            for pattern in json_include_suffixes)),  # noqa
         lambda key, value: read_json(value))
 
     post_settings_configured.send(sender=self)
@@ -598,10 +600,12 @@ class TerraJSONEncoder(JSONEncoder):
     if root is None:
       root = obj
 
-    return {k: TerraJSONEncoder.serializableSettings(v, root)
-            if isinstance(v, dict) else
-            v(root) if isfunction(v) and hasattr(v, 'settings_property')
-            else v for k, v in obj.items()}
+    return {
+        k: TerraJSONEncoder.serializableSettings(v, root) if isinstance(
+            v, dict) else
+        v(root) if isfunction(v) and hasattr(v, 'settings_property') else v
+        for k, v in obj.items()
+    }
 
   @staticmethod
   def dumps(obj):

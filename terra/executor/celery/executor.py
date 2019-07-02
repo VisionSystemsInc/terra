@@ -19,9 +19,8 @@
 import terra.executor.celery  # Load the celery app
 
 from concurrent.futures import Future, Executor, as_completed
-from concurrent.futures._base import (
-    RUNNING, FINISHED, CANCELLED, CANCELLED_AND_NOTIFIED
-)
+from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
+                                      CANCELLED_AND_NOTIFIED)
 from threading import Lock, Thread
 import logging
 import time
@@ -29,15 +28,6 @@ import time
 from celery import shared_task
 
 logger = logging.getLogger(__name__)
-
-
-# @shared_task(bind=True, serializer='pickle', track_started=True, retry_backoff=True)
-# def _celery_call(task, func, metadata, *args, **kwargs):
-#   try:
-#     return func(*args, **kwargs)
-#   except Exception as exc:
-#     retry_kwargs = (metadata or {}).get('retry_kwargs', {})
-#     raise task.retry(exc=exc, **retry_kwargs)
 
 
 class CeleryExecutorFuture(Future):
@@ -64,18 +54,23 @@ class CeleryExecutorFuture(Future):
           self._ar.revoke()
           self._ar.ready()
 
-        # Celery task should be REVOKED now. Otherwise may be not possible revoke it.
+        # Celery task should be REVOKED now. Otherwise may be not possible
+        # revoke it.
         if self._ar.state == 'REVOKED':
           result = super(CeleryExecutorFuture, self).cancel()
-          assert result is True, 'Please open an issue on Github: Upstream implementation changed?'
+          assert result is True, 'Please open an issue on Github: Upstream ' \
+                                 'implementation changed?'
         else:
           # Is not running nor revoked nor finished :/
-          # The revoke() had not produced effect: Task is probable not on a worker, then not revoke-able.
-          # Setting as RUNNING to inibit super() to cancel the Future, then putting back.
+          # The revoke() had not produced effect: Task is probable not on a
+          # worker, then not revoke-able.
+          # Setting as RUNNING to inibit super() to cancel the Future, then
+          # putting back.
           initial_state = self._state
           self._state = RUNNING
           result = super(CeleryExecutorFuture, self).cancel()
-          assert result is False, 'Please open an issue on Github: Upstream implementation changed?'
+          assert result is False, 'Please open an issue on Github: Upstream ' \
+                                  'implementation changed?'
           self._state = initial_state
 
         return result
@@ -133,7 +128,8 @@ class CeleryExecutor(Executor):
         if ar.state == 'REVOKED':
           logger.debug('Celery task "%s" canceled.', ar.id)
           if not fut.cancelled():
-            assert fut.cancel(), 'Future was not running but failed to be cancelled'
+            assert fut.cancel(), \
+                'Future was not running but failed to be cancelled'
             fut.set_running_or_notify_cancel()
           # Future is CANCELLED
 

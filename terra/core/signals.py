@@ -202,8 +202,8 @@ class Signal:
       return []
 
     return [
-      (receiver, receiver(signal=self, sender=sender, **named))
-      for receiver in self._live_receivers(sender)
+        (receiver, receiver(signal=self, sender=sender, **named))
+        for receiver in self._live_receivers(sender)
     ]
 
   def send_robust(self, sender, **named):
@@ -249,8 +249,8 @@ class Signal:
     if self._dead_receivers:
       self._dead_receivers = False
       self.receivers = [
-        r for r in self.receivers
-        if not(isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+          r for r in self.receivers
+          if not (isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
       ]
 
   def _live_receivers(self, sender):
@@ -328,6 +328,7 @@ def receiver(signal, **kwargs):
   ... def signals_receiver(sender, **kwargs):
   ...     stuff()
   """
+
   def _decorator(func):
     if isinstance(signal, (list, tuple)):
       for s in signal:
@@ -335,6 +336,7 @@ def receiver(signal, **kwargs):
     else:
       signal.connect(func, **kwargs)
     return func
+
   return _decorator
 
 
@@ -351,5 +353,5 @@ manual call to :func:`terra.core.settings.LazySettings.configure`.
 
 # Must be after post_settings_configured to prevent circular import errors.
 # Just can't use logger during import (global scope)
-from terra.logger import getLogger  # noqa
+from terra.logger import getLogger  # noqa: special case
 logger = getLogger(__name__)

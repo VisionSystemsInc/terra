@@ -18,7 +18,6 @@ class TestService_base(Foo.TestService, base.BaseService):
 
 
 class TestServiceBase(TestCase):
-
   @mock.patch.dict(os.environ, {'FOO': "BAR"})
   def test_env(self):
     service = base.BaseService()

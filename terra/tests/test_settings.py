@@ -7,7 +7,6 @@ from terra.core.settings import ObjectDict, settings_property, Settings
 
 
 class TestObjectDict(TestCase):
-
   def test_basic(self):
     d = ObjectDict({'foo': 3})
     self.assertEqual(d.foo, 3)
@@ -62,7 +61,6 @@ class TestObjectDict(TestCase):
 
 
 class TestSettings(TestCase):
-
   def setUp(self):
     self.temp_dir = TemporaryDirectory()
 
@@ -72,8 +70,7 @@ class TestSettings(TestCase):
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
   def test_lazy_attribute(self):
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
@@ -93,8 +90,7 @@ class TestSettings(TestCase):
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
   def test_lazy_item(self):
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
@@ -109,8 +105,7 @@ class TestSettings(TestCase):
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
   def test_comments(self):
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{\n'
                 '  "a": 15,\n'
@@ -129,12 +124,13 @@ class TestSettings(TestCase):
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.core.settings.global_templates', [
-      ({}, {'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44, 'foo': {'t': 15}}}),
-      ({'c': {'d': 14}}, {'e': 15})])
+  @mock.patch('terra.core.settings.global_templates',
+              [({},
+                {'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44, 'foo': {'t': 15}}}),
+               ({'c': {'d': 14}},
+                {'e': 15})])
   def test_global_templates(self):
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"b":"333", "c":"444"}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
@@ -159,12 +155,10 @@ class TestSettings(TestCase):
 
   @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.core.settings.global_templates', [
-      ({}, {'a': 11, 'b': 22}),
-      ({'c': {'d': 14}}, {'e': {'f': 15}})])
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': 22}), ({'c': {'d': 14}}, {'e': {'f': 15}})])
   def test_global_templates2(self):
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"c": {"d": 14}}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
@@ -196,14 +190,13 @@ class TestSettings(TestCase):
     terra.core.settings.global_templates[0][1].update({
         'a': a,
         'c': {
-          'e': settings_property(ce),
-          'b': settings_property(lambda self: 13.1),
+            'e': settings_property(ce),
+            'b': settings_property(lambda self: 13.1),
         },
         'd': d
     })
 
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
@@ -221,7 +214,8 @@ class TestSettings(TestCase):
     self.assertTrue(settings.configured)
 
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.core.settings.global_templates', [({}, {'a': 11, 'b': 22})])
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': 22})])
   def test_configure(self):
 
     self.assertFalse(settings.configured)
@@ -233,7 +227,8 @@ class TestSettings(TestCase):
     self.assertEqual(settings.c, 444)
 
   @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch('terra.core.settings.global_templates', [({}, {'a': 11, 'b': 22})])
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': 22})])
   def test_add_templates(self):
     import terra.core.settings as s
     self.assertEqual(s.global_templates, [({}, {'a': 11, 'b': 22})])
@@ -277,8 +272,7 @@ class TestSettings(TestCase):
   @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates', [])
   def test_json(self):
-    with NamedTemporaryFile(mode='w',
-                            dir=self.temp_dir.name,
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
 

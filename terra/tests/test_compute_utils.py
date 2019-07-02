@@ -33,8 +33,6 @@ class Service2_test:
 
 # I am purposefully showing multiple ways to mock _wrapped for demonstration
 # purposes
-
-
 patches = []
 
 
@@ -62,13 +60,13 @@ class TestUtils(TestCase):
     settings.configure({})
     self.assertIsInstance(utils.ComputeHandler()._connection,
                           terra.compute.dummy.Compute)
-    self.assertIsInstance(utils.ComputeHandler(
-      Compute.__module__)._connection, Compute)
+    self.assertIsInstance(
+        utils.ComputeHandler(Compute.__module__)._connection, Compute)
 
   def test_compute_handler_short_name(self):
     # context manager scope patch
     with mock.patch.object(settings, '_wrapped', None), \
-         warnings.catch_warnings():
+         warnings.catch_warnings():  # noqa: autopep8 bug
       settings.configure({'compute': {'arch': 'docker'}})
       warnings.simplefilter('ignore')  # Suppress imp cause by docker warnings
       self.assertIsInstance(utils.ComputeHandler()._connection,
@@ -83,8 +81,7 @@ class TestUtils(TestCase):
 
   @mock.patch.dict(utils.compute.__dict__, _connection=Compute())
   def test_load_service_by_class(self):
-    self.assertIsInstance(utils.load_service(Service),
-                          Service_test)
+    self.assertIsInstance(utils.load_service(Service), Service_test)
 
   @mock.patch.dict(utils.compute.__dict__, _connection=Compute())
   def test_load_service_by_str(self):

@@ -188,8 +188,8 @@ class _SetupTerraLogger():
 
     # Log the settings only to the file handler
     with HandlerLoggingContext(self.root_logger, [self.file_handler]):
-      self.root_logger.log(DEBUG1, "Settings:\n" +
-                           pprint.pformat(dict(settings)),
+      self.root_logger.log(DEBUG1,
+                           "Settings:\n" + pprint.pformat(dict(settings)),
                            extra=extra_logger_variables)
       # For some reason python doesn't make the root logger the designated
       # class, so much add extra manually here. Not even sure why I chose

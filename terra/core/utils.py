@@ -45,12 +45,11 @@ class cached_property:
   """
 
   name = None
+
   @staticmethod
   def func(instance):
-    raise TypeError(
-        'Cannot use cached_property instance without calling '
-        '__set_name__() on it.'
-    )
+    raise TypeError('Cannot use cached_property instance without calling '
+                    '__set_name__() on it.')
 
   def __init__(self, func, name=None):
     self.real_func = func
@@ -61,10 +60,8 @@ class cached_property:
       self.name = name
       self.func = self.real_func
     elif name != self.name:
-      raise TypeError(
-          "Cannot assign the same cached_property to two different names "
-          "(%r and %r)." % (self.name, name)
-      )
+      raise TypeError("Cannot assign the same cached_property to two "
+                      "different names (%r and %r)." % (self.name, name))
 
   def __get__(self, instance, cls=None):
     """

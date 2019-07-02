@@ -47,6 +47,7 @@ class BaseCompute:
   '''
   The base class for all Terra Service Compute Arches
   '''
+
   @classmethod
   def register(cls, service):
     '''
@@ -60,11 +61,12 @@ class BaseCompute:
       if service_name not in services:
         services[service_name] = {}
       if cls in services[service_name]:
-        raise(AlreadyRegisteredException(f'Service {service_name} already '
-                                         'registered'))
+        raise AlreadyRegisteredException(f'Service {service_name} already '
+                                         'registered')
       services[service_name][cls] = impl
 
       return impl
+
     return wrapper
 
   def create(self, *args, **kwargs):
