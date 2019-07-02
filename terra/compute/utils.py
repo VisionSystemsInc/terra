@@ -54,11 +54,11 @@ class ComputeHandler(Handler):
 
     Parameters
     ----------
-    self._overrite_type : :class:`str`, optional
+    self._override_type : :class:`str`, optional
         If not ``None``, override the name of the backend to load.
     '''
 
-    backend_name = self._overrite_type
+    backend_name = self._override_type
 
     if backend_name is None:
       backend_name = settings.compute.arch
@@ -67,9 +67,9 @@ class ComputeHandler(Handler):
 
     try:
       module = import_module(f'{backend_name}')
-      # Quack like a duck - make sure we're importing the right module
-      module.Compute
-    except (ImportError, AttributeError):
+      if not hasattr(module, 'Compute'):
+        raise ImportError(f"module '{backend_name}' has no attribute 'Compute'")
+    except ImportError:
       module = import_module(f'terra.compute.{backend_name}')
 
     return module.Compute()
@@ -82,7 +82,7 @@ For the most part, workflows will be interacting with :data:`compute` to
 '''
 
 
-def get_default_service(cls):
+def get_default_service_class(cls):
   '''
   Gets a compute class' default Service class from the class object.
 
@@ -105,7 +105,7 @@ def load_service(name_or_class):
 
   Parameters
   ----------
-  name_or_class : :class:`str` or :class:`class`
+  name_or_class : :class:`str` or :class:`class` or instance
       The service being loaded
 
   Returns
@@ -123,6 +123,7 @@ def load_service(name_or_class):
     name_or_class = f'{name_or_class.__module__}.{name_or_class.__name__}'
   else:
     module = name_or_class.rsplit('.', 1)[0]
+    # Import to trigger registration. Don't need return value
     import_module(module)
 
   try:
@@ -135,6 +136,6 @@ def load_service(name_or_class):
 
   if cls not in services:
     logger.info(f'Using default {cls} compute handler for {name_or_class}')
-    return get_default_service(cls)()
+    return get_default_service_class(cls)()
 
   return services[cls]()

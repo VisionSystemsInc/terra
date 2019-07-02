@@ -18,11 +18,11 @@ class ExecutorHandler(ClassHandler):
 
     Parameters
     ----------
-    self._overrite_type : :class:`str`, optional
+    self._override_type : :class:`str`, optional
         If not ``None``, override the name of the backend to load.
     '''
 
-    backend_name = self._overrite_type
+    backend_name = self._override_type
 
     if backend_name is None:
       backend_name = settings.executor.type

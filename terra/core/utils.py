@@ -88,14 +88,15 @@ class Handler:
   '''
 
   def __init__(self, override_type=None):
-    self._overrite_type = override_type
+    self._override_type = override_type
 
   def _connect_backend(self):
     '''
     Overload this function in children classes
     '''
-    if self._overrite_type:
-      _type = self._overrite_type
+
+    if self._override_type:
+      _type = self._override_type
     else:
       _type = int
     return _type()
@@ -112,7 +113,7 @@ class Handler:
     # recursion loop.
 
   def __setattr__(self, name, value):
-    if name in ('_overrite_type'):
+    if name in ('_override_type'):
       return super().__setattr__(name, value)
     return setattr(self._connection, name, value)
 
