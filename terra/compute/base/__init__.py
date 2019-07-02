@@ -5,8 +5,8 @@ from functools import wraps
 import terra.compute.utils
 
 
-class StageRunFailed(Exception):
-  ''' Exception thrown when a stage runner returns non-zero
+class ServiceRunFailed(Exception):
+  ''' Exception thrown when a service runner returns non-zero
   '''
 
 

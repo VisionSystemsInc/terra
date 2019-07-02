@@ -16,7 +16,7 @@ from vsi.tools.python import nested_patch
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute import compute
-from terra.compute.base import BaseService, BaseCompute, StageRunFailed
+from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
 from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
@@ -72,7 +72,6 @@ class Compute(BaseCompute):
 
     with EnvironmentContext(**env):
       pid = Popen(('just',) + args, **kwargs)
-      pid.wait()
       return pid
 
   def run(self, service_class):
@@ -96,8 +95,8 @@ class Compute(BaseCompute):
                     *(service_info.command),
                     env=service_info.env)
 
-    if pid.returncode != 0:
-      raise(StageRunFailed())
+    if pid.wait() != 0:
+      raise(ServiceRunFailed())
 
     service_info.post_run()
 
