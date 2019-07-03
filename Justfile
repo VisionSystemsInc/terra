@@ -75,6 +75,10 @@ function terra_caseify()
       Terra_Pipenv run python -m ${@+"${@}"}
       extra_args=$#
       ;;
+    run_pdb) # Run pdb module/cli in terra
+      Terra_Pipenv run python -m pdb -m ${@+"${@}"}
+      extra_args=$#
+      ;;
     run_terra) # Run command (arguments) in terra
       local rv=0
       Terra_Pipenv run ${@+"${@}"} || rv=$?
@@ -155,7 +159,7 @@ function terra_caseify()
         else
           # This is teadious, BUT neccessary since pipenv uses this special
           # stage just to install things correctly
-          TERRA_PIPEVN_DEV=1 justify build terra
+          TERRA_PIPENV_DEV=1 justify build terra
         fi
       fi
 

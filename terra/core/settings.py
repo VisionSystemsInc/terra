@@ -172,7 +172,7 @@ filename_suffixes = ['_file', '_files', '_dir', '_dirs', '_path', '_paths']
 '''
 
 json_include_suffixes = ['_json']
-'''list: The list key suffixes that are to be considered execututing json
+'''list: The list key suffixes that are to be considered executing json
 include replacement at load time.
 '''
 
@@ -253,6 +253,7 @@ global_templates = [
       "compute": {
         "arch": "terra.compute.dummy"
       },
+      "resume": False,
       'status_file': status_file,
       'processing_dir': processing_dir
     }

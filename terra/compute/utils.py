@@ -67,7 +67,9 @@ class ComputeHandler(Handler):
 
     try:
       module = import_module(f'{backend_name}')
-    except ImportError:
+      # Quack like a duck - make sure we're importing the right module
+      module.Compute
+    except (ImportError, AttributeError):
       module = import_module(f'terra.compute.{backend_name}')
 
     return module.Compute()
