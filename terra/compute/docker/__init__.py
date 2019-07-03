@@ -135,7 +135,7 @@ class Compute(BaseCompute):
     config = yaml.load(self.config(service_info, extra_compose_files))
 
     for volume in config['services'][service_info.compose_service_name].get(
-        'volumes', []):  # noqa: autopep8 bug
+        'volumes', []):
       if isinstance(volume, dict):
         if volume['type'] == 'bind':
           volume_map.append((volume['source'], volume['target']))
@@ -184,7 +184,8 @@ class Service(BaseService):
 
     # for (volume_host, volume_container), volume_flags in \
     #     zip(self.volumes, self.volumes_flags):
-    #   temp_compose += f'      - {volume_host}:{volume_container}\n' #), volume_flags}\n'
+    #   temp_compose += \
+    #       f'      - {volume_host}:{volume_container}\n' #), volume_flags}\n'
 
     # temp_compose_file = temp_dir / "docker-compose.yml"
 
@@ -203,7 +204,7 @@ class Service(BaseService):
     env_volume_index += 1
 
     for index, ((volume_host, volume_container), volume_flags) in \
-        enumerate(zip(self.volumes, self.volumes_flags)):  # noqa autopep8 bug
+        enumerate(zip(self.volumes, self.volumes_flags)):
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
@@ -238,9 +239,9 @@ class Service(BaseService):
 
     docker_config = nested_patch(
         docker_config,
-        lambda key, value: (isinstance(key, str) and
-                            any(key.endswith(pattern)
-                            for pattern in filename_suffixes)),  # noqa
+        lambda key, value: (isinstance(key, str)
+                            and any(key.endswith(pattern)
+                                    for pattern in filename_suffixes)),
         lambda key, value: patch_volume(value, reversed(volume_map))
     )
 

@@ -8,6 +8,7 @@ name = "pypi"
 
 [dev-packages]
 autopep8 = "*"
+pycodestyle = "*"
 pylint = "*"
 ipykernel = "*"
 

@@ -143,6 +143,9 @@ function terra_caseify()
       Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       extra_args=$#
       ;;
+
+    # How do I know what error code causes a problem in autopep8? You don't!
+    # At least not as far as I can tell.
     pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
@@ -156,9 +159,13 @@ function terra_caseify()
       fi
 
       echo "Running for autopep8..."
-      Terra_Pipenv run bash -c 'autopep8 --indent-size 2 --recursive --exit-code --diff \
-                          --global-config "${TERRA_TERRA_DIR}/autopep8.ini" \
-                          "${TERRA_TERRA_DIR}/terra"'
+      Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
+                                "${TERRA_TERRA_DIR}/terra"'
+      ;;
+    test_pep8) # Run pep8 test
+      justify pep8
+      Terra_Pipenv run bash -c 'pycodestyle \
+                                "${TERRA_TERRA_DIR}/terra"'
       ;;
 
     ### Syncing ###
@@ -178,11 +185,11 @@ function terra_caseify()
     update_pipenv-terra) # Update Terra core's pipenv
       Terra_Pipenv update
       ;;
-    dev_sync) # Developer's extra sync
+    sync_dev-pipenv-terra) # Developer's extra sync
       Terra_Pipenv install --dev --keep-outdated
       ;;
-    dev_update) # Developer: Update python packages
-      Terra_Pipenv install --dev
+    update_dev-pipenv-terra) # Developer: Update python packages
+      Terra_Pipenv update --dev
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n

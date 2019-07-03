@@ -13,8 +13,8 @@ class ExecutorHandler(ClassHandler):
   def _connect_backend(self):
     '''
     Loads the executor backend's base module, given either a fully qualified
-    compute backend name, or a partial (``terra.executor.{partial}.executor``), and
-    then returns a connection to the backend
+    compute backend name, or a partial (``terra.executor.{partial}.executor``),
+    and then returns a connection to the backend
 
     Parameters
     ----------

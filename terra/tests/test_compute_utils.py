@@ -66,7 +66,7 @@ class TestUtils(TestCase):
   def test_compute_handler_short_name(self):
     # context manager scope patch
     with mock.patch.object(settings, '_wrapped', None), \
-         warnings.catch_warnings():  # noqa: autopep8 bug
+         warnings.catch_warnings():
       settings.configure({'compute': {'arch': 'docker'}})
       warnings.simplefilter('ignore')  # Suppress imp cause by docker warnings
       self.assertIsInstance(utils.ComputeHandler()._connection,

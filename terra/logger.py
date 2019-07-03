@@ -48,7 +48,8 @@ logger = get_logger(__name__)
 And then use the ``logger`` object anywhere in the module. This logger is a
 python :mod:`logging` logger with the following extra configuration
 
-* Added `debug1`, `debug2`, and `debug3` levels (with `debug3` being the most verbose)
+* Added `debug1`, `debug2`, and `debug3` levels (with `debug3` being the most
+  verbose)
 * `debug` is really `debug1`
 * `debug3` is best used for debugging math in an algorithm
 * `debug2` is best used for more verbose statements used only for development
@@ -72,9 +73,9 @@ from logging import (
   CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, getLogger,
   _acquireLock, _releaseLock
 )
-# Must be import signal after getLogger is defined... Currently this is imported
-# from logger. But if a custom getLogger is defined eventually, it will need to
-# be defined before importing terra.core.signals.
+# Must be import signal after getLogger is defined... Currently this is
+# imported from logger. But if a custom getLogger is defined eventually, it
+# will need to be defined before importing terra.core.signals.
 from terra.core.signals import post_settings_configured
 
 
