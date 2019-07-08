@@ -3,6 +3,7 @@ from inspect import isclass
 from functools import wraps
 
 import terra.compute.utils
+from terra.compute.utils import load_service
 
 
 class ServiceRunFailed(Exception):
@@ -69,34 +70,73 @@ class BaseCompute:
 
     return wrapper
 
-  def create(self, *args, **kwargs):
-    '''
-    Place holder for code to create an instance in the compute
-    '''
+  def __getattr__(self, name):
+    implementation = name + 'Service'
+    # Default implementation caller
+    def defaultCommand(self, service_class, *args, **kwargs):
+      service_info = load_service(service_class)
 
-  def start(self, *args, **kwargs):
-    '''
-    Place holder for code to create an instance in the compute
-    '''
+      # Check and call pre_ call
+      pre_call = getattr(service_info, 'pre_' + name, None)
+      if pre_call:
+        pre_call(*args, **kwargs)
 
-  def run(self, *args, **kwargs):
-    '''
-    Place holder for code to run an instance in the compute. Runs
-    :func:`create` and then :func:`start` by default
-    '''
+      # Call command implementation
+      rv = self.__getattribute__(implementation)(service_info, *args, **kwargs)
 
-    self.create(*args, **kwargs)
-    self.start(*args, **kwargs)
+      # Check and call post_ call
+      post_call = getattr(service_info, 'post_' + name, None)
+      if post_call:
+        post_call(*args, **kwargs)
 
-  def stop(self, *args, **kwargs):
-    '''
-    Place holder for code to stop an instance in the compute
-    '''
+      return rv
 
-  def remove(self, *args, **kwargs):
-    '''
-    Place holder for code to remove an instance from the compute
-    '''
+    try:
+      # super hasattr
+      self.__getattribute__(name+'Service')
+    except AttributeError:
+      raise AttributeError(f'Compute command "{name}" does not have a service '
+                           f'implementation "{implementation}"')
+    else:
+      # return bound version of function
+      return defaultCommand.__get__(self, type(self))
+
+  # def create(self, *args, **kwargs):
+  #   '''
+  #   Place holder for code to create an instance in the compute
+  #   '''
+
+  # def start(self, *args, **kwargs):
+  #   '''
+  #   Place holder for code to create an instance in the compute
+  #   '''
+
+  # def run(self, service_class, *args, **kwargs):
+  #   service_info = load_service(service_class)
+
+  #   if hasattr(service_info, 'pre_run'):
+
+  #   self.runService(service_info, *args, **kwargs)
+
+  # def runService(self, *args, **kwargs):
+  #   '''
+  #   Place holder for code to run an instance in the compute. Runs
+  #   :func:`create` and then :func:`start` by default
+  #   '''
+
+  #   self.create(*args, **kwargs)
+  #   self.start(*args, **kwargs)
+
+
+  # def stop(self, *args, **kwargs):
+  #   '''
+  #   Place holder for code to stop an instance in the compute
+  #   '''
+
+  # def remove(self, *args, **kwargs):
+  #   '''
+  #   Place holder for code to remove an instance from the compute
+  #   '''
 
   def configuration_map(self, service_class):
     '''

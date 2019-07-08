@@ -30,7 +30,6 @@
 from importlib import import_module
 from terra.core.utils import Handler
 from terra import settings
-from terra.compute.base import services as compute_services
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -116,6 +115,8 @@ def load_service(name_or_class):
         Instead of the class specified. If ``name_or_class`` was already an
         instance, the same instance is returned
   '''
+
+  from terra.compute.base import services as compute_services
 
   if not isinstance(name_or_class, str):
     # If already instance, return it
