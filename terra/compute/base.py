@@ -73,70 +73,53 @@ class BaseCompute:
   def __getattr__(self, name):
     implementation = name + 'Service'
     # Default implementation caller
-    def defaultCommand(self, service_class, *args, **kwargs):
-      service_info = load_service(service_class)
-
-      # Check and call pre_ call
-      pre_call = getattr(service_info, 'pre_' + name, None)
-      if pre_call:
-        pre_call(*args, **kwargs)
-
-      # Call command implementation
-      rv = self.__getattribute__(implementation)(service_info, *args, **kwargs)
-
-      # Check and call post_ call
-      post_call = getattr(service_info, 'post_' + name, None)
-      if post_call:
-        post_call(*args, **kwargs)
-
-      return rv
 
     try:
       # super hasattr
-      self.__getattribute__(name+'Service')
+      self.__getattribute__(name + 'Service')
     except AttributeError:
       raise AttributeError(f'Compute command "{name}" does not have a service '
                            f'implementation "{implementation}"')
     else:
-      # return bound version of function
+      def defaultCommand(self, service_class, *args, **kwargs):
+
+        service_info = load_service(service_class)
+
+        # Check and call pre_ call
+        pre_call = getattr(service_info, 'pre_' + name, None)
+        if pre_call:
+          pre_call(*args, **kwargs)
+
+        # Call command implementation
+        rv = self.__getattribute__(implementation)(service_info, *args, **kwargs)
+
+        # Check and call post_ call
+        post_call = getattr(service_info, 'post_' + name, None)
+        if post_call:
+          post_call(*args, **kwargs)
+
+        return rv
+
+      defaultCommand.__doc__ = f'''The {name} command for {__class__.__qualname__}
+
+        The {name} command will call the a service's pre_{name} if it has one,
+        followed by the {implementation}, and then the service's post_{name} if
+        it has one.
+        Calls {implementation}'''
+      defaultCommand.__name__ = name
+      defaultCommand.__qualname__ = type(self).__qualname__ + '.' + name
+
+      # bind function and return it
       return defaultCommand.__get__(self, type(self))
 
-  # def create(self, *args, **kwargs):
-  #   '''
-  #   Place holder for code to create an instance in the compute
-  #   '''
+  def runService(self, *args, **kwargs):
+    '''
+    Place holder for code to run an instance in the compute. Runs
+    :func:`create` and then runs and returns :func:`start` by default.
+    '''
 
-  # def start(self, *args, **kwargs):
-  #   '''
-  #   Place holder for code to create an instance in the compute
-  #   '''
-
-  # def run(self, service_class, *args, **kwargs):
-  #   service_info = load_service(service_class)
-
-  #   if hasattr(service_info, 'pre_run'):
-
-  #   self.runService(service_info, *args, **kwargs)
-
-  # def runService(self, *args, **kwargs):
-  #   '''
-  #   Place holder for code to run an instance in the compute. Runs
-  #   :func:`create` and then :func:`start` by default
-  #   '''
-
-  #   self.create(*args, **kwargs)
-  #   self.start(*args, **kwargs)
-
-
-  # def stop(self, *args, **kwargs):
-  #   '''
-  #   Place holder for code to stop an instance in the compute
-  #   '''
-
-  # def remove(self, *args, **kwargs):
-  #   '''
-  #   Place holder for code to remove an instance from the compute
-  #   '''
+    self.create(*args, **kwargs)
+    return self.start(*args, **kwargs)
 
   def configuration_map(self, service_class):
     '''

@@ -81,8 +81,8 @@ class TestServiceDummy(TestCase):
     post_run = ['INFO:terra.compute.dummy:Post run:' in o
                 for o in cm.output].index(True)
 
-    self.assertLess(run, pre_run)
-    self.assertLess(pre_run, create)
+    self.assertLess(pre_run, run)
+    self.assertLess(run, create)
     self.assertLess(create, start)
     self.assertLess(start, post_run)
 

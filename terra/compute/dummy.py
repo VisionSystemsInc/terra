@@ -1,6 +1,6 @@
 from terra.compute.base import BaseCompute, BaseService
 # from terra import settings
-from terra.compute.utils import load_service
+from terra.compute.utils import load_service  # TODO: remove
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -11,24 +11,20 @@ class Compute(BaseCompute):
   services
   '''
 
-  def create(self, service_class):
-    logger.info("Create: " + str(load_service(service_class)))
+  def createService(self, service_info):
+    logger.info("Create: " + str(service_info))
 
-  def start(self, service_class):
-    logger.info("Start: " + str(load_service(service_class)))
+  def startService(self, service_info):
+    logger.info("Start: " + str(service_info))
 
-  def run(self, service_class):
-    service_info = load_service(service_class)
+  def runService(self, service_info):
     logger.info("Run: " + str(service_info))
-    service_info.pre_run()
-    self.create(service_class)
-    self.start(service_class)
-    service_info.post_run()
+    super().runService(service_info)
 
-  def stop(self, service_class):
+  def stopService(self, service_class):
     logger.info("Stop: " + str(load_service(service_class)))
 
-  def remove(self, service_class):
+  def removeService(self, service_class):
     logger.info("Remove: " + str(load_service(service_class)))
 
 
