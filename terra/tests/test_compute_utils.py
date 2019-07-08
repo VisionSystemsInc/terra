@@ -29,6 +29,15 @@ class Service2_test:
   pass
 
 
+# class Service3:
+#   pass
+
+
+# @Compute.register(Service3)
+# class Service3_test:
+#   pass
+
+
 # I am purposefully showing multiple ways to mock _wrapped for demonstration
 # purposes
 patches = []
@@ -36,12 +45,17 @@ patches = []
 
 # Module scope patch
 def setUpModule():
+  # # Assert check for services patch
+  # assert(Service3.__module__ + '.Service3' in terra.compute.base.services)
+
   patches.append(mock.patch.object(settings, '_wrapped', None))
-  patches.append(mock.patch.object(terra.compute.base, 'services', {}))
+  patches.append(mock.patch.dict(terra.compute.base.services, clear=True))
   for patch in patches:
     patch.start()
   settings.configure({'compute': {'arch': Compute.__module__}})
 
+  # # Assert check for services patch
+  # assert(Service3.__module__ + '.Service3' not in terra.compute.base.services)
   Compute.register(Service)(Service_test)
   terra.compute.base.BaseCompute.register(Service2)(Service2_test)
 

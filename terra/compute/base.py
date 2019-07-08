@@ -3,7 +3,6 @@ from inspect import isclass
 from functools import wraps
 
 import terra.compute.utils
-from terra.compute.utils import load_service
 
 
 class ServiceRunFailed(Exception):
@@ -83,7 +82,7 @@ class BaseCompute:
     else:
       def defaultCommand(self, service_class, *args, **kwargs):
 
-        service_info = load_service(service_class)
+        service_info = terra.compute.utils.load_service(service_class)
 
         # Check and call pre_ call
         pre_call = getattr(service_info, 'pre_' + name, None)

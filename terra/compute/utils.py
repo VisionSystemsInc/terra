@@ -30,6 +30,7 @@
 from importlib import import_module
 from terra.core.utils import Handler
 from terra import settings
+import terra.compute.base
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -116,8 +117,6 @@ def load_service(name_or_class):
         instance, the same instance is returned
   '''
 
-  from terra.compute.base import services as compute_services
-
   if not isinstance(name_or_class, str):
     # If already instance, return it
     if not isinstance(name_or_class, type):
@@ -130,7 +129,7 @@ def load_service(name_or_class):
     import_module(module)
 
   try:
-    services = compute_services[name_or_class]
+    services = terra.compute.base.services[name_or_class]
   except KeyError:
     logger.fatal(f'{name_or_class} is not registered')
     raise
