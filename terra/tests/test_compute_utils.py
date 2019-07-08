@@ -17,7 +17,6 @@ class Service:
   pass
 
 
-@Compute.register(Service)
 class Service_test:
   pass
 
@@ -26,7 +25,6 @@ class Service2:
   pass
 
 
-@terra.compute.base.BaseCompute.register(Service2)
 class Service2_test:
   pass
 
@@ -43,6 +41,9 @@ def setUpModule():
   for patch in patches:
     patch.start()
   settings.configure({'compute': {'arch': Compute.__module__}})
+
+  Compute.register(Service)(Service_test)
+  terra.compute.base.BaseCompute.register(Service2)(Service2_test)
 
 
 def tearDownModule():
@@ -81,6 +82,7 @@ class TestUtils(TestCase):
 
   @mock.patch.dict(utils.compute.__dict__, _connection=Compute())
   def test_load_service_by_class(self):
+    from terra.compute.base import services as compute_services
     self.assertIsInstance(utils.load_service(Service), Service_test)
 
   @mock.patch.dict(utils.compute.__dict__, _connection=Compute())

@@ -91,7 +91,8 @@ class BaseCompute:
           pre_call(*args, **kwargs)
 
         # Call command implementation
-        rv = self.__getattribute__(implementation)(service_info, *args, **kwargs)
+        rv = self.__getattribute__(implementation)(
+            service_info, *args, **kwargs)
 
         # Check and call post_ call
         post_call = getattr(service_info, 'post_' + name, None)
