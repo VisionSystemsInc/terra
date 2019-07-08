@@ -21,11 +21,11 @@ class Compute(BaseCompute):
     logger.info("Run: " + str(service_info))
     super().runService(service_info)
 
-  def stopService(self, service_class):
-    logger.info("Stop: " + str(load_service(service_class)))
+  def stopService(self, service_info):
+    logger.info("Stop: " + str(service_info))
 
-  def removeService(self, service_class):
-    logger.info("Remove: " + str(load_service(service_class)))
+  def removeService(self, service_info):
+    logger.info("Remove: " + str(service_info))
 
 
 class Service(BaseService):

@@ -43,10 +43,6 @@ class Compute(BaseCompute):
   Docker compute model, specifically ``docker-compose``
   '''
 
-  docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)' \
-                     r'((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|' \
-                     r':delegated|:cached|:consistent|:nocopy)*)$'
-
   def just(self, *args, **kwargs):
     '''
     Run a ``just`` command. Primarily used to run
@@ -74,7 +70,7 @@ class Compute(BaseCompute):
       pid = Popen(('just',) + args, **kwargs)
       return pid
 
-  def run(self, service_class):
+  def runService(self, service_info):
     '''
     Use the service class information to run the service runner in a docker
     using
@@ -86,9 +82,6 @@ class Compute(BaseCompute):
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
-    service_info = load_service(service_class)
-    service_info.pre_run()
-
     pid = self.just("--wrap", "Just-docker-compose",
                     '-f', service_info.compose_file,
                     'run', service_info.compose_service_name,
@@ -97,8 +90,6 @@ class Compute(BaseCompute):
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
-
-    service_info.post_run()
 
   def config(self, service_class, extra_compose_files=[]):
     '''
