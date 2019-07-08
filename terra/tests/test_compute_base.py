@@ -12,9 +12,26 @@ class Foo:
     pass
 
 
-@base.BaseCompute.register(Foo.TestService)
 class TestService_base(Foo.TestService, base.BaseService):
   pass
+
+
+patches = []
+
+
+def setUpModule():
+  patches.append(mock.patch.object(settings, '_wrapped', None))
+  patches.append(mock.patch.dict(base.services, clear=True))
+  for patch in patches:
+    patch.start()
+  settings.configure({})
+
+  base.BaseCompute.register(Foo.TestService)(TestService_base)
+
+
+def tearDownModule():
+  for patch in patches:
+    patch.stop()
 
 
 class TestServiceBase(TestCase):
