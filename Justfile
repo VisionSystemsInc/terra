@@ -143,6 +143,12 @@ function terra_caseify()
       Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       extra_args=$#
       ;;
+    # Ideas
+    coverage_terra) # Run coverate on terra
+      pushd "${TERRA_CWD}" >& /dev/null # Not needed because of a cd line above
+        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'coverage run && coverage report -m'
+      popd >& /dev/null # but added this so an app developer would know to add it
+      ;;
 
     # How do I know what error code causes a problem in autopep8? You don't!
     # At least not as far as I can tell.

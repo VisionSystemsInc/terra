@@ -11,6 +11,7 @@ autopep8 = "*"
 pycodestyle = "*"
 pylint = "*"
 ipykernel = "*"
+coverage = "==5.0a5" # I need a prerelease, change to * after 5 is released
 
 [packages]
 terra = {path = ".",editable = true}
