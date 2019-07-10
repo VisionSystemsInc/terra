@@ -32,9 +32,9 @@ RE Groups
 * 0: Source
 * 1: Junk - source drive (windows)
 * 2: Target
-* 4: Junk - target drive (windows)
-* 5: Flags
-* 6: Junk - last flag
+* 3: Junk - target drive (windows)
+* 4: Flags
+* 5: Junk - last flag
 '''
 
 
@@ -50,23 +50,36 @@ class Compute(BaseCompute):
 
     Arguments
     ---------
+    justfile : :class:`str`, optional
+        Optionally allow you to specify a custom ``Justfile``. Defaults to
+        Terra's ``Justfile`` is used, which is the correct course of action
+        most of the time
+    add_env : :class:`dict`, optional
+        Adds environment variables. Different from Popen's ``env`` in that it
+        does not completely replace the environment dictionary. You can specify
+        ``env`` and ``add_env`` at the same time. For example: using ``env``
+        is the only way to remove environment variables.
     *args :
         List of arguments to be pass to ``just``
     **kwargs :
         Arguments sent to Popen command
     '''
     logger.debug('Running: ' + ' '.join(
-        # [quote(f'{k}={v}') for k, v in env.items()] +
         [quote(x) for x in ('just',) + args]))
-    env = kwargs.pop('env', {})
-    env['JUSTFILE'] = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
+    add_env = kwargs.pop('add_env', {})
+    justfile = kwargs.pop('justfile',
+        os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile'))
+    add_env['JUSTFILE'] = justfile
 
     if logger.getEffectiveLevel() <= DEBUG1:
-      dd = dict_diff(os.environ, env)[3]
+      new_env = kwargs.get('env', os.environ).copy()
+      new_env.update(add_env)
+
+      dd = dict_diff(os.environ, new_env)[3]
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
-    with EnvironmentContext(**env):
+    with EnvironmentContext(**add_env):
       pid = Popen(('just',) + args, **kwargs)
       return pid
 
@@ -86,17 +99,15 @@ class Compute(BaseCompute):
                     '-f', service_info.compose_file,
                     'run', service_info.compose_service_name,
                     *(service_info.command),
-                    env=service_info.env)
+                    add_env=service_info.env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
 
-  def config(self, service_class, extra_compose_files=[]):
+  def configService(self, service_info, extra_compose_files=[]):
     '''
     Returns the ``docker-compose config`` output
     '''
-
-    service_info = load_service(service_class)
 
     args = ["--wrap", "Just-docker-compose",
             '-f', service_info.compose_file] + \
@@ -107,7 +118,7 @@ class Compute(BaseCompute):
                     env=service_info.env)
     return pid.communicate()[0]
 
-  def configuration_map(self, service_class, extra_compose_files=[]):
+  def configuration_mapService(self, service_info, extra_compose_files=[]):
     '''
     Returns the mapping of volumes from the host to the container.
 
@@ -116,13 +127,10 @@ class Compute(BaseCompute):
     list
         Return a list of tuple pairs [(host, remote), ... ] of the volumes
         mounted from the host to container
-    """
-
     '''
     # TODO: Make an OrderedDict
     volume_map = []
 
-    service_info = load_service(service_class)
     config = yaml.load(self.config(service_info, extra_compose_files))
 
     for volume in config['services'][service_info.compose_service_name].get(

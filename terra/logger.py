@@ -149,6 +149,57 @@ class _SetupTerraLogger():
     self.preconfig_file_handler.setFormatter(self.default_formatter)
     self.root_logger.addHandler(self.preconfig_file_handler)
 
+    # Replace the exception hook with our exception handler
+    self.setup_logging_exception_hook()
+    self.setup_logging_ipython_exception_hook()
+
+  def setup_logging_exception_hook(self):
+    '''
+    Setup logging of uncaught exceptions
+
+    MITM insert an error logging call on all uncaught exceptions. Should only
+    be called once, or else errors will be logged multiple times
+    '''
+
+    # Make a copy of the original hook so the inner function can call it
+    original_hook = sys.excepthook
+
+    # https://stackoverflow.com/a/16993115/4166604
+    def handle_exception(exc_type, exc_value, exc_traceback):
+      logger.error("Uncaught exception",
+                   exc_info=(exc_type, exc_value, exc_traceback))
+
+      return original_hook(exc_type, exc_value, exc_traceback)
+
+    # Replace the hook
+    sys.excepthook = handle_exception
+
+  # https://stackoverflow.com/a/49176714/4166604
+  def setup_logging_ipython_exception_hook(self):
+    '''
+    Setup logging of uncaught exceptions in ipython
+
+    MITM insert an error logging call on all uncaught exceptions. Should only
+    be called once, or else errors will be logged multiple times
+
+    If IPython cannot be imported, nothing happens.
+    '''
+    try:
+      from IPython.core.interactiveshell import InteractiveShell
+
+      original_exception = InteractiveShell.showtraceback
+
+      def handle_traceback(*args, **kwargs):
+        getLogger(__name__).error("Uncaught exception",
+                                  exc_info=sys.exc_info())
+        return original_exception(*args, **kwargs)
+
+      InteractiveShell.showtraceback = handle_traceback
+
+    except ImportError:
+      pass
+
+
   def configure_logger(self, sender, **kwargs):
     '''
     Call back function to configure the logger after settings have been
@@ -174,8 +225,12 @@ class _SetupTerraLogger():
     self.file_handler = logging.StreamHandler(stream=self.log_file)
 
     # Configure log level
-    self.stderr_handler.setLevel(settings.logging.level.upper())
-    self.file_handler.setLevel(settings.logging.level.upper())
+    level = settings.logging.level
+    if isinstance(level, str):
+      # make level case insensitive
+      level = level.upper()
+    self.stderr_handler.setLevel(level)
+    self.file_handler.setLevel(level)
 
     # Configure format
     self.file_handler.setFormatter(formatter)
@@ -306,6 +361,9 @@ logging.setLoggerClass(Logger)
 logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
+
+# Get the logger here, AFTER all the changes to the logger class
+logger = getLogger(__name__)
 
 # Disable log setup for unittests. Can't use settings here ;)
 if os.environ.get('TERRA_UNITTEST', None) != "1":

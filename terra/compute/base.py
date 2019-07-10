@@ -125,7 +125,7 @@ class BaseCompute:
     self.create(*args, **kwargs)
     return self.start(*args, **kwargs)
 
-  def configuration_map(self, service_class):
+  def configuration_mapService(self, service_info):
     '''
     Returns the mapping of volumes from the host to the remote
 
@@ -135,8 +135,6 @@ class BaseCompute:
         Return a list of tuple pairs [(host, remote), ... ] of the volumes
         mounted from the host to remote
     '''
-
-    service_info = terra.compute.utils.load_service(service_class)
 
     return service_info.volumes
 
