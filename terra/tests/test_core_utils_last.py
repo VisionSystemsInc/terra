@@ -1,6 +1,7 @@
 import unittest.mock as mock
 
 import terra.compute.utils
+from terra import settings
 
 from .utils import TestCase
 
@@ -10,18 +11,26 @@ from .utils import TestCase
 class TestUnitTests(TestCase):
   # Don't name this "test*" so normal discover doesn't pick it up, "last*" are
   # run last
-  def last_integrity_check(self):
+  def last_test_connection_handler(self):
     # Manual mock, since setattr gets in the way, have to do this one manually
-    original = object.__getattribute__(terra.compute.utils.compute,
-                                       '_connect_backend')
-    object.__setattr__(terra.compute.utils.compute, '_connect_backend',
-                      lambda: 31)
+    # original = object.__getattribute__(terra.compute.utils.compute,
+    #                                    '_connect_backend')
+    # object.__setattr__(terra.compute.utils.compute, '_connect_backend',
+    #                   lambda: 31)
 
-    self.assertEqual(terra.compute.utils.compute._connection, 31,
+    self.assertNotIn('_connection', terra.compute.utils.compute.__dict__,
+    # self.assertEqual(terra.compute.utils.compute._connection, 31,
         msg="If you are seeing this, one of the other unit tests has "
-            "initialized the compute connection. The side effect should be "
+            "initialized the compute connection. This side effect should be "
             "prevented by mocking out the _connection attribute. Otherwise "
             "unit tests can interfere with each other. Add 'import traceback; "
             " traceback.print_stack()' to ComputeHandler._connect_backend")
-    object.__setattr__(terra.compute.utils.compute, '_connect_backend',
-                       original)
+    # object.__setattr__(terra.compute.utils.compute, '_connect_backend',
+    #                    original)
+
+  def last_test_settings(self):
+    self.assertIsNone(settings._wrapped,
+        msg="If you are seting this, one of the other unit tests has "
+            "initialized the settings. This side effect should be "
+            "prevented by mocking out the settings._wrapped attribute. "
+            "Otherwise unit tests can interfere with each other")

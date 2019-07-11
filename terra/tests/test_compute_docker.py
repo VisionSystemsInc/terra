@@ -8,6 +8,7 @@ from terra.compute import base
 from terra.compute import docker
 from terra.compute import compute
 from terra.core.utils import cached_property
+import terra.compute.utils
 
 from .utils import TestCase
 
@@ -17,8 +18,10 @@ patches = []
 
 def setUpModule():
   patches.append(mock.patch.object(settings, '_wrapped', None))
-  # This resets the _connection to an called state
-  # patches.append(mock.patch.dict(compute.__dict__, '_connection', cached_property(lambda self: self._connect_backend())))
+  # This will resets the _connection to an uninitialized state
+  patches.append(mock.patch.object(terra.compute.utils.ComputeHandler,
+                 '_connection',
+                 mock.PropertyMock(return_value=docker.Compute())))
 
   # patches.append(mock.patch.dict(base.services, clear=True))
   for patch in patches:
