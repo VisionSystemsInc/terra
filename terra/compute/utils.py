@@ -28,6 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from importlib import import_module
+
 from terra.core.utils import Handler
 from terra import settings
 import terra.compute.base
@@ -58,9 +59,6 @@ class ComputeHandler(Handler):
     self._override_type : :class:`str`, optional
         If not ``None``, override the name of the backend to load.
     '''
-
-    import traceback as tb
-    print(tb.print_stack())
 
     backend_name = self._override_type
 
