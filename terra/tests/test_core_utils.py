@@ -56,7 +56,8 @@ class TestCachedProperty(TestCase):
     c = CacheTest()
 
     # Mock before cached
-    with mock.patch.dict(c.__dict__, {'foo': 5}):
+    with mock.patch.object(CacheTest, 'foo',
+                           mock.PropertyMock(return_value=5)):
       self.assertEqual(c.foo, 5)
       self.assertEqual(c.cached, 0)
 
@@ -68,7 +69,8 @@ class TestCachedProperty(TestCase):
     self.assertEqual(c.cached, 1)
 
     # Mock after cached
-    with mock.patch.dict(c.__dict__, {'foo': 6}):
+    with mock.patch.object(CacheTest, 'foo',
+                           mock.PropertyMock(return_value=6)):
       self.assertEqual(c.foo, 6)
       self.assertEqual(c.cached, 1)
 
