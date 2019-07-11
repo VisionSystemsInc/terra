@@ -59,6 +59,9 @@ class ComputeHandler(Handler):
         If not ``None``, override the name of the backend to load.
     '''
 
+    import traceback as tb
+    print(tb.print_stack())
+
     backend_name = self._override_type
 
     if backend_name is None:

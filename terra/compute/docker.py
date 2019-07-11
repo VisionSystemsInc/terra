@@ -133,8 +133,15 @@ class Compute(BaseCompute):
 
     config = yaml.load(self.config(service_info, extra_compose_files))
 
-    for volume in config['services'][service_info.compose_service_name].get(
-        'volumes', []):
+    if 'services' in config and \
+        service_info.compose_service_name in config['services'] and \
+        config['services'][service_info.compose_service_name]:
+      volumes = config['services'][service_info.compose_service_name].get(
+        'volumes', [])
+    else:
+      volumes=[]
+
+    for volume in volumes:
       if isinstance(volume, dict):
         if volume['type'] == 'bind':
           volume_map.append((volume['source'], volume['target']))
@@ -202,6 +209,7 @@ class Service(BaseService):
         f'{str(temp_dir)}:/tmp_settings:rw'
     env_volume_index += 1
 
+    # Copy self.volumes to the environment variables
     for index, ((volume_host, volume_container), volume_flags) in \
         enumerate(zip(self.volumes, self.volumes_flags)):
       volume_str = f'{volume_host}:{volume_container}'
@@ -236,6 +244,7 @@ class Service(BaseService):
             return value.replace(vol_from, vol_to, 1)
         return value
 
+    # Apply map translation to settings configuration
     docker_config = nested_patch(
         docker_config,
         lambda key, value: (isinstance(key, str)
@@ -249,6 +258,7 @@ class Service(BaseService):
     #   logger.warning('No processing dir set. Using "/tmp"')
     # docker_config['processing_dir'] = '/tmp'  # TODO: Remove/unhardcode this
 
+    # Dump the settings
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)
 
@@ -258,5 +268,5 @@ class Service(BaseService):
     self.temp_dir = None  # Delete temp_dir
 
   def add_volume(self, local, remote, flags=None):
-    self.volumes.append([local, remote])
+    self.volumes.append((local, remote))
     self.volumes_flags.append(flags)

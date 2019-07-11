@@ -45,6 +45,26 @@ class cached_property:
       ``url = cached_property(get_absolute_url, name='url')``)
   """
 
+  # Hmmm. with mock.patch.object(Foo, 'x', property(lambda self: 13)) as mock_foo: might be simplier
+  """
+  Notes
+  -----
+      When writing unittests, if an instance of :class:`cached_property` needs
+      to be mocked, it is best to patch the ``__dict__`` of the object. For
+      example, for a cached property ``bar`` for instance ``foo``:
+
+          mock.patch.dict(foo.__dict__, {'bar': 17})
+
+      This will prevent the property from being evaluated once, which
+      ``patch.object`` would do. However, if you want to mock the class:
+
+          with mock.patch.object(Foo, 'x',
+              new_callable=mock.PropertyMock(return_value=13)) as mock_foo:
+            foo = Foo()
+            print(foo.x) # Mocked property
+          print(foo.x) # Original property
+  """
+
   name = None
 
   @staticmethod
