@@ -64,8 +64,10 @@ class Compute(BaseCompute):
     **kwargs :
         Arguments sent to Popen command
     '''
+
     logger.debug('Running: ' + ' '.join(
         [quote(x) for x in ('just',) + args]))
+
     add_env = kwargs.pop('add_env', {})
     justfile = kwargs.pop(
         'justfile', os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile'))

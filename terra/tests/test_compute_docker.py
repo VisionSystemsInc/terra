@@ -134,14 +134,6 @@ class TestDockerJust(TestCase):
 ###############################################################################
 
 
-def mock_just(return_value):
-  def just(self, *args, **kwargs):
-    just.args = args
-    just.kwargs = kwargs
-    return type('blah', (object,), {'wait': lambda self: return_value})()
-  return just
-
-
 class MockJustService:
   compose_file = "file1"
   compose_service_name = "launch"
