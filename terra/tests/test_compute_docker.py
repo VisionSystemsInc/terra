@@ -1,7 +1,9 @@
 import os
 import re
+import json
 from unittest import mock
 import warnings
+import tempfile
 
 from terra import settings
 from terra.compute import base
@@ -14,7 +16,7 @@ from .utils import TestCase
 
 
 patches = []
-
+temp_dir = tempfile.TemporaryDirectory()
 
 def setUpModule():
   patches.append(mock.patch.object(settings, '_wrapped', None))
@@ -26,12 +28,15 @@ def setUpModule():
   # patches.append(mock.patch.dict(base.services, clear=True))
   for patch in patches:
     patch.start()
-  settings.configure({'compute': {'arch': 'docker'}})
+  settings.configure({'compute': {'arch': 'docker'},
+                      'processing_dir': temp_dir.name,
+                      'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
 
 def tearDownModule():
   for patch in patches:
     patch.stop()
+  temp_dir.cleanup()
 
 
 class TestDockerRe(TestCase):
@@ -485,40 +490,70 @@ class SomeService(docker.Service):
 
 
 def mock_map(self, *args, **kwargs):
-  print('WOOT')
   return [('/foo', '/bar'),
           ('/tmp/.X11-unix', '/tmp/.X11-unix')]
 
 
 class TestDockerService(TestCase):
-  # @mock.patch.object(docker.compute, 'configuration_mapService', mock_map)
+  def common(self, compute, service):
+      service.pre_run()
+      setup_dir = service.temp_dir.name
+      with open(os.path.join(setup_dir, 'config.json'), 'r') as fid:
+        config = json.load(fid)
+
+      self.assertEqual(config['foo_dir'], '/bar',
+                       'Path translation test failed')
+      self.assertEqual(config['bar_dir'], '/not_foo',
+                       'Nontranslated directory failure')
+      self.assertEqual(service.env['TERRA_SETTINGS_FILE'],
+                       "/tmp_settings/config.json",
+                       'Failure to set TERRA_SETTINGS_FILE')
+      service.post_run()
+      # Plain test
+
+      self.assertIn(f'{setup_dir}:/tmp_settings:rw',
+                    (v for k,v in service.env.items()
+                     if k.startswith('TERRA_VOLUME_')),
+                    'Configuration failed to injected into docker')
+
+
+  @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
   def test_service(self):
-    pass
-    # compute = docker.Compute()
-    # compute.configuration_map(SomeService())
-    # print(settings._wrapped)
-    # print(docker.compute)
-    # print(docker.compute.configuration_mapService)
-    # print(settings._wrapped)
-  #   service = SomeService()
-  #   service.pre_run()
-  #   setup_dir = service.temp_dir.name
-  #   service.post_run()
-  #   # Plain test
-  #   # f'{str(temp_dir)}:/tmp_settings:rw'
+    # Must not be a decorator, because at decorator time (before setUp is run),
+    # settings._wrapped is still None. Mock the version from setUpModule so I
+    # change the values without affecting any other test
+    with mock.patch.dict(settings._wrapped, {}):
+      compute = docker.Compute()
+      compute.configuration_map(SomeService())
 
-  #   # TERRA_VOLUME 
+      # Test setting for translation
+      settings.foo_dir = "/foo"
+      settings.bar_dir = "/not_foo"
 
-  #   # TERRA_SOMETHING_VOLUME
+      service = SomeService()
+      # Simple case
+      self.common(compute, service)
 
-  # def test_add_volume(self):
-  #   service = SomeService()
-  #   self.assertEqual(service.volumes, [])
+      # Run same tests with a TERRA_VOLUME externally set
+      service = SomeService()
+      service.add_volume('/test1', '/test2', 'z')
+      service.env['TERRA_VOLUME_1'] = "/Foo:/Bar"
+      self.common(compute, service)
+      # Make sure this is still set correctly
+      self.assertEqual(service.env['TERRA_VOLUME_1'], "/Foo:/Bar")
+      self.assertIn('/test1:/test2:z',
+                    (v for k,v in service.env.items()
+                     if k.startswith('TERRA_VOLUME_')),
+                    'Added volume failed to be bound')
 
-  #   service.add_volume('/foo', '/bar')
-  #   self.assertEqual(service.volumes, [('/foo', '/bar')])
-  #   self.assertEqual(service.volumes_flags, [None])
+  def test_add_volume(self):
+    service = SomeService()
+    self.assertEqual(service.volumes, [])
 
-  #   service.add_volume('/data', '/testData', 'ro')
-  #   self.assertEqual(service.volumes, [('/foo', '/bar'), ('/data', '/testData')])
-  #   self.assertEqual(service.volumes_flags, [None, 'ro'])
+    service.add_volume('/foo', '/bar')
+    self.assertEqual(service.volumes, [('/foo', '/bar')])
+    self.assertEqual(service.volumes_flags, [None])
+
+    service.add_volume('/data', '/testData', 'ro')
+    self.assertEqual(service.volumes, [('/foo', '/bar'), ('/data', '/testData')])
+    self.assertEqual(service.volumes_flags, [None, 'ro'])

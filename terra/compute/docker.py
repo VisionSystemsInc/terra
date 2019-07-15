@@ -265,7 +265,10 @@ class Service(BaseService):
   def post_run(self):
     super().post_run()
 
-    self.temp_dir = None  # Delete temp_dir
+    # Delete temp_dir
+    self.temp_dir.cleanup()
+    # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
+    # I did it this way.
 
   def add_volume(self, local, remote, flags=None):
     self.volumes.append((local, remote))
