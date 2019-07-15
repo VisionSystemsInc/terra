@@ -67,8 +67,8 @@ class Compute(BaseCompute):
     logger.debug('Running: ' + ' '.join(
         [quote(x) for x in ('just',) + args]))
     add_env = kwargs.pop('add_env', {})
-    justfile = kwargs.pop('justfile',
-        os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile'))
+    justfile = kwargs.pop(
+        'justfile', os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile'))
     add_env['JUSTFILE'] = justfile
 
     if logger.getEffectiveLevel() <= DEBUG1:
@@ -139,7 +139,7 @@ class Compute(BaseCompute):
       volumes = config['services'][service_info.compose_service_name].get(
         'volumes', [])
     else:
-      volumes=[]
+      volumes = []
 
     for volume in volumes:
       if isinstance(volume, dict):

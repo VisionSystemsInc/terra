@@ -109,7 +109,7 @@ class BaseCompute:
         The {name} command will call the a service's pre_{name} if it has one,
         followed by the {implementation}, and then the service's post_{name} if
         it has one.
-        Calls {implementation}'''
+        Calls {implementation}'''  # noqa
       defaultCommand.__name__ = name
       defaultCommand.__qualname__ = type(self).__qualname__ + '.' + name
 

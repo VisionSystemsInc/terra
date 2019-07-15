@@ -62,9 +62,10 @@ patches = []
 def setUpModule():
   patches.append(mock.patch.object(settings, '_wrapped', None))
   patches.append(mock.patch.dict(base.services, clear=True))
-  patches.append(mock.patch.object(terra.compute.utils.ComputeHandler,
-                 '_connection',
-                 mock.PropertyMock(return_value=dummy.Compute())))
+  patches.append(
+      mock.patch.object(terra.compute.utils.ComputeHandler,
+                        '_connection',
+                        mock.PropertyMock(return_value=dummy.Compute())))
   for patch in patches:
     patch.start()
   settings.configure({})

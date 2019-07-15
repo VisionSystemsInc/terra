@@ -4,6 +4,7 @@ from terra import settings
 from .utils import TestCase
 from terra.core.utils import cached_property
 
+
 class CacheTest:
   def __init__(self):
     self.cached = 0
@@ -12,6 +13,7 @@ class CacheTest:
   def foo(self):
     self.cached += 1
     return 13
+
 
 class TestCachedProperty(TestCase):
   def test_cached_property(self):
@@ -50,7 +52,6 @@ class TestCachedProperty(TestCase):
     self.assertEqual(c.foo, 13)
     # Verify it was only called onces
     self.assertEqual(c.cached, 1)
-
 
   def test_instance_mockability(self):
     c = CacheTest()

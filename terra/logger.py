@@ -199,7 +199,6 @@ class _SetupTerraLogger():
     except ImportError:
       pass
 
-
   def configure_logger(self, sender, **kwargs):
     '''
     Call back function to configure the logger after settings have been

@@ -18,19 +18,22 @@ from .utils import TestCase
 patches = []
 temp_dir = tempfile.TemporaryDirectory()
 
+
 def setUpModule():
   patches.append(mock.patch.object(settings, '_wrapped', None))
   # This will resets the _connection to an uninitialized state
-  patches.append(mock.patch.object(terra.compute.utils.ComputeHandler,
-                 '_connection',
-                 mock.PropertyMock(return_value=docker.Compute())))
+  patches.append(
+      mock.patch.object(terra.compute.utils.ComputeHandler,
+                        '_connection',
+                        mock.PropertyMock(return_value=docker.Compute())))
 
   # patches.append(mock.patch.dict(base.services, clear=True))
   for patch in patches:
     patch.start()
-  settings.configure({'compute': {'arch': 'docker'},
-                      'processing_dir': temp_dir.name,
-                      'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
+  settings.configure({
+      'compute': {'arch': 'docker'},
+      'processing_dir': temp_dir.name,
+      'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
 
 def tearDownModule():
@@ -65,8 +68,8 @@ class TestDockerRe(TestCase):
     for host_path in host_paths:
       for docker_path in docker_paths:
         for test_volume_flag in test_volume_flags:
-          results = parser.match(host_path + ":" + docker_path +
-                                 test_volume_flag).groups()
+          results = parser.match(host_path + ":" + docker_path
+                                 + test_volume_flag).groups()
 
           self.assertEqual(results[0], host_path)
           self.assertEqual(results[2], docker_path)
@@ -108,7 +111,7 @@ class TestDockerJust(TestCase):
     # test kwargs
     args, kwargs, env = compute.just("foobar", shell=False)
     self.assertEqual(args, (('just', 'foobar'),))
-    self.assertEqual(kwargs, {'shell':False})
+    self.assertEqual(kwargs, {'shell': False})
     self.assertEqual(env['JUSTFILE'], default_justfile)
 
     # Test logging code
@@ -130,6 +133,7 @@ class TestDockerJust(TestCase):
 
 ###############################################################################
 
+
 def mock_just(return_value):
   def just(self, *args, **kwargs):
     just.args = args
@@ -137,11 +141,13 @@ def mock_just(return_value):
     return type('blah', (object,), {'wait': lambda self: return_value})()
   return just
 
+
 class MockJustService:
   compose_file = "file1"
   compose_service_name = "launch"
   command = ["ls"]
   env = {"BAR": "FOO"}
+
 
 class TestDockerRun(TestCase):
   # Create a special mock functions that takes the Tests self as _self, and the
@@ -166,7 +172,8 @@ class TestDockerRun(TestCase):
 
     self.return_value = 0
     # This part of the test looks fragile
-    self.expected_args = ('--wrap', 'Just-docker-compose', '-f', 'file1', 'run', 'launch', 'ls')
+    self.expected_args = ('--wrap', 'Just-docker-compose',
+                          '-f', 'file1', 'run', 'launch', 'ls')
     self.expected_kwargs = {'add_env': {'BAR': 'FOO'}}
     compute.run(MockJustService())
 
@@ -203,12 +210,12 @@ class TestDockerConfig(TestCase):
     compute = docker.Compute()
 
     self.expected_args = expected_args1 + expected_args2
-    self.expected_kwargs = {'stdout': docker.PIPE, 'env': {'BAR':'FOO'}}
+    self.expected_kwargs = {'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}}
     self.assertEqual(compute.config(MockJustService()), 'out')
 
-    self.expected_args = (expected_args1 +
-                          ('-f', 'file15.yml', '-f', 'file2.yaml') +
-                          expected_args2)
+    self.expected_args = (expected_args1
+                          + ('-f', 'file15.yml', '-f', 'file2.yaml')
+                          + expected_args2)
     self.assertEqual(compute.configService(MockJustService(),
                                            ['file15.yml', 'file2.yaml']),
                      'out')
@@ -479,6 +486,7 @@ class TestDockerMap(TestCase):
 
 ###############################################################################
 
+
 class SomeService(docker.Service):
   def __init__(self, compose_service_name="launch", compose_file="file1",
                command=["ls"], env={"BAR": "FOO"}):
@@ -496,26 +504,25 @@ def mock_map(self, *args, **kwargs):
 
 class TestDockerService(TestCase):
   def common(self, compute, service):
-      service.pre_run()
-      setup_dir = service.temp_dir.name
-      with open(os.path.join(setup_dir, 'config.json'), 'r') as fid:
-        config = json.load(fid)
+    service.pre_run()
+    setup_dir = service.temp_dir.name
+    with open(os.path.join(setup_dir, 'config.json'), 'r') as fid:
+      config = json.load(fid)
 
-      self.assertEqual(config['foo_dir'], '/bar',
-                       'Path translation test failed')
-      self.assertEqual(config['bar_dir'], '/not_foo',
-                       'Nontranslated directory failure')
-      self.assertEqual(service.env['TERRA_SETTINGS_FILE'],
-                       "/tmp_settings/config.json",
-                       'Failure to set TERRA_SETTINGS_FILE')
-      service.post_run()
-      # Plain test
+    self.assertEqual(config['foo_dir'], '/bar',
+                     'Path translation test failed')
+    self.assertEqual(config['bar_dir'], '/not_foo',
+                     'Nontranslated directory failure')
+    self.assertEqual(service.env['TERRA_SETTINGS_FILE'],
+                     "/tmp_settings/config.json",
+                     'Failure to set TERRA_SETTINGS_FILE')
+    service.post_run()
+    # Plain test
 
-      self.assertIn(f'{setup_dir}:/tmp_settings:rw',
-                    (v for k,v in service.env.items()
-                     if k.startswith('TERRA_VOLUME_')),
-                    'Configuration failed to injected into docker')
-
+    self.assertIn(f'{setup_dir}:/tmp_settings:rw',
+                  (v for k, v in service.env.items()
+                   if k.startswith('TERRA_VOLUME_')),
+                  'Configuration failed to injected into docker')
 
   @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
   def test_service(self):
@@ -542,7 +549,7 @@ class TestDockerService(TestCase):
       # Make sure this is still set correctly
       self.assertEqual(service.env['TERRA_VOLUME_1'], "/Foo:/Bar")
       self.assertIn('/test1:/test2:z',
-                    (v for k,v in service.env.items()
+                    (v for k, v in service.env.items()
                      if k.startswith('TERRA_VOLUME_')),
                     'Added volume failed to be bound')
 
@@ -555,5 +562,6 @@ class TestDockerService(TestCase):
     self.assertEqual(service.volumes_flags, [None])
 
     service.add_volume('/data', '/testData', 'ro')
-    self.assertEqual(service.volumes, [('/foo', '/bar'), ('/data', '/testData')])
+    self.assertEqual(service.volumes, [('/foo', '/bar'),
+                                       ('/data', '/testData')])
     self.assertEqual(service.volumes_flags, [None, 'ro'])
