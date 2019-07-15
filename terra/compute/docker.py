@@ -176,28 +176,6 @@ class Service(BaseService):
     self.temp_dir = TemporaryDirectory()
     temp_dir = Path(self.temp_dir.name)
 
-    # with open(self.compose_file, 'r') as fid:
-    #   docker_file = yaml.load(fid.read())
-
-    # # Need to get the docker-compose version :-\
-    # with open(self.compose_file, 'r') as fid:
-    #   docker_file = yaml.load(fid.read())
-
-    # temp_compose = f'version: "{docker_file["version"]}"\n'
-    # temp_compose += 'services:\n'
-    # temp_compose +=f'  {self.compose_service_name}:\n'
-    # temp_compose += '    volumes:\n'
-
-    # for (volume_host, volume_container), volume_flags in \
-    #     zip(self.volumes, self.volumes_flags):
-    #   temp_compose += \
-    #       f'      - {volume_host}:{volume_container}\n' #), volume_flags}\n'
-
-    # temp_compose_file = temp_dir / "docker-compose.yml"
-
-    # with open(temp_compose_file, 'w') as fid:
-    #   fid.write(temp_compose)
-
     # Check to see if and are already defined, this will play nicely with
     # external influences
     env_volume_index = 1
@@ -252,11 +230,6 @@ class Service(BaseService):
                                     for pattern in filename_suffixes)),
         lambda key, value: patch_volume(value, reversed(volume_map))
     )
-
-    # This test doesn't work. It's already faked out long before this
-    # if 'processing_dir' not in docker_config:
-    #   logger.warning('No processing dir set. Using "/tmp"')
-    # docker_config['processing_dir'] = '/tmp'  # TODO: Remove/unhardcode this
 
     # Dump the settings
     with open(temp_dir / 'config.json', 'w') as fid:

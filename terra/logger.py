@@ -220,6 +220,7 @@ class _SetupTerraLogger():
     # Setup log file for use in configure
     self.log_file = os.path.join(settings.processing_dir,
                                  self.default_log_prefix)
+    os.makedirs(settings.processing_dir, exist_ok=True)
     self.log_file = open(self.log_file, 'a')
 
     self.file_handler = logging.StreamHandler(stream=self.log_file)
