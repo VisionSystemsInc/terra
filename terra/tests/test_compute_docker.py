@@ -80,7 +80,7 @@ class TestDockerRe(TestCase):
 
 
 def mock_popen(*args, **kwargs):
-  return (args, kwargs, os.environ.copy())
+  return (args, kwargs)
 
 
 class TestDockerJust(TestCase):
@@ -90,35 +90,36 @@ class TestDockerJust(TestCase):
 
     default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
     compute = docker.Compute()
-    args, kwargs, env = compute.just("foo  bar")
+    args, kwargs = compute.just("foo  bar")
     self.assertEqual(args, (('just', 'foo  bar'),))
-    self.assertEqual(kwargs, {})
-    self.assertEqual(env['JUSTFILE'], default_justfile)
+    self.assertEqual(set(kwargs.keys()), {'env'})
+    self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
 
     # Custom env
-    args, kwargs, env = compute.just("foo", "bar", add_env={"FOO": "BAR"})
+    args, kwargs = compute.just("foo", "bar", env={"FOO": "BAR"})
     self.assertEqual(args, (('just', 'foo', 'bar'),))
-    self.assertEqual(kwargs, {})
-    self.assertEqual(env['FOO'], 'BAR')
-    self.assertEqual(env['JUSTFILE'], default_justfile)
+    self.assertEqual(set(kwargs.keys()), {'env'})
+    self.assertEqual(kwargs, {'env': {'FOO': 'BAR', 'JUSTFILE': default_justfile}})
 
     # test custom justfile
-    args, kwargs, env = compute.just("foobar", justfile="/foo/bar")
+    args, kwargs = compute.just("foobar", justfile="/foo/bar")
     self.assertEqual(args, (('just', 'foobar'),))
-    self.assertEqual(kwargs, {})
-    self.assertEqual(env['JUSTFILE'], "/foo/bar")
+    self.assertEqual(set(kwargs.keys()), {'env'})
+    self.assertEqual(kwargs['env']['JUSTFILE'], "/foo/bar")
 
     # test kwargs
-    args, kwargs, env = compute.just("foobar", shell=False)
+    args, kwargs = compute.just("foobar", shell=False)
     self.assertEqual(args, (('just', 'foobar'),))
-    self.assertEqual(kwargs, {'shell': False})
-    self.assertEqual(env['JUSTFILE'], default_justfile)
+    self.assertEqual(set(kwargs.keys()), {'env', 'shell'})
+    self.assertEqual(kwargs['shell'], False)
+    self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
 
     # Test logging code
     with self.assertLogs(docker.__name__, level="DEBUG1") as cm:
       env = os.environ.copy()
       env.pop('PATH')
-      compute.just("foo", "bar", env=env, add_env={"FOO": "BAR"})
+      env['FOO'] = 'BAR'
+      compute.just("foo", "bar", env=env)
 
     env_lines = [x for x in cm.output if "Environment Modification:" in x][0]
     env_lines = env_lines.split('\n')
@@ -148,8 +149,8 @@ class TestDockerRun(TestCase):
   # test function before calling. self.return_value should also be set before
   # calling, so that the expected return value is returned
   def mock_just(_self, *args, **kwargs):
-    _self.assertEqual(_self.expected_args, args)
-    _self.assertEqual(_self.expected_kwargs, kwargs)
+    _self.just_args = args
+    _self.just_kwargs = kwargs
     return type('blah', (object,), {'wait': lambda self: _self.return_value})()
 
   def setUp(self):
@@ -164,10 +165,11 @@ class TestDockerRun(TestCase):
 
     self.return_value = 0
     # This part of the test looks fragile
-    self.expected_args = ('--wrap', 'Just-docker-compose',
-                          '-f', 'file1', 'run', 'launch', 'ls')
-    self.expected_kwargs = {'add_env': {'BAR': 'FOO'}}
     compute.run(MockJustService())
+    self.assertEqual(('--wrap', 'Just-docker-compose',
+                      '-f', 'file1', 'run', 'launch', 'ls'),
+                     self.just_args)
+    self.assertEqual({'env': {'BAR': 'FOO'}}, self.just_kwargs)
 
     # Test a non-zero return value
     self.return_value = 1

@@ -54,11 +54,10 @@ class Compute(BaseCompute):
         Optionally allow you to specify a custom ``Justfile``. Defaults to
         Terra's ``Justfile`` is used, which is the correct course of action
         most of the time
-    add_env : :class:`dict`, optional
-        Adds environment variables. Different from Popen's ``env`` in that it
-        does not completely replace the environment dictionary. You can specify
-        ``env`` and ``add_env`` at the same time. For example: using ``env``
-        is the only way to remove environment variables.
+    env : :class:`dict`, optional
+        Sets environment variables. Same as Popen's ``env``, except
+        ``JUSTFILE`` is programatically set, and cannot be overridden any other
+        way than chaning the ``justfile`` variable
     *args :
         List of arguments to be pass to ``just``
     **kwargs :
@@ -68,22 +67,18 @@ class Compute(BaseCompute):
     logger.debug('Running: ' + ' '.join(
         [quote(x) for x in ('just',) + args]))
 
-    add_env = kwargs.pop('add_env', {})
+    env = kwargs.pop('env', os.environ).copy()
     justfile = kwargs.pop(
         'justfile', os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile'))
-    add_env['JUSTFILE'] = justfile
+    env['JUSTFILE'] = justfile
 
     if logger.getEffectiveLevel() <= DEBUG1:
-      new_env = kwargs.get('env', os.environ).copy()
-      new_env.update(add_env)
-
-      dd = dict_diff(os.environ, new_env)[3]
+      dd = dict_diff(os.environ, env)[3]
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
-    with EnvironmentContext(**add_env):
-      pid = Popen(('just',) + args, **kwargs)
-      return pid
+    pid = Popen(('just',) + args, env=env, **kwargs)
+    return pid
 
   def runService(self, service_info):
     '''
@@ -101,7 +96,7 @@ class Compute(BaseCompute):
                     '-f', service_info.compose_file,
                     'run', service_info.compose_service_name,
                     *(service_info.command),
-                    add_env=service_info.env)
+                    env=service_info.env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
