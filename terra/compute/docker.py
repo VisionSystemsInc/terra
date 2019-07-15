@@ -7,7 +7,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
 
-from envcontext import EnvironmentContext
 import yaml
 
 from vsi.tools.diff import dict_diff
@@ -61,7 +60,7 @@ class Compute(BaseCompute):
     *args :
         List of arguments to be pass to ``just``
     **kwargs :
-        Arguments sent to Popen command
+        Arguments sent to ``Popen`` command
     '''
 
     logger.debug('Running: ' + ' '.join(

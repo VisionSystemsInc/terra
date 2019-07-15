@@ -1,12 +1,13 @@
 import os
-import subprocess
+from shlex import quote
+from subprocess import Popen
 
-from envcontext import EnvironmentContext
+from vsi.tools.diff import dict_diff
 
 from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
 from terra.compute.utils import load_service
-from terra.logger import getLogger
 from terra import settings
+from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
 
@@ -16,34 +17,48 @@ class Compute(BaseCompute):
   '''
 
   # run the service in a virtual env with the subprocess module
-  def run(self, service_class):
-    service_info = load_service(service_class)
+  def runService(self, service_info):
+    '''
+    Run a command, usually in a virtual env.
 
-    # pre run
-    logger.debug2("pre-running %s ", str(service_info))
-    service_info.pre_run()
+    Arguments
+    ---------
+    env : :class:`dict`, optional
+        Sets environment variables. Same as Popen's ``env``, except
+        ``JUSTFILE`` is programatically set, and cannot be overridden any other
+        way than chaning the ``justfile`` variable
+    *args :
+        List of arguments to be pass to ``Popen``
+    **kwargs :
+        Arguments sent to ``Popen`` command
+
+    If ``settings.compute.virtualenv_dir`` is set, then that directory is
+    automatically prepended to the ``PATH`` for the command to be executed.
+    '''
+
+    logger.debug('Running: ' + ' '.join(
+        [quote(x) for x in service_info.command]))
+
+    env = service_info.env
 
     # Replace 'python' command with virtual environment python executable
-    if settings.compute.get('virtualenv_dir', None):
-      service_info.env['PATH'] = settings.compute.virtualenv_dir \
+    if settings.compute.virtualenv_dir:
+      env['PATH'] = settings.compute.virtualenv_dir \
         + os.path.pathsep + service_info.env['PATH']
       # TODO: Not sure if I want this or not
       # if "_OLD_VIRTUAL_PATH" in service_info.env:
       #   service_info.env['PATH'] = service_info.env["_OLD_VIRTUAL_PATH"]
-      # service_info.command = [settings.compute.venv_python
-      #                         if el == 'python' else el
-      #                         for el in service_info.command]
+
+    if logger.getEffectiveLevel() <= DEBUG1:
+      dd = dict_diff(os.environ, env)[3]
+      if dd:
+        logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
     # run command -- command must be a list of strings
-    with EnvironmentContext(service_info.env):
-      pid = subprocess.Popen(service_info.command, env=service_info.env)
+    pid = Popen(service_info.command, env=env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
-
-    # post run
-    logger.debug2("post-running %s ", str(service_info))
-    service_info.post_run()
 
 
 class Service(BaseService):

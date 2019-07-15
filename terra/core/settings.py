@@ -273,11 +273,15 @@ global_templates = [
       'processing_dir': processing_dir,
       'unittest': unittest
     }
+  ),
+  (
+    {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
+    {"compute": {"virtualenv_dir": None}}  # Defaults
+  ),
+  (  # So much for DRY :(
+    {"compute": {"arch": "virtualenv"}},
+    {"compute": {"virtualenv_dir": None}}
   )
-  # , (
-  #   {"compute": {"arch": "terra.compute.dummy"}},  # Pattern
-  #   {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
-  # )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we
 conditionally assign default values. It is a list of pair tuples, where the
