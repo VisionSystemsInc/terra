@@ -99,7 +99,8 @@ class TestDockerJust(TestCase):
     args, kwargs = compute.just("foo", "bar", env={"FOO": "BAR"})
     self.assertEqual(args, (('just', 'foo', 'bar'),))
     self.assertEqual(set(kwargs.keys()), {'env'})
-    self.assertEqual(kwargs, {'env': {'FOO': 'BAR', 'JUSTFILE': default_justfile}})
+    self.assertEqual(kwargs, {'env': {'FOO': 'BAR',
+                                      'JUSTFILE': default_justfile}})
 
     # test custom justfile
     args, kwargs = compute.just("foobar", justfile="/foo/bar")

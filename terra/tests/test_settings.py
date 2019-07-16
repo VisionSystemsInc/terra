@@ -130,7 +130,6 @@ class TestSettings(TestCase):
     self.temp_dir.cleanup()
     while self.patches:
       self.patches.pop().stop()
-    self.assertFalse('TERRA_SETTINGS_FILE' in os.environ) #TODO: Delete
 
   def test_lazy_attribute(self):
     with self.assertRaises(ImproperlyConfigured):
@@ -348,7 +347,10 @@ class TestSettings(TestCase):
     def c(self):
       return self['a']
 
-    settings.add_templates([({}, {'a': fid.name, 'b_json': fid.name, 'c_json': c})])
+    settings.add_templates([({},
+                             {'a': fid.name,
+                              'b_json': fid.name,
+                              'c_json': c})])
 
     settings.configure({})
 
@@ -419,4 +421,3 @@ class TestSettings(TestCase):
 
     # Make sure I didn't break anything
     self.assertEqual(os.environ['TERRA_UNITTEST'], '1')
-

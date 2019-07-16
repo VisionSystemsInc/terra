@@ -94,3 +94,11 @@ class TestUtils(TestCase):
   def test_load_service_by_str_using_default_implementation(self):
     self.assertIsInstance(utils.load_service(Service.__module__ + '.Service2'),
                           Service)
+
+  @mock.patch.dict(utils.compute.__dict__, _connection=Compute())
+  def test_load_service_unregistered(self):
+    with self.assertRaises(KeyError), self.assertLogs(utils.__name__) as log:
+      utils.load_service(__name__)
+
+    self.assertTrue(any(f'{__name__} is not registered' in line
+                        for line in log.output))

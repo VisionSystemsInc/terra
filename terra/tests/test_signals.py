@@ -3,6 +3,7 @@ from unittest import mock
 from terra.core.signals import Signal, receiver
 from .utils import TestCase
 
+
 class TestSignals(TestCase):
   def signal_handle1(self, sender, **kwargs):
     self.assertEqual(sender, self.sender)
@@ -42,7 +43,6 @@ class TestSignals(TestCase):
     self.signal.connect(self.cache1)
     self.sender = Stuff()
     self.assertEqual(self.signal.send(sender=self.sender), [(self.cache1, 12)])
-
 
   def fail1(self, *args, **kwargs):
     self.assertTrue(0)

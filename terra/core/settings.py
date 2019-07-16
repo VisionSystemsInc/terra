@@ -601,12 +601,13 @@ class TerraJSONEncoder(JSONEncoder):
       Does not work on :class:`Settings` since it would be handled
       automatically as a :class:`dict`.
   '''
+
   def default(self, obj):
     if isinstance(obj, LazySettings):
       if obj._wrapped is None:
         raise ImproperlyConfigured('Settings not initialized')
       return TerraJSONEncoder.serializableSettings(obj._wrapped)
-    return JSONEncoder.default(self, obj) # pragma: no cover
+    return JSONEncoder.default(self, obj)  # pragma: no cover
 
   @staticmethod
   def serializableSettings(obj):
