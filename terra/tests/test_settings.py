@@ -1,9 +1,57 @@
 import os
+import json
 from unittest import mock
-from .utils import TestCase
 from tempfile import TemporaryDirectory, NamedTemporaryFile
+import tempfile
+
+from envcontext import EnvironmentContext
+
+from .utils import TestCase
 from terra import settings
-from terra.core.settings import ObjectDict, settings_property, Settings
+from terra.core.exceptions import ImproperlyConfigured
+from terra.core.settings import (
+  ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder
+)
+
+
+class TestLazyObject(TestCase):
+  def test_setup(self):
+    lazy = LazyObject()
+
+    # Test auto loading
+    with self.assertRaises(NotImplementedError):
+      lazy.test
+    with self.assertRaises(NotImplementedError):
+      lazy['test']
+    with self.assertRaises(NotImplementedError):
+      lazy.test = 13
+    with self.assertRaises(NotImplementedError):
+      'test' in lazy
+    with self.assertRaises(NotImplementedError):
+      lazy['test'] = 12
+    with self.assertRaises(NotImplementedError):
+      del(lazy.test)
+
+  def test_lazy(self):
+    lazy = LazyObject()
+
+    self.assertNotIn('values', dir(lazy))
+    # Make a dict that can take attribute assignment (aka not built in)
+    lazy['_wrapped'] = type("NewDict", (dict,), {})()
+    self.assertIn('values', dir(lazy))
+
+    lazy['foo'] = 'bar'
+    self.assertEqual(lazy['foo'], 'bar')
+    self.assertIn('foo', lazy)
+
+    lazy.test = 15
+    self.assertIn('test', dir(lazy))
+    self.assertEqual(lazy.test, 15)
+    del(lazy.test)
+    self.assertFalse(hasattr(lazy, 'test'))
+
+    with self.assertRaises(TypeError):
+      del(lazy._wrapped)
 
 
 class TestObjectDict(TestCase):
@@ -13,6 +61,11 @@ class TestObjectDict(TestCase):
     self.assertEqual(d['foo'], 3)
     with self.assertRaises(AttributeError):
       d.bar
+
+    d['bar'] = 4
+    d.far = 5
+    self.assertEqual(d.bar, 4)
+    self.assertEqual(d['far'], 5)
 
   def test_corner_cases(self):
     self.assertEqual(ObjectDict({}), {})
@@ -61,23 +114,38 @@ class TestObjectDict(TestCase):
 
 
 class TestSettings(TestCase):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.patches = []
+
   def setUp(self):
     self.temp_dir = TemporaryDirectory()
+    self.patches.append(mock.patch.dict(os.environ,
+                                        {'TERRA_SETTINGS_FILE': ""}))
+    self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    for patch in self.patches:
+      patch.start()
 
   def tearDown(self):
     self.temp_dir.cleanup()
+    while self.patches:
+      self.patches.pop().stop()
+    self.assertFalse('TERRA_SETTINGS_FILE' in os.environ) #TODO: Delete
 
-  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
-  @mock.patch.object(settings, '_wrapped', None)
   def test_lazy_attribute(self):
+    with self.assertRaises(ImproperlyConfigured):
+      settings.foo
+
     with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
 
     self.assertFalse(settings.configured)
+    self.assertEqual(repr(settings), '<LazySettings [Unevaluated]>')
     self.assertEqual(settings['a'], 15)
     self.assertTrue(settings.configured)
+    self.assertNotEqual(repr(settings), '<LazySettings [Unevaluated]>')
 
     self.assertEqual(settings['b'], "22")
     self.assertEqual(settings['c'], True)
@@ -87,8 +155,6 @@ class TestSettings(TestCase):
     self.assertIn('c', dir(settings))
     self.assertNotIn('22', dir(settings))
 
-  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
-  @mock.patch.object(settings, '_wrapped', None)
   def test_lazy_item(self):
     with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
@@ -102,8 +168,6 @@ class TestSettings(TestCase):
     self.assertEqual(settings.b, "22")
     self.assertEqual(settings.c, True)
 
-  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
-  @mock.patch.object(settings, '_wrapped', None)
   def test_comments(self):
     with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
@@ -122,8 +186,6 @@ class TestSettings(TestCase):
     self.assertEqual(settings.b, "22")
     self.assertEqual(settings.c, True)
 
-  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
-  @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates',
               [({},
                 {'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44, 'foo': {'t': 15}}}),
@@ -153,8 +215,6 @@ class TestSettings(TestCase):
     self.assertTrue('a' in settings)
     self.assertTrue(settings.configured)
 
-  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
-  @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22}), ({'c': {'d': 14}}, {'e': {'f': 15}})])
   def test_global_templates2(self):
@@ -171,8 +231,6 @@ class TestSettings(TestCase):
     self.assertEqual(settings.e.f, 15)
     self.assertTrue(settings.configured)
 
-  @mock.patch.dict(os.environ, {'TERRA_SETTINGS_FILE': ""})
-  @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates', [({}, {})])
   def test_settings_property(self):
     import terra.core.settings
@@ -204,6 +262,8 @@ class TestSettings(TestCase):
     self.assertFalse(settings.configured)
     self.assertEqual(settings.a, 12.1)
     self.assertEqual(settings.c.e, 11.1)
+    # Verify caching is happening
+    self.assertEqual(settings._wrapped.c['e'], 11.1)
     self.assertEqual(settings.c.b, 13.1)
     self.assertEqual(settings.d, d)
     self.assertEqual(settings.d(None), 3)
@@ -213,20 +273,20 @@ class TestSettings(TestCase):
       settings['q']
     self.assertTrue(settings.configured)
 
-  @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22})])
   def test_configure(self):
 
     self.assertFalse(settings.configured)
     settings.configure(b="333", c=444)
+    with self.assertRaises(ImproperlyConfigured):
+      settings.configure()
     self.assertTrue(settings.configured)
 
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, 444)
 
-  @mock.patch.object(settings, '_wrapped', None)
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22})])
   def test_add_templates(self):
@@ -252,8 +312,8 @@ class TestSettings(TestCase):
     self.assertIn("c", settings)
     self.assertEqual(settings.c, 33)
 
-  @mock.patch.object(settings, '_wrapped', Settings({'a': 11, 'b': 22}))
   def test_with_context(self):
+    settings._wrapped = Settings({'a': 11, 'b': 22})
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, 22)
     self.assertFalse(hasattr(settings, 'c'))
@@ -269,18 +329,94 @@ class TestSettings(TestCase):
     self.assertEqual(settings.b, 22)
     self.assertFalse(hasattr(settings, 'c'))
 
-  @mock.patch.object(settings, '_wrapped', None)
+  def test_lazy_context(self):
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 15}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    with settings:
+      self.assertEqual(settings.a, 15)
+
   @mock.patch('terra.core.settings.global_templates', [])
   def test_json(self):
     with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
 
-    settings.add_templates([({}, {'a': 11, 'b_json': fid.name})])
+    @settings_property
+    def c(self):
+      return self['a']
+
+    settings.add_templates([({}, {'a': fid.name, 'b_json': fid.name, 'c_json': c})])
 
     settings.configure({})
 
-    self.assertEqual(settings.a, 11)
+    self.assertEqual(settings.a, fid.name)
     self.assertEqual(settings.b_json.a, 15)
     self.assertEqual(settings.b_json.b, "22")
     self.assertEqual(settings.b_json.c, True)
+    self.assertEqual(settings.c_json.a, 15)
+    self.assertEqual(settings.c_json.b, "22")
+    self.assertEqual(settings.c_json.c, True)
+
+  def test_json_serializer(self):
+
+    @settings_property
+    def c(self):
+      return self.a + self.b
+
+    with self.assertRaises(ImproperlyConfigured):
+      TerraJSONEncoder.dumps(settings)
+
+    settings._wrapped = Settings({'a': 11, 'b': 22, 'c': c})
+    j = json.loads(TerraJSONEncoder.dumps(settings))
+    self.assertEqual(j['a'], 11)
+    self.assertEqual(j['b'], 22)
+    self.assertEqual(j['c'], 33)
+
+    settings._wrapped = Settings(
+                {'a': 11, 'b': 22, 'q': {'x': c, 'y': c, 'foo': {'t': [c]}}})
+    j = json.loads(TerraJSONEncoder.dumps(settings))
+    self.assertEqual(j['a'], 11)
+    self.assertEqual(j['b'], 22)
+    self.assertEqual(j['q']['x'], 33)
+    self.assertEqual(j['q']['y'], 33)
+    self.assertEqual(j['q']['foo']['t'][0], 33)
+
+  # Test all the properties here
+  def test_properties(self):
+    settings.configure({})
+    with settings:
+      settings.processing_dir = '/foobar'
+      self.assertEqual(settings.status_file, '/foobar/status.json')
+
+    with self.assertLogs(), settings:
+      self.assertEqual(settings.processing_dir, os.getcwd())
+
+    with settings, TemporaryDirectory() as temp_dir:
+      settings.config_file = os.path.join(temp_dir, 'foo.bar')
+      self.assertEqual(settings.processing_dir, temp_dir)
+
+    def mock_mkdtemp(prefix):
+      return f'"{prefix}"'
+
+    with mock.patch.object(tempfile, 'mkdtemp', mock_mkdtemp), \
+        self.assertLogs(), settings:
+      settings.config_file = '/land/of/foo.bar'
+      self.assertEqual(settings.processing_dir, '"terra_"')
+
+    with settings, EnvironmentContext(TERRA_UNITTEST="1"):
+      self.assertTrue(settings.unittest)
+
+    with settings, EnvironmentContext(TERRA_UNITTEST="0"):
+      self.assertFalse(settings.unittest)
+
+    # Test when unset
+    with settings, EnvironmentContext(TERRA_UNITTEST='1'):
+      os.environ.pop('TERRA_UNITTEST')
+      self.assertFalse(settings.unittest)
+
+    # Make sure I didn't break anything
+    self.assertEqual(os.environ['TERRA_UNITTEST'], '1')
+

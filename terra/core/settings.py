@@ -152,7 +152,7 @@ from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from vsi.tools.python import (
-    nested_patch_inplace, nested_update, nested_in_dict
+    nested_patch_inplace, nested_patch, nested_update, nested_in_dict
 )
 from json import JSONEncoder
 from terra.logger import getLogger
@@ -160,7 +160,7 @@ logger = getLogger(__name__)
 
 try:
   import jstyleson as json
-except ImportError:
+except ImportError:  # pragma: no cover
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
@@ -292,7 +292,7 @@ values.
 Values are copies recursively, but only if not already set by your settings.'''
 
 
-class LazyObject():
+class LazyObject:
   '''
   A wrapper class that lazily evaluates (calls :func:`LazyObject._setup`)
 
@@ -368,14 +368,6 @@ class LazyObject():
     if self._wrapped is None:
       self._setup()
     delattr(self._wrapped, name)
-
-  def __hasattr__(self, name):
-    '''Supported'''
-    if name == "_wrapped":
-      return True
-    if self._wrapped is None:
-      self._setup()
-    return name in self._wrapped
 
   def __dir__(self):
     """ Supported """
@@ -566,12 +558,20 @@ class Settings(ObjectDict):
     the values
     '''
 
+    # This is here instead of in LazySettings because the functor is given
+    # LazySettings, but then if __getattr__ is called on that, the segment of
+    # the settings object that is retreived is of type Settings, therefore
+    # the settings_property evaluation has to be here.
+
     try:
       val = self[name]
       if isfunction(val) and getattr(val, 'settings_property', None):
         # Ok this ONE line is a bit of a hack :( But I argue it's specific to
         # this singleton implementation, so I approve!
         val = val(settings)
+
+        # cache result, because the documentation said this should happen
+        self[name] = val
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
@@ -593,25 +593,52 @@ settings = LazySettings()
 
 
 class TerraJSONEncoder(JSONEncoder):
+  '''
+  Json serializer for :class:`LazySettings`.
+
+  .. note::
+
+      Does not work on :class:`Settings` since it would be handled
+      automatically as a :class:`dict`.
+  '''
   def default(self, obj):
     if isinstance(obj, LazySettings):
       if obj._wrapped is None:
-        raise Exception('Settings not initialized')
+        raise ImproperlyConfigured('Settings not initialized')
       return TerraJSONEncoder.serializableSettings(obj._wrapped)
-    return JSONEncoder.default(self, obj)
+    return JSONEncoder.default(self, obj) # pragma: no cover
 
   @staticmethod
-  def serializableSettings(obj, root=None):
-    if root is None:
-      root = obj
+  def serializableSettings(obj):
+    '''
+    Convert a :class:`Settings` object into a json serializable :class:`dict`.
 
-    return {
-        k: TerraJSONEncoder.serializableSettings(v, root) if isinstance(
-            v, dict) else
-        v(root) if isfunction(v) and hasattr(v, 'settings_property') else v
-        for k, v in obj.items()
-    }
+    Since :class:`Settings` can contain :func:`settings_property`, this
+    prevents json serialization. This function will evaluate all
+    :func:`settings_property`'s for you.
+
+    Arguments
+    ---------
+    obj: :class:`Settings` or :class:`LazySettings`
+        Object to be converted to json friendly :class:`Settings`
+    '''
+
+    if isinstance(obj, LazySettings):
+      obj = obj._wrapped
+
+    return nested_patch(
+        obj,
+        lambda k, v: isfunction(v) and hasattr(v, 'settings_property'),
+        lambda k, v: v(obj))
 
   @staticmethod
   def dumps(obj):
+    '''
+    Convenience function for running `dumps` using this encoder.
+
+    Arguments
+    ---------
+    obj: :class:`LazySettings`
+        Object to be converted to json friendly :class:`dict`
+    '''
     return json.dumps(obj, cls=TerraJSONEncoder)
