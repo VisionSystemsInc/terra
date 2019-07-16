@@ -64,8 +64,6 @@ class ComputeHandler(Handler):
 
     if backend_name is None:
       backend_name = settings.compute.arch
-    if not backend_name:
-      backend_name = 'terra.compute.dummy'
 
     try:
       module = import_module(f'{backend_name}')
