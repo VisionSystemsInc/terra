@@ -1,15 +1,19 @@
 from unittest import mock
 import argparse
+import re
 import os
 from tempfile import TemporaryDirectory
 import json
 
 from terra.utils.workflow import resumable, AlreadyRunException
 from terra import settings
+from terra.logger import DEBUG1
 from .utils import TestCase
+
 
 class Klass:
   pass
+
 
 class TestResumable(TestCase):
   def __init__(self, *args, **kwargs):
@@ -49,7 +53,7 @@ class TestResumable(TestCase):
     with self.assertRaises(AlreadyRunException):
       test1(Klass())
 
-  def test_status(self):
+  def test_status_file(self):
     @resumable
     def test1(self):
       pass
@@ -61,7 +65,7 @@ class TestResumable(TestCase):
     self.assertEqual(status['stage_status'], 'done')
     self.assertEqual(status['stage'], f'{__file__}//{test1.__qualname__}')
 
-  def test_stop_in_middle(self):
+  def test_status_file_stop_in_middle(self):
     @resumable
     def test1(self):
       pass
@@ -88,6 +92,12 @@ class TestResumable(TestCase):
     @resumable
     def test1(self):
       self.x = 12
+      return 11
+
+    @resumable
+    def test2(self):
+      self.y = 13
+      return 17
 
     klass = Klass()
 
@@ -95,12 +105,66 @@ class TestResumable(TestCase):
       settings.resume = True
       with open(settings.status_file, 'w') as fid:
         json.dump({'stage_status': 'done',
-                   'stage':f'{__file__}//{test1.__qualname__}'}, fid)
+                   'stage': f'{__file__}//{test1.__qualname__}'}, fid)
 
-      print('222')
-      test1(klass)
-      print('3343')
+      with self.assertLogs(resumable.__module__, DEBUG1) as cm:
+        self.assertIsNone(test1(klass))
+        self.assertEqual(test2(klass), 17)
 
-      self.assertEqual(klass.x, 12)
+      self.assertEqual(klass.y, 13)
+      self.assertFalse(hasattr(klass, 'x'))
 
+      self.assertTrue(any(re.search(
+          f"Skipping .*{test1.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Starting stage: .*{test2.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Finished stage: .*{test2.__qualname__}", o) for o in cm.output))
 
+  def test_resuming_after_incomplete(self):
+    @resumable
+    def test1(self):
+      self.x = 12
+      return 11
+
+    @resumable
+    def test2(self):
+      self.y = 13
+      return 17
+
+    klass = Klass()
+
+    with settings:
+      settings.resume = True
+      with open(settings.status_file, 'w') as fid:
+        json.dump({'stage_status': 'starting',
+                   'stage': f'{__file__}//{test2.__qualname__}'}, fid)
+
+      with self.assertLogs(resumable.__module__, DEBUG1) as cm:
+        self.assertIsNone(test1(klass))
+        self.assertEqual(test2(klass), 17)
+
+      self.assertEqual(klass.y, 13)
+      self.assertFalse(hasattr(klass, 'x'))
+
+      self.assertTrue(any(re.search(
+          f"Skipping .*{test1.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Starting stage: .*{test2.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Finished stage: .*{test2.__qualname__}", o) for o in cm.output))
+
+  def test_resume_no_status_file(self):
+    settings.resume = True
+
+    @resumable
+    def test1(self):
+      self.x = 12
+      return 11
+
+    klass = Klass()
+
+    self.assertFalse(os.path.exists(settings.status_file))
+    self.assertEqual(test1(klass), 11)
+    self.assertTrue(os.path.exists(settings.status_file))
+    self.assertEqual(klass.x, 12)

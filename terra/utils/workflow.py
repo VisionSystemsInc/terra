@@ -65,10 +65,7 @@ class resumable(BasicDecorator):
 
     # Load/create status file
     if not os.path.exists(settings.status_file):
-      try:
-        os.makedirs(os.path.dirname(settings.status_file))
-      except FileExistsError:
-        pass
+      os.makedirs(os.path.dirname(settings.status_file), exist_ok=True)
       with open(settings.status_file, 'w') as fid:
         fid.write("{}")
 
@@ -78,14 +75,19 @@ class resumable(BasicDecorator):
     # If resume is turned on
     if settings.resume:
       try:
+        # Keep skipping until you match stage_name
         if self.stage_self.status.stage != stage_name:
           logger.debug(f"Skipping {stage_name}... "
                        f"Resuming to {self.stage_self.status.stage}")
           return None
-        elif (stage_self.status.stage == stage_name
-              and stage_self.status.stage_status == "done"):
+        elif (self.stage_self.status.stage == stage_name
+              # If it's wasn't done, it doesn't get skipped.
+              and self.stage_self.status.stage_status == "done"):
           logger.debug(f"Skipping {stage_name}... "
-                       f"Resuming after {stage_self.status.stage}")
+                       f"Resuming after {self.stage_self.status.stage}")
+          # The resume feature is done now, disable it so that everything else
+          # can run
+          settings.resume = False
           return None
       except AttributeError:
         pass
@@ -111,7 +113,7 @@ class resumable(BasicDecorator):
 
   def save_status(self):
     '''
-    Smart update the file
+    Safe update the file
     '''
 
     shutil.move(settings.status_file, settings.status_file + '.bak')
