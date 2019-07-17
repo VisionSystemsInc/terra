@@ -1,5 +1,6 @@
 from unittest import mock
 import warnings
+import inspect
 
 from terra import settings
 from .utils import TestCase
@@ -102,3 +103,19 @@ class TestUtils(TestCase):
 
     self.assertTrue(any(f'{__name__} is not registered' in line
                         for line in log.output))
+
+
+class TestComputeHandler(TestCase):
+  @mock.patch.object(settings, '_wrapped', None)
+  def test_compute_handler(self):
+    settings.configure({'compute': {'arch': 'terra.compute.dummy'}})
+
+    test_compute = utils.ComputeHandler()
+
+    self.assertTrue(inspect.ismethod(test_compute.run))
+    self.assertIsNotNone(test_compute._connection)
+    self.assertIsInstance(test_compute._connection,
+                          terra.compute.dummy.Compute)
+
+  # Make sure this can be run twice
+  test_compute_handler2 = test_compute_handler

@@ -1,8 +1,6 @@
 import unittest.mock as mock
 
 import terra.compute.utils
-from terra import settings
-
 from .utils import TestCase
 
 
@@ -16,14 +14,7 @@ class TestUnitTests(TestCase):
         '_connection', terra.compute.utils.compute.__dict__,
         msg="If you are seeing this, one of the other unit tests has "
             "initialized the compute connection. This side effect should be "
-            "prevented by mocking out the _connection attribute. Otherwise "
-            "unit tests can interfere with each other. Add 'import traceback; "
+            "prevented by mocking out the _connection attribute, or "
+            "'mock.patch.dict(compute.__dict__)'. Otherwise unit tests can "
+            "interfere with each other. Add 'import traceback; "
             " traceback.print_stack()' to ComputeHandler._connect_backend")
-
-  def last_test_settings(self):
-    self.assertIsNone(
-        settings._wrapped,
-        msg="If you are seting this, one of the other unit tests has "
-            "initialized the settings. This side effect should be "
-            "prevented by mocking out the settings._wrapped attribute. "
-            "Otherwise unit tests can interfere with each other")

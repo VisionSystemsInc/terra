@@ -180,5 +180,16 @@ class ClassHandler(Handler):
   Based loosly on :class:`django.db.utils.ConnectionHandler`
   '''
 
-  def __call__(self, *args, **kwargs):
-    return self._connection(*args, **kwargs)
+  def _connect_backend(self):
+    '''
+    Overload this function in children classes
+    '''
+
+    if self._override_type:
+      _type = self._override_type
+    else:
+      _type = int
+    return _type
+
+  def __call__(self):
+    return self._connection()

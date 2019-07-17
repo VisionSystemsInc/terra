@@ -2,7 +2,9 @@ from unittest import mock
 
 from terra import settings
 from .utils import TestCase
-from terra.core.utils import cached_property
+from terra.core.utils import (
+    cached_property, Handler, ClassHandler
+)
 
 
 class CacheTest:
@@ -32,6 +34,33 @@ class TestCachedProperty(TestCase):
 
     # Test internal mechanics
     self.assertEqual(c.__dict__['foo'], 13)
+
+  def test_cached_property_set_name_not_called(self):
+    def foo(self):
+      return 15
+
+    class Bar:
+      pass
+
+    Bar.test = cached_property(foo)
+
+    with self.assertRaisesRegex(
+        TypeError, 'Cannot use cached_property instance without calling'):
+      Bar().test
+
+  def test_cached_property_reuse_different_names(self):
+    """
+    Disallow this case because the decorated function wouldn't be cached.
+    """
+    with self.assertRaises(RuntimeError) as cm:
+      class ReusedCachedProperty:
+        @cached_property
+        def a(self):
+          pass
+        b = a
+    self.assertIn(
+        "Cannot assign the same cached_property to two different names",
+        str(cm.exception.__context__))
 
   def test_class_mockability(self):
     # Test that mocking works
@@ -85,3 +114,61 @@ class TestCachedProperty(TestCase):
     c.__dict__.pop('foo')
     self.assertEqual(c.foo, 13)
     self.assertEqual(c.cached, 2)
+
+
+class TestHandler(TestCase):
+  def test_handler_autoconnect(self):
+    handle = Handler()
+    handle.real
+    self.assertIsNotNone(handle._connection)
+
+  def test_handler_simple(self):
+    handle = Handler()
+    self.assertIs(handle._connection, int(0))
+
+  def test_handler_override(self):
+    class Foo:
+      pass
+    handle = Handler(override_type=Foo)
+    self.assertIsInstance(handle._connection, Foo)
+
+  def test_handler_attr(self):
+    class Foo:
+      pass
+
+    handle = Handler(override_type=Foo)
+    handle.bar = 15
+    self.assertEqual(handle._connection.bar, 15)
+    handle._connection.foo = 11
+    self.assertEqual(handle.foo, 11)
+    del(handle.foo)
+    self.assertFalse(hasattr(handle._connection, 'foo'))
+    del(handle._connection.bar)
+    self.assertFalse(hasattr(handle, 'bar'))
+
+  def test_close_handle(self):
+    class Foo:
+      def close(self):
+        self.closed = True
+
+    handle = Handler(override_type=Foo)
+    handle.close()
+    self.assertTrue(handle._connection.closed)
+
+    handle = Handler(override_type=object)
+    # Should not error
+    handle.close()
+    with self.assertRaises(AttributeError):
+      handle.other()
+
+
+class TestClassHandler(TestCase):
+  def test_class_handler(self):
+    class Bar:
+      def __init__(self, x=17):
+        self.x = x
+    Ch = ClassHandler(override_type=Bar)
+    self.assertIsInstance(Ch(), Bar)
+
+    Ch = ClassHandler()
+    self.assertIsInstance(Ch(), int)

@@ -4,6 +4,7 @@ Utilities to help write CLIs
 import os
 import argparse
 
+
 def clean_path(path):
   return os.path.abspath(os.path.expanduser(path))
 
@@ -19,6 +20,12 @@ class FullPaths(argparse.Action):
 
 
 class FullPathsAppend(argparse._AppendAction):
+  """
+  Expand user home directory, and turns relative paths into absolute paths
+
+  Works on multiple paths for one argument
+  """
+
   def __call__(self, parser, namespace, values, option_string=None):
     # Python2 way
     # items = copy.copy(argparse._ensure_value(namespace, self.dest, []))

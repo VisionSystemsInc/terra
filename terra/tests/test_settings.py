@@ -421,3 +421,15 @@ class TestSettings(TestCase):
 
     # Make sure I didn't break anything
     self.assertEqual(os.environ['TERRA_UNITTEST'], '1')
+
+
+class TestUnitTests(TestCase):
+  # Don't name this "test*" so normal discover doesn't pick it up, "last*" are
+  # run last
+  def last_test_settings(self):
+    self.assertIsNone(
+        settings._wrapped,
+        msg="If you are seting this, one of the other unit tests has "
+            "initialized the settings. This side effect should be "
+            "prevented by mocking out the settings._wrapped attribute. "
+            "Otherwise unit tests can interfere with each other")

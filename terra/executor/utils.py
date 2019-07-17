@@ -26,19 +26,17 @@ class ExecutorHandler(ClassHandler):
 
     if backend_name is None:
       backend_name = settings.executor.type
-    if not backend_name:
-      backend_name = 'ThreadPoolExecutor'
 
     if backend_name == "DummyExecutor":
-      from .dummy import DummyExecutor
+      from terra.executor.dummy import DummyExecutor
       return DummyExecutor
-    if backend_name == "ThreadPoolExecutor":
+    elif backend_name == "ThreadPoolExecutor":
       return concurrent.futures.ThreadPoolExecutor
     elif backend_name == "ProcessPoolExecutor":
       return concurrent.futures.ProcessPoolExecutor
     elif backend_name == "CeleryExecutor":
-      import celery_executor.executors
-      return celery_executor.executors.CeleryExecutor
+      import terra.executor.celery
+      return terra.executor.celery.CeleryExecutor
     else:
       module_name = backend_name.rsplit('.', 1)
       module = import_module(f'{module_name[0]}')
