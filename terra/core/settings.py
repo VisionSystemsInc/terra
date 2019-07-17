@@ -271,7 +271,8 @@ global_templates = [
       "resume": False,
       'status_file': status_file,
       'processing_dir': processing_dir,
-      'unittest': unittest
+      'unittest': unittest,
+      'resume': False
     }
   ),
   (

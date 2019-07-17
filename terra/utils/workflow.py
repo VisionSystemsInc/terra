@@ -37,6 +37,10 @@ class resumable(BasicDecorator):
   Not every function in a workflow has to be a stage. These non-stage functions
   will always be run
 
+  The decorated function must have at least one argument named ``self``.
+  ``self.status`` is injected into the ``self`` object, and can be used to read
+  and write pieces of information to the ``status.json`` file
+
   Raises
   ------
   AlreadyRunException
@@ -54,7 +58,7 @@ class resumable(BasicDecorator):
 
     # Get self of the wrapped function
     all_kwargs = args_to_kwargs(self.fun, args, kwargs)
-    stage_self = all_kwargs['self']
+    self.stage_self = all_kwargs['self']
 
     # Create a unique name fot the function
     stage_name = f'{inspect.getfile(self.fun)}//{self.fun.__qualname__}'
@@ -69,14 +73,14 @@ class resumable(BasicDecorator):
         fid.write("{}")
 
     with open(settings.status_file, 'r') as fid:
-      stage_self.status = ObjectDict(json.load(fid))
+      self.stage_self.status = ObjectDict(json.load(fid))
 
     # If resume is turned on
     if settings.resume:
       try:
-        if stage_self.status.stage != stage_name:
+        if self.stage_self.status.stage != stage_name:
           logger.debug(f"Skipping {stage_name}... "
-                       f"Resuming to {stage_self.status.stage}")
+                       f"Resuming to {self.stage_self.status.stage}")
           return None
         elif (stage_self.status.stage == stage_name
               and stage_self.status.stage_status == "done"):
@@ -90,20 +94,26 @@ class resumable(BasicDecorator):
       settings.resume = False
 
     # Log starting...
-    stage_self.status.stage_status = "starting"
-    stage_self.status.stage = stage_name
-    logger.debug(f"Starting: {stage_name}")
+    self.stage_self.status.stage_status = "starting"
+    self.stage_self.status.stage = stage_name
+    logger.debug(f"Starting stage: {stage_name}")
+    self.save_status()
 
     # Run function
     result = self.fun(*args, **kwargs)
 
     # Log done
-    stage_self.status.stage_status = "done"
-    logger.debug(f"Finished: {stage_name}")
-
-    # Smart update the file
-    shutil.move(settings.status_file, settings.status_file + '.bak')
-    with open(settings.status_file, 'w') as fid:
-      json.dump(stage_self.status, fid)
+    self.stage_self.status.stage_status = "done"
+    logger.debug(f"Finished stage: {stage_name}")
+    self.save_status()
 
     return result
+
+  def save_status(self):
+    '''
+    Smart update the file
+    '''
+
+    shutil.move(settings.status_file, settings.status_file + '.bak')
+    with open(settings.status_file, 'w') as fid:
+      json.dump(self.stage_self.status, fid)
