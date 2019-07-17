@@ -4,9 +4,18 @@ import importlib
 from os import environ as env
 import os
 
-with open(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE']),
-          'r') as fid:
-  password = fid.readline().rstrip('\r\n')
+from terra.logger import getLogger
+logger = getLogger(__name__)
+
+try:
+  with open(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE']),
+            'r') as fid:
+    password = fid.readline().rstrip('\r\n')
+except FileNotFoundError:
+  logger.fatal(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE'])
+               + ": Redis password file not found. "
+               + "'just' should auto generate this")
+  raise
 
 broker_url = f'redis://:{password}@{env["TERRA_REDIS_HOSTNAME"]}:' \
              f'{env["TERRA_REDIS_PORT"]}/0'
