@@ -12,7 +12,7 @@ class DummyExecutor(Executor):
   def submit(self, fn, *args, **kwargs):
     with self._shutdownLock:
       if self._shutdown:
-        raise RuntimeError('cannot schedule new futures after shutdown')
+        raise RuntimeError('Cannot schedule new futures after shutdown')
 
       f = Future()
       try:
@@ -27,18 +27,3 @@ class DummyExecutor(Executor):
   def shutdown(self, wait=True):
     with self._shutdownLock:
       self._shutdown = True
-
-
-if __name__ == '__main__':
-
-  def fnc(err):
-    if err:
-      raise Exception("test")
-    else:
-      return "ok"
-
-  ex = DummyExecutor()
-  print(ex.submit(fnc, True))
-  print(ex.submit(fnc, False))
-  ex.shutdown()
-  ex.submit(fnc, True)  # raises exception
