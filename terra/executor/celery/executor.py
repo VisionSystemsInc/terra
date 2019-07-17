@@ -22,18 +22,16 @@ from concurrent.futures import Future, Executor, as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
                                       CANCELLED_AND_NOTIFIED)
 from threading import Lock, Thread
-import logging
 import time
 
-from celery import shared_task
-
-logger = logging.getLogger(__name__)
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 
 class CeleryExecutorFuture(Future):
   def __init__(self, asyncresult):
     self._ar = asyncresult
-    super(CeleryExecutorFuture, self).__init__()
+    super().__init__()
 
   def __del__(self):
     self._ar.forget()
@@ -46,34 +44,36 @@ class CeleryExecutorFuture(Future):
     """
     with self._condition:
       if self._state in [RUNNING, FINISHED, CANCELLED, CANCELLED_AND_NOTIFIED]:
-        return super(CeleryExecutorFuture, self).cancel()
+        return super().cancel()
 
-        # Not running and not canceled. May be possible to cancel!
-        self._ar.ready()  # Triggers an update check
-        if self._ar.state != 'REVOKED':
-          self._ar.revoke()
-          self._ar.ready()
+      # Not running and not canceled. May be possible to cancel!
+      self._ar.ready()  # Triggers an update check
+      if self._ar.state != 'REVOKED':
+        self._ar.revoke()
+        self._ar.ready()
 
-        # Celery task should be REVOKED now. Otherwise may be not possible
-        # revoke it.
-        if self._ar.state == 'REVOKED':
-          result = super(CeleryExecutorFuture, self).cancel()
-          assert result is True, 'Please open an issue on Github: Upstream ' \
-                                 'implementation changed?'
-        else:
-          # Is not running nor revoked nor finished :/
-          # The revoke() had not produced effect: Task is probable not on a
-          # worker, then not revoke-able.
-          # Setting as RUNNING to inibit super() to cancel the Future, then
-          # putting back.
-          initial_state = self._state
-          self._state = RUNNING
-          result = super(CeleryExecutorFuture, self).cancel()
-          assert result is False, 'Please open an issue on Github: Upstream ' \
-                                  'implementation changed?'
-          self._state = initial_state
+      # Celery task should be REVOKED now. Otherwise may be not possible
+      # revoke it.
+      if self._ar.state == 'REVOKED':
+        result = super().cancel()
+        if not result:  # pragma: no cover
+          logger.error('Please open an issue on Github: Upstream '
+                      'implementation changed?')
+      else:
+        # Is not running nor revoked nor finished :/
+        # The revoke() had not produced effect: Task is probable not on a
+        # worker, then not revoke-able.
+        # Setting as RUNNING to inhibit super() from cancelling the Future,
+        # then putting back.
+        initial_state = self._state
+        self._state = RUNNING
+        result = super().cancel()
+        if result:  # pragma: no cover
+          logger.error('Please open an issue on Github: Upstream '
+                       'implementation changed?')
+        self._state = initial_state
 
-        return result
+      return result
 
 
 class CeleryExecutor(Executor):
@@ -128,10 +128,10 @@ class CeleryExecutor(Executor):
         if ar.state == 'REVOKED':
           logger.debug('Celery task "%s" canceled.', ar.id)
           if not fut.cancelled():
-            assert fut.cancel(), \
-                'Future was not running but failed to be cancelled'
+            if not fut.cancel():  # pragma: no cover
+              logger.error('Future was not running but failed to be cancelled')
             fut.set_running_or_notify_cancel()
-          # Future is CANCELLED
+          # Future is CANCELLED -> CANCELLED_AND_NOTIFIED
 
         elif ar.state in ('RUNNING', 'RETRY'):
           logger.debug('Celery task "%s" running.', ar.id)
@@ -191,41 +191,6 @@ class CeleryExecutor(Executor):
       self._monitor_stopping = True
       try:
         self._monitor.join()
-      except RuntimeError:
+      except RuntimeError: # pragma: no cover
         # Thread never started. Cannot join
         pass
-
-
-class SyncExecutor(Executor):
-  """
-  Executor that does the job syncronously.
-
-  All the returned Futures will be already resolved. This executor is intended
-  to be mainly used on tests or to keep internal API conformance with the
-  Executor interface.
-
-  Based on a snippet from https://stackoverflow.com/a/10436851/798575
-  """
-
-  def __init__(self, lock=Lock):
-    self._shutdown = False
-    self._shutdown_lock = lock()
-
-  def submit(self, fn, *args, **kwargs):
-    with self._shutdown_lock:
-      if self._shutdown:
-        raise RuntimeError('cannot schedule new futures after shutdown')
-
-      f = Future()
-      try:
-        result = fn(*args, **kwargs)
-      except BaseException as e:
-        f.set_exception(e)
-      else:
-        f.set_result(result)
-
-      return f
-
-  def shutdown(self, wait=True):
-    with self._shutdown_lock:
-      self._shutdown = True

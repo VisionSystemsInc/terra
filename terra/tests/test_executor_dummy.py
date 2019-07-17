@@ -24,7 +24,7 @@ class TestExecutorDummy(TestCase):
   def test_shutdown(self):
     self.assertEqual(self.executor.submit(test1, 15).result(), 26)
     self.executor.shutdown()
-    with self.assertRaisesRegex(RuntimeError, "Cannot .* after shutdown"):
+    with self.assertRaisesRegex(RuntimeError, "cannot .* after shutdown"):
       self.executor.submit(test1, 29)
 
   def test_exception(self):

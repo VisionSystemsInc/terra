@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from unittest import mock, skipUnless
 
 try:
@@ -42,13 +43,171 @@ class TestCeleryConfig(TestCase):
     import terra.executor.celery.celeryconfig as cc
     self.assertEqual(cc.include, ['foo', 'bar'])
 
+# def celery_config():
+#   return {
+#     'accept_content': ['json', 'pickle'],
+
+#     ## The exception inheritance do change if not using 'pickle' serializer
+#     # See: https://github.com/celery/celery/issues/3586
+#     # and https://github.com/celery/celery/pull/3592
+#     'result_serializer': 'pickle',
+
+#     'worker_concurrency': 1,
+#     'worker_prefetch_multiplier': 1,
+#     'worker_lost_wait': 60,
+#     'worker_send_task_events': True,
+#     'task_acks_late': True,
+#     'task_queues': [Queue('celery'), Queue('retry')],
+#   }
+
+
+class MockAsyncResult:#(mock.Mock):
+  def __init__(self, id, fun):
+    self.id = id
+    self.fun = fun
+    self.forgotten = False
+
+  def ready(self):
+    return True
+  state = 'SUCCESS'
+  def revoke(self):
+    self.state = 'REVOKED'
+  def get(self, *args, **kwargs):
+    return self.fun(self)
+  def forget(self):
+    self.forgotten = True
+
+
+def test_factory():
+  def test(self):
+    return 17
+  test.apply_async = lambda args, kwargs: MockAsyncResult(1, test)
+
+  return test
+
 
 @skipUnless(celery, "Celery not installed")
-class TestSomething(TestCase):
+class TestCeleryExecutor(TestCase):
   def setUp(self):
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
+  #   self.patches.append(mock.patch.object(settings, '_wrapped', None))
     super().setUp()
-    settings.configure({})
+  #   settings.configure({})
+    from terra.executor.celery import CeleryExecutor
+    self.executor = CeleryExecutor(update_delay=0.001)
 
-  def test_something(self):
-    self.assertTrue(1)
+  def tearDown(self):
+    super().tearDown()
+    self.executor._monitor_stopping = True
+    try:
+      self.executor._monitor.join()
+    except RuntimeError:
+      # Thread never started. Cannot join
+      pass
+
+  def wait_for_state(self, future, state):
+    for x in range(100):
+      time.sleep(0.001)
+      if future._state == state:
+        break
+      if x == 99:
+        raise TimeoutError(f'Took longer than 100us for a 1us update for '
+                           f'{future._state} to become {state}')
+
+  def test_simple(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+    future.result()
+
+  def test_cancel(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+    future._ar.state = 'RECEIVED'
+
+    # Cancels!
+    self.assertTrue(future.cancel())
+
+    self.assertEqual(future._state, 'CANCELLED')
+    self.assertEqual(future._ar.state, 'REVOKED')
+
+  def test_cancel_uncancellable(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+    future._ar.state = 'RECEIVED'
+
+    # Make revoking fail
+    future._ar.revoke = lambda: True
+
+    # Fails to cancel
+    self.assertFalse(future.cancel())
+
+    self.assertEqual(future._state, 'PENDING')
+    self.assertEqual(future._ar.state, 'RECEIVED')
+
+  def test_cancel_running(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+    future._ar.state = 'RUNNING'
+    future._state = 'RUNNING'
+
+    # Fails to cancel
+    self.assertFalse(future.cancel())
+
+    self.assertEqual(future._state, 'RUNNING')
+    self.assertEqual(future._ar.state, 'RUNNING')
+
+  def test_update_futures_running(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+
+    self.assertFalse(future.running())
+    future._ar.state='RUNNING'
+    self.wait_for_state(future, 'RUNNING')
+    self.assertTrue(future.running())
+
+  def test_update_futures_finish(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+    future._state = 'FINISHED'
+
+    self.assertEqual(len(self.executor._futures), 1)
+
+    for x in range(100):
+      time.sleep(0.001)
+      if not len(self.executor._futures):
+        break
+      if x == 99:
+        raise TimeoutError('Took longer than 100us for a 1us update')
+
+  def test_update_futures_revoked(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+
+    self.assertFalse(future.cancelled())
+    future._ar.state='REVOKED'
+    self.wait_for_state(future, 'CANCELLED_AND_NOTIFIED')
+    self.assertTrue(future.cancelled())
+
+  def test_update_futures_success(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+
+    self.assertIsNone(future._result)
+    future._ar.state='SUCCESS'
+    self.wait_for_state(future, 'FINISHED')
+    self.assertEqual(future._result, 17)
+
+  def test_update_futures_failure(self):
+    test = test_factory()
+    future = self.executor.submit(test)
+
+    self.assertIsNone(future._result)
+    future._ar.state='FAILURE'
+    future._ar.result = TypeError('On no')
+    self.wait_for_state(future, 'FINISHED')
+
+  def test_shutdown(self):
+    test = test_factory()
+    self.assertEqual(self.executor.submit(test).result(), 17)
+    self.executor.shutdown()
+    with self.assertRaisesRegex(RuntimeError, "cannot .* after shutdown"):
+      self.executor.submit(test)
