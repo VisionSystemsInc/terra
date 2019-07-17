@@ -32,27 +32,19 @@ class Service2_test:
 
 # I am purposefully showing multiple ways to mock _wrapped for demonstration
 # purposes
-patches = []
+class TestComputeUtilsCase(TestCase):
+  def setUp(self):
+    self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    self.patches.append(mock.patch.dict(terra.compute.base.services,
+                                        clear=True))
+    super().setUp()
+    settings.configure({'compute': {'arch': Compute.__module__}})
+
+    Compute.register(Service)(Service_test)
+    terra.compute.base.BaseCompute.register(Service2)(Service2_test)
 
 
-# Module scope patch
-def setUpModule():
-  patches.append(mock.patch.object(settings, '_wrapped', None))
-  patches.append(mock.patch.dict(terra.compute.base.services, clear=True))
-  for patch in patches:
-    patch.start()
-  settings.configure({'compute': {'arch': Compute.__module__}})
-
-  Compute.register(Service)(Service_test)
-  terra.compute.base.BaseCompute.register(Service2)(Service2_test)
-
-
-def tearDownModule():
-  for patch in patches:
-    patch.stop()
-
-
-class TestUtils(TestCase):
+class TestUtils(TestComputeUtilsCase):
   def test_compute_handler_from_settings(self):
     self.assertIsInstance(utils.ComputeHandler()._connection, Compute)
 
@@ -105,7 +97,7 @@ class TestUtils(TestCase):
                         for line in log.output))
 
 
-class TestComputeHandler(TestCase):
+class TestComputeHandler(TestComputeUtilsCase):
   @mock.patch.object(settings, '_wrapped', None)
   def test_compute_handler(self):
     settings.configure({'compute': {'arch': 'terra.compute.dummy'}})

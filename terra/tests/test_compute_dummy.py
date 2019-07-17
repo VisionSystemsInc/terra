@@ -32,8 +32,23 @@ class TestServiceManual_dummy(TestServiceManual, dummy.Service):
     self.d = 44
 
 
+class TestComputeDummyCase(TestCase):
+  def setUp(self):
+    self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    self.patches.append(mock.patch.dict(base.services, clear=True))
+    self.patches.append(
+        mock.patch.object(terra.compute.utils.ComputeHandler,
+                          '_connection',
+                          mock.PropertyMock(return_value=dummy.Compute())))
+    super().setUp()
+
+    dummy.Compute.register(TestServiceManual)(TestServiceManual_dummy)
+    # Normally you don't register to the base
+    base.BaseCompute.register(TestService)(TestService_base)
+
+
 # Redundant tests left as implementation examples
-class TestDummyManual(TestCase):
+class TestDummyManual(TestComputeDummyCase):
   def test_registry(self):
     self.assertIn(TestService.__module__ + '.TestService', base.services)
 
@@ -56,31 +71,7 @@ class TestService_base(TestService, base.BaseService):
   pass  # No needs to register dummy even. Use default
 
 
-patches = []
-
-
-def setUpModule():
-  patches.append(mock.patch.object(settings, '_wrapped', None))
-  patches.append(mock.patch.dict(base.services, clear=True))
-  patches.append(
-      mock.patch.object(terra.compute.utils.ComputeHandler,
-                        '_connection',
-                        mock.PropertyMock(return_value=dummy.Compute())))
-  for patch in patches:
-    patch.start()
-  settings.configure({})
-
-  dummy.Compute.register(TestServiceManual)(TestServiceManual_dummy)
-  # Normally you don't register to the base
-  base.BaseCompute.register(TestService)(TestService_base)
-
-
-def tearDownModule():
-  for patch in patches:
-    patch.stop()
-
-
-class TestServiceDummy(TestCase):
+class TestServiceDummy(TestComputeDummyCase):
   test_service_name = TestService.__module__ + '.TestService'
 
   def __init__(self, *args, **kwargs):

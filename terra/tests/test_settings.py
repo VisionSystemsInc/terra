@@ -114,22 +114,11 @@ class TestObjectDict(TestCase):
 
 
 class TestSettings(TestCase):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.patches = []
-
   def setUp(self):
-    self.temp_dir = TemporaryDirectory()
     self.patches.append(mock.patch.dict(os.environ,
                                         {'TERRA_SETTINGS_FILE': ""}))
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    for patch in self.patches:
-      patch.start()
-
-  def tearDown(self):
-    self.temp_dir.cleanup()
-    while self.patches:
-      self.patches.pop().stop()
+    super().setUp()
 
   def test_lazy_attribute(self):
     with self.assertRaises(ImproperlyConfigured):

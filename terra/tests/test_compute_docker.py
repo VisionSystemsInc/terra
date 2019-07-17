@@ -15,34 +15,25 @@ import terra.compute.utils
 from .utils import TestCase
 
 
-patches = []
-temp_dir = tempfile.TemporaryDirectory()
+class TestComputeDockerCase(TestCase):
+  def setUp(self):
+    self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    # This will resets the _connection to an uninitialized state
+    self.patches.append(
+        mock.patch.object(terra.compute.utils.ComputeHandler,
+                          '_connection',
+                          mock.PropertyMock(return_value=docker.Compute())))
+
+    # patches.append(mock.patch.dict(base.services, clear=True))
+    super().setUp()
+
+    settings.configure({
+        'compute': {'arch': 'docker'},
+        'processing_dir': self.temp_dir.name,
+        'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
 
-def setUpModule():
-  patches.append(mock.patch.object(settings, '_wrapped', None))
-  # This will resets the _connection to an uninitialized state
-  patches.append(
-      mock.patch.object(terra.compute.utils.ComputeHandler,
-                        '_connection',
-                        mock.PropertyMock(return_value=docker.Compute())))
-
-  # patches.append(mock.patch.dict(base.services, clear=True))
-  for patch in patches:
-    patch.start()
-  settings.configure({
-      'compute': {'arch': 'docker'},
-      'processing_dir': temp_dir.name,
-      'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
-
-
-def tearDownModule():
-  for patch in patches:
-    patch.stop()
-  temp_dir.cleanup()
-
-
-class TestDockerRe(TestCase):
+class TestDockerRe(TestComputeDockerCase):
   def test_re(self):
     # Copied from test-docker_functions.bsh "Docker volume string parsing"
     host_paths = (".",
@@ -83,7 +74,7 @@ def mock_popen(*args, **kwargs):
   return (args, kwargs)
 
 
-class TestDockerJust(TestCase):
+class TestDockerJust(TestComputeDockerCase):
   @mock.patch.object(docker, 'Popen', mock_popen)
   def test_just(self):
     original_env = os.environ.copy()
@@ -143,7 +134,7 @@ class MockJustService:
   env = {"BAR": "FOO"}
 
 
-class TestDockerRun(TestCase):
+class TestDockerRun(TestComputeDockerCase):
   # Create a special mock functions that takes the Tests self as _self, and the
   # rest of the args as args/kwargs. This lets me do testing inside the mocked
   # function. self.expected_args and self.expected_kwargs should be set by the
@@ -155,11 +146,9 @@ class TestDockerRun(TestCase):
     return type('blah', (object,), {'wait': lambda self: _self.return_value})()
 
   def setUp(self):
-    self.patch = mock.patch.object(docker.Compute, 'just', self.mock_just)
-    self.patch.start()
-
-  def tearDown(self):
-    self.patch.stop()
+    self.patches.append(mock.patch.object(docker.Compute, 'just',
+                                          self.mock_just))
+    super().setUp()
 
   def test_run(self):
     compute = docker.Compute()
@@ -181,14 +170,11 @@ class TestDockerRun(TestCase):
 ###############################################################################
 
 
-class TestDockerConfig(TestCase):
+class TestDockerConfig(TestComputeDockerCase):
   def setUp(self):
-    self.patch = mock.patch.object(docker.Compute, 'just',
-                                   self.mock_just_config)
-    self.patch.start()
-
-  def tearDown(self):
-    self.patch.stop()
+    self.patches.append(mock.patch.object(docker.Compute, 'just',
+                                          self.mock_just_config))
+    super().setUp()
 
   # Create a special mock functions that takes the Tests self as _self, and the
   # rest of the args as args/kwargs. This lets me do testing inside the mocked
@@ -444,7 +430,7 @@ def mock_config(*args, **kwargs):
   return mock_yaml
 
 
-class TestDockerMap(TestCase):
+class TestDockerMap(TestComputeDockerCase):
   class Service:
     compose_service_name = "foo"
     volumes = []
@@ -497,7 +483,7 @@ def mock_map(self, *args, **kwargs):
           ('/tmp/.X11-unix', '/tmp/.X11-unix')]
 
 
-class TestDockerService(TestCase):
+class TestDockerService(TestComputeDockerCase):
   def common(self, compute, service):
     service.pre_run()
     setup_dir = service.temp_dir.name

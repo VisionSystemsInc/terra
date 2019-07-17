@@ -21,18 +21,11 @@ class TestResumable(TestCase):
     self.patches = []
 
   def setUp(self):
-    self.temp_dir = TemporaryDirectory()
     self.patches.append(mock.patch.dict(os.environ,
                                         {'TERRA_SETTINGS_FILE': ""}))
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    for patch in self.patches:
-      patch.start()
+    super().setUp()
     settings.configure({'processing_dir': self.temp_dir.name})
-
-  def tearDown(self):
-    self.temp_dir.cleanup()
-    while self.patches:
-      self.patches.pop().stop()
 
   def test_simple(self):
     @resumable

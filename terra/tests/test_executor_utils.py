@@ -8,19 +8,10 @@ from terra.executor.dummy import DummyExecutor
 
 
 class TestExecutorHandler(TestCase):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.patches = []
-
   def setUp(self):
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
     self.patches.append(mock.patch.dict(Executor.__dict__))
-    for patch in self.patches:
-      patch.start()
-
-  def tearDown(self):
-    while self.patches:
-      self.patches.pop().stop()
+    super().setUp()
 
   def test_executor_handler(self):
     settings.configure({'executor': {'type': 'DummyExecutor'}})

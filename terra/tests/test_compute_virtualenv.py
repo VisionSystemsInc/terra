@@ -10,33 +10,6 @@ import terra.compute.utils
 from .utils import TestCase
 
 
-patches = []
-temp_dir = tempfile.TemporaryDirectory()
-
-
-def setUpModule():
-  patches.append(mock.patch.object(settings, '_wrapped', None))
-  # This will resets the _connection to an uninitialized state
-  patches.append(
-      mock.patch.object(terra.compute.utils.ComputeHandler,
-                        '_connection',
-                        mock.PropertyMock(return_value=virtualenv.Compute())))
-
-  # patches.append(mock.patch.dict(base.services, clear=True))
-  for patch in patches:
-    patch.start()
-  settings.configure({
-      'compute': {'arch': 'virtualenv'},
-      'processing_dir': temp_dir.name,
-      'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
-
-
-def tearDownModule():
-  for patch in patches:
-    patch.stop()
-  temp_dir.cleanup()
-
-
 class MockVirtalEnvService(virtualenv.Service):
   def __init__(self):
     super().__init__()
@@ -45,17 +18,29 @@ class MockVirtalEnvService(virtualenv.Service):
 
 
 class TestVirtualEnv(TestCase):
+  def setUp(self):
+    self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    # This will resets the _connection to an uninitialized state
+    self.patches.append(
+        mock.patch.object(
+            terra.compute.utils.ComputeHandler,
+            '_connection',
+            mock.PropertyMock(return_value=virtualenv.Compute())))
+
+    self.patches.append(mock.patch.object(virtualenv,
+                                          'Popen', self.mock_popen))
+
+    # patches.append(mock.patch.dict(base.services, clear=True))
+    super().setUp()
+    settings.configure({
+        'compute': {'arch': 'virtualenv'},
+        'processing_dir': self.temp_dir.name,
+        'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
+
   def mock_popen(_self, *args, **kwargs):
     _self.popen_args = args
     _self.popen_kwargs = kwargs
     return type('blah', (object,), {'wait': lambda self: _self.return_value})()
-
-  def setUp(self):
-    self.patch = mock.patch.object(virtualenv, 'Popen', self.mock_popen)
-    self.patch.start()
-
-  def tearDown(self):
-    self.patch.stop()
 
   def test_run(self):
     compute = virtualenv.Compute()
