@@ -157,7 +157,7 @@ class TestResumable(TestCase):
 
     klass = Klass()
 
-    self.assertFalse(os.path.exists(settings.status_file))
+    self.assertNotExist(settings.status_file)
     self.assertEqual(test1(klass), 11)
-    self.assertTrue(os.path.exists(settings.status_file))
+    self.assertExist(settings.status_file)
     self.assertEqual(klass.x, 12)

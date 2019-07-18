@@ -84,7 +84,18 @@ __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
 
 
 class HandlerLoggingContext(object):
+  '''
+  A context Manager for swapping out logging handlers
+  '''
   def __init__(self, logger, handlers):
+    '''
+    Arguments
+    ---------
+    logger:
+        The logger to swap handlers on
+    handlers: list
+        List of handles to set the logger to
+    '''
     self.handlers = handlers
     self.logger = logger
 
@@ -185,7 +196,10 @@ class _SetupTerraLogger():
     If IPython cannot be imported, nothing happens.
     '''
     try:
-      from IPython.core.interactiveshell import InteractiveShell
+      import warnings
+      with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        from IPython.core.interactiveshell import InteractiveShell
 
       original_exception = InteractiveShell.showtraceback
 

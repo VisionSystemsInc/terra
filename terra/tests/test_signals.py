@@ -1,6 +1,6 @@
 from unittest import mock
 
-from terra.core.signals import Signal, receiver
+from terra.core.signals import Signal, receiver, post_settings_configured
 from .utils import TestCase
 
 
@@ -150,3 +150,13 @@ class TestSignals(TestCase):
     self.count = 0.0
     self.signal.send(sender=self.sender)
     self.assertEqual(self.count, 1.1)
+
+
+class TestUnitTests(TestCase):
+  def last_test_signals(self):
+    for signal in [post_settings_configured]:
+      self.assertFalse(signal.receivers,
+          msg="If you are seting this, one of the other unit tests has "
+              "left a signal connected. This side effect should be "
+              "prevented by disconnecting any functions you connected to a "
+              "signal.")

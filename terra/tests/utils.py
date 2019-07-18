@@ -1,5 +1,7 @@
 from unittest import TestCase as TestCaseOriginal
+from unittest.util import safe_repr
 from tempfile import TemporaryDirectory
+import os
 
 
 class TestCase(TestCaseOriginal):
@@ -46,3 +48,36 @@ class TestCase(TestCaseOriginal):
       self._temp_dir.cleanup()
     while self.patches:
       self.patches.pop().stop()
+
+  def assertExist(self, filename, msg=None, is_dir=None):
+    '''
+    Fails if the filename does not exist
+
+    Can take an optional argument ``is_dir`` to assert that it is a directory
+    or not. The default ``None`` does not check.
+    '''
+    if not os.path.exists(filename):
+      msg = self._formatMessage(msg,
+                                '%s does not exist' % (safe_repr(filename)))
+      raise self.failureException(msg)
+
+    if is_dir is not None:
+      if is_dir:
+        if not os.path.isdir(filename):
+          msg = self._formatMessage(
+              msg, '%s is not a directory' % (safe_repr(filename)))
+          raise self.failureException(msg)
+      elif os.path.isdir(filename):
+        msg = self._formatMessage(
+            msg, '%s is a directory' % (safe_repr(filename)))
+        raise self.failureException(msg)
+
+
+  def assertNotExist(self, filename, msg=None):
+    '''
+    Fails if the filename does not exist
+    '''
+
+    if os.path.exists(filename):
+      msg = self._formatMessage(msg, '%s does exist' % (safe_repr(filename)))
+      raise self.failureException(msg)
