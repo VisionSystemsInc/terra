@@ -20,7 +20,7 @@ class TestHandlerLoggingContext(TestCase):
     test_logger.setLevel(logging.INFO)
     handler_default = logging.handlers.MemoryHandler(1000)
     handler_swap = logging.handlers.MemoryHandler(1000)
-    test_logger.addHandler(handler_default)
+    test_logger.logger.addHandler(handler_default)
 
     # Test normal case
     message1 = str(uuid.uuid4())

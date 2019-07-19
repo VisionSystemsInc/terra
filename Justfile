@@ -140,7 +140,11 @@ function terra_caseify()
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
       # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
-      Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+      if [[ $# == 0 ]]; then
+        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+      else
+        Terra_Pipenv run env TERRA_UNITTEST=1 python -m unittest "${@}"
+      fi
       extra_args=$#
       ;;
     # Ideas

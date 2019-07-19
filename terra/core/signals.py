@@ -354,5 +354,5 @@ manual call to :func:`terra.core.settings.LazySettings.configure`.
 
 # Must be after post_settings_configured to prevent circular import errors.
 # Just can't use logger during import (global scope)
-from terra.logger import getLogger  # noqa: special case
-logger = getLogger(__name__)
+import terra.logger  # noqa: special case
+logger = terra.logger.getLogger(__name__)
