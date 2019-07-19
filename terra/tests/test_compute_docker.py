@@ -115,7 +115,7 @@ class TestDockerJust(TestComputeDockerCase):
 
     env_lines = [x for x in cm.output if "Environment Modification:" in x][0]
     env_lines = env_lines.split('\n')
-    self.assertEqual(len(env_lines), 4)
+    self.assertEqual(len(env_lines), 4, env_lines)
 
     self.assertTrue(any(o.startswith('- PATH:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
