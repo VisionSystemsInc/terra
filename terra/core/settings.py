@@ -155,8 +155,6 @@ from vsi.tools.python import (
     nested_patch_inplace, nested_patch, nested_update, nested_in_dict
 )
 from json import JSONEncoder
-from terra.logger import getLogger
-logger = getLogger(__name__)
 
 try:
   import jstyleson as json
@@ -644,3 +642,7 @@ class TerraJSONEncoder(JSONEncoder):
         Object to be converted to json friendly :class:`dict`
     '''
     return json.dumps(obj, cls=TerraJSONEncoder)
+
+
+import terra.logger  # noqa
+logger = terra.logger.getLogger(__name__)

@@ -352,7 +352,11 @@ element in the settings (which is done automatically), or in rare cases after a
 manual call to :func:`terra.core.settings.LazySettings.configure`.
 '''
 
+from terra.logger import getLogger  # noqa
+logger = getLogger(__name__)
 # Must be after post_settings_configured to prevent circular import errors.
 # Just can't use logger during import (global scope)
-import terra.logger  # noqa: special case
-logger = terra.logger.getLogger(__name__)
+# This also works. Just "import terra.logger" does not, because logger isn't
+# done being imported here
+# import terra.logger as terra_logger
+# terra_logger = terra_logger.getLogger(__name__)

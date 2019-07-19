@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from unittest import mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
@@ -7,6 +8,8 @@ import tempfile
 from envcontext import EnvironmentContext
 
 from .utils import TestCase
+from .test_logger import TestLoggerCase
+
 from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
@@ -413,8 +416,11 @@ class TestSettings(TestCase):
 
 
 class TestUnitTests(TestCase):
-  # Don't name this "test*" so normal discover doesn't pick it up, "last*" are
-  # run last
+  # Don't make this part of the TestSettings class
+
+  # def test_fail(self):
+  #   settings.configure({})
+
   def last_test_settings(self):
     self.assertIsNone(
         settings._wrapped,
@@ -422,3 +428,19 @@ class TestUnitTests(TestCase):
             "initialized the settings. This side effect should be "
             "prevented by mocking out the settings._wrapped attribute. "
             "Otherwise unit tests can interfere with each other")
+
+
+class TestCircularDependency(TestLoggerCase):
+  # I don't want this unloading terra to interfere with other last_tests, as
+  # this would reset modules to their initial state, giving false positives to
+  # corruption checks. So mock it
+  @mock.patch.dict(sys.modules)
+  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')  # Needed to make circular
+  def last_test_import_settings(self):
+    # Unload terra
+    for module in list(sys.modules.keys()):
+      if module.startswith('terra'):
+        sys.modules.pop(module)
+
+    import terra.core.settings
+    terra.core.settings.settings._setup()

@@ -45,7 +45,7 @@ def NamedTemporaryFileFactory(test_self):
   return NamedTemporaryFile
 
 
-class TestLogger(TestCase):
+class TestLoggerCase(TestCase):
   def setUp(self):
     self.original_system_hook = sys.excepthook
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
@@ -79,6 +79,8 @@ class TestLogger(TestCase):
     # auto removed on free, but I think it's still better to put this here.
     super().tearDown()
 
+
+class TestLogger(TestLoggerCase):
   def test_setup_working(self):
     self.assertFalse(settings.configured)
     self.assertEqual(settings.processing_dir, self.temp_dir.name)
