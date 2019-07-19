@@ -2,6 +2,8 @@ from unittest import TestCase as TestCaseOriginal
 from unittest.util import safe_repr
 from tempfile import TemporaryDirectory
 import os
+import sys
+import types
 
 
 class TestCase(TestCaseOriginal):
@@ -81,3 +83,17 @@ class TestCase(TestCaseOriginal):
     if os.path.exists(filename):
       msg = self._formatMessage(msg, '%s does exist' % (safe_repr(filename)))
       raise self.failureException(msg)
+
+
+def make_traceback(depth=1):
+  tb = None
+  while True:
+    try:
+      frame = sys._getframe(depth)
+      depth += 1
+    except ValueError:
+      break
+
+    tb = types.TracebackType(tb, frame, frame.f_lasti, frame.f_lineno)
+
+  return tb

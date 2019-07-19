@@ -210,7 +210,7 @@ class _SetupTerraLogger():
 
       InteractiveShell.showtraceback = handle_traceback
 
-    except ImportError:
+    except ImportError:  # pragma: no cover
       pass
 
   def configure_logger(self, sender, **kwargs):
@@ -380,7 +380,7 @@ logging.addLevelName(DEBUG3, "DEBUG3")
 logger = getLogger(__name__)
 
 # Disable log setup for unittests. Can't use settings here ;)
-if os.environ.get('TERRA_UNITTEST', None) != "1":
+if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
   # Configure logging (pre configure)
   _logs = _SetupTerraLogger()
 
