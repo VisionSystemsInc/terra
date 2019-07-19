@@ -37,15 +37,29 @@ class TestCase(TestCaseOriginal):
 
   @property
   def temp_dir(self):
+    '''
+    Automatically creates a temporary directory for any unittest that needs it
+
+    Cleanups automatically in :func:`tearDown`
+    '''
     if self._temp_dir is None:
       self._temp_dir = TemporaryDirectory()
     return self._temp_dir
 
   def setUp(self):
+    '''
+    A basic setup that starts ``self.patches`` ``unittest.mock.patch`` objects
+
+    A lot of the time, using the decorator is not possible as values are not
+    available at load time that are needed for a patch
+    '''
     for patch in self.patches:
       patch.start()
 
   def tearDown(self):
+    '''
+    Stops any patches in ``self.patches`` and cleanups up ``self.temp_dir``
+    '''
     if self._temp_dir is not None:
       self._temp_dir.cleanup()
     while self.patches:
@@ -84,7 +98,14 @@ class TestCase(TestCaseOriginal):
       raise self.failureException(msg)
 
 
+# https://stackoverflow.com/a/54653137/4166604
 def make_traceback(depth=1):
+  '''
+  Create a phony traceback
+
+  Useful for testing calls that need a traceback object, such as
+  ``sys.excepthook``
+  '''
   tb = None
   while True:
     try:

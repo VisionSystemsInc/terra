@@ -111,15 +111,17 @@ class TestDockerJust(TestComputeDockerCase):
       env = os.environ.copy()
       env.pop('PATH')
       env['FOO'] = 'BAR'
-      compute.just("foo", "bar", env=env)
+      with mock.patch.dict(os.environ, JUSTFILE='/foo/bar'):
+        compute.just("foo", "bar", env=env)
 
     env_lines = [x for x in cm.output if "Environment Modification:" in x][0]
     env_lines = env_lines.split('\n')
-    self.assertEqual(len(env_lines), 4, env_lines)
+    self.assertEqual(len(env_lines), 5, env_lines)
 
     self.assertTrue(any(o.startswith('- PATH:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ JUSTFILE:') for o in env_lines))
+    self.assertTrue(any(o.startswith('- JUSTFILE:') for o in env_lines))
 
     # Make sure nothing inadvertently changed environ
     self.assertEqual(original_env, os.environ)
