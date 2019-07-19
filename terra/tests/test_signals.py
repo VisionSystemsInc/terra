@@ -155,8 +155,9 @@ class TestSignals(TestCase):
 class TestUnitTests(TestCase):
   def last_test_signals(self):
     for signal in [post_settings_configured]:
-      self.assertFalse(signal.receivers,
+      self.assertFalse(
+          signal.receivers,
           msg="If you are seting this, one of the other unit tests has "
-              "left a signal connected. This side effect should be "
-              "prevented by disconnecting any functions you connected to a "
-              "signal.")
+          "left a signal connected. This side effect should be "
+          "prevented by disconnecting any functions you connected to a "
+          "signal.")

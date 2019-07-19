@@ -82,6 +82,7 @@ class HandlerLoggingContext(object):
   '''
   A context Manager for swapping out logging handlers
   '''
+
   def __init__(self, logger, handlers):
     '''
     Arguments

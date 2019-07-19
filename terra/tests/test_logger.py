@@ -35,6 +35,7 @@ class TestHandlerLoggingContext(TestCase):
     self.assertNotIn(message2, str(handler_default.buffer))
     self.assertIn(message2, str(handler_swap.buffer))
 
+
 def NamedTemporaryFileFactory(test_self):
   def NamedTemporaryFile(**kwargs):
     kwargs['dir'] = test_self.temp_dir.name
@@ -42,6 +43,7 @@ def NamedTemporaryFileFactory(test_self):
     test_self.temp_log_file = rv.name
     return rv
   return NamedTemporaryFile
+
 
 class TestLogger(TestCase):
   def setUp(self):
@@ -96,7 +98,8 @@ class TestLogger(TestCase):
     self.assertTrue(self._logs._configured)
 
   def test_exception_hook_installed(self):
-    self.assertEqual(sys.excepthook.__qualname__,
+    self.assertEqual(
+        sys.excepthook.__qualname__,
         '_SetupTerraLogger.setup_logging_exception_hook.'
         '<locals>.handle_exception')
     self.assertEqual('terra.logger', sys.excepthook.__module__)
@@ -110,8 +113,9 @@ class TestLogger(TestCase):
     self._logs.setup_logging_exception_hook()
     with self.assertLogs() as cm:
       # with self.assertRaises(ZeroDivisionError):
-        tb = make_traceback()
-        sys.excepthook(ZeroDivisionError, ZeroDivisionError('division by almost zero'), tb)
+      tb = make_traceback()
+      sys.excepthook(ZeroDivisionError,
+                     ZeroDivisionError('division by almost zero'), tb)
 
     self.assertIn('division by almost zero', str(cm.output))
     # Test stack trace stuff in there
@@ -132,7 +136,8 @@ class TestLogger(TestCase):
     self.assertEqual(stderr_handler.level, logging.WARNING)
 
   def test_logs_temp_file(self):
-    temp_handler = [h for h in self._logs.root_logger.handlers
+    temp_handler = [
+        h for h in self._logs.root_logger.handlers
         if hasattr(h, 'stream') and h.stream.name == self.temp_log_file][0]
     # Test that log everything is set
     self.assertEqual(temp_handler.level, logger.NOTSET)
@@ -151,22 +156,21 @@ class TestLogger(TestCase):
                                None)
     self.assertEqual(self._logs.stderr_handler.format(record), "foo bar Hiya")
 
-  # def test_hostname(self):
-  #   # settings.configure({'processing_dir': self.temp_dir.name,
-  #   #                     'logging': {'format': 'foo {asctime} {msg}'}})
+  def test_hostname(self):
+    test_logger = logger.getLogger(f'{__name__}.test_hostname')
 
-  #   record = logging.LogRecord(__name__, logger.ERROR, __file__, 0, "Hiya", (),
-  #                              None)
-  #   self.assertIn('(preconfig)', self._logs.stderr_handler.format(record))
+    record = test_logger.logger.makeRecord(__name__, logger.ERROR, __file__, 0,
+                                           "Hiya", (), None,
+                                           extra=test_logger.extra)
+    self.assertIn('(preconfig)', self._logs.stderr_handler.format(record))
 
-  #   settings._setup()
+    settings._setup()
 
-  #   test_logger = logger.getLogger(f'{__name__}.test_hostname')
-
-  #   record = logging.LogRecord(__name__, logger.ERROR, __file__, 0, "Hiya", (),
-  #                              None, extra=test_logger.extra)
-  #   self.assertIn(f'({platform.node()})', self._logs.stderr_handler.format(record))
-
+    record = test_logger.logger.makeRecord(__name__, logger.ERROR, __file__, 0,
+                                           "Hiya", (), None,
+                                           extra=test_logger.extra)
+    self.assertIn(f'({platform.node()})',
+                  self._logs.stderr_handler.format(record))
 
   def test_level(self):
     settings.configure({'processing_dir': self.temp_dir.name,
@@ -190,22 +194,39 @@ class TestLogger(TestCase):
   def test_replay(self):
     # Swap out the stderr stream handler for this test
     test_handler = logging.handlers.MemoryHandler(capacity=1000)
+    test_handler.setLevel(
+        logger._SetupTerraLogger.default_stderr_handler_level)
     self._logs.root_logger.handlers = [
         test_handler if h is self._logs.stderr_handler
         else h for h in self._logs.root_logger.handlers]
     self._logs.stderr_handler = test_handler
 
-
     test_logger = logger.getLogger(f'{__name__}.test_replay')
-    test_logger.error('hi')
-    settings._setup()
+    message1 = str(uuid.uuid4())
+    message2 = str(uuid.uuid4())
+    message3 = str(uuid.uuid4())
+    test_logger.error(message1)
+    test_logger.debug1(message2)
+    test_logger.debug2(message3)
+
+    self.assertEqual(str(test_handler.buffer).count(message1), 1)
+    self.assertEqual(str(test_handler.buffer).count(message2), 0)
+    self.assertEqual(str(test_handler.buffer).count(message3), 0)
+
+    settings.configure({'processing_dir': self.temp_dir.name,
+                        'logging': {'level': 'debug1'}})
+
+    self.assertEqual(str(test_handler.buffer).count(message1), 2)
+    self.assertEqual(str(test_handler.buffer).count(message2), 1)
+    self.assertEqual(str(test_handler.buffer).count(message3), 0)
 
   def test_configured_file(self):
     settings._setup()
     log_filename = os.path.join(self.temp_dir.name,
                                 self._logs.default_log_prefix)
 
-    log_handler = [h for h in self._logs.root_logger.handlers
+    log_handler = [
+        h for h in self._logs.root_logger.handlers
         if hasattr(h, 'stream') and h.stream.name == log_filename][0]
 
     # Test the defaults
@@ -230,14 +251,16 @@ class TestLogger(TestCase):
       logger.getLogger(f'{__name__}.test_debug3').debug3(message)
     self.assertIn(message, str(cm.output))
 
+
 class TestUnitTests(TestCase):
   def last_test_logger(self):
     import logging
     root_logger = logging.getLogger(None)
 
-    self.assertFalse(root_logger.handlers,
+    self.assertFalse(
+        root_logger.handlers,
         msg="If you are seting this, one of the other unit tests has "
-            "initialized the logger. This side effect should be "
-            "prevented for you automatically. If you are seeing this, you "
-            "have configured logging manually, and should make sure you "
-            "restore it.")
+        "initialized the logger. This side effect should be "
+        "prevented for you automatically. If you are seeing this, you "
+        "have configured logging manually, and should make sure you "
+        "restore it.")

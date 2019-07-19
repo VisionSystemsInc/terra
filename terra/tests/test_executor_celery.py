@@ -43,25 +43,8 @@ class TestCeleryConfig(TestCase):
     import terra.executor.celery.celeryconfig as cc
     self.assertEqual(cc.include, ['foo', 'bar'])
 
-# def celery_config():
-#   return {
-#     'accept_content': ['json', 'pickle'],
 
-#     ## The exception inheritance do change if not using 'pickle' serializer
-#     # See: https://github.com/celery/celery/issues/3586
-#     # and https://github.com/celery/celery/pull/3592
-#     'result_serializer': 'pickle',
-
-#     'worker_concurrency': 1,
-#     'worker_prefetch_multiplier': 1,
-#     'worker_lost_wait': 60,
-#     'worker_send_task_events': True,
-#     'task_acks_late': True,
-#     'task_queues': [Queue('celery'), Queue('retry')],
-#   }
-
-
-class MockAsyncResult:#(mock.Mock):
+class MockAsyncResult:
   def __init__(self, id, fun):
     self.id = id
     self.fun = fun
@@ -70,10 +53,13 @@ class MockAsyncResult:#(mock.Mock):
   def ready(self):
     return True
   state = 'SUCCESS'
+
   def revoke(self):
     self.state = 'REVOKED'
+
   def get(self, *args, **kwargs):
     return self.fun(self)
+
   def forget(self):
     self.forgotten = True
 
@@ -89,9 +75,7 @@ def test_factory():
 @skipUnless(celery, "Celery not installed")
 class TestCeleryExecutor(TestCase):
   def setUp(self):
-  #   self.patches.append(mock.patch.object(settings, '_wrapped', None))
     super().setUp()
-  #   settings.configure({})
     from terra.executor.celery import CeleryExecutor
     self.executor = CeleryExecutor(update_delay=0.001)
 
@@ -160,7 +144,7 @@ class TestCeleryExecutor(TestCase):
     future = self.executor.submit(test)
 
     self.assertFalse(future.running())
-    future._ar.state='RUNNING'
+    future._ar.state = 'RUNNING'
     self.wait_for_state(future, 'RUNNING')
     self.assertTrue(future.running())
 
@@ -183,7 +167,7 @@ class TestCeleryExecutor(TestCase):
     future = self.executor.submit(test)
 
     self.assertFalse(future.cancelled())
-    future._ar.state='REVOKED'
+    future._ar.state = 'REVOKED'
     self.wait_for_state(future, 'CANCELLED_AND_NOTIFIED')
     self.assertTrue(future.cancelled())
 
@@ -192,7 +176,7 @@ class TestCeleryExecutor(TestCase):
     future = self.executor.submit(test)
 
     self.assertIsNone(future._result)
-    future._ar.state='SUCCESS'
+    future._ar.state = 'SUCCESS'
     self.wait_for_state(future, 'FINISHED')
     self.assertEqual(future._result, 17)
 
@@ -201,7 +185,7 @@ class TestCeleryExecutor(TestCase):
     future = self.executor.submit(test)
 
     self.assertIsNone(future._result)
-    future._ar.state='FAILURE'
+    future._ar.state = 'FAILURE'
     future._ar.result = TypeError('On no')
     self.wait_for_state(future, 'FINISHED')
 

@@ -74,7 +74,6 @@ class TestCase(TestCaseOriginal):
             msg, '%s is a directory' % (safe_repr(filename)))
         raise self.failureException(msg)
 
-
   def assertNotExist(self, filename, msg=None):
     '''
     Fails if the filename does not exist

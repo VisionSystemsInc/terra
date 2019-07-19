@@ -58,7 +58,7 @@ class CeleryExecutorFuture(Future):
         result = super().cancel()
         if not result:  # pragma: no cover
           logger.error('Please open an issue on Github: Upstream '
-                      'implementation changed?')
+                       'implementation changed?')
       else:
         # Is not running nor revoked nor finished :/
         # The revoke() had not produced effect: Task is probable not on a
@@ -191,6 +191,6 @@ class CeleryExecutor(Executor):
       self._monitor_stopping = True
       try:
         self._monitor.join()
-      except RuntimeError: # pragma: no cover
+      except RuntimeError:  # pragma: no cover
         # Thread never started. Cannot join
         pass
