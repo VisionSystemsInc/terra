@@ -4,3 +4,5 @@ try:
   from _terra import *
 except ImportError:
   pass
+
+__all__ = ['settings']

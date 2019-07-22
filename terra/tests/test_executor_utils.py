@@ -31,6 +31,7 @@ class TestExecutorHandler(TestCase):
 
     self.assertIsNotNone(Executor._connection)
     self.assertIsInstance(Executor._connection(), DummyExecutor)
+    self.assertIsInstance(executee, DummyExecutor)
 
   def test_executor_name_thread(self):
     settings.configure({'executor': {'type': 'ThreadPoolExecutor'}})

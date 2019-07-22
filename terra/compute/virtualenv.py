@@ -5,7 +5,6 @@ from subprocess import Popen
 from vsi.tools.diff import dict_diff
 
 from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
-from terra.compute.utils import load_service
 from terra import settings
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)

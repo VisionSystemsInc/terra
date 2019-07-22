@@ -12,6 +12,7 @@ __all__ = ['CeleryExecutor']
 
 app = Celery(env['TERRA_CELERY_MAIN_NAME'])
 app.config_from_object(env['TERRA_CELERY_CONF'])
+print('WHAT?')
 
 # Running on windows.
 # https://stackoverflow.com/questions/37255548/how-to-run-celery-on-windows

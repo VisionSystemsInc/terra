@@ -1,6 +1,5 @@
 from unittest import mock
 import warnings
-import inspect
 
 from terra import settings
 from .utils import TestCase
@@ -89,7 +88,6 @@ class TestUtils(TestComputeUtilsCase):
 
   @mock.patch.dict(utils.compute.__dict__, _connection=Compute())
   def test_load_service_by_class(self):
-    from terra.compute.base import services as compute_services
     self.assertIsInstance(utils.load_service(Service), Service_test)
 
   @mock.patch.dict(utils.compute.__dict__, _connection=Compute())

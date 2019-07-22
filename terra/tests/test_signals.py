@@ -1,5 +1,3 @@
-from unittest import mock
-
 from terra.core.signals import Signal, receiver, post_settings_configured
 from .utils import TestCase
 

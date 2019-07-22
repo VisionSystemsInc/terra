@@ -16,7 +16,6 @@ from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute import compute
 from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
-from terra.compute.utils import load_service
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
@@ -66,17 +65,17 @@ class Compute(BaseCompute):
     logger.debug('Running: ' + ' '.join(
         [quote(x) for x in ('just',) + args]))
 
-    env = kwargs.pop('env', os.environ).copy()
+    just_env = kwargs.pop('env', env).copy()
     justfile = kwargs.pop(
-        'justfile', os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile'))
-    env['JUSTFILE'] = justfile
+        'justfile', os.path.join(env['TERRA_TERRA_DIR'], 'Justfile'))
+    just_env['JUSTFILE'] = justfile
 
     if logger.getEffectiveLevel() <= DEBUG1:
-      dd = dict_diff(os.environ, env)[3]
+      dd = dict_diff(env, just_env)[3]
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
-    pid = Popen(('just',) + args, env=env, **kwargs)
+    pid = Popen(('just',) + args, env=just_env, **kwargs)
     return pid
 
   def runService(self, service_info):

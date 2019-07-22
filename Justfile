@@ -174,7 +174,7 @@ function terra_caseify()
       ;;
     test_pep8) # Run pep8 test
       justify pep8
-      Terra_Pipenv run bash -c 'pycodestyle \
+      Terra_Pipenv run bash -c 'flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
 

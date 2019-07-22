@@ -3,13 +3,11 @@ import re
 import json
 from unittest import mock
 import warnings
-import tempfile
 
 from terra import settings
 from terra.compute import base
 from terra.compute import docker
 from terra.compute import compute
-from terra.core.utils import cached_property
 import terra.compute.utils
 
 from .utils import TestCase
@@ -576,24 +574,24 @@ class TestDockerService(TestComputeDockerCase):
 
   @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
   def test_service_other_dir_methods(self):
-      compute = docker.Compute()
-      compute.configuration_map(SomeService())
+    compute = docker.Compute()
+    compute.configuration_map(SomeService())
 
-      # Test setting for translation
-      settings.foo_dir = "/foo"
-      settings.bar_dir = "/not_foo"
+    # Test setting for translation
+    settings.foo_dir = "/foo"
+    settings.bar_dir = "/not_foo"
 
-      # Run same tests with a TERRA_VOLUME externally set
-      service = SomeService()
-      service.add_volume('/test1', '/test2', 'z')
-      service.env['TERRA_VOLUME_1'] = "/Foo:/Bar"
-      self.common(compute, service)
-      # Make sure this is still set correctly
-      self.assertEqual(service.env['TERRA_VOLUME_1'], "/Foo:/Bar")
-      self.assertIn('/test1:/test2:z',
-                    (v for k, v in service.env.items()
-                     if k.startswith('TERRA_VOLUME_')),
-                    'Added volume failed to be bound')
+    # Run same tests with a TERRA_VOLUME externally set
+    service = SomeService()
+    service.add_volume('/test1', '/test2', 'z')
+    service.env['TERRA_VOLUME_1'] = "/Foo:/Bar"
+    self.common(compute, service)
+    # Make sure this is still set correctly
+    self.assertEqual(service.env['TERRA_VOLUME_1'], "/Foo:/Bar")
+    self.assertIn('/test1:/test2:z',
+                  (v for k, v in service.env.items()
+                   if k.startswith('TERRA_VOLUME_')),
+                  'Added volume failed to be bound')
 
   def test_add_volume(self):
     service = SomeService()

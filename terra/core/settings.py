@@ -403,8 +403,6 @@ class LazySettings(LazyObject):
         If the settings has already been configured, will throw an error. Under
         normal circumstances, :func:`_setup` will not be called a second time.
     """
-    from terra.core.signals import post_settings_configured
-
     settings_file = os.environ.get(ENVIRONMENT_VARIABLE)
     if not settings_file:
       desc = ("setting %s" % name) if name else "settings"

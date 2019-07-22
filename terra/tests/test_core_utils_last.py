@@ -1,5 +1,3 @@
-import unittest.mock as mock
-
 import terra.compute.utils
 from .utils import TestCase
 

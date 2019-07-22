@@ -1,6 +1,5 @@
 from unittest import mock
 
-from terra import settings
 from .utils import TestCase
 from terra.core.utils import (
     cached_property, Handler, ClassHandler

@@ -61,7 +61,6 @@ python :mod:`logging` logger with the following extra configuration
 import logging.handlers
 import sys
 import tempfile
-import threading
 import platform
 import pprint
 import os

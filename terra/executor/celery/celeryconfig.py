@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import importlib
 from os import environ as env
 import os
 

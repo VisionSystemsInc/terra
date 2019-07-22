@@ -1,6 +1,4 @@
 from terra.compute.base import BaseCompute, BaseService
-# from terra import settings
-from terra.compute.utils import load_service  # TODO: remove
 from terra.logger import getLogger
 logger = getLogger(__name__)
 

@@ -8,7 +8,6 @@ try:
 except:   # noqa
   celery = None
 
-from terra import settings
 from .utils import TestCase
 
 
@@ -32,7 +31,7 @@ class TestCeleryConfig(TestCase):
   def test_no_redis_passwordfile(self):
     os.remove(os.path.join(self.temp_dir.name, 'foo'))
     with self.assertRaises(FileNotFoundError), self.assertLogs():
-      import terra.executor.celery.celeryconfig
+      import terra.executor.celery.celeryconfig  # noqa
 
   def test_redis_passwordfile(self):
     import terra.executor.celery.celeryconfig as cc
@@ -195,3 +194,9 @@ class TestCeleryExecutor(TestCase):
     self.executor.shutdown()
     with self.assertRaisesRegex(RuntimeError, "cannot .* after shutdown"):
       self.executor.submit(test)
+
+  def test_import(self):
+    import terra.executor.celery
+    from celery._state import _apps
+    # import pdb; pdb.set_trace()
+    print([a for a in _apps])

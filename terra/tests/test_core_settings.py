@@ -18,10 +18,11 @@ from terra.core.settings import (
 
 
 class TestLazyObject(TestCase):
-  def test_setup(self):
+  def test_setup_called(self):
     lazy = LazyObject()
 
-    # Test auto loading
+    # Test auto loading, but since they aren't implemented, the error means
+    # _setup is successfully getting called
     with self.assertRaises(NotImplementedError):
       lazy.test
     with self.assertRaises(NotImplementedError):
