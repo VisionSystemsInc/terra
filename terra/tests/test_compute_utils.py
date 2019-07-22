@@ -10,6 +10,8 @@ import terra.compute.docker
 import terra.compute.base
 
 
+# A test compute based off of dummy, but not dummy. These two classes turn this
+# test into an official terra compute definition
 class Compute(terra.compute.dummy.Compute):
   pass
 
@@ -34,21 +36,28 @@ class Service2_test:
 # purposes
 class TestComputeUtilsCase(TestCase):
   def setUp(self):
+    # Use setting
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    # For registering a service
     self.patches.append(mock.patch.dict(terra.compute.base.services,
                                         clear=True))
     super().setUp()
+    # Register this Compute
     settings.configure({'compute': {'arch': Compute.__module__}})
 
+    # Manually register without using decorator
     Compute.register(Service)(Service_test)
+    # Manually register against base compute. Normally this is never done, but
+    # done for some core case tests below
     terra.compute.base.BaseCompute.register(Service2)(Service2_test)
 
 
 class TestUtils(TestComputeUtilsCase):
   def test_compute_handler_from_settings(self):
+    # Test handler working
     self.assertIsInstance(utils.ComputeHandler()._connection, Compute)
 
-  # Function scope patch
+  # I don't want setUp's configure for this test
   @mock.patch.object(settings, '_wrapped', None)
   def test_compute_handler_from_override(self):
     settings.configure({})
@@ -57,16 +66,21 @@ class TestUtils(TestComputeUtilsCase):
     self.assertIsInstance(
         utils.ComputeHandler(Compute.__module__)._connection, Compute)
 
+  # I don't want setUp's configure for this test
+  @mock.patch.object(settings, '_wrapped', None)
   def test_compute_handler_short_name(self):
-    # context manager scope patch
-    with mock.patch.object(settings, '_wrapped', None), \
-         warnings.catch_warnings():
-      settings.configure({'compute': {'arch': 'docker'}})
-      warnings.simplefilter('ignore')  # Suppress imp cause by docker warnings
+    # Since the "docker" library is installed, this test actually imports
+    # docker before importing the real docker Compute, hence the warning.
+    settings.configure({'compute': {'arch': 'docker'}})
+    # Suppress imp warnings caused by docker
+    with warnings.catch_warnings():
+      warnings.simplefilter('ignore')
+      # Make sure it worked
       self.assertIsInstance(utils.ComputeHandler()._connection,
                             terra.compute.docker.Compute)
 
   def test_get_default_service(self):
+    # Make sure service definition works too
     self.assertIs(utils.get_default_service_class(Compute), Service)
 
   def test_load_service_by_instance(self):
@@ -93,19 +107,14 @@ class TestUtils(TestComputeUtilsCase):
     with self.assertRaises(KeyError), self.assertLogs(utils.__name__) as log:
       utils.load_service(__name__)
 
-    self.assertTrue(any(f'{__name__} is not registered' in line
-                        for line in log.output))
+    self.assertIn(f'{__name__} is not registered', str(log.output))
 
 
 class TestComputeHandler(TestComputeUtilsCase):
   @mock.patch.object(settings, '_wrapped', None)
   def test_compute_handler(self):
     settings.configure({'compute': {'arch': 'terra.compute.dummy'}})
-
     test_compute = utils.ComputeHandler()
-
-    self.assertTrue(inspect.ismethod(test_compute.run))
-    self.assertIsNotNone(test_compute._connection)
     self.assertIsInstance(test_compute._connection,
                           terra.compute.dummy.Compute)
 

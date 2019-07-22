@@ -9,7 +9,7 @@ import terra.compute.utils
 from .utils import TestCase
 
 
-# Test Dummy
+# Test Dummy Definition
 class TestServiceManual(dummy.BaseService):
   # These implementations aren't actually even needed with assertLogs, however
   # I'll leave them here as future examples
@@ -26,6 +26,7 @@ class TestServiceManual(dummy.BaseService):
     self.c = 33
 
 
+# Test Dummy Service
 class TestServiceManual_dummy(TestServiceManual, dummy.Service):
   def __init__(self):
     super().__init__()
@@ -34,8 +35,11 @@ class TestServiceManual_dummy(TestServiceManual, dummy.Service):
 
 class TestComputeDummyCase(TestCase):
   def setUp(self):
+    # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    # Use registry
     self.patches.append(mock.patch.dict(base.services, clear=True))
+    # Use compute
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,
                           '_connection',
@@ -74,14 +78,15 @@ class TestService_base(TestService, base.BaseService):
 class TestServiceDummy(TestComputeDummyCase):
   test_service_name = TestService.__module__ + '.TestService'
 
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+  def setUp(self):
+    super().setUp()
     self.dummyCompute = dummy.Compute()
 
   def test_run(self):
     with self.assertLogs(dummy.__name__, level="INFO") as cm:
       self.dummyCompute.run(self.test_service_name)
 
+    # Find which log messages state the specific steps of processing
     run = ['INFO:terra.compute.dummy:Run:' in o for o in cm.output].index(True)
     pre_run = ['INFO:terra.compute.dummy:Pre run:' in o
                for o in cm.output].index(True)
@@ -92,6 +97,7 @@ class TestServiceDummy(TestComputeDummyCase):
     post_run = ['INFO:terra.compute.dummy:Post run:' in o
                 for o in cm.output].index(True)
 
+    # Make sure everything ran in order
     self.assertLess(pre_run, run)
     self.assertLess(run, create)
     self.assertLess(create, start)

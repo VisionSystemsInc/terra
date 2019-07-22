@@ -1,5 +1,4 @@
 import os
-import unittest
 
 
 # Use this as a package level setup

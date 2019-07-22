@@ -17,6 +17,7 @@ from .utils import TestCase
 
 class TestComputeDockerCase(TestCase):
   def setUp(self):
+    # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # This will resets the _connection to an uninitialized state
     self.patches.append(
@@ -27,6 +28,7 @@ class TestComputeDockerCase(TestCase):
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
 
+    # Configure for docker
     settings.configure({
         'compute': {'arch': 'docker'},
         'processing_dir': self.temp_dir.name,
@@ -70,47 +72,65 @@ class TestDockerRe(TestComputeDockerCase):
 ###############################################################################
 
 
+# Dummy mock to double check args
 def mock_popen(*args, **kwargs):
   return (args, kwargs)
 
 
 class TestDockerJust(TestComputeDockerCase):
-  @mock.patch.object(docker, 'Popen', mock_popen)
-  def test_just(self):
-    original_env = os.environ.copy()
+  def setUp(self):
+    self.patches.append(mock.patch.object(docker, 'Popen', mock_popen))
+    super().setUp()
+    # Make a copy
+    self.original_env = os.environ.copy()
 
+  def tearDown(self):
+    super().tearDown()
+    # Make sure nothing inadvertently changed environ
+    self.assertEqual(self.original_env, os.environ)
+
+  def test_just_simple(self):
     default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
+    # Create a compute
     compute = docker.Compute()
+    # Call just, and get the args calculated, retrieved via mock
     args, kwargs = compute.just("foo  bar")
     self.assertEqual(args, (('just', 'foo  bar'),))
     self.assertEqual(set(kwargs.keys()), {'env'})
     self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
 
-    # Custom env
+  def test_just_custom_env(self):
+    default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
+    # Use the env kwarg
     args, kwargs = compute.just("foo", "bar", env={"FOO": "BAR"})
     self.assertEqual(args, (('just', 'foo', 'bar'),))
     self.assertEqual(set(kwargs.keys()), {'env'})
     self.assertEqual(kwargs, {'env': {'FOO': 'BAR',
                                       'JUSTFILE': default_justfile}})
 
-    # test custom justfile
+  def test_just_custom_justfile(self):
+    # Use the justfile kwarg
     args, kwargs = compute.just("foobar", justfile="/foo/bar")
     self.assertEqual(args, (('just', 'foobar'),))
     self.assertEqual(set(kwargs.keys()), {'env'})
     self.assertEqual(kwargs['env']['JUSTFILE'], "/foo/bar")
 
-    # test kwargs
+  def test_just_kwargs(self):
+    default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
+    # Use the shell kwarg for Popen
     args, kwargs = compute.just("foobar", shell=False)
     self.assertEqual(args, (('just', 'foobar'),))
     self.assertEqual(set(kwargs.keys()), {'env', 'shell'})
     self.assertEqual(kwargs['shell'], False)
     self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
 
-    # Test logging code
+  def test_logging_code(self):
+    # Test the debug1 diffdict log output
     with self.assertLogs(docker.__name__, level="DEBUG1") as cm:
       env = os.environ.copy()
       env.pop('PATH')
       env['FOO'] = 'BAR'
+      # Sometimes JUSTFILE is set, so make this part of the test!
       with mock.patch.dict(os.environ, JUSTFILE='/foo/bar'):
         compute.just("foo", "bar", env=env)
 
@@ -118,13 +138,14 @@ class TestDockerJust(TestComputeDockerCase):
     env_lines = env_lines.split('\n')
     self.assertEqual(len(env_lines), 5, env_lines)
 
+    # Verify logs say PATH was removed
     self.assertTrue(any(o.startswith('- PATH:') for o in env_lines))
+    # FOO was added
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
+    # JUSTFILE was changed
     self.assertTrue(any(o.startswith('+ JUSTFILE:') for o in env_lines))
     self.assertTrue(any(o.startswith('- JUSTFILE:') for o in env_lines))
 
-    # Make sure nothing inadvertently changed environ
-    self.assertEqual(original_env, os.environ)
 
 ###############################################################################
 
@@ -148,6 +169,7 @@ class TestDockerRun(TestComputeDockerCase):
     return type('blah', (object,), {'wait': lambda self: _self.return_value})()
 
   def setUp(self):
+    # Mock the just call for recording
     self.patches.append(mock.patch.object(docker.Compute, 'just',
                                           self.mock_just))
     super().setUp()
@@ -158,6 +180,7 @@ class TestDockerRun(TestComputeDockerCase):
     self.return_value = 0
     # This part of the test looks fragile
     compute.run(MockJustService())
+    # Run a docker service
     self.assertEqual(('--wrap', 'Just-docker-compose',
                       '-f', 'file1', 'run', 'launch', 'ls'),
                      self.just_args)
@@ -174,6 +197,7 @@ class TestDockerRun(TestComputeDockerCase):
 
 class TestDockerConfig(TestComputeDockerCase):
   def setUp(self):
+    # Mock the just call for recording
     self.patches.append(mock.patch.object(docker.Compute, 'just',
                                           self.mock_just_config))
     super().setUp()
@@ -182,29 +206,38 @@ class TestDockerConfig(TestComputeDockerCase):
   # rest of the args as args/kwargs. This lets me do testing inside the mocked
   # function.
   def mock_just_config(_self, *args, **kwargs):
-    _self.assertEqual(args, _self.expected_args)
-    _self.assertEqual(kwargs, _self.expected_kwargs)
+    _self.just_args = args
+    _self.just_kwargs = kwargs
+    # _self.assertEqual(args, _self.expected_args)
+    # _self.assertEqual(kwargs, _self.expected_kwargs)
     return type('blah', (object,),
                 {'communicate': lambda self: ('out', None)})()
 
   def test_config(self):
-    expected_args1 = ('--wrap', 'Just-docker-compose', '-f', 'file1')
-    expected_args2 = ('config',)
     compute = docker.Compute()
 
-    self.expected_args = expected_args1 + expected_args2
-    self.expected_kwargs = {'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}}
     self.assertEqual(compute.config(MockJustService()), 'out')
+    self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
+                      'config'), self.just_args)
 
-    self.expected_args = (expected_args1
-                          + ('-f', 'file15.yml', '-f', 'file2.yaml')
-                          + expected_args2)
+    self.assertEqual({'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}},
+                     self.just_kwargs)
+
+  def test_config_with_custom_files(self):
+    compute = docker.Compute()
     self.assertEqual(compute.configService(MockJustService(),
                                            ['file15.yml', 'file2.yaml']),
                      'out')
+    self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
+                      '-f', 'file15.yml', '-f', 'file2.yaml',
+                      'config'),
+                     self.just_args)
+    self.assertEqual({'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}},
+                     self.just_kwargs)
 
 
 ###############################################################################
+
 
 mock_yaml = r'''secrets:
   redis_commander_secret:
@@ -438,18 +471,24 @@ class TestDockerMap(TestComputeDockerCase):
     volumes = []
 
   @mock.patch.object(docker.Compute, 'configService', mock_config)
-  def test_config(self):
+  def test_config_non_existing_service(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
 
     with warnings.catch_warnings():
       warnings.simplefilter('ignore')
+      # USe the default name, foo, which doesn't even exist
       volume_map = compute.configuration_map(service)
+    # Should be empty
     self.assertEqual(volume_map, [])
+
+  @mock.patch.object(docker.Compute, 'configService', mock_config)
+  def test_config_terra_service(self):
+    compute = docker.Compute()
+    service = TestDockerMap.Service()
 
     service.compose_service_name = "terra"
     volume_map = compute.configuration_map(service)
-
     ans = [('/tmp', '/bar'),
            ('/opt/projects/terra/terra_dsm/external/terra', '/src'),
            ('/opt/projects/terra/terra_dsm/external/terra', '/terra'),
@@ -457,6 +496,11 @@ class TestDockerMap(TestComputeDockerCase):
            ('/opt/projects/terra/terra_dsm/external/terra/external/vsi_common',
             '/vsi')]
     self.assertEqual(volume_map, ans)
+
+  @mock.patch.object(docker.Compute, 'configService', mock_config)
+  def test_config_test_service(self):
+    compute = docker.Compute()
+    service = TestDockerMap.Service()
 
     service.compose_service_name = "test"
     volume_map = compute.configuration_map(service)
@@ -486,29 +530,35 @@ def mock_map(self, *args, **kwargs):
 
 
 class TestDockerService(TestComputeDockerCase):
+  # Test the flushing configuration to json for a container mechanism
+
   def common(self, compute, service):
     service.pre_run()
     setup_dir = service.temp_dir.name
     with open(os.path.join(setup_dir, 'config.json'), 'r') as fid:
       config = json.load(fid)
 
+    # Test that foo_dir has been translated
     self.assertEqual(config['foo_dir'], '/bar',
                      'Path translation test failed')
+    # Test that bar_dir has not changed
     self.assertEqual(config['bar_dir'], '/not_foo',
                      'Nontranslated directory failure')
+    # Verify the setting files is pointed to correctly
     self.assertEqual(service.env['TERRA_SETTINGS_FILE'],
                      "/tmp_settings/config.json",
                      'Failure to set TERRA_SETTINGS_FILE')
+    # Clean up temp file
     service.post_run()
-    # Plain test
 
+    # Test that the config dir was set to be mounted
     self.assertIn(f'{setup_dir}:/tmp_settings:rw',
                   (v for k, v in service.env.items()
                    if k.startswith('TERRA_VOLUME_')),
                   'Configuration failed to injected into docker')
 
   @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
-  def test_service(self):
+  def test_service_simple(self):
     # Must not be a decorator, because at decorator time (before setUp is run),
     # settings._wrapped is still None. Mock the version from setUpModule so I
     # change the values without affecting any other test
@@ -523,6 +573,15 @@ class TestDockerService(TestComputeDockerCase):
       service = SomeService()
       # Simple case
       self.common(compute, service)
+
+  @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
+  def test_service_other_dir_methods(self):
+      compute = docker.Compute()
+      compute.configuration_map(SomeService())
+
+      # Test setting for translation
+      settings.foo_dir = "/foo"
+      settings.bar_dir = "/not_foo"
 
       # Run same tests with a TERRA_VOLUME externally set
       service = SomeService()

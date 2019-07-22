@@ -5,7 +5,7 @@ from unittest import mock, skipUnless
 
 try:
   import celery
-except:
+except:   # noqa
   celery = None
 
 from terra import settings
