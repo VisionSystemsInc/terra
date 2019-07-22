@@ -1,8 +1,8 @@
 from terra.core.settings import settings
 
 try:
-  from _terra import *
+  from . import _terra
 except ImportError:
   pass
 
-__all__ = ['settings']
+__all__ = ['settings', '_terra']

@@ -328,18 +328,6 @@ class LazyObject:
       self._setup()
     return getattr(self._wrapped, name, *args, **kwargs)
 
-  def __getitem__(self, name):
-    '''Supported'''
-    if self._wrapped is None:
-      self._setup()
-    return self._wrapped[name]
-
-  def __contains__(self, name):
-    '''Supported'''
-    if self._wrapped is None:
-      self._setup()
-    return self._wrapped.__contains__(name)
-
   def __setattr__(self, name, value):
     '''Supported'''
     if name == "_wrapped":
@@ -349,16 +337,6 @@ class LazyObject:
       if self._wrapped is None:
         self._setup()
       setattr(self._wrapped, name, value)
-
-  def __setitem__(self, name, value):
-    '''Supported'''
-    if name == "_wrapped":
-      # Assign to __dict__ to avoid infinite __setattr__ loops.
-      self.__dict__["_wrapped"] = value
-    else:
-      if self._wrapped is None:
-        self._setup()
-      self._wrapped[name] = value
 
   def __delattr__(self, name):
     '''Supported'''
@@ -375,6 +353,35 @@ class LazyObject:
       return list(set(d + dir(self._wrapped)))
     return d
 
+  def __getitem__(self, name):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped[name]
+
+  def __setitem__(self, name, value):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    self._wrapped[name] = value
+
+  def __delitem__(self, name):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    del(self._wrapped[name])
+
+  def __contains__(self, name):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__contains__(name)
+
+  def __iter__(self):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return iter(self._wrapped)
 
 class LazySettings(LazyObject):
   '''

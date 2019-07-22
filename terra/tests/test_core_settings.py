@@ -35,25 +35,63 @@ class TestLazyObject(TestCase):
       lazy['test'] = 12
     with self.assertRaises(NotImplementedError):
       del(lazy.test)
+    with self.assertRaises(NotImplementedError):
+      del(lazy['test'])
+    with self.assertRaises(NotImplementedError):
+      iter(lazy)
 
-  def test_lazy(self):
+
+  def test_lazy_dir(self):
     lazy = LazyObject()
 
     self.assertNotIn('values', dir(lazy))
     # Make a dict that can take attribute assignment (aka not built in)
-    lazy['_wrapped'] = type("NewDict", (dict,), {})()
+    lazy._wrapped = type("NewDict", (dict,), {'quack': 'duck'})()
+    # Values is there because _wrapped is a dict
     self.assertIn('values', dir(lazy))
+    # quack is there because it's a class level variable
+    self.assertIn('quack', dir(lazy))
 
+  def test_lazy_set_item(self):
+    lazy = LazyObject()
+    lazy._wrapped = type("NewDict", (dict,), {})()
+
+    # set item
     lazy['foo'] = 'bar'
+    # verify it is set right
     self.assertEqual(lazy['foo'], 'bar')
+    self.assertEqual(lazy._wrapped['foo'], 'bar')
+
+  def test_lazy_contains(self):
+    lazy = LazyObject()
+    lazy._wrapped = type("NewDict", (dict,), {})(foo='bar')
+
     self.assertIn('foo', lazy)
 
+  def test_lazy_set_attribute(self):
+    lazy = LazyObject()
+    lazy._wrapped = type("NewDict", (dict,), {})()
+
     lazy.test = 15
+    with self.assertRaises(AttributeError):
+      object.__getattribute__(lazy, 'test')
+    self.assertEqual(object.__getattribute__(lazy._wrapped, 'test'), 15)
     self.assertIn('test', dir(lazy))
-    self.assertEqual(lazy.test, 15)
+
+  def test_lazy_del_attribute(self):
+    lazy = LazyObject()
+    lazy._wrapped = type("NewDict", (dict,), {})()
+
+    lazy.test = 17
+    self.assertTrue(hasattr(lazy, 'test'))
+    self.assertTrue(hasattr(lazy._wrapped, 'test'))
     del(lazy.test)
     self.assertFalse(hasattr(lazy, 'test'))
+    self.assertFalse(hasattr(lazy._wrapped, 'test'))
 
+  def test_lazy_del_attribute_protections(self):
+    lazy = LazyObject()
+    lazy._wrapped = type("NewDict", (dict,), {})()
     with self.assertRaises(TypeError):
       del(lazy._wrapped)
 
@@ -63,35 +101,72 @@ class TestObjectDict(TestCase):
     d = ObjectDict({'foo': 3})
     self.assertEqual(d.foo, 3)
     self.assertEqual(d['foo'], 3)
+
+  def test_missing_entry(self):
+    d = ObjectDict()
+
+    with self.assertRaises(KeyError):
+      d['bar']
+
+    # This should be attribute, not key error
     with self.assertRaises(AttributeError):
       d.bar
 
+  def test_set_attribute(self):
+    d = ObjectDict()
+    d.far = 5
+    self.assertEqual(d.far, 5)
+
+  def test_set_index(self):
+    d = ObjectDict()
+    d['bar'] = 4
+    self.assertEqual(d['bar'], 4)
+
+  def test_cross_setting(self):
+    d = ObjectDict()
+
+    # Set one way
     d['bar'] = 4
     d.far = 5
+    # Read the other
     self.assertEqual(d.bar, 4)
     self.assertEqual(d['far'], 5)
 
-  def test_corner_cases(self):
+  def test_constructor_corner_case(self):
     self.assertEqual(ObjectDict({}), {})
     self.assertEqual(ObjectDict(), {})
 
     with self.assertRaises(TypeError):
       ObjectDict({'a': 1}, {'b': 5})
 
+  def test_dict_constructor(self):
     a = {'a': 1}
-    self.assertEqual(ObjectDict(**a), {'a': 1})
+    self.assertEqual(ObjectDict(**a), a)
 
-  def test_attributes(self):
+  def test_nested_attributes(self):
     d = ObjectDict()
-    d.foo = 3
-    self.assertEqual(d.foo, 3)
+
+    # set var to a dict, which should auto convert to ObjectDict
     d.bar = {'prop': 'value'}
+    self.assertIsInstance(d.bar, ObjectDict)
+
+    # test Reading
     self.assertEqual(d.bar.prop, 'value')
-    self.assertEqual(d, {'foo': 3, 'bar': {'prop': 'value'}})
+
+
+    # test partial setting
     d.bar.prop = 'newer'
     self.assertEqual(d.bar.prop, 'newer')
 
-  def test_extraction(self):
+  def test_comparison(self):
+    d = ObjectDict()
+    d.bar = {'prop': 'value'}
+    d.foo = 3
+
+    # should compare like a normal dict
+    self.assertEqual(d, {'foo': 3, 'bar': {'prop': 'value'}})
+
+  def test_extraction_list(self):
     d = ObjectDict({'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]})
 
     self.assertTrue(isinstance(d.bar, list))
@@ -99,61 +174,75 @@ class TestObjectDict(TestCase):
     self.assertEqual([getattr(x, 'x') for x in d.bar], [1, 3])
     self.assertEqual([getattr(x, 'y') for x in d.bar], [2, 4])
 
+  def test_extraction_empty_list(self):
     d = ObjectDict()
     self.assertEqual(list(d.keys()), [])
 
+  def test_constructor_nested(self):
     d = ObjectDict(foo=3, bar=dict(x=1, y=2))
     self.assertEqual(d.foo, 3)
     self.assertEqual(d.bar.x, 1)
+    self.assertIsInstance(d.bar, ObjectDict)
 
-  def test_multiple_lists(self):
+  def test_constructor_multiple_lists(self):
     d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
     self.assertEqual(d.b[0][0].c, 'foo')
+    self.assertIsInstance(d.b[0][0], ObjectDict)
 
   def test_dir(self):
     d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
     self.assertIn('a', dir(d))
     self.assertIn('b', dir(d))
     self.assertNotIn('c', dir(d))
+    self.assertIn('c', dir(d.b[0][0]))
 
 
 class TestSettings(TestCase):
   def setUp(self):
+    # Useful for tests that set this
     self.patches.append(mock.patch.dict(os.environ,
                                         {'TERRA_SETTINGS_FILE': ""}))
+    # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
     super().setUp()
 
-  def test_lazy_attribute(self):
+  def test_unconfigured(self):
     with self.assertRaises(ImproperlyConfigured):
       settings.foo
 
+  def test_settings_file(self):
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 15, "b":"22.3", "c": true}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    self.assertFalse(settings.configured)
+    self.assertEqual(repr(settings), '<LazySettings [Unevaluated]>')
+    # int
+    self.assertEqual(settings['a'], 15)
+    self.assertTrue(settings.configured)
+    self.assertNotEqual(repr(settings), '<LazySettings [Unevaluated]>')
+
+    # str
+    self.assertEqual(settings['b'], "22.3")
+    self.assertNotIn('22.3', dir(settings))
+    # bool
+    self.assertEqual(settings['c'], True)
+
+  def test_lazy_dir(self):
+    settings.configure({"a": 15, "b":"22.3", "c": True})
+
+    self.assertIn('a', dir(settings))
+    self.assertIn('b', dir(settings))
+    self.assertIn('c', dir(settings))
+
+  def test_settings_file_item(self):
     with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
                             delete=False) as fid:
       fid.write('{"a": 15, "b":"22", "c": true}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
 
     self.assertFalse(settings.configured)
-    self.assertEqual(repr(settings), '<LazySettings [Unevaluated]>')
-    self.assertEqual(settings['a'], 15)
-    self.assertTrue(settings.configured)
-    self.assertNotEqual(repr(settings), '<LazySettings [Unevaluated]>')
-
-    self.assertEqual(settings['b'], "22")
-    self.assertEqual(settings['c'], True)
-
-    self.assertIn('a', dir(settings))
-    self.assertIn('b', dir(settings))
-    self.assertIn('c', dir(settings))
-    self.assertNotIn('22', dir(settings))
-
-  def test_lazy_item(self):
-    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
-                            delete=False) as fid:
-      fid.write('{"a": 15, "b":"22", "c": true}')
-    os.environ['TERRA_SETTINGS_FILE'] = fid.name
-
-    settings._wrapped = None
     self.assertEqual(settings.a, 15)
     self.assertTrue(settings.configured)
 
@@ -178,6 +267,23 @@ class TestSettings(TestCase):
     self.assertEqual(settings.b, "22")
     self.assertEqual(settings.c, True)
 
+  def test_nested_in(self):
+    settings.configure({'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44,
+                                                'foo': {'t': 15}}})
+    self.assertIn('a', settings)
+    self.assertIn('b', settings)
+    self.assertIn('q', settings)
+    self.assertNotIn('x', settings)
+    self.assertNotIn('y', settings)
+    self.assertNotIn('foo', settings)
+    self.assertNotIn('t', settings)
+    self.assertIn('q.x', settings)
+    self.assertIn('q.y', settings)
+    self.assertIn('q.foo', settings)
+    self.assertNotIn('q.t', settings)
+    self.assertIn('q.foo.t', settings)
+
+
   @mock.patch('terra.core.settings.global_templates',
               [({},
                 {'a': 11, 'b': 22, 'q': {'x': 33, 'y': 44, 'foo': {'t': 15}}}),
@@ -193,18 +299,7 @@ class TestSettings(TestCase):
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, "444")
-    with self.assertRaises(AttributeError):
-      settings.e
-    with self.assertRaises(KeyError):
-      settings['e']
-    self.assertFalse('e' in settings)
-    self.assertFalse('e.t' in settings)
-    self.assertFalse('q.z' in settings)
-    self.assertTrue('q.x' in settings)
-    self.assertTrue('q.foo' in settings)
-    self.assertTrue('q.foo.t' in settings)
-    self.assertTrue('q' in settings)
-    self.assertTrue('a' in settings)
+    self.assertEqual(settings.q, {'x': 33, 'y': 44, 'foo': {'t': 15}})
     self.assertTrue(settings.configured)
 
   @mock.patch('terra.core.settings.global_templates',
@@ -219,7 +314,6 @@ class TestSettings(TestCase):
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, 22)
     self.assertEqual(settings.c.d, 14)
-    self.assertTrue('e' in settings)
     self.assertEqual(settings.e.f, 15)
     self.assertTrue(settings.configured)
 
@@ -281,7 +375,7 @@ class TestSettings(TestCase):
 
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22})])
-  def test_add_templates(self):
+  def test_add_templates_domino(self):
     import terra.core.settings as s
     self.assertEqual(s.global_templates, [({}, {'a': 11, 'b': 22})])
     settings.add_templates([({'a': 11}, {'c': 33})])
@@ -291,8 +385,12 @@ class TestSettings(TestCase):
     self.assertEqual(settings.b, 22)
     self.assertNotIn("c", settings)
 
-    settings._wrapped = None
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': 22})])
+  def test_add_templates_order(self):
+    import terra.core.settings as s
 
+    settings.add_templates([({'a': 11}, {'c': 33})])
     # Demonstrate one of the possible complications/solutions.
     settings.add_templates([({}, {'a': 11})])
     self.assertEqual(s.global_templates, [({}, {'a': 11}),
@@ -328,7 +426,12 @@ class TestSettings(TestCase):
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
 
     with settings:
+      settings.b = 12
       self.assertEqual(settings.a, 15)
+      self.assertEqual(settings.b, 12)
+
+    self.assertEqual(settings.a, 15)
+    self.assertNotIn('b', settings)
 
   @mock.patch('terra.core.settings.global_templates', [])
   def test_json(self):

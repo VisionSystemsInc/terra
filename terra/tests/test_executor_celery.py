@@ -195,8 +195,25 @@ class TestCeleryExecutor(TestCase):
     with self.assertRaisesRegex(RuntimeError, "cannot .* after shutdown"):
       self.executor.submit(test)
 
-  def test_import(self):
-    import terra.executor.celery
-    from celery._state import _apps
-    # import pdb; pdb.set_trace()
-    print([a for a in _apps])
+#   def test_import(self):
+#     import terra.executor.celery
+#     from celery._state import _apps
+#     print([a for a in _apps])
+
+
+# # This is too hard to test, unittest.discover does something funky, celery
+# # Is double registered. And I don't know how to stop it. The point of this
+# # test was going to be to to be able to write a test to verify the celery app
+# # is registered, but that's out of window now.
+# @skipUnless(celery, "Celery not installed")
+# class TestUnitTests(TestCase):
+#   def last_test_celery_apps(self):
+#     self.assertEqual(
+#         len(celery._state._apps), 0,
+#         msg="If you are seeing this, one of the other unit tests has "
+#             "initialized the celery apps. This side effect should be "
+#             "prevented by mocking out the celary._state._apps, or "
+#             "'mock.patch.???'. Otherwise unit tests can "
+#             "interfere with each other. Add 'import traceback; "
+#             "traceback.print_stack()' to terra/executor/celery/__init__.py "
+#             "to see who is importing the app")
