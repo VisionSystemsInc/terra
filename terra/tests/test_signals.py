@@ -29,7 +29,6 @@ class TestSignals(TestCase):
     self.signal.send(sender=self.sender, foo='bar')
     self.assertEqual(self.kwargs, {'foo': 'bar', 'signal': self.signal})
 
-# TODO Using cache?
   def cache1(self, *args, **kwargs):
     return 12
 

@@ -108,9 +108,9 @@ class TestLogger(TestLoggerCase):
 
   def test_exception_hook(self):
     def save_exec_info(exc_type, exc, tb):
-      save_exec_info.exc_type = exc_type
-      save_exec_info.exc = exc
-      save_exec_info.tb = tb
+      self.exc_type = exc_type
+      self.exc = exc
+      self.tb = tb
     sys.excepthook = save_exec_info
     self._logs.setup_logging_exception_hook()
     with self.assertLogs() as cm:
@@ -122,9 +122,9 @@ class TestLogger(TestLoggerCase):
     self.assertIn('division by almost zero', str(cm.output))
     # Test stack trace stuff in there
     self.assertIn('test_exception_hook', str(cm.output))
-    self.assertEqual(save_exec_info.exc_type, ZeroDivisionError)
-    self.assertIsInstance(save_exec_info.exc, ZeroDivisionError)
-    self.assertIs(save_exec_info.tb, tb)
+    self.assertEqual(self.exc_type, ZeroDivisionError)
+    self.assertIsInstance(self.exc, ZeroDivisionError)
+    self.assertIs(self.tb, tb)
 
   def test_root_logger_setup(self):
     self.assertEqual(self._logs.root_logger, logging.getLogger(None))
