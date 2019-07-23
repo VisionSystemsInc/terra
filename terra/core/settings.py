@@ -538,7 +538,7 @@ class ObjectDict(dict):
       return self[name]
     except KeyError:
       raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__qualname__, name))
+          self.__class__.__qualname__, name)) from None
 
   def __setattr__(self, name, value):
     """ Supported """

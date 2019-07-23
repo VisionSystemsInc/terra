@@ -80,7 +80,7 @@ class BaseCompute:
       self.__getattribute__(name + 'Service')
     except AttributeError:
       raise AttributeError(f'Compute command "{name}" does not have a service '
-                           f'implementation "{implementation}"')
+                           f'implementation "{implementation}"') from None
     else:
       def defaultCommand(self, service_class, *args, **kwargs):
 
