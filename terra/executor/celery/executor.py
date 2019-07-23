@@ -202,7 +202,7 @@ class CeleryExecutor(Executor):
 
 class SyncExecutor(Executor):
   """
-  Executor that does the job syncronously.
+  Executor that does the job synchronously.
 
   All the returned Futures will be already resolved. This executor is intended
   to be mainly used on tests or to keep internal API conformance with the
