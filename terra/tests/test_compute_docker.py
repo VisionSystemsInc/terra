@@ -246,7 +246,7 @@ services:
   ipykernel:
     build:
       args:
-        TERRA_PIPEVN_DEV: '0'
+        TERRA_PIPENV_DEV: '0'
       context: /opt/projects/terra/terra_dsm/external/terra
       dockerfile: docker/terra.Dockerfile
     cap_add:
@@ -352,7 +352,7 @@ services:
   terra:
     build:
       args:
-        TERRA_PIPEVN_DEV: '0'
+        TERRA_PIPENV_DEV: '0'
       context: /opt/projects/terra/terra_dsm/external/terra
       dockerfile: docker/terra.Dockerfile
     cap_add:
@@ -405,7 +405,7 @@ services:
   test:
     build:
       args:
-        TERRA_PIPEVN_DEV: '0'
+        TERRA_PIPENV_DEV: '0'
       context: /opt/projects/terra/terra_dsm/external/terra
       dockerfile: docker/terra.Dockerfile
     cap_add:

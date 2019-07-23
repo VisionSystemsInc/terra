@@ -177,10 +177,10 @@ class ClassHandler(Handler):
   Like :class:`Handler`, except operates on a class instead of an instance of a
   class.
 
-  Based loosly on :class:`django.db.utils.ConnectionHandler`
+  Based loosely on :class:`django.db.utils.ConnectionHandler`
   '''
 
-  def _connect_backend(self):
+  def _connect_backend(self, *args, **kwargs):
     '''
     Overload this function in children classes
     '''
@@ -191,5 +191,5 @@ class ClassHandler(Handler):
       _type = int
     return _type
 
-  def __call__(self):
-    return self._connection()
+  def __call__(self, *args, **kwargs):
+    return self._connection(*args, **kwargs)

@@ -15,7 +15,7 @@ class BaseService:
   ``super().__init__ should`` be called when inheriting a :class:`BaseService`
   class's ``__init__``
 
-  Service dewfinitoins can define a ``pre_{command}`` and ``post_{command}``
+  Service definitions can define a ``pre_{command}`` and ``post_{command}``
   function that will be called before and after a ``{command}Service`` call,
   if they exist
   '''
