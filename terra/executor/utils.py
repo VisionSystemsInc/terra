@@ -30,6 +30,9 @@ class ExecutorHandler(ClassHandler):
     if backend_name == "DummyExecutor":
       from terra.executor.dummy import DummyExecutor
       return DummyExecutor
+    elif backend_name == "SyncExecutor":
+      from terra.executor.sync import SyncExecutor
+      return SyncExecutor
     elif backend_name == "ThreadPoolExecutor":
       return concurrent.futures.ThreadPoolExecutor
     elif backend_name == "ProcessPoolExecutor":

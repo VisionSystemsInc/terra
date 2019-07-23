@@ -1,19 +1,13 @@
 from concurrent.futures import Future, Executor
 from threading import Lock
 
-
-# No need for a global shutdown lock here, not multi-threaded/process
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 
 class DummyExecutor(Executor):
   """
-  Executor that does the job syncronously.
-
-  All the returned Futures will be already resolved. This executor is intended
-  to be mainly used on tests or to keep internal API conformance with the
-  Executor interface.
-
-  Based on a snippet from https://stackoverflow.com/a/10436851/798575
+  Executor that does the nothin, just logs what would happen.
   """
 
   def __init__(self, *arg, **kwargs):
@@ -26,13 +20,10 @@ class DummyExecutor(Executor):
         raise RuntimeError('cannot schedule new futures after shutdown')
 
       f = Future()
-      try:
-        result = fn(*args, **kwargs)
-      except BaseException as e:
-        f.set_exception(e)
-      else:
-        f.set_result(result)
-
+      logger.info(f'Run function: {fn}')
+      logger.info(f'With args: {args}')
+      logger.info(f'With kwargs: {kwargs}')
+      f.set_result(None)
       return f
 
   def shutdown(self, wait=True):

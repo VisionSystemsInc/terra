@@ -5,6 +5,7 @@ from terra import settings
 from .utils import TestCase
 from terra.executor.utils import ExecutorHandler, Executor
 from terra.executor.dummy import DummyExecutor
+from terra.executor.sync import SyncExecutor
 
 
 class TestExecutorHandler(TestCase):
@@ -32,6 +33,10 @@ class TestExecutorHandler(TestCase):
     self.assertIsNotNone(Executor._connection)
     self.assertIsInstance(Executor._connection(), DummyExecutor)
     self.assertIsInstance(executee, DummyExecutor)
+
+  def test_executor_name_sync(self):
+    settings.configure({'executor': {'type': 'SyncExecutor'}})
+    self.assertIsInstance(Executor._connection(), SyncExecutor)
 
   def test_executor_name_thread(self):
     settings.configure({'executor': {'type': 'ThreadPoolExecutor'}})
