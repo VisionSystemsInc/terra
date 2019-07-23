@@ -1,0 +1,4 @@
+[run]
+omit = ./terra/tests/*
+source = ./terra
+command_line = -m unittest discover ./terra

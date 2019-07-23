@@ -139,18 +139,23 @@ function terra_caseify()
     test_terra) # Run unit tests
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
-      Terra_Pipenv run bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+      # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
+      if [[ $# == 0 ]]; then
+        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+      else
+        Terra_Pipenv run env TERRA_UNITTEST=1 python -m unittest "${@}"
+      fi
       extra_args=$#
       ;;
-    # pep8) # Check for pep8 compliance in ./terra
-    #      Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run test bash -c \
-    #       "if ! command -v autopep8 >& /dev/null; then
-    #          pipenv install --dev;
-    #        fi;
-    #        autopep8 --indent-size 2 --recursive --exit-code --diff \
-    #                 --global-config ${TERRA_TERRA_DIR_DOCKER}/autopep8.ini \
-    #                 ${TERRA_TERRA_DIR_DOCKER}/terra"
-    #   ;;
+    # Ideas
+    coverage_terra) # Run coverate on terra
+      pushd "${TERRA_CWD}" >& /dev/null # Not needed because of a cd line above
+        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'coverage run && coverage report -m'
+      popd >& /dev/null # but added this so an app developer would know to add it
+      ;;
+
+    # How do I know what error code causes a problem in autopep8? You don't!
+    # At least not as far as I can tell.
     pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
@@ -163,17 +168,14 @@ function terra_caseify()
         fi
       fi
 
-      local terra_dir
-      if [[ "${TERRA_LOCAL}" = "1" ]]; then
-        terra_dir="${TERRA_TERRA_DIR}"
-      else
-        terra_dir="${TERRA_TERRA_DIR_DOCKER}"
-      fi
-
       echo "Running for autopep8..."
-      Terra_Pipenv run autopep8 --indent-size 2 --recursive --exit-code --diff \
-                          --global-config "${terra_dir}/autopep8.ini" \
-                          "${terra_dir}/terra"
+      Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
+                                "${TERRA_TERRA_DIR}/terra"'
+      ;;
+    test_pep8) # Run pep8 test
+      justify pep8
+      Terra_Pipenv run bash -c 'flake8 \
+                                "${TERRA_TERRA_DIR}/terra"'
       ;;
 
     ### Syncing ###
@@ -193,11 +195,11 @@ function terra_caseify()
     update_pipenv-terra) # Update Terra core's pipenv
       Terra_Pipenv update
       ;;
-    dev_sync) # Developer's extra sync
+    sync_dev-pipenv-terra) # Developer's extra sync
       Terra_Pipenv install --dev --keep-outdated
       ;;
-    dev_update) # Developer: Update python packages
-      Terra_Pipenv install --dev
+    update_dev-pipenv-terra) # Developer: Update python packages
+      Terra_Pipenv update --dev
       ;;
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n

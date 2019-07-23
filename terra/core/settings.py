@@ -120,8 +120,8 @@ framework instead of a larger application.
 # Copyright (c) Django Software Foundation and individual contributors.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
 #     1. Redistributions of source code must retain the above copyright notice,
 #        this list of conditions and the following disclaimer.
@@ -130,20 +130,21 @@ framework instead of a larger application.
 #        notice, this list of conditions and the following disclaimer in the
 #        documentation and/or other materials provided with the distribution.
 #
-#     3. Neither the name of Django nor the names of its contributors may be used
-#        to endorse or promote products derived from this software without
+#     3. Neither the name of Django nor the names of its contributors may be
+#        used to endorse or promote products derived from this software without
 #        specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
 import os
 from inspect import isfunction
@@ -151,15 +152,13 @@ from functools import wraps
 
 from terra.core.exceptions import ImproperlyConfigured
 from vsi.tools.python import (
-  nested_patch_inplace, nested_update, nested_in_dict
+    nested_patch_inplace, nested_patch, nested_update, nested_in_dict
 )
 from json import JSONEncoder
-from terra.logger import getLogger
-logger = getLogger(__name__)
 
 try:
   import jstyleson as json
-except ImportError:
+except ImportError:  # pragma: no cover
   import json
 
 ENVIRONMENT_VARIABLE = "TERRA_SETTINGS_FILE"
@@ -191,9 +190,11 @@ def settings_property(func):
   func : func
       Function being decorated
   '''
+
   @wraps(func)
   def wrapper(*args, **kwargs):
     return func(*args, **kwargs)
+
   wrapper.settings_property = True
   return wrapper
 
@@ -235,6 +236,18 @@ def processing_dir(self):
   return processing_dir
 
 
+@settings_property
+def unittest(self):
+  '''
+  A :func:`settings_property` for determing if unittests are running or not
+
+  Checks the value of :env:`TERRA_UNITTEST` and returns True or False based off
+  of that.
+  '''
+
+  return os.environ.get('TERRA_UNITTEST', None) == "1"
+
+
 # TODO: come up with a way for apps to extend this themselves
 global_templates = [
   (
@@ -255,13 +268,19 @@ global_templates = [
       },
       "resume": False,
       'status_file': status_file,
-      'processing_dir': processing_dir
+      'processing_dir': processing_dir,
+      'unittest': unittest,
+      'resume': False
     }
+  ),
+  (
+    {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
+    {"compute": {"virtualenv_dir": None}}  # Defaults
+  ),
+  (  # So much for DRY :(
+    {"compute": {"arch": "virtualenv"}},
+    {"compute": {"virtualenv_dir": None}}
   )
-  # , (
-  #   {"compute": {"arch": "terra.compute.dummy"}},  # Pattern
-  #   {"compute": {"value1": "100", "value3": {"value2": "200"}}}  # Defaults
-  # )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we
 conditionally assign default values. It is a list of pair tuples, where the
@@ -272,7 +291,7 @@ values.
 Values are copies recursively, but only if not already set by your settings.'''
 
 
-class LazyObject():
+class LazyObject:
   '''
   A wrapper class that lazily evaluates (calls :func:`LazyObject._setup`)
 
@@ -309,18 +328,6 @@ class LazyObject():
       self._setup()
     return getattr(self._wrapped, name, *args, **kwargs)
 
-  def __getitem__(self, name):
-    '''Supported'''
-    if self._wrapped is None:
-      self._setup()
-    return self._wrapped[name]
-
-  def __contains__(self, name):
-    '''Supported'''
-    if self._wrapped is None:
-      self._setup()
-    return self._wrapped.__contains__(name)
-
   def __setattr__(self, name, value):
     '''Supported'''
     if name == "_wrapped":
@@ -331,16 +338,6 @@ class LazyObject():
         self._setup()
       setattr(self._wrapped, name, value)
 
-  def __setitem__(self, name, value):
-    '''Supported'''
-    if name == "_wrapped":
-      # Assign to __dict__ to avoid infinite __setattr__ loops.
-      self.__dict__["_wrapped"] = value
-    else:
-      if self._wrapped is None:
-        self._setup()
-      self._wrapped[name] = value
-
   def __delattr__(self, name):
     '''Supported'''
     if name == "_wrapped":
@@ -349,13 +346,42 @@ class LazyObject():
       self._setup()
     delattr(self._wrapped, name)
 
-  def __hasattr__(self, name):
+  def __dir__(self):
+    """ Supported """
+    d = super().__dir__()
+    if self._wrapped is not None:
+      return list(set(d + dir(self._wrapped)))
+    return d
+
+  def __getitem__(self, name):
     '''Supported'''
-    if name == "_wrapped":
-      return True
     if self._wrapped is None:
       self._setup()
-    return name in self._wrapped
+    return self._wrapped[name]
+
+  def __setitem__(self, name, value):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    self._wrapped[name] = value
+
+  def __delitem__(self, name):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    del(self._wrapped[name])
+
+  def __contains__(self, name):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__contains__(name)
+
+  def __iter__(self):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return iter(self._wrapped)
 
 
 class LazySettings(LazyObject):
@@ -385,16 +411,14 @@ class LazySettings(LazyObject):
         If the settings has already been configured, will throw an error. Under
         normal circumstances, :func:`_setup` will not be called a second time.
     """
-    from terra.core.signals import post_settings_configured
-
     settings_file = os.environ.get(ENVIRONMENT_VARIABLE)
     if not settings_file:
       desc = ("setting %s" % name) if name else "settings"
       raise ImproperlyConfigured(
           "Requested %s, but settings are not configured. "
           "You must either define the environment variable %s "
-          "or call settings.configure() before accessing settings."
-          % (desc, ENVIRONMENT_VARIABLE))
+          "or call settings.configure() before accessing settings." %
+          (desc, ENVIRONMENT_VARIABLE))
     with open(settings_file) as fid:
       self.configure(json.load(fid))
     self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
@@ -440,20 +464,18 @@ class LazySettings(LazyObject):
         self._wrapped.update(d)
 
     def read_json(json_file):
-      print('reading', json_file)
-
       # In case json_file is an @settings_property function
       if getattr(json_file, 'settings_property', None):
         json_file = json_file(settings)
 
       with open(json_file, 'r') as fid:
-        return json.load(fid)
+        return Settings(json.load(fid))
 
     nested_patch_inplace(
         self._wrapped,
-        lambda key, value: (isinstance(key, str) and
-                            any(key.endswith(pattern)
-                            for pattern in json_include_suffixes)),  # noqa bug
+        lambda key, value: (isinstance(key, str)
+                            and any(key.endswith(pattern)
+                                    for pattern in json_include_suffixes)),
         lambda key, value: read_json(value))
 
     post_settings_configured.send(sender=self)
@@ -486,6 +508,14 @@ class LazySettings(LazyObject):
     for template in templates:
       global_templates.insert(-offset, template)
 
+  def __enter__(self):
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__enter__()
+
+  def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+    return self._wrapped.__exit__(exc_type, exc_value, traceback)
+
 
 class ObjectDict(dict):
   '''
@@ -508,7 +538,7 @@ class ObjectDict(dict):
       return self[name]
     except KeyError:
       raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__name__, name))
+          self.__class__.__qualname__, name)) from None
 
   def __setattr__(self, name, value):
     """ Supported """
@@ -533,17 +563,34 @@ class Settings(ObjectDict):
     the values
     '''
 
+    # This is here instead of in LazySettings because the functor is given
+    # LazySettings, but then if __getattr__ is called on that, the segment of
+    # the settings object that is retreived is of type Settings, therefore
+    # the settings_property evaluation has to be here.
+
     try:
       val = self[name]
       if isfunction(val) and getattr(val, 'settings_property', None):
         # Ok this ONE line is a bit of a hack :( But I argue it's specific to
         # this singleton implementation, so I approve!
         val = val(settings)
+
+        # cache result, because the documentation said this should happen
+        self[name] = val
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
       raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__name__, name)) from None
+          self.__class__.__qualname__, name)) from None
+
+  def __enter__(self):
+    import copy
+    object.__setattr__(self, "_backup", copy.deepcopy(self))
+
+  def __exit__(self, type_, value, traceback):
+    self.clear()
+    self.update(self._backup)
+    del self._backup
 
 
 settings = LazySettings()
@@ -551,23 +598,57 @@ settings = LazySettings()
 
 
 class TerraJSONEncoder(JSONEncoder):
+  '''
+  Json serializer for :class:`LazySettings`.
+
+  .. note::
+
+      Does not work on :class:`Settings` since it would be handled
+      automatically as a :class:`dict`.
+  '''
+
   def default(self, obj):
     if isinstance(obj, LazySettings):
       if obj._wrapped is None:
-        raise Exception('Settings not initialized')
+        raise ImproperlyConfigured('Settings not initialized')
       return TerraJSONEncoder.serializableSettings(obj._wrapped)
-    return JSONEncoder.default(self, obj)
+    return JSONEncoder.default(self, obj)  # pragma: no cover
 
   @staticmethod
-  def serializableSettings(obj, root=None):
-    if root is None:
-      root = obj
+  def serializableSettings(obj):
+    '''
+    Convert a :class:`Settings` object into a json serializable :class:`dict`.
 
-    return {k: TerraJSONEncoder.serializableSettings(v, root)
-            if isinstance(v, dict) else
-            v(root) if isfunction(v) and hasattr(v, 'settings_property')
-            else v for k, v in obj.items()}
+    Since :class:`Settings` can contain :func:`settings_property`, this
+    prevents json serialization. This function will evaluate all
+    :func:`settings_property`'s for you.
+
+    Arguments
+    ---------
+    obj: :class:`Settings` or :class:`LazySettings`
+        Object to be converted to json friendly :class:`Settings`
+    '''
+
+    if isinstance(obj, LazySettings):
+      obj = obj._wrapped
+
+    return nested_patch(
+        obj,
+        lambda k, v: isfunction(v) and hasattr(v, 'settings_property'),
+        lambda k, v: v(obj))
 
   @staticmethod
   def dumps(obj):
+    '''
+    Convenience function for running `dumps` using this encoder.
+
+    Arguments
+    ---------
+    obj: :class:`LazySettings`
+        Object to be converted to json friendly :class:`dict`
+    '''
     return json.dumps(obj, cls=TerraJSONEncoder)
+
+
+import terra.logger  # noqa
+logger = terra.logger.getLogger(__name__)

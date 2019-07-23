@@ -1,45 +1,31 @@
-# https://stackoverflow.com/a/10436851
-
 from concurrent.futures import Future, Executor
 from threading import Lock
 
+from terra.logger import getLogger
+logger = getLogger(__name__)
+
 
 class DummyExecutor(Executor):
+  """
+  Executor that does the nothin, just logs what would happen.
+  """
 
   def __init__(self, *arg, **kwargs):
     self._shutdown = False
-    self._shutdownLock = Lock()
+    self._shutdown_lock = Lock()
 
   def submit(self, fn, *args, **kwargs):
-    with self._shutdownLock:
+    with self._shutdown_lock:
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
       f = Future()
-      try:
-        result = fn(*args, **kwargs)
-      except BaseException as e:
-        f.set_exception(e)
-      else:
-        f.set_result(result)
-
+      logger.info(f'Run function: {fn}')
+      logger.info(f'With args: {args}')
+      logger.info(f'With kwargs: {kwargs}')
+      f.set_result(None)
       return f
 
   def shutdown(self, wait=True):
-    with self._shutdownLock:
+    with self._shutdown_lock:
       self._shutdown = True
-
-
-if __name__ == '__main__':
-
-  def fnc(err):
-    if err:
-      raise Exception("test")
-    else:
-      return "ok"
-
-  ex = DummyExecutor()
-  print(ex.submit(fnc, True))
-  print(ex.submit(fnc, False))
-  ex.shutdown()
-  ex.submit(fnc, True)  # raises exception

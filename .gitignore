@@ -6,3 +6,5 @@ local_post.env
 terra.egg-info
 docs/python
 docs/_build
+.coverage
+htmlcov

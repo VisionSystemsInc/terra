@@ -7,7 +7,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
 
-from envcontext import EnvironmentContext
 import yaml
 
 from vsi.tools.diff import dict_diff
@@ -15,8 +14,8 @@ from vsi.tools.python import nested_patch
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
-from terra.compute.base import BaseService, BaseCompute, StageRunFailed
-from terra.compute.utils import load_service
+from terra.compute import compute
+from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
@@ -31,9 +30,9 @@ RE Groups
 * 0: Source
 * 1: Junk - source drive (windows)
 * 2: Target
-* 4: Junk - target drive (windows)
-* 5: Flags
-* 6: Junk - last flag
+* 3: Junk - target drive (windows)
+* 4: Flags
+* 5: Junk - last flag
 '''
 
 
@@ -42,10 +41,6 @@ class Compute(BaseCompute):
   Docker compute model, specifically ``docker-compose``
   '''
 
-  docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)' \
-                     r'((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|' \
-                     r':delegated|:cached|:consistent|:nocopy)*)$'
-
   def just(self, *args, **kwargs):
     '''
     Run a ``just`` command. Primarily used to run
@@ -53,28 +48,37 @@ class Compute(BaseCompute):
 
     Arguments
     ---------
+    justfile : :class:`str`, optional
+        Optionally allow you to specify a custom ``Justfile``. Defaults to
+        Terra's ``Justfile`` is used, which is the correct course of action
+        most of the time
+    env : :class:`dict`, optional
+        Sets environment variables. Same as Popen's ``env``, except
+        ``JUSTFILE`` is programatically set, and cannot be overridden any other
+        way than chaning the ``justfile`` variable
     *args :
         List of arguments to be pass to ``just``
     **kwargs :
-        Arguments sent to Popen command
+        Arguments sent to ``Popen`` command
     '''
+
     logger.debug('Running: ' + ' '.join(
-        # [quote(f'{k}={v}') for k, v in env.items()] +
         [quote(x) for x in ('just',) + args]))
-    env = kwargs.pop('env', {})
-    env['JUSTFILE'] = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
+
+    just_env = kwargs.pop('env', env).copy()
+    justfile = kwargs.pop(
+        'justfile', os.path.join(env['TERRA_TERRA_DIR'], 'Justfile'))
+    just_env['JUSTFILE'] = justfile
 
     if logger.getEffectiveLevel() <= DEBUG1:
-      dd = dict_diff(os.environ, env)[3]
+      dd = dict_diff(env, just_env)[3]
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
-    with EnvironmentContext(**env):
-      pid = Popen(('just',) + args, **kwargs)
-      pid.wait()
-      return pid
+    pid = Popen(('just',) + args, env=just_env, **kwargs)
+    return pid
 
-  def run(self, service_class):
+  def runService(self, service_info):
     '''
     Use the service class information to run the service runner in a docker
     using
@@ -86,26 +90,19 @@ class Compute(BaseCompute):
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
-    service_info = load_service(service_class)
-    service_info.pre_run(self)
-
     pid = self.just("--wrap", "Just-docker-compose",
                     '-f', service_info.compose_file,
                     'run', service_info.compose_service_name,
                     *(service_info.command),
                     env=service_info.env)
 
-    if pid.returncode != 0:
-      raise(StageRunFailed())
+    if pid.wait() != 0:
+      raise ServiceRunFailed()
 
-    service_info.post_run(self)
-
-  def config(self, service_class, extra_compose_files=[]):
+  def configService(self, service_info, extra_compose_files=[]):
     '''
     Returns the ``docker-compose config`` output
     '''
-
-    service_info = load_service(service_class)
 
     args = ["--wrap", "Just-docker-compose",
             '-f', service_info.compose_file] + \
@@ -116,7 +113,7 @@ class Compute(BaseCompute):
                     env=service_info.env)
     return pid.communicate()[0]
 
-  def configuration_map(self, service_class, extra_compose_files=[]):
+  def configuration_mapService(self, service_info, extra_compose_files=[]):
     '''
     Returns the mapping of volumes from the host to the container.
 
@@ -125,16 +122,21 @@ class Compute(BaseCompute):
     list
         Return a list of tuple pairs [(host, remote), ... ] of the volumes
         mounted from the host to container
-    """
-
     '''
     # TODO: Make an OrderedDict
     volume_map = []
 
-    service_info = load_service(service_class)
     config = yaml.load(self.config(service_info, extra_compose_files))
 
-    for volume in config['services'][service_info.compose_service_name].get('volumes', []):
+    if 'services' in config and \
+        service_info.compose_service_name in config['services'] and \
+        config['services'][service_info.compose_service_name]:
+      volumes = config['services'][service_info.compose_service_name].get(
+        'volumes', [])
+    else:
+      volumes = []
+
+    for volume in volumes:
       if isinstance(volume, dict):
         if volume['type'] == 'bind':
           volume_map.append((volume['source'], volume['target']))
@@ -163,32 +165,11 @@ class Service(BaseService):
     super().__init__()
     self.volumes_flags = []
 
-  def pre_run(self, compute):  # Compute?
-    super().pre_run(compute)
+  def pre_run(self):
+    super().pre_run()
 
     self.temp_dir = TemporaryDirectory()
     temp_dir = Path(self.temp_dir.name)
-
-    # with open(self.compose_file, 'r') as fid:
-    #   docker_file = yaml.load(fid.read())
-
-    # # Need to get the docker-compose version :-\
-    # with open(self.compose_file, 'r') as fid:
-    #   docker_file = yaml.load(fid.read())
-
-    # temp_compose = f'version: "{docker_file["version"]}"\n'
-    # temp_compose += 'services:\n'
-    # temp_compose +=f'  {self.compose_service_name}:\n'
-    # temp_compose += '    volumes:\n'
-
-    # for (volume_host, volume_container), volume_flags in \
-    #     zip(self.volumes, self.volumes_flags):
-    #   temp_compose += f'      - {volume_host}:{volume_container}\n' #), volume_flags}\n'
-
-    # temp_compose_file = temp_dir / "docker-compose.yml"
-
-    # with open(temp_compose_file, 'w') as fid:
-    #   fid.write(temp_compose)
 
     # Check to see if and are already defined, this will play nicely with
     # external influences
@@ -201,8 +182,9 @@ class Service(BaseService):
         f'{str(temp_dir)}:/tmp_settings:rw'
     env_volume_index += 1
 
+    # Copy self.volumes to the environment variables
     for index, ((volume_host, volume_container), volume_flags) in \
-        enumerate(zip(self.volumes, self.volumes_flags)):  # noqa bug
+        enumerate(zip(self.volumes, self.volumes_flags)):
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
@@ -235,27 +217,27 @@ class Service(BaseService):
             return value.replace(vol_from, vol_to, 1)
         return value
 
+    # Apply map translation to settings configuration
     docker_config = nested_patch(
         docker_config,
-        lambda key, value: (isinstance(key, str) and
-                            any(key.endswith(pattern)
-                            for pattern in filename_suffixes)),  # noqa bug
+        lambda key, value: (isinstance(key, str)
+                            and any(key.endswith(pattern)
+                                    for pattern in filename_suffixes)),
         lambda key, value: patch_volume(value, reversed(volume_map))
     )
 
-    # This test doesn't work. It's already faked out long before this
-    # if 'processing_dir' not in docker_config:
-    #   logger.warning('No processing dir set. Using "/tmp"')
-    # docker_config['processing_dir'] = '/tmp'  # TODO: Remove/unhardcode this
-
+    # Dump the settings
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(docker_config, fid)
 
-  def post_run(self, compute):
-    super().post_run(compute)
+  def post_run(self):
+    super().post_run()
 
-    self.temp_dir = None  # Delete temp_dir
+    # Delete temp_dir
+    self.temp_dir.cleanup()
+    # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
+    # I did it this way.
 
   def add_volume(self, local, remote, flags=None):
-    self.volumes.append([local, remote])
+    self.volumes.append((local, remote))
     self.volumes_flags.append(flags)

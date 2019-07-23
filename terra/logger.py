@@ -48,7 +48,8 @@ logger = get_logger(__name__)
 And then use the ``logger`` object anywhere in the module. This logger is a
 python :mod:`logging` logger with the following extra configuration
 
-* Added `debug1`, `debug2`, and `debug3` levels (with `debug3` being the most verbose)
+* Added `debug1`, `debug2`, and `debug3` levels (with `debug3` being the most
+  verbose)
 * `debug` is really `debug1`
 * `debug3` is best used for debugging math in an algorithm
 * `debug2` is best used for more verbose statements used only for development
@@ -60,22 +61,16 @@ python :mod:`logging` logger with the following extra configuration
 import logging.handlers
 import sys
 import tempfile
-import threading
 import platform
 import pprint
 import os
 
-from vsi.tools.python import args_to_kwargs
 from terra.core.exceptions import ImproperlyConfigured
 
 from logging import (
-  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, getLogger,
-  _acquireLock, _releaseLock
+  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET,
+  getLogger as getLogger_original, _acquireLock, _releaseLock
 )
-# Must be import signal after getLogger is defined... Currently this is imported
-# from logger. But if a custom getLogger is defined eventually, it will need to
-# be defined before importing terra.core.signals.
-from terra.core.signals import post_settings_configured
 
 
 __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
@@ -83,9 +78,24 @@ __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
 
 
 class HandlerLoggingContext(object):
+  '''
+  A context Manager for swapping out logging handlers
+  '''
+
   def __init__(self, logger, handlers):
+    '''
+    Arguments
+    ---------
+    logger:
+        The logger to swap handlers on
+    handlers: list
+        List of handles to set the logger to
+    '''
     self.handlers = handlers
-    self.logger = logger
+    if isinstance(logger, logging.LoggerAdapter):
+      self.logger = logger.logger
+    else:
+      self.logger = logger
 
   def __enter__(self):
     try:
@@ -148,6 +158,59 @@ class _SetupTerraLogger():
     self.preconfig_file_handler.setFormatter(self.default_formatter)
     self.root_logger.addHandler(self.preconfig_file_handler)
 
+    # Replace the exception hook with our exception handler
+    self.setup_logging_exception_hook()
+    self.setup_logging_ipython_exception_hook()
+
+  def setup_logging_exception_hook(self):
+    '''
+    Setup logging of uncaught exceptions
+
+    MITM insert an error logging call on all uncaught exceptions. Should only
+    be called once, or else errors will be logged multiple times
+    '''
+
+    # Make a copy of the original hook so the inner function can call it
+    original_hook = sys.excepthook
+
+    # https://stackoverflow.com/a/16993115/4166604
+    def handle_exception(exc_type, exc_value, exc_traceback):
+      logger.error("Uncaught exception",
+                   exc_info=(exc_type, exc_value, exc_traceback))
+
+      return original_hook(exc_type, exc_value, exc_traceback)
+
+    # Replace the hook
+    sys.excepthook = handle_exception
+
+  # https://stackoverflow.com/a/49176714/4166604
+  def setup_logging_ipython_exception_hook(self):
+    '''
+    Setup logging of uncaught exceptions in ipython
+
+    MITM insert an error logging call on all uncaught exceptions. Should only
+    be called once, or else errors will be logged multiple times
+
+    If IPython cannot be imported, nothing happens.
+    '''
+    try:
+      import warnings
+      with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        from IPython.core.interactiveshell import InteractiveShell
+
+      original_exception = InteractiveShell.showtraceback
+
+      def handle_traceback(*args, **kwargs):
+        getLogger(__name__).error("Uncaught exception",
+                                  exc_info=sys.exc_info())
+        return original_exception(*args, **kwargs)
+
+      InteractiveShell.showtraceback = handle_traceback
+
+    except ImportError:  # pragma: no cover
+      pass
+
   def configure_logger(self, sender, **kwargs):
     '''
     Call back function to configure the logger after settings have been
@@ -168,13 +231,18 @@ class _SetupTerraLogger():
     # Setup log file for use in configure
     self.log_file = os.path.join(settings.processing_dir,
                                  self.default_log_prefix)
+    os.makedirs(settings.processing_dir, exist_ok=True)
     self.log_file = open(self.log_file, 'a')
 
     self.file_handler = logging.StreamHandler(stream=self.log_file)
 
     # Configure log level
-    self.stderr_handler.setLevel(settings.logging.level.upper())
-    self.file_handler.setLevel(settings.logging.level.upper())
+    level = settings.logging.level
+    if isinstance(level, str):
+      # make level case insensitive
+      level = level.upper()
+    self.stderr_handler.setLevel(level)
+    self.file_handler.setLevel(level)
 
     # Configure format
     self.file_handler.setFormatter(formatter)
@@ -188,8 +256,8 @@ class _SetupTerraLogger():
 
     # Log the settings only to the file handler
     with HandlerLoggingContext(self.root_logger, [self.file_handler]):
-      self.root_logger.log(DEBUG1, "Settings:\n" +
-                           pprint.pformat(dict(settings)),
+      self.root_logger.log(DEBUG1,
+                           "Settings:\n" + pprint.pformat(dict(settings)),
                            extra=extra_logger_variables)
       # For some reason python doesn't make the root logger the designated
       # class, so much add extra manually here. Not even sure why I chose
@@ -234,47 +302,38 @@ extra_logger_variables = {'hostname': platform.node()}
 '''dict: Extra logger variables that can be reference in log messages'''
 
 
-class Logger(logging.Logger):
+class LoggerAdapter(logging.LoggerAdapter):
   '''
-  Terra's :class:`logging.Logger`
+  Terra's :class:`logging.LoggerAdapter`
   '''
-
-  def _log(self, *args, **kwargs):
-    kw = args_to_kwargs(logging.Logger._log, (None,) + args, kwargs)
-    kw.pop('self')
-
-    if kw['extra'] is None:
-      kw['extra'] = extra_logger_variables
-    else:
-      extra = extra_logger_variables.copy()
-      extra.update(kw['extra'])
-      kw['extra'] = extra
-
-    return super()._log(**kw)
 
   def debug1(self, msg, *args, **kwargs):
     '''
     Logs a message with level :data:`DEBUG1` on this logger. Same as ``debug``.
     The arguments are interpreted as for :func:`logging.debug`
     '''
-    if self.isEnabledFor(DEBUG1):
-      self._log(DEBUG1, msg, args, **kwargs)
+    self.log(DEBUG1, msg, *args, **kwargs)
 
   def debug2(self, msg, *args, **kwargs):
     '''
     Logs a message with level :data:`DEBUG2` on this logger. The arguments are
     interpreted as for :func:`logging.debug`
     '''
-    if self.isEnabledFor(DEBUG2):
-      self._log(DEBUG2, msg, args, **kwargs)
+    self.log(DEBUG2, msg, *args, **kwargs)
 
   def debug3(self, msg, *args, **kwargs):
     '''
     Logs a message with level :data:`DEBUG3` on this logger. The arguments are
     interpreted as for :func:`logging.debug`
     '''
-    if self.isEnabledFor(DEBUG3):
-      self._log(DEBUG3, msg, args, **kwargs)
+    self.log(DEBUG3, msg, *args, **kwargs)
+
+  fatal = logging.LoggerAdapter.critical
+
+
+def getLogger(name=None, extra=extra_logger_variables):
+  logger = getLogger_original(name)
+  return LoggerAdapter(logger, extra)
 
 
 DEBUG1 = 10
@@ -300,14 +359,22 @@ Should be used for more specific development debug messages, such as math
 output used to debug algorithms
 '''
 
-logging.setLoggerClass(Logger)
-
 logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
 
-# Configure logging (pre configure)
-_logs = _SetupTerraLogger()
+# Get the logger here, AFTER all the changes to the logger class
+logger = getLogger(__name__)
 
-# register post_configure with settings
-post_settings_configured.connect(_logs.configure_logger)
+# Disable log setup for unittests. Can't use settings here ;)
+if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
+  # Must be import signal after getLogger is defined... Currently this is
+  # imported from logger. But if a custom getLogger is defined eventually, it
+  # will need to be defined before importing terra.core.signals.
+  import terra.core.signals
+
+  # Configure logging (pre configure)
+  _logs = _SetupTerraLogger()
+
+  # register post_configure with settings
+  terra.core.signals.post_settings_configured.connect(_logs.configure_logger)

@@ -1,8 +1,8 @@
 # Copyright (c) Django Software Foundation and individual contributors.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
 #     1. Redistributions of source code must retain the above copyright notice,
 #        this list of conditions and the following disclaimer.
@@ -11,20 +11,21 @@
 #        notice, this list of conditions and the following disclaimer in the
 #        documentation and/or other materials provided with the distribution.
 #
-#     3. Neither the name of Django nor the names of its contributors may be used
-#        to endorse or promote products derived from this software without
+#     3. Neither the name of Django nor the names of its contributors may be
+#        used to endorse or promote products derived from this software without
 #        specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
 
 class cached_property:
@@ -42,17 +43,40 @@ class cached_property:
       When not used as a decorator, allows you to make cached properties of
       other methods. (e.g.
       ``url = cached_property(get_absolute_url, name='url')``)
+
+  Notes
+  -----
+      Since :class:`cached_property` is a non-data descriptor, it can be mocked
+      in instances using ``__dict__``, however both classes and instances
+      (instantiated and uninstantiated) can be mocked using a ``PropertyMock``
+      (data descriptor), as a simplier catch all. This will prevent the wrapped
+      function from being evaluated even once:
+
+          class Foo():
+            @cached_property
+            def x(self):
+              self.called = True
+              return 15
+
+          bar = Foo()
+          with mock.patch.object(Foo, 'x',
+              new_callable=mock.PropertyMock(return_value=13)) as mock_foo:
+            foo = Foo()
+            print(foo.x) # Mocked property
+          print(foo.x) # Original property
+
+      See https://docs.python.org/3/howto/descriptor.html#invoking-descriptors
+      for more details
   """
 
   name = None
+
   @staticmethod
   def func(instance):
-    raise TypeError(
-        'Cannot use cached_property instance without calling '
-        '__set_name__() on it.'
-    )
+    raise TypeError('Cannot use cached_property instance without calling '
+                    '__set_name__() on it.')
 
-  def __init__(self, func, name=None):
+  def __init__(self, func):
     self.real_func = func
     self.__doc__ = getattr(func, '__doc__')
 
@@ -61,10 +85,8 @@ class cached_property:
       self.name = name
       self.func = self.real_func
     elif name != self.name:
-      raise TypeError(
-          "Cannot assign the same cached_property to two different names "
-          "(%r and %r)." % (self.name, name)
-      )
+      raise TypeError("Cannot assign the same cached_property to two "
+                      "different names (%r and %r)." % (self.name, name))
 
   def __get__(self, instance, cls=None):
     """
@@ -88,14 +110,15 @@ class Handler:
   '''
 
   def __init__(self, override_type=None):
-    self._overrite_type = override_type
+    self._override_type = override_type
 
   def _connect_backend(self):
     '''
     Overload this function in children classes
     '''
-    if self._overrite_type:
-      _type = self._overrite_type
+
+    if self._override_type:
+      _type = self._override_type
     else:
       _type = int
     return _type()
@@ -112,7 +135,7 @@ class Handler:
     # recursion loop.
 
   def __setattr__(self, name, value):
-    if name in ('_overrite_type'):
+    if name in ('_override_type'):
       return super().__setattr__(name, value)
     return setattr(self._connection, name, value)
 
@@ -157,5 +180,16 @@ class ClassHandler(Handler):
   Based loosly on :class:`django.db.utils.ConnectionHandler`
   '''
 
-  def __call__(self, *args, **kwargs):
-    return self._connection(*args, **kwargs)
+  def _connect_backend(self):
+    '''
+    Overload this function in children classes
+    '''
+
+    if self._override_type:
+      _type = self._override_type
+    else:
+      _type = int
+    return _type
+
+  def __call__(self):
+    return self._connection()

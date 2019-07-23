@@ -11,8 +11,8 @@ See https://docs.djangoproject.com/en/2.2/topics/signals/ for more info
 # Copyright (c) Django Software Foundation and individual contributors.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
 #     1. Redistributions of source code must retain the above copyright notice,
 #        this list of conditions and the following disclaimer.
@@ -21,20 +21,21 @@ See https://docs.djangoproject.com/en/2.2/topics/signals/ for more info
 #        notice, this list of conditions and the following disclaimer in the
 #        documentation and/or other materials provided with the distribution.
 #
-#     3. Neither the name of Django nor the names of its contributors may be used
-#        to endorse or promote products derived from this software without
+#     3. Neither the name of Django nor the names of its contributors may be
+#        used to endorse or promote products derived from this software without
 #        specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
 import threading
 import weakref
@@ -202,8 +203,8 @@ class Signal:
       return []
 
     return [
-      (receiver, receiver(signal=self, sender=sender, **named))
-      for receiver in self._live_receivers(sender)
+        (receiver, receiver(signal=self, sender=sender, **named))
+        for receiver in self._live_receivers(sender)
     ]
 
   def send_robust(self, sender, **named):
@@ -249,8 +250,8 @@ class Signal:
     if self._dead_receivers:
       self._dead_receivers = False
       self.receivers = [
-        r for r in self.receivers
-        if not(isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
+          r for r in self.receivers
+          if not (isinstance(r[1], weakref.ReferenceType) and r[1]() is None)
       ]
 
   def _live_receivers(self, sender):
@@ -328,6 +329,7 @@ def receiver(signal, **kwargs):
   ... def signals_receiver(sender, **kwargs):
   ...     stuff()
   """
+
   def _decorator(func):
     if isinstance(signal, (list, tuple)):
       for s in signal:
@@ -335,6 +337,7 @@ def receiver(signal, **kwargs):
     else:
       signal.connect(func, **kwargs)
     return func
+
   return _decorator
 
 
@@ -349,7 +352,11 @@ element in the settings (which is done automatically), or in rare cases after a
 manual call to :func:`terra.core.settings.LazySettings.configure`.
 '''
 
-# Must be after post_settings_configured to prevent circular import errors.
-# Just can't use logger during import (global scope)
 from terra.logger import getLogger  # noqa
 logger = getLogger(__name__)
+# Must be after post_settings_configured to prevent circular import errors.
+# Just can't use logger during import (global scope)
+# This also works. Just "import terra.logger" does not, because logger isn't
+# done being imported here
+# import terra.logger as terra_logger
+# terra_logger = terra_logger.getLogger(__name__)
