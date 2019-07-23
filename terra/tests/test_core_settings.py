@@ -52,6 +52,15 @@ class TestLazyObject(TestCase):
     # quack is there because it's a class level variable
     self.assertIn('quack', dir(lazy))
 
+  def test_lazy_iter(self):
+    lazy = LazyObject()
+    data = [11, 33, 22]
+    lazy._wrapped = data
+
+    # Shrugs
+    for x,y in zip(iter(lazy), iter(data)):
+      self.assertEqual(x, y)
+
   def test_lazy_set_item(self):
     lazy = LazyObject()
     lazy._wrapped = type("NewDict", (dict,), {})()
@@ -178,7 +187,7 @@ class TestObjectDict(TestCase):
     d = ObjectDict()
     self.assertEqual(list(d.keys()), [])
 
-  def test_constructor_nested(self):
+  def test_constructor_dict(self):
     d = ObjectDict(foo=3, bar=dict(x=1, y=2))
     self.assertEqual(d.foo, 3)
     self.assertEqual(d.bar.x, 1)
@@ -340,24 +349,21 @@ class TestSettings(TestCase):
         'd': d
     })
 
-    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
-                            delete=False) as fid:
-      fid.write('{}')
-    os.environ['TERRA_SETTINGS_FILE'] = fid.name
-
     self.assertFalse(settings.configured)
+    settings.configure()
+
+    # Not cached
+    self.assertNotEqual(settings._wrapped['a'], 12.1)
     self.assertEqual(settings.a, 12.1)
+    # Verify cached
+    self.assertEqual(settings._wrapped['a'], 12.1)
+
     self.assertEqual(settings.c.e, 11.1)
-    # Verify caching is happening
-    self.assertEqual(settings._wrapped.c['e'], 11.1)
     self.assertEqual(settings.c.b, 13.1)
+
+    # A non settings_property function is just a function
     self.assertEqual(settings.d, d)
     self.assertEqual(settings.d(None), 3)
-    with self.assertRaises(AttributeError):
-      settings.q
-    with self.assertRaises(KeyError):
-      settings['q']
-    self.assertTrue(settings.configured)
 
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22})])
@@ -372,6 +378,15 @@ class TestSettings(TestCase):
     self.assertEqual(settings.a, 11)
     self.assertEqual(settings.b, "333")
     self.assertEqual(settings.c, 444)
+
+  def test_undefined_key(self):
+    settings.configure()
+
+    with self.assertRaises(AttributeError):
+      settings.q
+    with self.assertRaises(KeyError):
+      settings['q']
+    self.assertTrue(settings.configured)
 
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22})])
@@ -425,6 +440,7 @@ class TestSettings(TestCase):
       fid.write('{"a": 15}')
     os.environ['TERRA_SETTINGS_FILE'] = fid.name
 
+    self.assertFalse(settings.configured)
     with settings:
       settings.b = 12
       self.assertEqual(settings.a, 15)
@@ -446,6 +462,7 @@ class TestSettings(TestCase):
     settings.add_templates([({},
                              {'a': fid.name,
                               'b_json': fid.name,
+                              # Both json AND settings_property
                               'c_json': c})])
 
     settings.configure({})
@@ -473,6 +490,11 @@ class TestSettings(TestCase):
     self.assertEqual(j['b'], 22)
     self.assertEqual(j['c'], 33)
 
+  def test_nested_json_serializer(self):
+    @settings_property
+    def c(self):
+      return self.a + self.b
+
     settings._wrapped = Settings(
                 {'a': 11, 'b': 22, 'q': {'x': c, 'y': c, 'foo': {'t': [c]}}})
     j = json.loads(TerraJSONEncoder.dumps(settings))
@@ -482,19 +504,27 @@ class TestSettings(TestCase):
     self.assertEqual(j['q']['y'], 33)
     self.assertEqual(j['q']['foo']['t'][0], 33)
 
-  # Test all the properties here
-  def test_properties(self):
+  def test_properties_status_file(self):
     settings.configure({})
     with settings:
       settings.processing_dir = '/foobar'
       self.assertEqual(settings.status_file, '/foobar/status.json')
 
+  def test_properties_processing_dir_default(self):
+    settings.configure({})
+
     with self.assertLogs(), settings:
       self.assertEqual(settings.processing_dir, os.getcwd())
+
+  def test_properties_status_file(self):
+    settings.configure({})
 
     with settings, TemporaryDirectory() as temp_dir:
       settings.config_file = os.path.join(temp_dir, 'foo.bar')
       self.assertEqual(settings.processing_dir, temp_dir)
+
+  def test_properties_processing_dir_config_file(self):
+    settings.configure({})
 
     def mock_mkdtemp(prefix):
       return f'"{prefix}"'
@@ -503,6 +533,9 @@ class TestSettings(TestCase):
         self.assertLogs(), settings:
       settings.config_file = '/land/of/foo.bar'
       self.assertEqual(settings.processing_dir, '"terra_"')
+
+  def test_properties_unittest(self):
+    settings.configure({})
 
     with settings, EnvironmentContext(TERRA_UNITTEST="1"):
       self.assertTrue(settings.unittest)

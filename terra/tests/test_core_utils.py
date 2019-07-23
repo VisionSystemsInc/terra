@@ -108,19 +108,14 @@ class TestCachedProperty(TestCase):
     # Verify it was only called onces
     self.assertEqual(c.cached, 1)
 
-    # This should never be done, but the only way to re-execute a
-    # cached_property
+    # This should NEVER be done, but the only way to re-execute a
+    # cached_property, which I'm testing here
     c.__dict__.pop('foo')
     self.assertEqual(c.foo, 13)
     self.assertEqual(c.cached, 2)
 
 
 class TestHandler(TestCase):
-  def test_handler_autoconnect(self):
-    handle = Handler()
-    handle.real
-    self.assertIsNotNone(handle._connection)
-
   def test_handler_simple(self):
     handle = Handler()
     self.assertIs(handle._connection, int(0))
@@ -136,14 +131,40 @@ class TestHandler(TestCase):
       pass
 
     handle = Handler(override_type=Foo)
+
+    # Set on handle
     handle.bar = 15
+    # Debug verify on connection
     self.assertEqual(handle._connection.bar, 15)
+
+    # Emulate something in connection changing itself
     handle._connection.foo = 11
+    # Verify on handler
     self.assertEqual(handle.foo, 11)
+
+  def test_handler_del_attr(self):
+    class Foo:
+      pass
+
+    handle = Handler(override_type=Foo)
+
+    handle._connection.foo = 11
+    handle.bar = 15
+
     del(handle.foo)
     self.assertFalse(hasattr(handle._connection, 'foo'))
     del(handle._connection.bar)
     self.assertFalse(hasattr(handle, 'bar'))
+
+  def test_handler_autoconnect(self):
+    handle = Handler()
+    # Not connected
+    self.assertNotIn('_connection', handle.__dict__)
+    # Since the default is an int, int has a real property
+    handle.real
+    # Connected
+    self.assertIn('_connection', handle.__dict__)
+    self.assertIsNotNone(handle._connection)
 
   def test_close_handle(self):
     class Foo:

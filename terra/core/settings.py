@@ -383,6 +383,7 @@ class LazyObject:
       self._setup()
     return iter(self._wrapped)
 
+
 class LazySettings(LazyObject):
   '''
   A :class:`LazyObject` proxy for either global Terra settings or a custom
