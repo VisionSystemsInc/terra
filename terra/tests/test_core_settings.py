@@ -40,7 +40,6 @@ class TestLazyObject(TestCase):
     with self.assertRaises(NotImplementedError):
       iter(lazy)
 
-
   def test_lazy_dir(self):
     lazy = LazyObject()
 
@@ -58,7 +57,7 @@ class TestLazyObject(TestCase):
     lazy._wrapped = data
 
     # Shrugs
-    for x,y in zip(iter(lazy), iter(data)):
+    for x, y in zip(iter(lazy), iter(data)):
       self.assertEqual(x, y)
 
   def test_lazy_set_item(self):
@@ -162,7 +161,6 @@ class TestObjectDict(TestCase):
     # test Reading
     self.assertEqual(d.bar.prop, 'value')
 
-
     # test partial setting
     d.bar.prop = 'newer'
     self.assertEqual(d.bar.prop, 'newer')
@@ -239,7 +237,7 @@ class TestSettings(TestCase):
     self.assertEqual(settings['c'], True)
 
   def test_lazy_dir(self):
-    settings.configure({"a": 15, "b":"22.3", "c": True})
+    settings.configure({"a": 15, "b": "22.3", "c": True})
 
     self.assertIn('a', dir(settings))
     self.assertIn('b', dir(settings))
@@ -291,7 +289,6 @@ class TestSettings(TestCase):
     self.assertIn('q.foo', settings)
     self.assertNotIn('q.t', settings)
     self.assertIn('q.foo.t', settings)
-
 
   @mock.patch('terra.core.settings.global_templates',
               [({},
@@ -516,14 +513,14 @@ class TestSettings(TestCase):
     with self.assertLogs(), settings:
       self.assertEqual(settings.processing_dir, os.getcwd())
 
-  def test_properties_status_file(self):
+  def test_properties_processing_dir_config_file(self):
     settings.configure({})
 
     with settings, TemporaryDirectory() as temp_dir:
       settings.config_file = os.path.join(temp_dir, 'foo.bar')
       self.assertEqual(settings.processing_dir, temp_dir)
 
-  def test_properties_processing_dir_config_file(self):
+  def test_properties_processing_dir_nonexisting_config_file(self):
     settings.configure({})
 
     def mock_mkdtemp(prefix):
