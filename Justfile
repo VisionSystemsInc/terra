@@ -148,7 +148,7 @@ function terra_caseify()
       extra_args=$#
       ;;
     # Ideas
-    coverage_terra) # Run coverate on terra
+    coverage_terra) # Run coverage on terra
       pushd "${TERRA_CWD}" >& /dev/null # Not needed because of a cd line above
         Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'coverage run && coverage report -m'
       popd >& /dev/null # but added this so an app developer would know to add it

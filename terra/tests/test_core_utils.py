@@ -192,3 +192,10 @@ class TestClassHandler(TestCase):
 
     Ch = ClassHandler()
     self.assertIsInstance(Ch(), int)
+
+  def test_class_handler_with_arguments(self):
+    class Bar:
+      def __init__(self, x=17):
+        self.x = x
+    Ch = ClassHandler(override_type=Bar)
+    self.assertIsInstance(Ch(x=12), Bar)

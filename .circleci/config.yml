@@ -35,7 +35,7 @@ jobs:
           name: Build dockers
           command: |
             source setup.env
-            TERRA_PIPEVN_DEV=1 just build terra
+            TERRA_PIPENV_DEV=1 just build terra
 
       - run:
           name: Running test code
