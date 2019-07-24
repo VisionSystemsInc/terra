@@ -166,8 +166,6 @@ class Service(BaseService):
     self.volumes_flags = []
 
   def pre_run(self):
-    super().pre_run()
-
     self.temp_dir = TemporaryDirectory()
     temp_dir = Path(self.temp_dir.name)
 
@@ -231,8 +229,6 @@ class Service(BaseService):
       json.dump(docker_config, fid)
 
   def post_run(self):
-    super().post_run()
-
     # Delete temp_dir
     self.temp_dir.cleanup()
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason

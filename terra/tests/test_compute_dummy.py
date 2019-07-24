@@ -17,11 +17,9 @@ class TestServiceManual(dummy.BaseService):
     self.a = 11
 
   def pre_run(self):
-    super().pre_run()
     self.b = 22
 
   def post_run(self):
-    super().post_run()
     self.c = 33
 
 

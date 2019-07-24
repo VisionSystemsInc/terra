@@ -62,5 +62,5 @@ class Compute(BaseCompute):
 
 class Service(BaseService):
   '''
-  Base service class, prints pre_run and post_run steps
+  Virtualenv service class
   '''
