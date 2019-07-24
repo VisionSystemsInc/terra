@@ -609,7 +609,8 @@ class TestCircularDependency(TestLoggerCase):
   # this would reset modules to their initial state, giving false positives to
   # corruption checks. So mock it
   @mock.patch.dict(sys.modules)
-  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')  # Needed to make circular
+  # Needed to make circular imports
+  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')
   def last_test_import_settings(self):
     # Unload terra
     for module in list(sys.modules.keys()):
