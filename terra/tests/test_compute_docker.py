@@ -223,8 +223,8 @@ class TestDockerConfig(TestComputeDockerCase):
 
   def test_config_with_custom_files(self):
     compute = docker.Compute()
-    self.assertEqual(compute.configService(MockJustService(),
-                                           ['file15.yml', 'file2.yaml']),
+    self.assertEqual(compute.config_service(MockJustService(),
+                                            ['file15.yml', 'file2.yaml']),
                      'out')
     self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
                       '-f', 'file15.yml', '-f', 'file2.yaml',
@@ -468,7 +468,7 @@ class TestDockerMap(TestComputeDockerCase):
     compose_service_name = "foo"
     volumes = []
 
-  @mock.patch.object(docker.Compute, 'configService', mock_config)
+  @mock.patch.object(docker.Compute, 'config_service', mock_config)
   def test_config_non_existing_service(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
@@ -480,7 +480,7 @@ class TestDockerMap(TestComputeDockerCase):
     # Should be empty
     self.assertEqual(volume_map, [])
 
-  @mock.patch.object(docker.Compute, 'configService', mock_config)
+  @mock.patch.object(docker.Compute, 'config_service', mock_config)
   def test_config_terra_service(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
@@ -495,7 +495,7 @@ class TestDockerMap(TestComputeDockerCase):
             '/vsi')]
     self.assertEqual(volume_map, ans)
 
-  @mock.patch.object(docker.Compute, 'configService', mock_config)
+  @mock.patch.object(docker.Compute, 'config_service', mock_config)
   def test_config_test_service(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
@@ -555,7 +555,7 @@ class TestDockerService(TestComputeDockerCase):
                    if k.startswith('TERRA_VOLUME_')),
                   'Configuration failed to injected into docker')
 
-  @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
+  @mock.patch.object(docker.Compute, 'configuration_map_service', mock_map)
   def test_service_simple(self):
     # Must not be a decorator, because at decorator time (before setUp is run),
     # settings._wrapped is still None. Mock the version from setUpModule so I
@@ -572,7 +572,7 @@ class TestDockerService(TestComputeDockerCase):
       # Simple case
       self.common(compute, service)
 
-  @mock.patch.object(docker.Compute, 'configuration_mapService', mock_map)
+  @mock.patch.object(docker.Compute, 'configuration_map_service', mock_map)
   def test_service_other_dir_methods(self):
     compute = docker.Compute()
     compute.configuration_map(SomeService())

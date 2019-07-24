@@ -78,7 +78,7 @@ class Compute(BaseCompute):
     pid = Popen(('just',) + args, env=just_env, **kwargs)
     return pid
 
-  def runService(self, service_info):
+  def run_service(self, service_info):
     '''
     Use the service class information to run the service runner in a docker
     using
@@ -99,7 +99,7 @@ class Compute(BaseCompute):
     if pid.wait() != 0:
       raise ServiceRunFailed()
 
-  def configService(self, service_info, extra_compose_files=[]):
+  def config_service(self, service_info, extra_compose_files=[]):
     '''
     Returns the ``docker-compose config`` output
     '''
@@ -113,7 +113,7 @@ class Compute(BaseCompute):
                     env=service_info.env)
     return pid.communicate()[0]
 
-  def configuration_mapService(self, service_info, extra_compose_files=[]):
+  def configuration_map_service(self, service_info, extra_compose_files=[]):
     '''
     Returns the mapping of volumes from the host to the container.
 

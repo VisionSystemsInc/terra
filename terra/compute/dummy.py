@@ -9,20 +9,20 @@ class Compute(BaseCompute):
   services
   '''
 
-  def createService(self, service_info):
+  def create_service(self, service_info):
     logger.info("Create: " + str(service_info))
 
-  def startService(self, service_info):
+  def start_service(self, service_info):
     logger.info("Start: " + str(service_info))
 
-  def runService(self, service_info):
+  def run_service(self, service_info):
     logger.info("Run: " + str(service_info))
-    super().runService(service_info)
+    super().run_service(service_info)
 
-  def stopService(self, service_info):
+  def stop_service(self, service_info):
     logger.info("Stop: " + str(service_info))
 
-  def removeService(self, service_info):
+  def remove_service(self, service_info):
     logger.info("Remove: " + str(service_info))
 
 

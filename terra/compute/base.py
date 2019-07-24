@@ -62,12 +62,12 @@ class BaseCompute:
     return wrapper
 
   def __getattr__(self, name):
-    implementation = name + 'Service'
+    implementation = name + '_service'
     # Default implementation caller
 
     try:
       # super hasattr
-      self.__getattribute__(name + 'Service')
+      self.__getattribute__(implementation)
     except AttributeError:
       raise AttributeError(f'Compute command "{name}" does not have a service '
                            f'implementation "{implementation}"') from None
@@ -104,7 +104,7 @@ class BaseCompute:
       # bind function and return it
       return defaultCommand.__get__(self, type(self))
 
-  def runService(self, *args, **kwargs):
+  def run_service(self, *args, **kwargs):
     '''
     Place holder for code to run an instance in the compute. Runs
     :func:`create` and then runs and returns :func:`start` by default.
@@ -113,7 +113,7 @@ class BaseCompute:
     self.create(*args, **kwargs)
     return self.start(*args, **kwargs)
 
-  def configuration_mapService(self, service_info):
+  def configuration_map_service(self, service_info):
     '''
     Returns the mapping of volumes from the host to the remote
 

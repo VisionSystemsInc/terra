@@ -16,7 +16,7 @@ class Compute(BaseCompute):
   '''
 
   # run the service in a virtual env with the subprocess module
-  def runService(self, service_info):
+  def run_service(self, service_info):
     '''
     Run a command, usually in a virtual env.
 
