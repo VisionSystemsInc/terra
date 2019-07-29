@@ -74,14 +74,12 @@ class TestLoggerCase(TestCase):
     sys.excepthook = self.original_system_hook
     try:
       self._logs.log_file.close()
-      print('log closed')
     except AttributeError:
       pass
     # Windows is pickier about deleting files
     try:
       if self._logs.tmp_file:
         self._logs.tmp_file.close()
-        print('temp log closed')
     except AttributeError:
       pass
     self._logs.root_logger.handlers = []

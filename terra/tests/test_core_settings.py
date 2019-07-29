@@ -619,3 +619,7 @@ class TestCircularDependency(TestLoggerCase):
 
     import terra.core.settings
     terra.core.settings.settings._setup()
+
+    # Picky windows
+    import terra.logger
+    terra.logger._logs.log_file.close()
