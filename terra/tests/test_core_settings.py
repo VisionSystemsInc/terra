@@ -505,8 +505,13 @@ class TestSettings(TestCase):
   def test_properties_status_file(self):
     settings.configure({})
     with settings:
-      settings.processing_dir = '/foobar'
-      self.assertEqual(settings.status_file, '/foobar/status.json')
+      if os.name == "nt":
+        settings.processing_dir = 'C:\\foobar'
+        ans = 'C:\\foobar\\status.json'
+      else:
+        settings.processing_dir = '/foobar'
+        ans = '/foobar/status.json'
+      self.assertEqual(settings.status_file, ans)
 
   def test_properties_processing_dir_default(self):
     settings.configure({})
