@@ -20,7 +20,7 @@ class TestFullPaths(TestCase):
                               '--foo', '~/home.txt',
                               '--foo', './bar.txt'])
     ans = [os.path.join(os.getcwd(), 'foo.txt'),
-           os.path.expanduser('/ok.txt'),
+           os.path.abspath(os.path.expanduser('/ok.txt')),
            os.path.join(os.path.expanduser('~'), 'home.txt'),
            os.path.join(os.getcwd(), 'bar.txt')]
     self.assertEqual(ans, args.foo)
