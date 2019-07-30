@@ -13,7 +13,8 @@ from .test_logger import TestLoggerCase
 from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
-  ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder
+  ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder,
+  ExpandedString
 )
 
 
@@ -547,6 +548,45 @@ class TestSettings(TestCase):
 
     # Make sure I didn't break anything
     self.assertEqual(os.environ['TERRA_UNITTEST'], '1')
+
+  def test_expanduser(self):
+    settings.configure({'test_dir': '~/foo',
+                        'test_that': '~/bar'})
+
+    self.assertEqual(settings.test_dir, os.path.expanduser('~/foo'))
+    self.assertNotEqual(settings.test_that, os.path.expanduser('~/bar'))
+    self.assertEqual(settings.test_that, '~/bar')
+
+  def test_expanduser_once(self):
+    settings.configure({'test_dir': ExpandedString('~/foo'),
+                        'test_file': '~/bar'})
+
+    self.assertNotIsInstance(settings._wrapped['test_file'], ExpandedString)
+    self.assertEqual(settings.test_file, os.path.expanduser('~/bar'))
+    self.assertIsInstance(settings._wrapped['test_file'], ExpandedString)
+
+    self.assertEqual(settings.test_dir, '~/foo')
+
+  def test_expandvars(self):
+    with EnvironmentContext(FOO="NOTBAR"):
+      settings.configure({'test1': 'this${FOO}that',
+                          'test2': 'a${GKLDGSJLGKJSGURNAONV}b'})
+
+    with EnvironmentContext(FOO="BAR"):
+      self.assertEqual(settings.test1, 'thisBARthat')
+      self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
+
+  def test_expandvars_once(self):
+    settings.configure({'test2': 'a${GKLDGSJLGKJSGURNAONV}b'})
+
+    # Evaluate it here once
+    self.assertNotIsInstance(settings._wrapped['test2'], ExpandedString)
+    self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
+    self.assertIsInstance(settings._wrapped['test2'], ExpandedString)
+
+    with EnvironmentContext(GKLDGSJLGKJSGURNAONV="FOO"):
+      # Show it is not evaluated again here
+      self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
 
 
 class TestUnitTests(TestCase):
