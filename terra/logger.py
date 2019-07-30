@@ -64,17 +64,20 @@ import tempfile
 import platform
 import pprint
 import os
+import traceback
+import io
 
 from terra.core.exceptions import ImproperlyConfigured
 
 from logging import (
   CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET,
-  getLogger as getLogger_original, _acquireLock, _releaseLock
+  getLogger as getLogger_original, _acquireLock, _releaseLock, currentframe,
+  _srcfile as logging_srcfile, Logger as Logger_original
 )
 
 
 __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
-           'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3']
+           'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3', 'Logger']
 
 
 class HandlerLoggingContext(object):
@@ -302,6 +305,39 @@ extra_logger_variables = {'hostname': platform.node()}
 '''dict: Extra logger variables that can be reference in log messages'''
 
 
+class Logger(Logger_original):
+  def findCaller(self, stack_info=False):
+    """
+    Find the stack frame of the caller so that we can note the source
+    file name, line number and function name.
+    """
+    f = currentframe()
+    # On some versions of IronPython, currentframe() returns None if
+    # IronPython isn't run with -X:Frames.
+    if f is not None:
+      f = f.f_back
+    rv = "(unknown file)", 0, "(unknown function)", None
+    while hasattr(f, "f_code"):
+      co = f.f_code
+      filename = os.path.normcase(co.co_filename)
+      # I have to fix this line to be smarter
+      if filename in _srcfiles:
+        f = f.f_back
+        continue
+      sinfo = None
+      if stack_info:
+        sio = io.StringIO()
+        sio.write('Stack (most recent call last):\n')
+        traceback.print_stack(f, file=sio)
+        sinfo = sio.getvalue()
+        if sinfo[-1] == '\n':
+          sinfo = sinfo[:-1]
+        sio.close()
+      rv = (co.co_filename, f.f_lineno, co.co_name, sinfo)
+      break
+    return rv
+
+
 class LoggerAdapter(logging.LoggerAdapter):
   '''
   Terra's :class:`logging.LoggerAdapter`
@@ -336,6 +372,10 @@ def getLogger(name=None, extra=extra_logger_variables):
   return LoggerAdapter(logger, extra)
 
 
+_srcfiles = (logging_srcfile,
+             os.path.normcase(getLogger.__code__.co_filename))
+
+
 DEBUG1 = 10
 '''
 Debug level one. Same as the original :data:`logging.DEBUG` level, but now
@@ -362,6 +402,8 @@ output used to debug algorithms
 logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
+
+logging.setLoggerClass(Logger)
 
 # Get the logger here, AFTER all the changes to the logger class
 logger = getLogger(__name__)
