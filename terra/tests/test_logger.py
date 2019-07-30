@@ -1,4 +1,5 @@
 from unittest import mock
+import io
 import os
 import sys
 from tempfile import NamedTemporaryFile as NamedTemporaryFileOrig
@@ -173,6 +174,38 @@ class TestLogger(TestLoggerCase):
                                            extra=test_logger.extra)
     self.assertIn(f'({platform.node()})',
                   self._logs.stderr_handler.format(record))
+
+  # Test https://stackoverflow.com/q/19615876/4166604
+  def test_funcName(self):
+    stream = io.StringIO()
+    test_logger = logger.getLogger(f'{__name__}.test_funcName')
+    formatter = logging.Formatter('%(filename)s:%(funcName)s %(msg)s')
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(formatter)
+    handler.setLevel(logger.DEBUG2)
+    test_logger.logger.addHandler(handler)
+    test_logger.setLevel(logger.DEBUG2)
+
+    test_logger.debug2('hiya')
+    self.assertEqual(stream.getvalue(),
+                     f'{os.path.basename(__file__)}:test_funcName hiya\n')
+
+  def test_funcName_stackinfo(self):
+    stream = io.StringIO()
+    test_logger = logger.getLogger(f'{__name__}.test_funcName')
+    formatter = logging.Formatter('%(filename)s:%(funcName)s %(msg)s')
+    handler = logging.StreamHandler(stream)
+    handler.setFormatter(formatter)
+    handler.setLevel(logger.DEBUG2)
+    test_logger.logger.addHandler(handler)
+    test_logger.setLevel(logger.DEBUG2)
+
+    test_logger.debug2('byeee', stack_info=True)
+    self.assertNotIn(logger._srcfiles[0], stream.getvalue())
+    self.assertNotIn(logger._srcfiles[1], stream.getvalue())
+    self.assertIn(
+        f'{os.path.basename(__file__)}:test_funcName_stackinfo byeee\n',
+        stream.getvalue())
 
   def test_level(self):
     settings.configure({'processing_dir': self.temp_dir.name,
