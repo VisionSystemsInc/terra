@@ -559,6 +559,7 @@ class ObjectDict(dict):
 class ExpandedString(str):
   pass
 
+
 class Settings(ObjectDict):
   def __getattr__(self, name):
     '''
