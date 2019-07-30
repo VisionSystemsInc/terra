@@ -556,6 +556,9 @@ class ObjectDict(dict):
     nested_update(self, *args, **kwargs)
 
 
+class ExpandedString(str):
+  pass
+
 class Settings(ObjectDict):
   def __getattr__(self, name):
     '''
@@ -565,7 +568,7 @@ class Settings(ObjectDict):
 
     # This is here instead of in LazySettings because the functor is given
     # LazySettings, but then if __getattr__ is called on that, the segment of
-    # the settings object that is retreived is of type Settings, therefore
+    # the settings object that is retrieved is of type Settings, therefore
     # the settings_property evaluation has to be here.
 
     try:
@@ -576,6 +579,13 @@ class Settings(ObjectDict):
         val = val(settings)
 
         # cache result, because the documentation said this should happen
+        self[name] = val
+
+      if isinstance(val, str) and not isinstance(val, ExpandedString):
+        val = os.path.expandvars(val)
+        if any(name.endswith(pattern) for pattern in filename_suffixes):
+          val = os.path.expanduser(val)
+        val = ExpandedString(val)
         self[name] = val
       return val
     except KeyError:
