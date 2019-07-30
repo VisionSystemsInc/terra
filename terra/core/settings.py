@@ -568,7 +568,7 @@ class Settings(ObjectDict):
 
     # This is here instead of in LazySettings because the functor is given
     # LazySettings, but then if __getattr__ is called on that, the segment of
-    # the settings object that is retreived is of type Settings, therefore
+    # the settings object that is retrieved is of type Settings, therefore
     # the settings_property evaluation has to be here.
 
     try:
