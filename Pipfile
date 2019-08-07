@@ -23,3 +23,5 @@ envcontext = "*"
 celery = {extras = ["redis"], version = "*"}
 flower = "*"
 pyyaml = "*"
+
+colorama = {version = ">=0.4, <1", markers = "sys_platform == 'win32'"}

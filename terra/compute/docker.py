@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import json
+import distutils.spawn
 
 import yaml
 
@@ -75,7 +76,16 @@ class Compute(BaseCompute):
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
-    pid = Popen(('just',) + args, env=just_env, **kwargs)
+    # Get bash path for windows compatibility. I can't explain this error, but
+    # while the PATH is set right, I can't call "bash" because the WSL bash is
+    # called instead. It appearst to be a bug in the windows kernel as
+    # subprocess._winapi.CreateProcess('bash', 'bash --version', None, None,
+    # 0, 0, os.environ, None, None) even fails.
+    # Microsoft probably has a special exception for the word "bash" that
+    # calls WSL bash on execute :(
+    kwargs['executable'] = distutils.spawn.find_executable('bash')
+    # Have to call bash for windows compatibilitiy, no shebang support
+    pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
     return pid
 
   def run_service(self, service_info):
