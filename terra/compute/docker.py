@@ -1,4 +1,6 @@
 import os
+import posixpath
+import ntpath
 from os import environ as env
 from subprocess import Popen, PIPE
 from shlex import quote
@@ -78,13 +80,13 @@ class Compute(BaseCompute):
 
     # Get bash path for windows compatibility. I can't explain this error, but
     # while the PATH is set right, I can't call "bash" because the WSL bash is
-    # called instead. It appearst to be a bug in the windows kernel as
+    # called instead. It appears to be a bug in the windows kernel as
     # subprocess._winapi.CreateProcess('bash', 'bash --version', None, None,
     # 0, 0, os.environ, None, None) even fails.
     # Microsoft probably has a special exception for the word "bash" that
     # calls WSL bash on execute :(
     kwargs['executable'] = distutils.spawn.find_executable('bash')
-    # Have to call bash for windows compatibilitiy, no shebang support
+    # Have to call bash for windows compatibility, no shebang support
     pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
     return pid
 
@@ -174,6 +176,8 @@ class Service(BaseService):
   def __init__(self):
     super().__init__()
     self.volumes_flags = []
+    # For WCOW, set to 'windows'
+    self.container_platform = 'linux'
 
   def pre_run(self):
     self.temp_dir = TemporaryDirectory()
@@ -244,6 +248,25 @@ class Service(BaseService):
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
     # I did it this way.
 
-  def add_volume(self, local, remote, flags=None):
+  def add_volume(self, local, remote, flags=None, prefix=None):
+    if self.container_platform == "windows":
+      path = ntpath
+    else:
+      path = posixpath
+
+    # If LCOW
+    if os.name == "nt" and self.container_platform == "linux":
+      # Convert to posix slashed
+      remote = remote.replace('\\', '/')
+      # Remove duplicates
+      remote = re.sub('//+', '/', remote)
+      # Split drive letter off
+      drive, remote = ntpath.splitdrive(remote)
+      if drive:
+        remote = posixpath.join('/', drive[0], remote.lstrip(r'\/'))
+
+    if prefix:
+      remote = path.join(prefix, remote.lstrip(r'\/'))
+
     self.volumes.append((local, remote))
     self.volumes_flags.append(flags)
