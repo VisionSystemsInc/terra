@@ -216,11 +216,17 @@ class Service(BaseService):
     if os.name == "nt":
       logger.warning("Windows volume mapping is experimental.")
 
+      self.env['TERRA_AUTO_ESCAPE'] = self.env['TERRA_AUTO_ESCAPE'] \
+                                      + '|TERRA_SETTINGS_FILE'
+
       def patch_volume(value, volume_map):
         for vol_from, vol_to in volume_map:
-          if (isinstance(value, str)
-              and value.lower().startswith(vol_from.lower())):
-            return value.lower().replace(vol_from.lower(), vol_to.lower(), 1)
+          pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
+
+          if isinstance(value, str) and pattern.match(value):
+            value = pattern.sub(vol_to, value)
+            value = value.replace('\\', '/')
+            break
         return value
     else:
       def patch_volume(value, volume_map):
