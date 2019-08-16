@@ -188,6 +188,7 @@ function terra_caseify()
       fi
       justify build terra
       justify sync pipenv-terra
+      Terra_Pipenv sync
       ;;
     sync_pipenv-terra) # Sync Terra core's pipenv without updating
       Terra_Pipenv install --keep-outdated
