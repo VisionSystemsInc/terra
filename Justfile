@@ -186,6 +186,7 @@ function terra_caseify()
         # to be run the first time sync is run.
         touch "${TERRA_CWD}/.just_synced"
       fi
+      justify git_submodule-update # For those users who don't remember!
       justify build terra
       justify sync pipenv-terra
       Terra_Pipenv sync

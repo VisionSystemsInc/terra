@@ -1,11 +1,14 @@
 import os
+import posixpath
+import ntpath
 from os import environ as env
 from subprocess import Popen, PIPE
 from shlex import quote
 import re
-from pathlib import Path
+import pathlib
 from tempfile import TemporaryDirectory
 import json
+import distutils.spawn
 
 import yaml
 
@@ -75,7 +78,16 @@ class Compute(BaseCompute):
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
-    pid = Popen(('just',) + args, env=just_env, **kwargs)
+    # Get bash path for windows compatibility. I can't explain this error, but
+    # while the PATH is set right, I can't call "bash" because the WSL bash is
+    # called instead. It appears to be a bug in the windows kernel as
+    # subprocess._winapi.CreateProcess('bash', 'bash --version', None, None,
+    # 0, 0, os.environ, None, None) even fails.
+    # Microsoft probably has a special exception for the word "bash" that
+    # calls WSL bash on execute :(
+    kwargs['executable'] = distutils.spawn.find_executable('bash')
+    # Have to call bash for windows compatibility, no shebang support
+    pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
     return pid
 
   def run_service(self, service_info):
@@ -164,10 +176,12 @@ class Service(BaseService):
   def __init__(self):
     super().__init__()
     self.volumes_flags = []
+    # For WCOW, set to 'windows'
+    self.container_platform = 'linux'
 
   def pre_run(self):
     self.temp_dir = TemporaryDirectory()
-    temp_dir = Path(self.temp_dir.name)
+    temp_dir = pathlib.Path(self.temp_dir.name)
 
     # Check to see if and are already defined, this will play nicely with
     # external influences
@@ -202,11 +216,27 @@ class Service(BaseService):
     if os.name == "nt":
       logger.warning("Windows volume mapping is experimental.")
 
+      # Prevent the setting file name from being expanded.
+      self.env['TERRA_AUTO_ESCAPE'] = self.env['TERRA_AUTO_ESCAPE'] \
+                                      + '|TERRA_SETTINGS_FILE'
+
       def patch_volume(value, volume_map):
+        value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
         for vol_from, vol_to in volume_map:
-          if (isinstance(value, str)
-              and value.lower().startswith(vol_from.lower())):
-            return value.lower().replace(vol_from.lower(), vol_to.lower(), 1)
+          vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
+
+          if isinstance(value, str):
+            try:
+              remainder = value_path.relative_to(vol_from)
+            except ValueError:
+              continue
+            if self.container_platform == "windows":
+              value = pathlib.PureWindowsPath(vol_to)
+            else:
+              value = pathlib.PurePosixPath(vol_to)
+
+            value /= remainder
+            return str(value)
         return value
     else:
       def patch_volume(value, volume_map):
@@ -234,6 +264,25 @@ class Service(BaseService):
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
     # I did it this way.
 
-  def add_volume(self, local, remote, flags=None):
+  def add_volume(self, local, remote, flags=None, prefix=None):
+    if self.container_platform == "windows":
+      path = ntpath
+    else:
+      path = posixpath
+
+    # If LCOW
+    if os.name == "nt" and self.container_platform == "linux":
+      # Convert to posix slashed
+      remote = remote.replace('\\', '/')
+      # Remove duplicates
+      remote = re.sub('//+', '/', remote)
+      # Split drive letter off
+      drive, remote = ntpath.splitdrive(remote)
+      if drive:
+        remote = posixpath.join('/', drive[0], remote.lstrip(r'\/'))
+
+    if prefix:
+      remote = path.join(prefix, remote.lstrip(r'\/'))
+
     self.volumes.append((local, remote))
     self.volumes_flags.append(flags)

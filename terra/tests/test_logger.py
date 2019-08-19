@@ -2,6 +2,7 @@ from unittest import mock
 import io
 import os
 import sys
+import json
 from tempfile import NamedTemporaryFile as NamedTemporaryFileOrig
 import logging
 import uuid
@@ -59,8 +60,9 @@ class TestLoggerCase(TestCase):
 
     # Don't use settings.configure here, because I need to test out logging
     # signals
+    config = {"processing_dir": self.temp_dir.name}
     with open(settings_filename, 'w') as fid:
-      fid.write(f'{{"processing_dir": "{self.temp_dir.name}"}}')
+      json.dump(config, fid)
 
     self._logs = logger._SetupTerraLogger()
 
@@ -72,6 +74,12 @@ class TestLoggerCase(TestCase):
     sys.excepthook = self.original_system_hook
     try:
       self._logs.log_file.close()
+    except AttributeError:
+      pass
+    # Windows is pickier about deleting files
+    try:
+      if self._logs.tmp_file:
+        self._logs.tmp_file.close()
     except AttributeError:
       pass
     self._logs.root_logger.handlers = []

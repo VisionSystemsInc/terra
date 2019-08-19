@@ -505,8 +505,13 @@ class TestSettings(TestCase):
   def test_properties_status_file(self):
     settings.configure({})
     with settings:
-      settings.processing_dir = '/foobar'
-      self.assertEqual(settings.status_file, '/foobar/status.json')
+      if os.name == "nt":
+        settings.processing_dir = 'C:\\foobar'
+        ans = 'C:\\foobar\\status.json'
+      else:
+        settings.processing_dir = '/foobar'
+        ans = '/foobar/status.json'
+      self.assertEqual(settings.status_file, ans)
 
   def test_properties_processing_dir_default(self):
     settings.configure({})
@@ -609,7 +614,8 @@ class TestCircularDependency(TestLoggerCase):
   # this would reset modules to their initial state, giving false positives to
   # corruption checks. So mock it
   @mock.patch.dict(sys.modules)
-  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')  # Needed to make circular
+  # Needed to make circular imports
+  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')
   def last_test_import_settings(self):
     # Unload terra
     for module in list(sys.modules.keys()):
@@ -618,3 +624,7 @@ class TestCircularDependency(TestLoggerCase):
 
     import terra.core.settings
     terra.core.settings.settings._setup()
+
+    # Picky windows
+    import terra.logger
+    terra.logger._logs.log_file.close()
