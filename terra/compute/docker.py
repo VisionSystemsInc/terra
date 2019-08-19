@@ -5,7 +5,7 @@ from os import environ as env
 from subprocess import Popen, PIPE
 from shlex import quote
 import re
-from pathlib import Path
+import pathlib
 from tempfile import TemporaryDirectory
 import json
 import distutils.spawn
@@ -181,7 +181,7 @@ class Service(BaseService):
 
   def pre_run(self):
     self.temp_dir = TemporaryDirectory()
-    temp_dir = Path(self.temp_dir.name)
+    temp_dir = pathlib.Path(self.temp_dir.name)
 
     # Check to see if and are already defined, this will play nicely with
     # external influences
@@ -216,17 +216,27 @@ class Service(BaseService):
     if os.name == "nt":
       logger.warning("Windows volume mapping is experimental.")
 
+      # Prevent the setting file name from being expanded.
       self.env['TERRA_AUTO_ESCAPE'] = self.env['TERRA_AUTO_ESCAPE'] \
                                       + '|TERRA_SETTINGS_FILE'
 
       def patch_volume(value, volume_map):
+        value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
         for vol_from, vol_to in volume_map:
-          pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
+          vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
 
-          if isinstance(value, str) and pattern.match(value):
-            value = pattern.sub(vol_to, value)
-            value = value.replace('\\', '/')
-            break
+          if isinstance(value, str):
+            try:
+              remainder = value_path.relative_to(vol_from)
+            except ValueError:
+              continue
+            if self.container_platform == "windows":
+              value = pathlib.PureWindowsPath(vol_to)
+            else:
+              value = pathlib.PurePosixPath(vol_to)
+
+            value /= remainder
+            return str(value)
         return value
     else:
       def patch_volume(value, volume_map):
