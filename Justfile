@@ -182,7 +182,6 @@ function terra_caseify()
       fi
       justify git_submodule-update # For those users who don't remember!
       justify build terra
-      justify sync pipenv-terra
       Terra_Pipenv sync
       ;;
 
