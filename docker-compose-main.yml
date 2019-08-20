@@ -90,6 +90,13 @@ services:
         /redis-commander/docker/entrypoint.sh'
     # " Fix vscode syntax highlighting error
 
+  terra_pipenv:
+    <<: *terra
+    build:
+      <<: *terra_build
+      target: dep_pipenv
+    image: ${TERRA_DOCKER_REPO}:terra_pipenv_${TERRA_USERNAME}
+
   test:
     <<: *terra
     volumes:

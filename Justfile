@@ -23,7 +23,7 @@ function Terra_Pipenv()
     PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
     return $rv
   else
-    Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run terra pipenv ${@+"${@}"} || rv=$?
+    Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run terra_pipenv pipenv ${@+"${@}"} || rv=$?
     return $rv
   fi
 }
@@ -55,14 +55,8 @@ function terra_caseify()
         justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
-        justify _post_build_terra
         justify build services
       fi
-      ;;
-    _post_build_terra)
-      image_name=$(docker create ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME})
-      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
-      docker rm ${image_name}
       ;;
     build_services) # Build services. Takes arguments that are passed to the \
                     # docker-compose build command, such as "redis"
@@ -191,18 +185,13 @@ function terra_caseify()
       justify sync pipenv-terra
       Terra_Pipenv sync
       ;;
-    sync_pipenv-terra) # Sync Terra core's pipenv without updating
-      Terra_Pipenv install --keep-outdated
+
+    pipenv_install-terra) # Install/update pipenv packages into terra. Add --dev \
+                          # for development packages.
+      Terra_Pipenv install ${@+"${@}"}
+      extra_args=$#
       ;;
-    update_pipenv-terra) # Update Terra core's pipenv
-      Terra_Pipenv update
-      ;;
-    sync_dev-pipenv-terra) # Developer's extra sync
-      Terra_Pipenv install --dev --keep-outdated
-      ;;
-    update_dev-pipenv-terra) # Developer: Update python packages
-      Terra_Pipenv update --dev
-      ;;
+
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean venv
