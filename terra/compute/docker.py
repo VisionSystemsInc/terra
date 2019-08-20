@@ -218,7 +218,7 @@ class Service(BaseService):
 
       # Prevent the setting file name from being expanded.
       self.env['TERRA_AUTO_ESCAPE'] = self.env['TERRA_AUTO_ESCAPE'] \
-                                      + '|TERRA_SETTINGS_FILE'
+          + '|TERRA_SETTINGS_FILE'
 
       def patch_volume(value, volume_map):
         value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
