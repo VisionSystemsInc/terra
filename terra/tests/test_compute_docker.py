@@ -93,32 +93,33 @@ class TestDockerJust(TestComputeDockerCase):
     compute = docker.Compute()
     # Call just, and get the args calculated, retrieved via mock
     args, kwargs = compute.just("foo  bar")
-    self.assertEqual(args, (('just', 'foo  bar'),))
-    self.assertEqual(set(kwargs.keys()), {'env'})
+    self.assertEqual(args, (('bash', 'just', 'foo  bar'),))
+    self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
     self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
 
   def test_just_custom_env(self):
     default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
     # Use the env kwarg
     args, kwargs = compute.just("foo", "bar", env={"FOO": "BAR"})
-    self.assertEqual(args, (('just', 'foo', 'bar'),))
-    self.assertEqual(set(kwargs.keys()), {'env'})
+    self.assertEqual(args, (('bash', 'just', 'foo', 'bar'),))
+    self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
+    self.assertTrue(kwargs.pop('executable').endswith('bash'))
     self.assertEqual(kwargs, {'env': {'FOO': 'BAR',
                                       'JUSTFILE': default_justfile}})
 
   def test_just_custom_justfile(self):
     # Use the justfile kwarg
     args, kwargs = compute.just("foobar", justfile="/foo/bar")
-    self.assertEqual(args, (('just', 'foobar'),))
-    self.assertEqual(set(kwargs.keys()), {'env'})
+    self.assertEqual(args, (('bash', 'just', 'foobar'),))
+    self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
     self.assertEqual(kwargs['env']['JUSTFILE'], "/foo/bar")
 
   def test_just_kwargs(self):
     default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
     # Use the shell kwarg for Popen
     args, kwargs = compute.just("foobar", shell=False)
-    self.assertEqual(args, (('just', 'foobar'),))
-    self.assertEqual(set(kwargs.keys()), {'env', 'shell'})
+    self.assertEqual(args, (('bash', 'just', 'foobar'),))
+    self.assertEqual(set(kwargs.keys()), {'executable', 'env', 'shell'})
     self.assertEqual(kwargs['shell'], False)
     self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
 
