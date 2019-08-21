@@ -5,8 +5,6 @@ services:
     build: &terra_build
       context: .
       dockerfile: docker/terra.Dockerfile
-      args:
-        - TERRA_PIPENV_DEV=${TERRA_PIPENV_DEV-0}
     # prevent different users from clobbering each others images
     image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
     environment:
@@ -18,7 +16,7 @@ services:
       - DISPLAY
       - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/terra.Justfile
       - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
-      - PYTHONPATH=${TERRA_SOURCE_DIR_DOCKER-/src}
+      - PYTHONPATH=${TERRA_PYTHONPATH-}
       - TZ
     cap_add:
       - SYS_PTRACE # Useful for gdb
@@ -28,12 +26,6 @@ services:
         type: ${TERRA_TERRA_DIR_TYPE}
         source: ${TERRA_TERRA_DIR}
         target: ${TERRA_TERRA_DIR_DOCKER}
-        read_only: true
-      # app source code
-      - &terra_app_volume
-        type: ${TERRA_APP_DIR_TYPE}
-        source: ${TERRA_APP_DIR}
-        target: ${TERRA_APP_DIR_DOCKER}
         read_only: true
       # vsi_common
       - &terra_vsi_volume
@@ -46,11 +38,6 @@ services:
         type: volume
         source: terra-venv
         target: /venv
-      # The settings volume is used for settings files around
-      # - &terra_settings
-      #   type: bind
-      #   source: ${TERRA_SETTINGS_DIR-}
-      #   target: ${TERRA_SETTINGS_DIR_DOCKER}
 
   redis-commander:
     image: rediscommander/redis-commander
@@ -90,6 +77,20 @@ services:
         /redis-commander/docker/entrypoint.sh'
     # " Fix vscode syntax highlighting error
 
+  terra_pipenv:
+    <<: *terra
+    build:
+      <<: *terra_build
+      target: pipenv_run
+    image: ${TERRA_DOCKER_REPO}:terra_pipenv_${TERRA_USERNAME}
+    volumes:
+      - <<: *terra_source_volume
+        # egg-info directory will need to be writable
+        read_only: false
+      - <<: *terra_vsi_volume
+        read_only: false
+      - <<: *terra_venv_volume
+
   test:
     <<: *terra
     volumes:
@@ -117,4 +118,4 @@ volumes:
   terra-venv:
     labels:
       com.vsi.just.clean_action: delete
-      com.vsi.just.clean_setup: run terra nopipenv true
+      com.vsi.just.clean_setup: run nopipenv_terra true

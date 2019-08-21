@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Additional setup
           command: |
-            touch local.env
+            echo 'TERRA_LOCAL=0' >  local.env
 
       # - run:
       #     name: Checkout test data (git-lfs)
@@ -35,17 +35,18 @@ jobs:
           name: Build dockers
           command: |
             source setup.env
-            TERRA_PIPENV_DEV=1 just build terra
+            just sync terra
+            just pipenv sync-terra --dev
 
       - run:
           name: Running test code
           # no_output_timeout: 30m
           command: |
             source setup.env
-            TERRA_LOCAL=0 just test terra ${CIRCLE_CI_TEST_FLAGS-}
+            just test terra ${CIRCLE_CI_TEST_FLAGS-}
 
       - run:
           name: Check pep8 compliance
           command: |
             source setup.env
-            TERRA_LOCAL=0 just test pep8
+            just test pep8

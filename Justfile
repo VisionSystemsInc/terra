@@ -18,23 +18,20 @@ fi
 
 function Terra_Pipenv()
 {
-  local rv=0
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
-    PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || rv=$?
-    return $rv
+    PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
-    Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run terra pipenv ${@+"${@}"} || rv=$?
-    return $rv
+    Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
 }
 
-# Allow terra to be run as a non-plugin too. When called as a plugin, this
-# caseify is overridden by the main project, since plugins are supposed to be
-# sourced at the begining of a Justfile, not after caseify is defined.
-function caseify()
-{
-  defaultify ${@+"${@}"}
-}
+# Allow terra to be run as a non-plugin too
+if ! declare -pf caseify &> /dev/null; then
+  function caseify()
+  {
+    defaultify ${@+"${@}"}
+  }
+fi
 
 # Main function
 function terra_caseify()
@@ -55,14 +52,8 @@ function terra_caseify()
         justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
-        justify _post_build_terra
         justify build services
       fi
-      ;;
-    _post_build_terra)
-      image_name=$(docker create ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME})
-      docker cp ${image_name}:/venv/Pipfile.lock "${TERRA_CWD}/Pipfile.lock"
-      docker rm ${image_name}
       ;;
     build_services) # Build services. Takes arguments that are passed to the \
                     # docker-compose build command, such as "redis"
@@ -85,6 +76,16 @@ function terra_caseify()
       extra_args=$#
       return $rv
       ;;
+
+    run_nopipenv-terra) # Run terra command not in pipenv
+      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+        ${@+"${@}"}
+      else
+        Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${terra_service_name-terra} nopipenv ${@+"${@}"} || rv=$?
+      fi
+      extra_args=$#
+      ;;
+
     run_redis) # Run redis
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
       extra_args=$#
@@ -139,8 +140,8 @@ function terra_caseify()
     test_terra) # Run unit tests
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
-      # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
       if [[ $# == 0 ]]; then
+        # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
         Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       else
         Terra_Pipenv run env TERRA_UNITTEST=1 python -m unittest "${@}"
@@ -159,13 +160,7 @@ function terra_caseify()
     pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
-        if [[ "${TERRA_LOCAL}" = "1" ]]; then
-          Terra_Pipenv install --dev --keep-outdated
-        else
-          # This is teadious, BUT neccessary since pipenv uses this special
-          # stage just to install things correctly
-          TERRA_PIPENV_DEV=1 justify build terra
-        fi
+        justify pipenv terra sync --dev
       fi
 
       echo "Running for autopep8..."
@@ -187,25 +182,23 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       justify git_submodule-update # For those users who don't remember!
-      justify build terra
-      justify sync pipenv-terra
-      Terra_Pipenv sync
+      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+        Terra_Pipenv sync
+      else
+        justify build terra
+      fi
       ;;
-    sync_pipenv-terra) # Sync Terra core's pipenv without updating
-      Terra_Pipenv install --keep-outdated
+
+    pipenv_terra) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
+                  # installing/updating pipenv packages into terra
+      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
+      extra_args=$#
       ;;
-    update_pipenv-terra) # Update Terra core's pipenv
-      Terra_Pipenv update
-      ;;
-    sync_dev-pipenv-terra) # Developer's extra sync
-      Terra_Pipenv install --dev --keep-outdated
-      ;;
-    update_dev-pipenv-terra) # Developer: Update python packages
-      Terra_Pipenv update --dev
-      ;;
+
     clean_all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
-      COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean venv
+      COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+      COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker-compose clean terra-redis
       ;;
 
     ### Other ###

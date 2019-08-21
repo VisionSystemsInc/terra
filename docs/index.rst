@@ -12,6 +12,7 @@ Welcome to Terra's documentation!
 
    terra/getting_started
    terra/settings
+   terra/apps
    python/modules
    terra/contributing
 

@@ -9,7 +9,7 @@ FROM python:3.7.3-alpine3.8 as dep_stage
 SHELL ["/usr/bin/env", "sh", "-euxvc"]
 
 # Install any runtime dependencies
-RUN apk add --no-cache bash libressl
+RUN apk add --no-cache bash libressl tzdata
 
 ENV WORKON_HOME=/venv \
     PIPENV_PIPFILE=/terra/Pipfile \
@@ -31,19 +31,23 @@ RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers
 ADD external/vsi_common/setup.py /terra/external/vsi_common/
 ADD setup.py Pipfile Pipfile.lock /terra/
 
-ARG TERRA_PIPENV_DEV=0
     # Install all packages into the image
 RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
     (cd /terra; /usr/local/pipenv/bin/fake_package terra terra); \
-    if [ "${TERRA_PIPENV_DEV}" = "1" ]; then \
-      pipenv install --dev --keep-outdated; \
-    else \
-      pipenv install --keep-outdated; \
-    fi; \
-    # Copy the lock file, so that it can be copied out of the image in "just _post_build"
-    cp /terra/Pipfile.lock /venv; \
+    pipenv sync; \
     # Cleanup and make way for the real /terra that will be mounted at runtime
     rm -rf /terra/* /tmp/pip*
+
+###############################################################################
+
+FROM pipenv_cache as pipenv_run
+
+COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=vsi /vsi /vsi
+
+ENTRYPOINT ["/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
+
+CMD ["bash"]
 
 ###############################################################################
 
