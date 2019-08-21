@@ -7,7 +7,7 @@ function caseify()
   case "${cmd}" in
     redis-server) # Run redis server
       local conf="$(mktemp -u)"
-      echo -n "requirepass " | cat - "/run/secrets/${TERRA_REDIS_SECRET_DOCKER}" > "${conf}"
+      echo -n "requirepass " | cat - "/run/secrets/${TERRA_REDIS_SECRET}" > "${conf}"
       redis-server "${conf}"
       ;;
     *)
