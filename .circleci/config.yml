@@ -36,7 +36,7 @@ jobs:
           command: |
             source setup.env
             just sync terra
-            just pipenv sync-terra --dev
+            just pipenv terra sync --dev
 
       - run:
           name: Running test code
