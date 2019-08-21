@@ -183,7 +183,9 @@ function terra_caseify()
       fi
       justify git_submodule-update # For those users who don't remember!
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
+        COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         Terra_Pipenv sync
+        justify build services
       else
         justify build terra
       fi
