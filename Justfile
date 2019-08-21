@@ -160,7 +160,7 @@ function terra_caseify()
     pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
-        justify pipenv sync-terra --dev
+        justify pipenv terra sync --dev
       fi
 
       echo "Running for autopep8..."
@@ -189,15 +189,9 @@ function terra_caseify()
       fi
       ;;
 
-    pipenv_install-terra) # Install/update pipenv packages into terra. Add --dev \
-                          # for development packages.
-      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv install ${@+"${@}"}
-      extra_args=$#
-      ;;
-
-    pipenv_sync-terra) # Run pipenv sync on terra. Add --dev \
-                       # for development packages.
-      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
+    pipenv_terra) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
+                  # installing/updating pipenv packages into terra
+      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
       extra_args=$#
       ;;
 
