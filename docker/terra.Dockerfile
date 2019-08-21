@@ -24,30 +24,30 @@ RUN /tmp/pipenv/get-pipenv; rm -rf /tmp/pipenv || :
 
 ###############################################################################
 
-FROM dep_stage as dep_pipenv
+FROM dep_stage as pipenv_cache
 
 RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers
 
 ADD external/vsi_common/setup.py /terra/external/vsi_common/
 ADD setup.py Pipfile Pipfile.lock /terra/
 
-###############################################################################
-
-FROM dep_pipenv as pipenv_cache
-
-ARG TERRA_PIPENV_DEV=0
     # Install all packages into the image
 RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
     (cd /terra; /usr/local/pipenv/bin/fake_package terra terra); \
-    if [ "${TERRA_PIPENV_DEV}" = "1" ]; then \
-      pipenv sync --dev; \
-    else \
-      pipenv sync; \
-    fi; \
-    # Copy the lock file, so that it can be copied out of the image in "just _post_build"
-    cp /terra/Pipfile.lock /venv; \
+    pipenv sync; \
     # Cleanup and make way for the real /terra that will be mounted at runtime
     rm -rf /terra/* /tmp/pip*
+
+###############################################################################
+
+FROM pipenv_cache as pipenv_run
+
+COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=vsi /vsi /vsi
+
+ENTRYPOINT ["/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
+
+CMD ["bash"]
 
 ###############################################################################
 
