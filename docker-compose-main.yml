@@ -118,4 +118,4 @@ volumes:
   terra-venv:
     labels:
       com.vsi.just.clean_action: delete
-      com.vsi.just.clean_setup: run nopipenv_terra true
+      com.vsi.just.clean_setup: terra run-nopipenv true

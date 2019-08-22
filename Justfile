@@ -10,11 +10,19 @@ source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
 
 cd "${TERRA_CWD}"
 
-# Make a plugin if not the main Justfile
-JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
+# Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
   JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
+else
+  # Allow terra to be run as a non-plugin too
+  function caseify()
+  {
+    defaultify ${@+"${@}"}
+  }
 fi
+
+# Always add this to the list, because of how the caseify above works
+JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 
 function Terra_Pipenv()
 {
@@ -24,14 +32,6 @@ function Terra_Pipenv()
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
 }
-
-# Allow terra to be run as a non-plugin too
-if ! declare -pf caseify &> /dev/null; then
-  function caseify()
-  {
-    defaultify ${@+"${@}"}
-  }
-fi
 
 # Main function
 function terra_caseify()
@@ -43,8 +43,13 @@ function terra_caseify()
       export TERRA_LOCAL=1
       ;;
 
+    # # terra) # Run terra core target
+    #   terra_caseify terra_cmd ${@+"${@}"}
+    #   # extra_args=$#
+    #   ;;
+
     ### Building docker images ###
-    build_terra) # Build Docker image
+    terra_build) # Build Docker image
       if [ "$#" -gt "0" ]; then
         Docker-compose build ${@+"${@}"}
         extra_args=$#
@@ -52,10 +57,10 @@ function terra_caseify()
         justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
-        justify build services
+        justify terra build-services
       fi
       ;;
-    build_services) # Build services. Takes arguments that are passed to the \
+    terra_build-services) # Build services. Takes arguments that are passed to the \
                     # docker-compose build command, such as "redis"
       Docker-compose -f "${TERRA_CWD}/docker-compose.yml" build ${@+"${@}"}
       extra_args=$#
@@ -70,14 +75,14 @@ function terra_caseify()
       Terra_Pipenv run python -m pdb -m ${@+"${@}"}
       extra_args=$#
       ;;
-    run_terra) # Run command (arguments) in terra
+    terra_run) # Run command (arguments) in terra
       local rv=0
       Terra_Pipenv run ${@+"${@}"} || rv=$?
       extra_args=$#
       return $rv
       ;;
 
-    run_nopipenv-terra) # Run terra command not in pipenv
+    terra_run-nopipenv) # Run terra command not in pipenv
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
         ${@+"${@}"}
       else
@@ -123,13 +128,13 @@ function terra_caseify()
       ;;
 
     ### Deploy command ###
-    up) # Start redis (and any other services) in the background.
+    terra_up) # Start redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" up -d
       ;;
-    down) # Stop redis (and any other services) in the background.
+    terra_down) # Stop redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" down
       ;;
-    deploy) # Deploy services on a swarm
+    terra_deploy) # Deploy services on a swarm
       Docker-compose -f "${TERRA_CWD}/docker-compose.yml" \
                      -f "${TERRA_CWD}/docker-compose-swarm.yml" config | \
           Docker stack deploy -c - terra
@@ -137,7 +142,7 @@ function terra_caseify()
 
 
     ### Testing ###
-    test_terra) # Run unit tests
+    terra_test) # Run unit tests
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
       if [[ $# == 0 ]]; then
@@ -149,7 +154,7 @@ function terra_caseify()
       extra_args=$#
       ;;
     # Ideas
-    coverage_terra) # Run coverage on terra
+    terra_coverage) # Run coverage on terra
       pushd "${TERRA_CWD}" >& /dev/null # Not needed because of a cd line above
         Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'coverage run && coverage report -m'
       popd >& /dev/null # but added this so an app developer would know to add it
@@ -157,24 +162,24 @@ function terra_caseify()
 
     # How do I know what error code causes a problem in autopep8? You don't!
     # At least not as far as I can tell.
-    pep8) # Check pep8 compliance in ./terra
+    terra_pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
-        justify pipenv terra sync --dev
+        justify terra pipenv sync --dev
       fi
 
       echo "Running for autopep8..."
       Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
-    test_pep8) # Run pep8 test
-      justify pep8
+    terra_test-pep8) # Run pep8 test
+      justify terra pep8
       Terra_Pipenv run bash -c 'flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
 
     ### Syncing ###
-    sync_terra) # Synchronize the many aspects of the project when new code changes \
+    terra_sync) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout"
       if [ ! -e "${TERRA_CWD}/.just_synced" ]; then
         # Add any commands here, like initializing a database, etc... that need
@@ -185,19 +190,19 @@ function terra_caseify()
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         Terra_Pipenv sync
-        justify build services
+        justify terra build-services
       else
-        justify build terra
+        justify terra build
       fi
       ;;
 
-    pipenv_terra) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
+    terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
                   # installing/updating pipenv packages into terra
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
       extra_args=$#
       ;;
 
-    clean_all) # Delete all local volumes
+    terra_clean-all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" n
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
       COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker-compose clean terra-redis
@@ -205,7 +210,7 @@ function terra_caseify()
 
     ### Other ###
     # command: bash -c "touch /tmp/watchdog; while [ -e /tmp/watchdog ]; do rm /tmp/watchdog; sleep 1000; done"
-    # vscode) # Execute vscode magic in a vscode container
+    # terra_vscode) # Execute vscode magic in a vscode container
     #   local container="$(docker ps -q -f "label=com.docker.compose.service=vscode" -f "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}")"
     #   if [ -z "${container}" ]; then
     #     Just-docker-compose -f "${C3D_CWD}/docker-compose.yml" up -d vscode
@@ -223,19 +228,21 @@ function terra_caseify()
     #   extra_args+=$#
     #   ;;
 
-    ipykernel_terra) # Start a jupyter kernel in runserver
+    terra_ipykernel) # Start a jupyter kernel in runserver. You must have run \
+                     # just terra pipenv sync --dev for this to work.
       # Example kernel.json
       # {
       # "display_name": "terra",
       # "argv": [
       #  "python", "-m", "docker_proxy_kernel",
       #  "-f", "{connection_file}",
-      #  "--cmd", "['/home/noah/git/terra/external/vsi_common/linux/just', 'ipykernel']"
+      #  "--cmd", "['{source dir}/terra/external/vsi_common/linux/just', 'terra', 'ipykernel']"
       # ],
-      # "env": {"JUSTFILE": "/home/noah/git/terra/Justfile"},
+      # "env": {"JUSTFILE": "{source dir}/terra/Justfile"},
       # "language": "python"
       # }
-      Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run -T --service-ports ipykernel \
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" \
+          run -T --service-ports ipykernel \
           pipenv run python -m ipykernel_launcher ${@+"${@}"} > /dev/null
       extra_args=$#
       ;;
