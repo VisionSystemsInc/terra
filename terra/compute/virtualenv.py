@@ -1,10 +1,15 @@
+import distutils.spawn
+import json
 import os
+import pathlib
 from shlex import quote
 from subprocess import Popen
+from tempfile import TemporaryDirectory
 
 from vsi.tools.diff import dict_diff
 
 from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
+from terra.core.settings import TerraJSONEncoder
 from terra import settings
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
@@ -53,8 +58,14 @@ class Compute(BaseCompute):
       if dd:
         logger.debug1('Environment Modification:\n' + '\n'.join(dd))
 
+    # Similar (but different) to a bug in docker compute, the right python
+    # executable is not found on the path, possibly because Popen doesn't
+    # search the env's path, but this will manually search and find the right
+    # command
+    executable = distutils.spawn.find_executable(service_info.command[0], path=env['PATH'])
+
     # run command -- command must be a list of strings
-    pid = Popen(service_info.command, env=env)
+    pid = Popen(service_info.command, env=env, executable=executable)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
@@ -64,3 +75,27 @@ class Service(BaseService):
   '''
   Virtualenv service class
   '''
+
+  def pre_run(self):
+    """
+
+    """
+    # Create a temp directory, store it in this instance
+    self.temp_dir = TemporaryDirectory()
+
+    # Use a config.json file to store settings within that temp directory
+    temp_config_file = os.path.join(self.temp_dir.name, 'config.json')
+
+    # Serialize config file
+    docker_config = TerraJSONEncoder.serializableSettings(settings)
+
+    # Dump the serialized config to the temp config file
+    with open(temp_config_file, 'w') as fid:
+      json.dump(docker_config, fid)
+
+    # Set the Terra settings file for this service runner to the temp config file
+    self.env['TERRA_SETTINGS_FILE'] = temp_config_file
+
+  def post_run(self):
+    # Delete temp_dir
+    self.temp_dir.cleanup()
