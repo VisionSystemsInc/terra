@@ -19,7 +19,8 @@ terra = {path = ".",editable = true}
 vsi-common = {editable = true,path = "./external/vsi_common"}
 # Repeat this dependencies possibly due to a bug
 jstyleson = "*"
-docker-compose = "*"
+# Hack because pypiwin32 is stupid
+docker-compose = {markers = "sys_platform != 'win32'"}
 envcontext = "*"
 celery = {extras = ["redis"], version = "*"}
 flower = "*"
