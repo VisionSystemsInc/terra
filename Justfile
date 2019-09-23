@@ -66,6 +66,60 @@ function terra_caseify()
       extra_args=$#
       ;;
 
+    # terra_build-singular) # Build dockers for import to singularity and push them to registry
+    #   justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
+    #   justify terra build-services
+    #   for image in "${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}"; do
+    #     command="$(docker inspect -f '{{json .Config.Cmd}}' ${image})"
+    #     entrypoint="$(docker inspect -f '{{json .Config.Entrypoint}}' ${image})"
+    #     if [[ ${entrypoint} == null ]]; then
+    #       entrypoint=
+    #     else
+    #       # Remove tini and optional -- argument after it
+    #       entrypoint="$(sed -E 's|"[^"]*tini",("--",)?||' <<< "${entrypoint}")"
+    #       entrypoint="ENTRYPOINT ${entrypoint}"
+    #     fi
+    #     if [[ ${command} == null ]]; then
+    #       command=
+    #     else
+    #       command="CMD ${command}"
+    #     fi
+    #     ( # Quick dockerfile
+    #       echo "FROM ${image}";
+    #       echo "${entrypoint}";
+    #       echo "${command}"
+    #     ) |  Docker build -t "${TERRA_LOCAL_DOCKER_REGISTRY}${TERRA_LOCAL_DOCKER_REGISTRY+/}${image}" -
+    #     Docker push "${TERRA_LOCAL_DOCKER_REGISTRY}${TERRA_LOCAL_DOCKER_REGISTRY+/}${image}"
+    #   done
+    #   ;;
+
+    # terra_pull-singular) # Pull images from registry
+    #   for image in "${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}"; do
+    #     SINGULARITY_NOHTTPS=1 singularity build ${image##*:}.simg docker://${TERRA_LOCAL_DOCKER_REGISTRY}/${image}
+    #   done
+    #   ;;
+
+    terra_build-singular) # Build singularity images
+      justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
+      justify terra build-services
+      # docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock -v /opt/projects/terra/singularity/nginx:/output --privileged singularityware/docker2singularity:v2.6 mypytest:latest
+
+      for image in "${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}"; do
+        docker run -it --rm --privileged --entrypoint= \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v "$(pwd)":/output \
+          singularityware/docker2singularity:v2.6 bash -c "
+            sed -i 's|echo \"(9/10)|echo \"(8.5/10) Custom script\"; [[ -r \\\${build_sandbox}/.singularity.d/tosingular ]] \\&\\& source \\\${build_sandbox}/.singularity.d/tosingular; &|' /docker2singularity.sh &&
+            /docker2singularity.sh \"\${@}\"" bash "${image}"
+          #   sed -Ei 's|(chmod.*runscript;)|\1 cp \\\${build_sandbox}/.singularity.d/runscript \\\${build_sandbox}/.singularity.d/startscript|' /docker2singularity.sh &&
+          #   /docker2singularity.sh \"\${@}\"" bash "${image}"
+      done
+      ;;
+
+    terra_run-singular-redis) # Run redis in singularity
+      singularity run -e -c --pwd /data redis_${TERRA_USERNAME}.simg
+      ;;
+
     ### Running containers ###
     run) # Run python module/cli in terra
       Terra_Pipenv run python -m ${@+"${@}"}

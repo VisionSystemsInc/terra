@@ -1,0 +1,5 @@
+#!/usr/bin/env false bash
+
+sed -Ei 's|^exec (/[^ ]*/)?tini( --)?|exec|' ${build_sandbox}/.singularity.d/runscript
+
+cp ${build_sandbox}/.singularity.d/runscript ${build_sandbox}/.singularity.d/startscript
