@@ -1,5 +1,6 @@
 import os
 
+
 def find_file_in_path(fname, path=None):
   """
   Find a file in any of the directories on the PATH.

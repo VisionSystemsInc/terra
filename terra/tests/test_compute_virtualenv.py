@@ -102,4 +102,5 @@ class TestVirtualEnv(TestCase):
     self.assertTrue(any(o.startswith('- BAR:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
     # Added by Terra
-    self.assertTrue(any(o.startswith('+ TERRA_SETTINGS_FILE:') for o in env_lines))
+    self.assertTrue(any(o.startswith('+ TERRA_SETTINGS_FILE:')
+                        for o in env_lines))

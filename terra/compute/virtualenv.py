@@ -1,7 +1,6 @@
 import distutils.spawn
 import json
 import os
-import pathlib
 from shlex import quote
 from subprocess import Popen
 from tempfile import TemporaryDirectory
@@ -62,7 +61,8 @@ class Compute(BaseCompute):
     # executable is not found on the path, possibly because Popen doesn't
     # search the env's path, but this will manually search and find the right
     # command
-    executable = distutils.spawn.find_executable(service_info.command[0], path=env['PATH'])
+    executable = distutils.spawn.find_executable(service_info.command[0],
+                                                 path=env['PATH'])
 
     # run command -- command must be a list of strings
     pid = Popen(service_info.command, env=env, executable=executable)
@@ -93,7 +93,8 @@ class Service(BaseService):
     with open(temp_config_file, 'w') as fid:
       json.dump(docker_config, fid)
 
-    # Set the Terra settings file for this service runner to the temp config file
+    # Set the Terra settings file for this service runner to the temp config
+    # file
     self.env['TERRA_SETTINGS_FILE'] = temp_config_file
 
   def post_run(self):
