@@ -62,7 +62,7 @@ class TestVirtualEnv(TestCase):
 
     self.assertEqual(self.popen_args, (['ls'],))
     # Only kwarg is env
-    self.assertEqual(set(self.popen_kwargs.keys()), {'env'})
+    self.assertEqual(set(self.popen_kwargs.keys()), {'env', 'executable'})
     self.assertEqual(self.popen_kwargs['env']['BAR'], 'FOO')
 
   def test_run_virtualenv(self):
@@ -76,7 +76,7 @@ class TestVirtualEnv(TestCase):
       compute.run(service)
 
     self.assertEqual(self.popen_args, (['ls'],))
-    self.assertEqual(set(self.popen_kwargs.keys()), {'env'})
+    self.assertEqual(set(self.popen_kwargs.keys()), {'env', 'executable'})
     self.assertEqual(self.popen_kwargs['env']['BAR'], 'FOO')
     self.assertTrue(self.popen_kwargs['env']['PATH'].startswith('/bar/foo'))
 
@@ -87,7 +87,7 @@ class TestVirtualEnv(TestCase):
     # Test logging code
     with self.assertLogs(virtualenv.__name__, level="DEBUG1") as cm:
       env = os.environ.copy()
-      env.pop('PATH')
+      env.pop('SHLVL')
       env['FOO'] = 'BAR'
       service.env = env
 
@@ -96,7 +96,9 @@ class TestVirtualEnv(TestCase):
 
     env_lines = [x for x in cm.output if "Environment Modification:" in x][0]
     env_lines = env_lines.split('\n')
-    self.assertEqual(len(env_lines), 3)
+    self.assertEqual(len(env_lines), 4)
 
-    self.assertTrue(any(o.startswith('- PATH:') for o in env_lines))
+    self.assertTrue(any(o.startswith('- SHLVL:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
+    # Added by Terra
+    self.assertTrue(any(o.startswith('+ TERRA_SETTINGS_FILE:') for o in env_lines))
