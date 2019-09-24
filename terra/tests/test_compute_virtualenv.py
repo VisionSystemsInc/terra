@@ -86,8 +86,9 @@ class TestVirtualEnv(TestCase):
 
     # Test logging code
     with self.assertLogs(virtualenv.__name__, level="DEBUG1") as cm:
+      os.environ['BAR'] = 'FOO'
       env = os.environ.copy()
-      env.pop('SHLVL')
+      env.pop('BAR')
       env['FOO'] = 'BAR'
       service.env = env
 
@@ -98,7 +99,7 @@ class TestVirtualEnv(TestCase):
     env_lines = env_lines.split('\n')
     self.assertEqual(len(env_lines), 4)
 
-    self.assertTrue(any(o.startswith('- SHLVL:') for o in env_lines))
+    self.assertTrue(any(o.startswith('- BAR:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
     # Added by Terra
     self.assertTrue(any(o.startswith('+ TERRA_SETTINGS_FILE:') for o in env_lines))
