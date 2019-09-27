@@ -10,8 +10,6 @@ COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 COPY --from=vsi /vsi /vsi
 
-ADD docker/tosingular /.singularity.d/
-RUN chmod 755 /.singularity.d/tosingular
 ADD terra.env /terra/
 ADD docker/redis.Justfile /terra/docker/
 
