@@ -6,6 +6,7 @@ from subprocess import Popen
 from tempfile import TemporaryDirectory
 
 from vsi.tools.diff import dict_diff
+from vsi.tools.dir_util import is_subdir
 
 from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
 from terra.core.settings import TerraJSONEncoder
@@ -63,6 +64,20 @@ class Compute(BaseCompute):
     # command
     executable = distutils.spawn.find_executable(service_info.command[0],
                                                  path=env['PATH'])
+
+    # Check if the executable was found in the virtualenv_dir.
+    # If it wasn't, warn the user in case they made a mistake
+    if is_subdir(executable, settings.compute.virtualenv_dir):
+      logger.warning("""
+                     Couldn't find command {} in virtualenv_dir {}. Using {}
+                     instead. If you meant to bypass the virtualenv dir, then
+                     feel free to ignore this message. If you weren't expecting
+                     this, then make sure the compute.virtualenv_dir is
+                     correct.
+                     """
+                     .format(service_info.command[0],
+                             settings.compute.virtualenv_dir,
+                             executable))
 
     # run command -- command must be a list of strings
     pid = Popen(service_info.command, env=env, executable=executable)
