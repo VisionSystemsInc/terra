@@ -68,16 +68,12 @@ class Compute(BaseCompute):
     # Check if the executable was found in the virtualenv_dir.
     # If it wasn't, warn the user in case they made a mistake
     if is_subdir(executable, settings.compute.virtualenv_dir):
-      logger.warning("""
-                     Couldn't find command {} in virtualenv_dir {}. Using {}
-                     instead. If you meant to bypass the virtualenv dir, then
-                     feel free to ignore this message. If you weren't expecting
-                     this, then make sure the compute.virtualenv_dir is
-                     correct.
-                     """
-                     .format(service_info.command[0],
-                             settings.compute.virtualenv_dir,
-                             executable))
+      logger.warning(f"Couldn't find command {service_info.command[0]} in "
+                     f"virtualenv_dir {settings.compute.virtualenv_dir}. Using "
+                     f"{executable} instead. If you meant to bypass the "
+                     "virtualenv dir, then feel free to ignore this message. "
+                     "If you weren't expecting this, then make sure the "
+                     "compute.virtualenv_dir is correct.")
 
     # run command -- command must be a list of strings
     pid = Popen(service_info.command, env=env, executable=executable)
