@@ -70,85 +70,6 @@ class TestDockerRe(TestComputeDockerCase):
 ###############################################################################
 
 
-# Dummy mock to double check args
-def mock_popen(*args, **kwargs):
-  return (args, kwargs)
-
-
-class TestDockerJust(TestComputeDockerCase):
-  def setUp(self):
-    self.patches.append(mock.patch.object(docker, 'Popen', mock_popen))
-    super().setUp()
-    # Make a copy
-    self.original_env = os.environ.copy()
-
-  def tearDown(self):
-    super().tearDown()
-    # Make sure nothing inadvertently changed environ
-    self.assertEqual(self.original_env, os.environ)
-
-  def test_just_simple(self):
-    default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
-    # Create a compute
-    compute = docker.Compute()
-    # Call just, and get the args calculated, retrieved via mock
-    args, kwargs = compute.just("foo  bar")
-    self.assertEqual(args, (('bash', 'just', 'foo  bar'),))
-    self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
-    self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
-
-  def test_just_custom_env(self):
-    default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
-    # Use the env kwarg
-    args, kwargs = compute.just("foo", "bar", env={"FOO": "BAR"})
-    self.assertEqual(args, (('bash', 'just', 'foo', 'bar'),))
-    self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
-    self.assertTrue(kwargs.pop('executable').endswith('bash'))
-    self.assertEqual(kwargs, {'env': {'FOO': 'BAR',
-                                      'JUSTFILE': default_justfile}})
-
-  def test_just_custom_justfile(self):
-    # Use the justfile kwarg
-    args, kwargs = compute.just("foobar", justfile="/foo/bar")
-    self.assertEqual(args, (('bash', 'just', 'foobar'),))
-    self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
-    self.assertEqual(kwargs['env']['JUSTFILE'], "/foo/bar")
-
-  def test_just_kwargs(self):
-    default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
-    # Use the shell kwarg for Popen
-    args, kwargs = compute.just("foobar", shell=False)
-    self.assertEqual(args, (('bash', 'just', 'foobar'),))
-    self.assertEqual(set(kwargs.keys()), {'executable', 'env', 'shell'})
-    self.assertEqual(kwargs['shell'], False)
-    self.assertEqual(kwargs['env']['JUSTFILE'], default_justfile)
-
-  def test_logging_code(self):
-    # Test the debug1 diffdict log output
-    with self.assertLogs(docker.__name__, level="DEBUG1") as cm:
-      env = os.environ.copy()
-      env.pop('PATH')
-      env['FOO'] = 'BAR'
-      # Sometimes JUSTFILE is set, so make this part of the test!
-      with mock.patch.dict(os.environ, JUSTFILE='/foo/bar'):
-        compute.just("foo", "bar", env=env)
-
-    env_lines = [x for x in cm.output if "Environment Modification:" in x][0]
-    env_lines = env_lines.split('\n')
-    self.assertEqual(len(env_lines), 5, env_lines)
-
-    # Verify logs say PATH was removed
-    self.assertTrue(any(o.startswith('- PATH:') for o in env_lines))
-    # FOO was added
-    self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
-    # JUSTFILE was changed
-    self.assertTrue(any(o.startswith('+ JUSTFILE:') for o in env_lines))
-    self.assertTrue(any(o.startswith('- JUSTFILE:') for o in env_lines))
-
-
-###############################################################################
-
-
 class MockJustService:
   compose_file = "file1"
   compose_service_name = "launch"
@@ -476,7 +397,7 @@ class TestDockerMap(TestComputeDockerCase):
 
     with warnings.catch_warnings():
       warnings.simplefilter('ignore')
-      # USe the default name, foo, which doesn't even exist
+      # Use the default name, foo, which doesn't even exist
       volume_map = compute.configuration_map(service)
     # Should be empty
     self.assertEqual(volume_map, [])

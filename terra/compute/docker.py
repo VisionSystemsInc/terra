@@ -18,7 +18,8 @@ from vsi.tools.python import nested_patch
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute import compute
-from terra.compute.base import BaseService, BaseCompute, ServiceRunFailed
+from terra.compute.base import BaseService, ServiceRunFailed
+from terra.compute.just import Compute as JustCompute
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
@@ -39,7 +40,7 @@ RE Groups
 '''
 
 
-class Compute(BaseCompute):
+class Compute(JustCompute):
   '''
   Docker compute model, specifically ``docker-compose``
   '''
