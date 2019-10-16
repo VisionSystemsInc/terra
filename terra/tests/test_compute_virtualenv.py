@@ -50,8 +50,15 @@ class TestVirtualEnv(TestCase):
     service = MockVirtualEnvService()
 
     self.return_value = 1
-    with self.assertRaises(base.ServiceRunFailed):
-      compute.run(service)
+
+    import warnings
+    with warnings.catch_warnings():
+      with self.assertRaises(base.ServiceRunFailed):
+        warnings.simplefilter('ignore')
+        compute.run(service)
+      # Delete the service now, so that the temp directory is cleaned up, so
+      # the warning is captured now, in the context
+      del service
 
   def test_run_simple(self):
     compute = virtualenv.Compute()
@@ -73,7 +80,10 @@ class TestVirtualEnv(TestCase):
       settings.compute.virtualenv_dir = "/bar/foo"
 
       self.return_value = 0
-      compute.run(service)
+      with self.assertLogs(virtualenv.__name__, level="WARNING") as cm:
+        compute.run(service)
+      self.assertTrue(any("Couldn't find command ls in virtualenv_dir" in x for x in cm.output))
+
 
     self.assertEqual(self.popen_args, (['ls'],))
     self.assertEqual(set(self.popen_kwargs.keys()), {'env', 'executable'})
