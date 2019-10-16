@@ -6,7 +6,7 @@ if [ -n "${CMD}" ]; then
 fi
 
 # Remove tini, since it isn't needed or desired in singularity
-sed -Ei 's|^exec (/[^ ]*/)?tini( --)?|exec|' "${build_sandbox}/.singularity.d/runscript"
+sed -Ei 's|^ *exec (/[^ ]*/)?tini( --)?|exec|' "${build_sandbox}/.singularity.d/runscript"
 
 # Copy the run script to the start scipt, so that instance start does what we want
 cp "${build_sandbox}/.singularity.d/runscript" "${build_sandbox}/.singularity.d/startscript"
