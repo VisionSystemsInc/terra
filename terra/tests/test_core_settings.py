@@ -603,7 +603,7 @@ class TestUnitTests(TestCase):
   def last_test_settings(self):
     self.assertIsNone(
         settings._wrapped,
-        msg="If you are seting this, one of the other unit tests has "
+        msg="If you are seeing this, one of the other unit tests has "
             "initialized the settings. This side effect should be "
             "prevented by mocking out the settings._wrapped attribute. "
             "Otherwise unit tests can interfere with each other")

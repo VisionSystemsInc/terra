@@ -72,24 +72,13 @@ function terra_caseify()
       justify terra build-services
 
       for image in "${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}"; do
-        justify export singular "${image}"
+        justify singularity import -n "${image##*:}.simg" "${image}"
       done
       ;;
 
-    export_singular) # Explort docker image "$1" to singularity
-      Docker run -it --rm --privileged --entrypoint= \
-          --mount source=/var/run/docker.sock,destination=/var/run/docker.sock,type=bind \
-          --mount source="$(pwd)",destination=/output,type=bind \
-          --mount source="${TERRA_TERRA_DIR}/docker",destination=/custom,type=bind,readonly=true \
-          singularityware/docker2singularity:v2.6 bash -c "
-            sed -i 's|echo \"(9/10)|echo \"(8.5/10) Custom script\"; [[ -r /custom/tosingular ]] \\&\\& source /custom/tosingular; &|' /docker2singularity.sh &&
-            /docker2singularity.sh \"\${@}\"" bash "${1}"
-      extra_args=1
-      ;;
-
     terra_run-singular-redis) # Run redis in singularity
-      mkdir -p "${TERRA_SOURCE_DIR}/singular/redis"
-      ${DRYRUN} singularity run -e -c -B "${TERRA_SOURCE_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
+      mkdir -p "${TERRA_TERRA_SOURCE_DIR}/singular/redis"
+      ${DRYRUN} singularity run -e -c -B "${TERRA_TERRA_SOURCE_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
       ;;
 
     ### Running containers ###
