@@ -12,7 +12,9 @@ from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
 
-class Compute(BaseCompute):
+# Not called Compute, because this is not meant to be an actual compute, but a
+# parent class.
+class JustCompute(BaseCompute):
   def just(self, *args, **kwargs):
     '''
     Run a ``just`` command. Primarily used to run ``--wrap``

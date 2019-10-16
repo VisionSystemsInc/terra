@@ -16,14 +16,14 @@ class TestComputeJustCase(TestCase):
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,
                           '_connection',
-                          mock.PropertyMock(return_value=just.Compute())))
+                          mock.PropertyMock(return_value=just.JustCompute())))
 
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
 
     # Configure for base
     settings.configure({
-        'compute': {'arch': 'terra.compose.just'},
+        'compute': {'arch': 'mocked_out'},
         'processing_dir': self.temp_dir.name,
         'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
@@ -48,7 +48,7 @@ class TestBaseJust(TestComputeJustCase):
   def test_just_simple(self):
     default_justfile = os.path.join(os.environ['TERRA_TERRA_DIR'], 'Justfile')
     # Create a compute
-    compute = just.Compute()
+    compute = just.JustCompute()
     # Call just, and get the args calculated, retrieved via mock
     args, kwargs = compute.just("foo  bar")
     self.assertEqual(args, (('bash', 'just', 'foo  bar'),))

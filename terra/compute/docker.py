@@ -19,7 +19,7 @@ from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute import compute
 from terra.compute.base import BaseService, ServiceRunFailed
-from terra.compute.just import Compute as JustCompute
+from terra.compute.just import JustCompute
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
