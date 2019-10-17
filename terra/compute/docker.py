@@ -221,11 +221,11 @@ class Service(BaseService):
           + '|TERRA_SETTINGS_FILE'
 
       def patch_volume(value, volume_map):
-        value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
-        for vol_from, vol_to in volume_map:
-          vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
+        if isinstance(value, str):
+          value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
+          for vol_from, vol_to in volume_map:
+            vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
 
-          if isinstance(value, str):
             try:
               remainder = value_path.relative_to(vol_from)
             except ValueError:
@@ -240,9 +240,10 @@ class Service(BaseService):
         return value
     else:
       def patch_volume(value, volume_map):
-        for vol_from, vol_to in volume_map:
-          if isinstance(value, str) and value.startswith(vol_from):
-            return value.replace(vol_from, vol_to, 1)
+        if isinstance(value, str):
+          for vol_from, vol_to in volume_map:
+            if value.startswith(vol_from):
+              return value.replace(vol_from, vol_to, 1)
         return value
 
     # Apply map translation to settings configuration
