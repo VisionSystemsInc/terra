@@ -107,7 +107,7 @@ class BaseCompute:
   def run_service(self, *args, **kwargs):
     '''
     Place holder for code to run an instance in the compute. Runs
-    :func:`create` and then runs and returns :func:`start` by default.
+    ``create`` and then runs and returns ``start`` by default.
     '''
 
     self.create(*args, **kwargs)

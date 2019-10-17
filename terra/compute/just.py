@@ -15,6 +15,9 @@ logger = getLogger(__name__)
 # Not called Compute, because this is not meant to be an actual compute, but a
 # parent class.
 class JustCompute(BaseCompute):
+  '''
+  TODO: Remove this, it doesn't need to be a class
+  '''
   def just(self, *args, **kwargs):
     '''
     Run a ``just`` command. Primarily used to run ``--wrap``

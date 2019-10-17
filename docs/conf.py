@@ -14,7 +14,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('/terra'))
+sys.path.insert(0, os.path.abspath('/src'))
 
 
 # -- Project information -----------------------------------------------------
@@ -82,7 +82,13 @@ napoleon_include_special_with_doc = True
 
 # Autodoc parameters
 
-autodoc_mock_imports = ["vsi", "envcontext", "vxl"]
+autodoc_mock_imports = ["vsi",
+                        "vxl",
+                        "terra._terra",
+
+                        "envcontext",
+                        "yaml",
+                        "celery"]
 
 nitpick_ignore = [('py:class', 'bool'),
                   ('py:class', 'array_like'),
@@ -110,6 +116,10 @@ nitpick_ignore = [('py:class', 'bool'),
                   ('py:class', 'django.db.utils.ConnectionHandler'),
 
                   ('py:class', 'weakref.WeakKeyDictionary'),
+                  ('py:class', 'json.encoder.JSONEncoder'),
+                  ('py:class', 'concurrent.futures._base.Executor'),
+                  ('py:class', 'concurrent.futures._base.Future'),
+                  ('py:class', 'argparse._AppendAction'),
 
                   ('py:mod',   'logging'),
                   ('py:data',  'logging.DEBUG'),

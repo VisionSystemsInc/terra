@@ -87,13 +87,13 @@ def get_default_service_class(cls):
   '''
   Gets a compute class' default Service class from the class object.
 
+  Since computes are name ``Compute`` in the base module, the class ``Service``
+  should be defined in the same file. This will return that ``Service`` class
+
   Arguments
   ---------
   cls : type
       The compute class whose service class you want
-
-  Since computes are name ``Compute`` in the base module, the class ``Service``
-  should be defined in the same file. This will return that ``Service`` class
   '''
   module = import_module(f'{cls.__module__}')
   return module.Service
@@ -111,9 +111,9 @@ def load_service(name_or_class):
 
   Returns
   -------
-    instance
-        Instead of the class specified. If ``name_or_class`` was already an
-        instance, the same instance is returned
+  object
+      Instead of the class specified. If ``name_or_class`` was already an
+      instance, the same instance is returned
   '''
 
   if not isinstance(name_or_class, str):

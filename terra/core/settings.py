@@ -241,7 +241,7 @@ def unittest(self):
   '''
   A :func:`settings_property` for determing if unittests are running or not
 
-  Checks the value of :env:`TERRA_UNITTEST` and returns True or False based off
+  Checks the value of :envvar:`TERRA_UNITTEST` and returns True or False based off
   of that.
   '''
 
@@ -496,12 +496,12 @@ class LazySettings(LazyObject):
   def add_templates(self, templates):
     """
     Helper function to easily expose adding more defaults templates to
-    :var:`global_templates` specific for an application
+    :data:`global_templates` specific for an application
 
     Arguments
     ---------
     templates : list
-      A list of pairs of dictionaries just like :var:`global_templates`
+      A list of pairs of dictionaries just like :data:`global_templates`
     """
     # Pre-extend
     offset = len(global_templates)

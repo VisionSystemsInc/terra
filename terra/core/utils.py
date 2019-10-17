@@ -50,7 +50,7 @@ class cached_property:
       in instances using ``__dict__``, however both classes and instances
       (instantiated and uninstantiated) can be mocked using a ``PropertyMock``
       (data descriptor), as a simplier catch all. This will prevent the wrapped
-      function from being evaluated even once:
+      function from being evaluated even once::
 
           class Foo():
             @cached_property

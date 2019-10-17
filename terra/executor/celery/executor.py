@@ -75,19 +75,26 @@ class CeleryExecutorFuture(Future):
 
 
 class CeleryExecutor(Executor):
+  """
+  Executor implementation using celery tasks.
+
+  Parameters
+  ----------
+  predelay
+      Will trigger before the `.apply_async` internal call
+  postdelay
+      Will trigger before the `.apply_async` internal call
+  applyasync_kwargs
+      Options passed to the `.apply_async()` call
+  retry_kwargs
+      Options passed to the `.retry()` call on errors
+  retry_queue
+      Sugar to set an alternative queue specially for errors
+  update_delay
+      Delay time between checks for Future state changes
+  """
   def __init__(self, predelay=None, postdelay=None, applyasync_kwargs=None,
                retry_kwargs=None, retry_queue='', update_delay=0.1):
-    """
-    Executor implementation using celery tasks.
-
-    Args:
-        predelay: Will trigger before the `.apply_async` internal call
-        postdelay: Will trigger before the `.apply_async` internal call
-        applyasync_kwargs: Options passed to the `.apply_async()` call
-        retry_kwargs: Options passed to the `.retry()` call on errors
-        retry_queue: Sugar to set an alternative queue specially for errors
-        update_delay: Delay time between checks for Future state changes
-    """
     # Options about calling the Task
     self._predelay = predelay
     self._postdelay = postdelay
@@ -151,6 +158,8 @@ class CeleryExecutor(Executor):
         #     pass
 
   def submit(self, fn, *args, **kwargs):
+    """
+    """ # Original python comment has * and isn't napoleon
     with self._shutdown_lock:
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')

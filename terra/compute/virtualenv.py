@@ -25,6 +25,9 @@ class Compute(BaseCompute):
     '''
     Run a command, usually in a virtual env.
 
+    If ``settings.compute.virtualenv_dir`` is set, then that directory is
+    automatically prepended to the ``PATH`` for the command to be executed.
+
     Arguments
     ---------
     env : :class:`dict`, optional
@@ -35,9 +38,6 @@ class Compute(BaseCompute):
         List of arguments to be pass to ``Popen``
     **kwargs :
         Arguments sent to ``Popen`` command
-
-    If ``settings.compute.virtualenv_dir`` is set, then that directory is
-    automatically prepended to the ``PATH`` for the command to be executed.
     '''
 
     logger.debug('Running: ' + ' '.join(
