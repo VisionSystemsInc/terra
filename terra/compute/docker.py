@@ -2,8 +2,7 @@ import os
 import posixpath
 import ntpath
 from os import environ as env
-from subprocess import Popen, PIPE
-from shlex import quote
+from subprocess import PIPE
 import re
 import pathlib
 from tempfile import TemporaryDirectory
@@ -45,52 +44,6 @@ class Compute(JustCompute):
   '''
   Docker compute model, specifically ``docker-compose``
   '''
-
-  def just(self, *args, **kwargs):
-    '''
-    Run a ``just`` command. Primarily used to run
-    ``--wrap Just-docker-compose``
-
-    Arguments
-    ---------
-    justfile : :class:`str`, optional
-        Optionally allow you to specify a custom ``Justfile``. Defaults to
-        Terra's ``Justfile`` is used, which is the correct course of action
-        most of the time
-    env : :class:`dict`, optional
-        Sets environment variables. Same as Popen's ``env``, except
-        ``JUSTFILE`` is programatically set, and cannot be overridden any other
-        way than chaning the ``justfile`` variable
-    *args :
-        List of arguments to be pass to ``just``
-    **kwargs :
-        Arguments sent to ``Popen`` command
-    '''
-
-    logger.debug('Running: ' + ' '.join(
-        [quote(x) for x in ('just',) + args]))
-
-    just_env = kwargs.pop('env', env).copy()
-    justfile = kwargs.pop(
-        'justfile', os.path.join(env['TERRA_TERRA_DIR'], 'Justfile'))
-    just_env['JUSTFILE'] = justfile
-
-    if logger.getEffectiveLevel() <= DEBUG1:
-      dd = dict_diff(env, just_env)[3]
-      if dd:
-        logger.debug1('Environment Modification:\n' + '\n'.join(dd))
-
-    # Get bash path for windows compatibility. I can't explain this error, but
-    # while the PATH is set right, I can't call "bash" because the WSL bash is
-    # called instead. It appears to be a bug in the windows kernel as
-    # subprocess._winapi.CreateProcess('bash', 'bash --version', None, None,
-    # 0, 0, os.environ, None, None) even fails.
-    # Microsoft probably has a special exception for the word "bash" that
-    # calls WSL bash on execute :(
-    kwargs['executable'] = distutils.spawn.find_executable('bash')
-    # Have to call bash for windows compatibility, no shebang support
-    pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
-    return pid
 
   def run_service(self, service_info):
     '''
