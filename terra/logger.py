@@ -189,8 +189,13 @@ class _SetupTerraLogger():
 
     # https://stackoverflow.com/a/16993115/4166604
     def handle_exception(exc_type, exc_value, exc_traceback):
-      logger.error("Uncaught exception",
-                   exc_info=(exc_type, exc_value, exc_traceback))
+      # Try catch here because I want to make sure the original hook is called
+      try:
+        logger.error("Uncaught exception",
+                    exc_info=(exc_type, exc_value, exc_traceback))
+      except:
+        print('There was an exception logging in the execpetion handler!')
+        traceback.print_exc()
 
       return original_hook(exc_type, exc_value, exc_traceback)
 
