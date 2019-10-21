@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 
 class ContainerService(BaseService):
   '''
-  Base docker service class
+  Base container service class
   '''
 
   def __init__(self):
@@ -38,13 +38,13 @@ class ContainerService(BaseService):
     while f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}' in self.env:
       env_volume_index += 1
 
-    # Setup volumes for docker
+    # Setup volumes for container
     self.env[f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = \
         f'{str(temp_dir)}:/tmp_settings:rw'
     env_volume_index += 1
 
     # Copy self.volumes to the environment variables
-    for index, ((volume_host, volume_container), volume_flags) in \
+    for _, ((volume_host, volume_container), volume_flags) in \
         enumerate(zip(self.volumes, self.volumes_flags)):
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
@@ -57,8 +57,8 @@ class ContainerService(BaseService):
 
     logger.debug3("Volume map: %s", volume_map)
 
-    # Setup config file for docker
-    docker_config = TerraJSONEncoder.serializableSettings(settings)
+    # Setup config file for container
+    container_config = TerraJSONEncoder.serializableSettings(settings)
 
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
@@ -96,8 +96,8 @@ class ContainerService(BaseService):
         return value
 
     # Apply map translation to settings configuration
-    docker_config = nested_patch(
-        docker_config,
+    container_config = nested_patch(
+        container_config,
         lambda key, value: (isinstance(key, str)
                             and any(key.endswith(pattern)
                                     for pattern in filename_suffixes)),
@@ -106,7 +106,7 @@ class ContainerService(BaseService):
 
     # Dump the settings
     with open(temp_dir / 'config.json', 'w') as fid:
-      json.dump(docker_config, fid)
+      json.dump(container_config, fid)
 
   def post_run(self):
     # Delete temp_dir
