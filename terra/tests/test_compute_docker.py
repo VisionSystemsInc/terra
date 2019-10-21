@@ -90,7 +90,7 @@ class TestDockerRun(TestComputeDockerCase):
 
   def setUp(self):
     # Mock the just call for recording
-    self.patches.append(mock.patch.object(docker.Compute, 'just',
+    self.patches.append(mock.patch.object(docker, 'just',
                                           self.mock_just))
     super().setUp()
 
@@ -118,7 +118,7 @@ class TestDockerRun(TestComputeDockerCase):
 class TestDockerConfig(TestComputeDockerCase):
   def setUp(self):
     # Mock the just call for recording
-    self.patches.append(mock.patch.object(docker.Compute, 'just',
+    self.patches.append(mock.patch.object(docker, 'just',
                                           self.mock_just_config))
     super().setUp()
 

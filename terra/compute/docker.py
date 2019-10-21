@@ -17,9 +17,9 @@ from vsi.tools.python import nested_patch
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute import compute
-from terra.compute.base import ServiceRunFailed
+from terra.compute.base import BaseCompute, ServiceRunFailed
 from terra.compute.container import ContainerService
-from terra.compute.just import JustCompute
+from terra.compute.utils import just
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
@@ -40,7 +40,7 @@ RE Groups
 '''
 
 
-class Compute(JustCompute):
+class Compute(BaseCompute):
   '''
   Docker compute model, specifically ``docker-compose``
   '''
@@ -57,11 +57,11 @@ class Compute(JustCompute):
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
-    pid = self.just("--wrap", "Just-docker-compose",
-                    '-f', service_info.compose_file,
-                    'run', service_info.compose_service_name,
-                    *(service_info.command),
-                    env=service_info.env)
+    pid = just("--wrap", "Just-docker-compose",
+               '-f', service_info.compose_file,
+               'run', service_info.compose_service_name,
+               *(service_info.command),
+               env=service_info.env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
@@ -76,8 +76,8 @@ class Compute(JustCompute):
         sum([['-f', extra] for extra in extra_compose_files], []) + \
         ['config']
 
-    pid = self.just(*args, stdout=PIPE,
-                    env=service_info.env)
+    pid = just(*args, stdout=PIPE,
+               env=service_info.env)
     return pid.communicate()[0]
 
   def configuration_map_service(self, service_info, extra_compose_files=[]):
