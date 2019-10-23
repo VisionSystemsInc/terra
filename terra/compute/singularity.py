@@ -1,5 +1,8 @@
+from subprocess import PIPE
+
 from terra import settings
-from terra.compute.base import BaseService, BaseCompute
+from terra.compute.base import BaseCompute
+from terra.compute.container import ContainerService
 from terra.compute.utils import just
 from terra.compute.base import ServiceRunFailed
 
@@ -25,3 +28,20 @@ class Compute(BaseCompute):
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
+  def config_service(self, service_info, extra_compose_files=[]):
+    '''
+    Returns the ``singular-compose config-null`` output
+    '''
+
+    args = ["--wrap", "singular-compose",
+            '-f', service_info.compose_file] + \
+        sum([['-f', extra] for extra in extra_compose_files], []) + \
+        ['config']
+
+    pid = just(*args, stdout=PIPE,
+               env=service_info.env)
+    return pid.communicate()[0]
+class Service(ContainerService):
+  '''
+  Base docker service class
+  '''
