@@ -22,7 +22,7 @@ class SyncExecutor(Executor):
 
   def submit(self, fn, *args, **kwargs):
     '''
-    ''' # Sphinx bug
+    '''  # Sphinx incompatible comment in original code
     with self._shutdown_lock:
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')

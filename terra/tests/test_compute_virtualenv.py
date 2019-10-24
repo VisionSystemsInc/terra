@@ -82,8 +82,8 @@ class TestVirtualEnv(TestCase):
       self.return_value = 0
       with self.assertLogs(virtualenv.__name__, level="WARNING") as cm:
         compute.run(service)
-      self.assertTrue(any("Couldn't find command ls in virtualenv_dir" in x for x in cm.output))
-
+      self.assertTrue(any("Couldn't find command ls in virtualenv_dir" in x
+                          for x in cm.output))
 
     self.assertEqual(self.popen_args, (['ls'],))
     self.assertEqual(set(self.popen_kwargs.keys()), {'env', 'executable'})

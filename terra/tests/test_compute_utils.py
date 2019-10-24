@@ -45,7 +45,6 @@ class TestComputeUtilsCase(TestCase):
     # Register this Compute
     settings.configure({'compute': {'arch': Compute.__module__},
                         'processing_dir': self.temp_dir.name})
-        # 'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
     # Manually register without using decorator
     Compute.register(Service)(Service_test)
@@ -181,7 +180,7 @@ class TestBaseJust(TestComputeUtilsCase):
       env = os.environ.copy()
       env.pop('PATH')
       env['FOO'] = 'BAR'
-        # Sometimes JUSTFILE is set, so make this part of the test!
+      # Sometimes JUSTFILE is set, so make this part of the test!
       with mock.patch.dict(os.environ, JUSTFILE='/foo/bar'):
         utils.just("foo", "bar", env=env)
 

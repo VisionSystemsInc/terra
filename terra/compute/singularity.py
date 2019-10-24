@@ -10,6 +10,7 @@ from terra.compute.base import ServiceRunFailed
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+
 class Compute(BaseCompute):
   def run_service(self, service_info):
     '''
@@ -29,6 +30,7 @@ class Compute(BaseCompute):
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
+
   def config_service(self, service_info, extra_compose_files=[]):
     '''
     Returns the ``singular-compose config-null`` output
@@ -45,9 +47,11 @@ class Compute(BaseCompute):
 
     data = data.split(b'\0^')
     data = dict(zip([header.decode() for header in data[::2]],
-        [[chunk.decode() for chunk in group.split(b'\0.')] for group in data[1::2]]))
+                    [[chunk.decode() for chunk in group.split(b'\0.')]
+                     for group in data[1::2]]))
     if 'environment' in data:
-      data['environment'] = dict(zip(data['environment'][::2], data['environment'][1::2]))
+      data['environment'] = dict(zip(data['environment'][::2],
+                                     data['environment'][1::2]))
 
     return data
 
@@ -81,6 +85,7 @@ class Compute(BaseCompute):
     # Strip trailing /'s to make things look better
     return [(volume_host.rstrip(slashes), volume_remote.rstrip(slashes))
             for volume_host, volume_remote in volume_map]
+
 
 class Service(ContainerService):
   '''

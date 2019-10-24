@@ -93,6 +93,7 @@ class CeleryExecutor(Executor):
   update_delay
       Delay time between checks for Future state changes
   """
+
   def __init__(self, predelay=None, postdelay=None, applyasync_kwargs=None,
                retry_kwargs=None, retry_queue='', update_delay=0.1):
     # Options about calling the Task
@@ -159,7 +160,7 @@ class CeleryExecutor(Executor):
 
   def submit(self, fn, *args, **kwargs):
     """
-    """ # Original python comment has * and isn't napoleon
+    """  # Original python comment has * and isn't napoleon compatible
     with self._shutdown_lock:
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')

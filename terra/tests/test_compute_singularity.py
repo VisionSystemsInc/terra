@@ -16,5 +16,6 @@ from .utils import TestCase
 class TestComputeSingularCase(TestCase):
   pass
 
+
 class TestSingular(TestComputeSingularCase):
   pass
