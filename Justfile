@@ -5,6 +5,7 @@ source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terr
 # Plugins
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
 
@@ -211,6 +212,13 @@ function terra_caseify()
       fi
       ;;
 
+    terra_sync-singular) # Synchronize the many aspects of the project when new code changes \
+          # are applied e.g. after "git checkout" for a singularity build
+      justify git_submodule-update # For those users who don't remember!
+      Terra_Pipenv sync
+      justify terra_build-singular
+      ;;
+
     terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
                   # installing/updating pipenv packages into terra
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
@@ -218,9 +226,13 @@ function terra_caseify()
       ;;
 
     terra_clean-all) # Delete all local volumes
-      ask_question "Are you sure? This will remove packages not in Pipfile!" n
+      ask_question "Are you sure? This will remove packages not in Pipfile!" answer_clean_all
+      [ "$answer_clean_all" == "0" ] && return 1
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
       COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker-compose clean terra-redis
+      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+        Terra_Pipenv --rm
+      fi
       ;;
 
     ### Other ###

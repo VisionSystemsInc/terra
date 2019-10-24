@@ -12,6 +12,6 @@ Terra project from VSI
 
 ```
 source 'setup.env'
-just sync
+just terra sync
 just terra run
 ```

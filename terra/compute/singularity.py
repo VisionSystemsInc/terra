@@ -1,3 +1,4 @@
+import os
 from subprocess import PIPE
 
 from terra import settings
@@ -21,7 +22,7 @@ class Compute(BaseCompute):
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
-    pid = just("--wrap", "singular-compose",
+    pid = just("singular-compose",
                'run', service_info.compose_service_name,
                *(service_info.command),
                env=service_info.env)
@@ -33,14 +34,54 @@ class Compute(BaseCompute):
     Returns the ``singular-compose config-null`` output
     '''
 
-    args = ["--wrap", "singular-compose",
+    args = ["singular-compose",
             '-f', service_info.compose_file] + \
         sum([['-f', extra] for extra in extra_compose_files], []) + \
-        ['config']
+        ['config-null', service_info.compose_service_name]
 
     pid = just(*args, stdout=PIPE,
                env=service_info.env)
-    return pid.communicate()[0]
+    data = pid.communicate()[0]
+
+    data = data.split(b'\0^')
+    data = dict(zip([header.decode() for header in data[::2]],
+        [[chunk.decode() for chunk in group.split(b'\0.')] for group in data[1::2]]))
+    if 'environment' in data:
+      data['environment'] = dict(zip(data['environment'][::2], data['environment'][1::2]))
+
+    return data
+
+  def configuration_map_service(self, service_info, extra_compose_files=[]):
+    '''
+    Returns the mapping of volumes from the host to the container.
+
+    Returns
+    -------
+    list
+        Return a list of tuple pairs [(host, remote), ... ] of the volumes
+        mounted from the host to container
+    '''
+    # TODO: Make an OrderedDict
+    volume_map = []
+
+    config = self.config(service_info, extra_compose_files)
+
+    volumes = config.get('volumes', [])
+
+    for volume in volumes:
+      volume = volume.split(':')
+      volume_map.append((volume[0], volume[1]))
+
+    volume_map = volume_map + service_info.volumes
+
+    slashes = '/'
+    if os.name == 'nt':
+      slashes += '\\'
+
+    # Strip trailing /'s to make things look better
+    return [(volume_host.rstrip(slashes), volume_remote.rstrip(slashes))
+            for volume_host, volume_remote in volume_map]
+
 class Service(ContainerService):
   '''
   Base docker service class
