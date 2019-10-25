@@ -1,7 +1,6 @@
 import os
 from subprocess import PIPE
 
-from terra import settings
 from terra.compute.base import BaseCompute
 from terra.compute.container import ContainerService
 from terra.compute.utils import just

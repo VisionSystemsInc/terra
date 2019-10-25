@@ -241,8 +241,8 @@ def unittest(self):
   '''
   A :func:`settings_property` for determing if unittests are running or not
 
-  Checks the value of :envvar:`TERRA_UNITTEST` and returns True or False based off
-  of that.
+  Checks the value of :envvar:`TERRA_UNITTEST` and returns True or False based
+  off of that.
   '''
 
   return os.environ.get('TERRA_UNITTEST', None) == "1"

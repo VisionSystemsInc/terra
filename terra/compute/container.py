@@ -13,7 +13,7 @@ from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
 from terra.compute import compute
 from terra.compute.base import BaseService
-from terra.logger import getLogger, DEBUG1
+from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
@@ -35,7 +35,8 @@ class ContainerService(BaseService):
     # Check to see if and are already defined, this will play nicely with
     # external influences
     env_volume_index = 1
-    while f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}' in self.env:
+    while f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}' in \
+        self.env:
       env_volume_index += 1
 
     # Setup volumes for container
@@ -49,7 +50,8 @@ class ContainerService(BaseService):
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
-      self.env[f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = volume_str
+      self.env[f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = \
+          volume_str
       env_volume_index += 1
 
     # volume_map = compute.configuration_map(self, [str(temp_compose_file)])

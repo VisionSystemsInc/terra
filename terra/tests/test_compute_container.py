@@ -4,10 +4,7 @@ from unittest import mock
 
 from terra import settings
 from terra.compute import docker
-from terra.compute import compute
-import terra.compute.utils
 
-from .utils import TestCase
 from .test_compute_docker import TestComputeDockerCase
 
 

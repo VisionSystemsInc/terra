@@ -193,7 +193,7 @@ class _SetupTerraLogger():
       try:
         logger.error("Uncaught exception",
                      exc_info=(exc_type, exc_value, exc_traceback))
-      except:
+      except Exception:
         print('There was an exception logging in the execpetion handler!')
         traceback.print_exc()
 

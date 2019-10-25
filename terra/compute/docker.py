@@ -1,26 +1,13 @@
 import os
-import posixpath
-import ntpath
-from os import environ as env
 from subprocess import PIPE
 import re
-import pathlib
-from tempfile import TemporaryDirectory
-import json
-import distutils.spawn
 
 import yaml
 
-from vsi.tools.diff import dict_diff
-from vsi.tools.python import nested_patch
-
-from terra import settings
-from terra.core.settings import TerraJSONEncoder, filename_suffixes
-from terra.compute import compute
 from terra.compute.base import BaseCompute, ServiceRunFailed
 from terra.compute.container import ContainerService
 from terra.compute.utils import just
-from terra.logger import getLogger, DEBUG1
+from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
