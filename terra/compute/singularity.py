@@ -44,11 +44,14 @@ class Compute(BaseCompute):
                env=service_info.env)
     data = pid.communicate()[0]
 
+    # Split all the groups by the "header" word, null+^
     data = data.split(b'\0^')
     data = dict(zip([header.decode() for header in data[::2]],
+                    # Split all the data up "data" word, null+.
                     [[chunk.decode() for chunk in group.split(b'\0.')]
                      for group in data[1::2]]))
     if 'environment' in data:
+      # Environment is special, it comes in key/value pairs, zip em up.
       data['environment'] = dict(zip(data['environment'][::2],
                                      data['environment'][1::2]))
 

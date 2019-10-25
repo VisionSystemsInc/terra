@@ -94,8 +94,9 @@ def get_default_service_class(cls):
   '''
   Gets a compute class' default Service class from the class object.
 
-  Since computes are name ``Compute`` in the base module, the class ``Service``
-  should be defined in the same file. This will return that ``Service`` class
+  Since computes are named ``Compute`` in the base module, the class
+  ``Service`` should be defined in the same file. This will return that
+  ``Service`` class
 
   Arguments
   ---------
