@@ -596,12 +596,19 @@ class Settings(ObjectDict):
 
   def __enter__(self):
     import copy
-    object.__setattr__(self, "_backup", copy.deepcopy(self))
+    try:
+      # check if _backup exists
+      backup = object.__getattribute__(self, "_backup")
+      # if it does, append a copy of self
+      backup.append(copy.deepcopy(self))
+    except AttributeError:
+      # if it doesn't exist yet, make a list
+      object.__setattr__(self, "_backup", [copy.deepcopy(self)])
 
   def __exit__(self, type_, value, traceback):
     self.clear()
-    self.update(self._backup)
-    del self._backup
+    backup = self._backup.pop()
+    self.update(backup)
 
 
 settings = LazySettings()

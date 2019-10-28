@@ -60,7 +60,7 @@ class resumable(BasicDecorator):
     all_kwargs = args_to_kwargs(self.fun, args, kwargs)
     self.stage_self = all_kwargs['self']
 
-    # Create a unique name fot the function
+    # Create a unique name for the function
     stage_name = f'{inspect.getfile(self.fun)}//{self.fun.__qualname__}'
 
     # Load/create status file
@@ -72,6 +72,8 @@ class resumable(BasicDecorator):
     with open(settings.status_file, 'r') as fid:
       self.stage_self.status = ObjectDict(json.load(fid))
 
+    temporary_overwrite = False
+
     # If resume is turned on
     if settings.resume:
       try:
@@ -80,15 +82,20 @@ class resumable(BasicDecorator):
           logger.debug(f"Skipping {stage_name}... "
                        f"Resuming to {self.stage_self.status.stage}")
           return None
-        elif (self.stage_self.status.stage == stage_name
-              # If it's wasn't done, it doesn't get skipped.
-              and self.stage_self.status.stage_status == "done"):
+
+        # After here, we know the stage name has been matched
+        # i.e. self.stage_self.status.stage == stage_name
+
+        # If the stage is done, skip it
+        elif self.stage_self.status.stage_status == "done":
           logger.debug(f"Skipping {stage_name}... "
                        f"Resuming after {self.stage_self.status.stage}")
           # The resume feature is done now, disable it so that everything else
           # can run
           settings.resume = False
           return None
+        else:  # the stage is being re-run, so we're going to set overwrite to True
+          temporary_overwrite = True
       except AttributeError:
         pass
       # Set resume to false, so that this code isn't run again for this run.
@@ -102,7 +109,15 @@ class resumable(BasicDecorator):
     self.save_status()
 
     # Run function
-    result = self.fun(*args, **kwargs)
+    if temporary_overwrite:
+      # If we are resuming a broken stage, then temporarily set overwrite to True
+      logger.info(f"Resuming stage: {stage_name}, temporarily setting "
+                  "overwrite to True.")
+      with settings:
+        settings.overwrite = True
+        result = self.fun(*args, **kwargs)
+    else:
+      result = self.fun(*args, **kwargs)
 
     # Log done
     self.stage_self.status.stage_status = "done"

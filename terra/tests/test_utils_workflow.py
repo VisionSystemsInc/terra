@@ -145,6 +145,110 @@ class TestResumable(TestCase):
       self.assertTrue(any(re.search(
           f"Finished stage: .*{test2.__qualname__}", o) for o in cm.output))
 
+  def test_resuming_overwrite_when_not_done(self):
+    @resumable
+    def test1(self):
+      self.x = 12
+      return settings.overwrite
+
+    @resumable
+    def test2(self):
+      self.y = 13
+      return settings.overwrite
+
+    @resumable
+    def test3(self):
+      self.z = 14
+      return settings.overwrite
+
+    klass = Klass()
+
+    with settings:
+      settings.resume = True
+      settings.overwrite = False
+      with open(settings.status_file, 'w') as fid:
+        json.dump({'stage_status': 'starting',
+                   'stage': f'{__file__}//{test2.__qualname__}'}, fid)
+
+      with self.assertLogs(resumable.__module__, DEBUG1) as cm:
+
+        # test1 shouldn't be run, so the resumable decorator will return False
+        self.assertIsNone(test1(klass))
+
+        # the stage we resume should have overwrite set to True
+        self.assertTrue(test2(klass))
+
+        # the stages following should have overwrite reset to what it was before
+        self.assertFalse(test3(klass))
+
+      self.assertFalse(hasattr(klass, 'x'))
+      self.assertEqual(klass.y, 13)
+      self.assertEqual(klass.z, 14)
+
+      self.assertTrue(any(re.search(
+          f"Skipping .*{test1.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Starting stage: .*{test2.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Finished stage: .*{test2.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Resuming stage: .*{test2.__qualname__}, temporarily setting overwrite to True.", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Starting stage: .*{test3.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Finished stage: .*{test3.__qualname__}", o) for o in cm.output))
+
+  def test_resuming_overwrite_when_done(self):
+    @resumable
+    def test1(self):
+      self.x = 12
+      return settings.overwrite
+
+    @resumable
+    def test2(self):
+      self.y = 13
+      return settings.overwrite
+
+    @resumable
+    def test3(self):
+      self.z = 14
+      return settings.overwrite
+
+    klass = Klass()
+
+    with settings:
+      settings.resume = True
+      settings.overwrite = False
+      with open(settings.status_file, 'w') as fid:
+        json.dump({'stage_status': 'done',
+                   'stage': f'{__file__}//{test2.__qualname__}'}, fid)
+
+      with self.assertLogs(resumable.__module__, DEBUG1) as cm:
+
+        # test1 shouldn't be run, so the resumable decorator will return False
+        self.assertIsNone(test1(klass))
+
+        # test2 is done, so it shouldn't be run either
+        self.assertIsNone(test2(klass))
+
+        # test3 should run, but overwrite shouldn't be modified
+        self.assertFalse(test3(klass))
+
+      self.assertFalse(hasattr(klass, 'x'))
+      self.assertFalse(hasattr(klass, 'y'))
+      self.assertEqual(klass.z, 14)
+
+      self.assertTrue(any(re.search(
+          f"Skipping .*{test1.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Skipping .*{test2.__qualname__}", o) for o in cm.output))
+      self.assertFalse(any(re.search(
+          f"Resuming stage: .*{test2.__qualname__}, temporarily setting overwrite to True.", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Starting stage: .*{test3.__qualname__}", o) for o in cm.output))
+      self.assertTrue(any(re.search(
+          f"Finished stage: .*{test3.__qualname__}", o) for o in cm.output))
+
   def test_resume_no_status_file(self):
     settings.resume = True
 
