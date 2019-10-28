@@ -8,7 +8,6 @@ from tempfile import TemporaryDirectory
 import json
 
 from vsi.tools.python import nested_patch
-from vsi.test.utils import TestCase, make_traceback, NamedTemporaryFileFactory
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
@@ -138,7 +137,7 @@ class ContainerService(BaseService):
         # If prefix drive is unset, copy from remote
         if not prefix_drive:
           prefix_drive = remote_drive
-        remote = ntpath.join(prefix_drive, '\\'+prefix.lstrip(r'\/'),
+        remote = ntpath.join(prefix_drive, '\\' + prefix.lstrip(r'\/'),
                              remote.lstrip(r'\/'))
     else:
       # If LCOW

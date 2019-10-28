@@ -231,7 +231,7 @@ class Signal:
     """
     if not self.receivers or \
        self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
-      return []
+      return []  # pragma: no cover Not my code
 
     # Call each receiver with whatever arguments it can accept.
     # Return a list of tuple pairs [(receiver, response), ... ].
@@ -268,7 +268,7 @@ class Signal:
       # .send() prior to calling _live_receivers() due to concurrent .send()
       # call.
       if receivers is NO_RECEIVERS:
-        return []
+        return []  # pragma: no cover Not my code
     if receivers is None:
       with self.lock:
         self._clear_dead_receivers()
@@ -279,7 +279,8 @@ class Signal:
             receivers.append(receiver)
         if self.use_caching:
           if not receivers:
-            self.sender_receivers_cache[sender] = NO_RECEIVERS
+            self.sender_receivers_cache[sender] = \
+                NO_RECEIVERS  # pragma: no cover
           else:
             # Note, we must cache the weakref versions.
             self.sender_receivers_cache[sender] = receivers

@@ -178,7 +178,7 @@ class TestResumable(TestCase):
         # the stage we resume should have overwrite set to True
         self.assertTrue(test2(klass))
 
-        # the stages following should have overwrite reset to what it was before
+        # the stages following should reset overwrite to what it was before
         self.assertFalse(test3(klass))
 
       self.assertFalse(hasattr(klass, 'x'))
@@ -192,7 +192,8 @@ class TestResumable(TestCase):
       self.assertTrue(any(re.search(
           f"Finished stage: .*{test2.__qualname__}", o) for o in cm.output))
       self.assertTrue(any(re.search(
-          f"Resuming stage: .*{test2.__qualname__}, temporarily setting overwrite to True.", o) for o in cm.output))
+          f"Resuming stage: .*{test2.__qualname__}, "
+          "temporarily setting overwrite to True.", o) for o in cm.output))
       self.assertTrue(any(re.search(
           f"Starting stage: .*{test3.__qualname__}", o) for o in cm.output))
       self.assertTrue(any(re.search(
@@ -243,7 +244,8 @@ class TestResumable(TestCase):
       self.assertTrue(any(re.search(
           f"Skipping .*{test2.__qualname__}", o) for o in cm.output))
       self.assertFalse(any(re.search(
-          f"Resuming stage: .*{test2.__qualname__}, temporarily setting overwrite to True.", o) for o in cm.output))
+          f"Resuming stage: .*{test2.__qualname__}, "
+          "temporarily setting overwrite to True.", o) for o in cm.output))
       self.assertTrue(any(re.search(
           f"Starting stage: .*{test3.__qualname__}", o) for o in cm.output))
       self.assertTrue(any(re.search(

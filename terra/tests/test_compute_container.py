@@ -1,12 +1,10 @@
 import os
 import ntpath
-import posixpath
 import json
 import tempfile
 from unittest import mock, skipIf
 
 from terra import settings
-from terra.compute import docker
 from terra.compute import base
 import terra.compute.container
 from vsi.test.utils import TestCase, NamedTemporaryFileFactory
@@ -26,10 +24,9 @@ def mock_map(self, *args, **kwargs):
   return [('/foo', '/bar'),
           ('/tmp/.X11-unix', '/tmp/.X11-unix')]
 
+
 def mock_map_lcow(self, *args, **kwargs):
   return [('/c/foo', '/bar')]
-
-from tempfile import mkdtemp as mkdtempOrig
 
 
 class TestComputeContainerCase(TestCase):
@@ -97,7 +94,7 @@ class TestContainerService(TestComputeContainerCase):
       compute.configuration_map(SomeService())
 
       # Test setting for translation
-      settings.foo_dir = "/foo" # From mock_map
+      settings.foo_dir = "/foo"  # From mock_map
       settings.bar_dir = "/not_foo"
 
       service = SomeService()
@@ -113,7 +110,7 @@ class TestContainerService(TestComputeContainerCase):
       compute.configuration_map(SomeService())
 
       # Test setting for translation
-      settings.foo_dir = "/C/FoO" # From mock_map
+      settings.foo_dir = "/C/FoO"  # From mock_map
       settings.bar_dir = "/not_foo"
 
       service = SomeService()

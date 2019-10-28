@@ -94,7 +94,8 @@ class resumable(BasicDecorator):
           # can run
           settings.resume = False
           return None
-        else:  # the stage is being re-run, so we're going to set overwrite to True
+        # the stage is being re-run, so we're going to set overwrite to True
+        else:
           temporary_overwrite = True
       except AttributeError:
         pass
@@ -110,7 +111,8 @@ class resumable(BasicDecorator):
 
     # Run function
     if temporary_overwrite:
-      # If we are resuming a broken stage, then temporarily set overwrite to True
+      # If we are resuming a broken stage, then temporarily set overwrite to
+      # True
       logger.info(f"Resuming stage: {stage_name}, temporarily setting "
                   "overwrite to True.")
       with settings:

@@ -447,3 +447,4 @@ class TestDockerMap(TestComputeDockerCase):
            ('/tmp/.X11-unix', '/tmp/.X11-unix'),
            ('/opt/projects/terra/terra_dsm/external/terra/external/vsi_common',
             '/vsi')]
+    self.assertEqual(volume_map, ans)
