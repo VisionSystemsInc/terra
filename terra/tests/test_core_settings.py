@@ -40,6 +40,8 @@ class TestLazyObject(TestCase):
       del(lazy['test'])
     with self.assertRaises(NotImplementedError):
       iter(lazy)
+    with self.assertRaises(NotImplementedError):
+      len(lazy)
 
   def test_lazy_dir(self):
     lazy = LazyObject()
@@ -103,6 +105,20 @@ class TestLazyObject(TestCase):
     lazy._wrapped = type("NewDict", (dict,), {})()
     with self.assertRaises(TypeError):
       del(lazy._wrapped)
+
+  def test_lazy_items(self):
+    lazy = LazyObject()
+    lazy._wrapped = type("NewDict", (list,), {})((11, 22, 33))
+
+    lazy[1] = 17
+    self.assertEqual(lazy[0], 11)
+    self.assertEqual(lazy[1], 17)
+    self.assertEqual(lazy[2], 33)
+    self.assertEqual(len(lazy), 3)
+    del(lazy[0])
+    self.assertEqual(lazy[0], 17)
+    self.assertEqual(lazy[1], 33)
+    self.assertEqual(len(lazy), 2)
 
 
 class TestObjectDict(TestCase):
@@ -446,6 +462,31 @@ class TestSettings(TestCase):
 
     self.assertEqual(settings.a, 15)
     self.assertNotIn('b', settings)
+
+  def test_multiple_lazy_contexts(self):
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 15}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    self.assertFalse(settings.configured)
+    with settings:
+      settings.b = 12
+      self.assertEqual(settings.a, 15)
+      self.assertEqual(settings.b, 12)
+      with settings:
+        settings.a = 16
+        settings.c = 27
+        self.assertEqual(settings.a, 16)
+        self.assertEqual(settings.b, 12)
+        self.assertEqual(settings.c, 27)
+      self.assertEqual(settings.a, 15)
+      self.assertEqual(settings.b, 12)
+      self.assertNotIn('c', settings)
+
+    self.assertEqual(settings.a, 15)
+    self.assertNotIn('b', settings)
+    self.assertNotIn('c', settings)
 
   @mock.patch('terra.core.settings.global_templates', [])
   def test_json(self):

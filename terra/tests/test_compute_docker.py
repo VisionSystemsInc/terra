@@ -1,3 +1,6 @@
+import os
+import posixpath
+import ntpath
 import re
 from unittest import mock
 import warnings
@@ -357,7 +360,7 @@ services:
       TZ: /usr/share/zoneinfo/America/New_York]
     image: terra:terra_me
     volumes:
-    - /tmp:/bar:ro
+    - /tmp\:/bar:ro
     - source: /opt/projects/terra/terra_dsm/external/terra
       target: /terra
       type: bind
@@ -415,7 +418,25 @@ class TestDockerMap(TestComputeDockerCase):
     self.assertEqual(volume_map, ans)
 
   @mock.patch.object(docker.Compute, 'config_service', mock_config)
+  @mock.patch.object(os, 'name', 'posix')
+  @mock.patch.object(os, 'path', posixpath)
   def test_config_test_service(self):
+    compute = docker.Compute()
+    service = TestDockerMap.Service()
+
+    service.compose_service_name = "test"
+    volume_map = compute.configuration_map(service)
+    ans = [('/tmp\\', '/bar'),
+           ('/opt/projects/terra/terra_dsm/external/terra', '/terra'),
+           ('/tmp/.X11-unix', '/tmp/.X11-unix'),
+           ('/opt/projects/terra/terra_dsm/external/terra/external/vsi_common',
+            '/vsi')]
+    self.assertEqual(volume_map, ans)
+
+  @mock.patch.object(docker.Compute, 'config_service', mock_config)
+  @mock.patch.object(os, 'name', 'nt')
+  @mock.patch.object(os, 'path', ntpath)
+  def test_config_test_service_nt(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
 
@@ -426,4 +447,3 @@ class TestDockerMap(TestComputeDockerCase):
            ('/tmp/.X11-unix', '/tmp/.X11-unix'),
            ('/opt/projects/terra/terra_dsm/external/terra/external/vsi_common',
             '/vsi')]
-    self.assertEqual(volume_map, ans)

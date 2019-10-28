@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 import json
 
 from vsi.tools.python import nested_patch
+from vsi.test.utils import TestCase, make_traceback, NamedTemporaryFileFactory
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder, filename_suffixes
@@ -75,6 +76,13 @@ class ContainerService(BaseService):
         if isinstance(value, str):
           value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
           for vol_from, vol_to in volume_map:
+            # pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
+
+            # if isinstance(value, str) and pattern.match(value):
+            #   value = pattern.sub(vol_to, value)
+            #   value = value.replace('\\', '/')
+            #   break
+
             vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
 
             try:
@@ -122,19 +130,30 @@ class ContainerService(BaseService):
     else:
       path = posixpath
 
-    # If LCOW
-    if os.name == "nt" and self.container_platform == "linux":
-      # Convert to posix slashed
-      remote = remote.replace('\\', '/')
-      # Remove duplicates
-      remote = re.sub('//+', '/', remote)
-      # Split drive letter off
-      drive, remote = ntpath.splitdrive(remote)
-      if drive:
-        remote = posixpath.join('/', drive[0], remote.lstrip(r'\/'))
+    # WCOW
+    if self.container_platform == "windows":
+      if prefix:
+        remote_drive, remote = ntpath.splitdrive(remote)
+        prefix_drive, prefix = ntpath.splitdrive(prefix)
+        # If prefix drive is unset, copy from remote
+        if not prefix_drive:
+          prefix_drive = remote_drive
+        remote = ntpath.join(prefix_drive, '\\'+prefix.lstrip(r'\/'),
+                             remote.lstrip(r'\/'))
+    else:
+      # If LCOW
+      if os.name == "nt":
+        # Convert to posix slashed
+        remote = remote.replace('\\', '/')
+        # Remove duplicates
+        remote = re.sub('//+', '/', remote)
+        # Split drive letter off
+        drive, remote = ntpath.splitdrive(remote)
+        if drive:
+          remote = posixpath.join('/', drive[0], remote.lstrip(r'\/'))
 
-    if prefix:
-      remote = path.join(prefix, remote.lstrip(r'\/'))
+      if prefix:
+        remote = path.join(prefix, remote.lstrip(r'\/'))
 
     self.volumes.append((local, remote))
     self.volumes_flags.append(flags)

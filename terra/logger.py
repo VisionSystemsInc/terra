@@ -400,8 +400,6 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
   else:
     s = warnings.formatwarning(message, category, filename, lineno, line)
     logger = getLogger("py.warnings")
-    # if not logger.handlers:
-    #   logger.addHandler(NullHandler())
     logger.warning("%s", s)
 
 

@@ -371,6 +371,12 @@ class LazyObject:
       self._setup()
     del(self._wrapped[name])
 
+  def __len__(self):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__len__()
+
   def __contains__(self, name):
     '''Supported'''
     if self._wrapped is None:
