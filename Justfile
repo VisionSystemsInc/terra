@@ -171,8 +171,12 @@ function terra_caseify()
       ;;
     # Ideas
     terra_coverage) # Run coverage on terra
+      local report_rcfile="${TERRA_CWD}/.coveragerc"
+      if [ "${OS-}" = "Windows_NT" ]; then
+        report_rcfile="${TERRA_CWD}/.coveragerc_nt"
+      fi
       pushd "${TERRA_CWD}" >& /dev/null # Not needed because of a cd line above
-        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'coverage run && coverage report -m'
+        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c "coverage run && coverage report -m --rcfile '${report_rcfile}'"
       popd >& /dev/null # but added this so an app developer would know to add it
       ;;
 

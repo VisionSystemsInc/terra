@@ -14,7 +14,7 @@ class SomeService(terra.compute.container.ContainerService):
   def __init__(self, compose_service_name="launch", compose_file="file1",
                command=["ls"], env={"BAR": "FOO"}):
     self.compose_service_name = compose_service_name
-    self.compose_file = compose_file
+    self.compose_files = [compose_file]
     self.command = command
     self.env = env
     super().__init__()

@@ -2,3 +2,8 @@
 omit = ./terra/tests/*
 source = ./terra
 command_line = -m unittest discover ./terra
+
+[report]
+exclude_lines =
+    pragma: no cover
+    pragma: nt cover

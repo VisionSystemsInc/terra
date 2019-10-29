@@ -1,6 +1,4 @@
 import os
-import posixpath
-import ntpath
 import re
 from unittest import mock
 import warnings
@@ -71,7 +69,7 @@ class TestDockerRe(TestComputeDockerCase):
 
 
 class MockJustService:
-  compose_file = "file1"
+  compose_files = ["file1"]
   compose_service_name = "launch"
   command = ["ls"]
   env = {"BAR": "FOO"}
@@ -143,10 +141,11 @@ class TestDockerConfig(TestComputeDockerCase):
     self.assertEqual({'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
 
-  def test_config_with_custom_files(self):
+  def test_config_with_multiple_compose_files(self):
     compute = docker.Compute()
-    self.assertEqual(compute.config_service(MockJustService(),
-                                            ['file15.yml', 'file2.yaml']),
+    service = MockJustService()
+    service.compose_files = service.compose_files + ['file15.yml', 'file2.yaml']
+    self.assertEqual(compute.config_service(service),
                      'out')
     self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
                       '-f', 'file15.yml', '-f', 'file2.yaml',
@@ -419,7 +418,6 @@ class TestDockerMap(TestComputeDockerCase):
 
   @mock.patch.object(docker.Compute, 'config_service', mock_config)
   @mock.patch.object(os, 'name', 'posix')
-  @mock.patch.object(os, 'path', posixpath)
   def test_config_test_service(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
@@ -435,7 +433,6 @@ class TestDockerMap(TestComputeDockerCase):
 
   @mock.patch.object(docker.Compute, 'config_service', mock_config)
   @mock.patch.object(os, 'name', 'nt')
-  @mock.patch.object(os, 'path', ntpath)
   def test_config_test_service_nt(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()

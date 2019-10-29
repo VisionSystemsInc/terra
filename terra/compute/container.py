@@ -27,6 +27,7 @@ class ContainerService(BaseService):
     self.volumes_flags = []
     # For WCOW, set to 'windows'
     self.container_platform = 'linux'
+    self.extra_compose_files = []
 
   def pre_run(self):
     self.temp_dir = TemporaryDirectory()
@@ -54,7 +55,6 @@ class ContainerService(BaseService):
           volume_str
       env_volume_index += 1
 
-    # volume_map = compute.configuration_map(self, [str(temp_compose_file)])
     volume_map = compute.configuration_map(self)
 
     logger.debug3("Volume map: %s", volume_map)
@@ -64,7 +64,7 @@ class ContainerService(BaseService):
 
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
-    if os.name == "nt":
+    if os.name == "nt":  # pragma: nt cover
       logger.warning("Windows volume mapping is experimental.")
 
       # Prevent the setting file name from being expanded.
@@ -96,7 +96,7 @@ class ContainerService(BaseService):
             value /= remainder
             return str(value)
         return value
-    else:
+    else:  # pragma: linux cover
       def patch_volume(value, volume_map):
         if isinstance(value, str):
           for vol_from, vol_to in volume_map:
