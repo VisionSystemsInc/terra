@@ -1,0 +1,46 @@
+terra.core package
+==================
+
+Submodules
+----------
+
+terra.core.exceptions module
+----------------------------
+
+.. automodule:: terra.core.exceptions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.core.settings module
+--------------------------
+
+.. automodule:: terra.core.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.core.signals module
+-------------------------
+
+.. automodule:: terra.core.signals
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.core.utils module
+-----------------------
+
+.. automodule:: terra.core.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: terra.core
+   :members:
+   :undoc-members:
+   :show-inheritance:

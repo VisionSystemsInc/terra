@@ -1,0 +1,32 @@
+terra package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+
+   terra.compute
+   terra.core
+   terra.executor
+   terra.utils
+
+Submodules
+----------
+
+terra.logger module
+-------------------
+
+.. automodule:: terra.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: terra
+   :members:
+   :undoc-members:
+   :show-inheritance:

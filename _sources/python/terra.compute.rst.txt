@@ -1,0 +1,70 @@
+terra.compute package
+=====================
+
+Submodules
+----------
+
+terra.compute.base module
+-------------------------
+
+.. automodule:: terra.compute.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.compute.container module
+------------------------------
+
+.. automodule:: terra.compute.container
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.compute.docker module
+---------------------------
+
+.. automodule:: terra.compute.docker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.compute.dummy module
+--------------------------
+
+.. automodule:: terra.compute.dummy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.compute.singularity module
+--------------------------------
+
+.. automodule:: terra.compute.singularity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.compute.utils module
+--------------------------
+
+.. automodule:: terra.compute.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.compute.virtualenv module
+-------------------------------
+
+.. automodule:: terra.compute.virtualenv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: terra.compute
+   :members:
+   :undoc-members:
+   :show-inheritance:

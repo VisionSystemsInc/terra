@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>What is Terra &mdash; Terra 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Logging Settings" href="settings.html" />
+    <link rel="prev" title="Welcome to Terra’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Terra
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">What is Terra</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#settings">Settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Logging Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Adding Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/modules.html">terra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Terra</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>What is Terra</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/terra/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="what-is-terra">
+<h1>What is Terra<a class="headerlink" href="#what-is-terra" title="Permalink to this headline">¶</a></h1>
+<p>Terra in an infrastructure with the purpose of running algorithms in a compute architecture agnostic way. The goal is, once an algorithm (app) is setup, the same algorithm can be deployed on multiple compute arches</p>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="settings">
+<h3>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h3>
+<p>Everything in a terra app should be controlled by one main json file. This file will contain all the information from what compute arch to use, any compute arch settings, logging settings, input files, output, etc… Accessing the settings will be accomplished simply by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">terra</span> <span class="kn">import</span> <span class="n">settings</span>
+
+<span class="n">settings</span><span class="o">.</span><span class="n">my_settings</span>
+<span class="n">settings</span><span class="o">.</span><span class="n">something</span><span class="o">.</span><span class="k">else</span><span class="o">.</span><span class="n">here</span>
+</pre></div>
+</div>
+<p>The settings file used is controlled by the environment variable <span class="target" id="index-0"></span><a class="reference internal" href="../python/terra.core.html#envvar-TERRA_SETTINGS_FILE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_SETTINGS_FILE</span></code></a> and is usually set by the cli.</p>
+<p>While, underneath the hood the settings is a nested dictionary, it will be accessed via attributes instead of indexing, for ease of use.</p>
+<p class="rubric">Templating</p>
+<p>Default values of settings are prepopulated by <a class="reference internal" href="../python/terra.core.html#terra.core.settings.global_templates" title="terra.core.settings.global_templates"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.core.settings.global_templates</span></code></a>. This data structure is a list of tuple pair of <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>. Within the pair, the first <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> represents a <em>pattern</em>, and the second is the <em>default</em> values. When values of <em>pattern</em> match the configuration, then the <em>defaults</em> of that pattern are applied. These <em>defaults</em> are applied in order, where the last <em>default</em> overrides the earlier ones, but by combining all of the dictionaries into one, using <code class="xref py py-func docutils literal notranslate"><span class="pre">vsi.tools.python.nested_update()</span></code></p>
+<p class="rubric">Advanced usage</p>
+<p>Todo</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="settings.html" class="btn btn-neutral float-right" title="Logging Settings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to Terra’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, VSI
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

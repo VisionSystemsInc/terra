@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>terra package &mdash; Terra 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="terra.compute package" href="terra.compute.html" />
+    <link rel="prev" title="terra" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Terra
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Logging Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/apps.html">Adding Apps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">terra</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">terra package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html">terra.compute package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html">terra.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html">terra.executor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html">terra.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-terra.logger">terra.logger module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-terra">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/contributing.html">Contributing Guidlines</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Terra</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">terra</a> &raquo;</li>
+        
+      <li>terra package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/python/terra.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="terra-package">
+<h1>terra package<a class="headerlink" href="#terra-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="terra.compute.html">terra.compute package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.base">terra.compute.base module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.container">terra.compute.container module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.docker">terra.compute.docker module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.dummy">terra.compute.dummy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.singularity">terra.compute.singularity module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.utils">terra.compute.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.virtualenv">terra.compute.virtualenv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terra.core.html">terra.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.exceptions">terra.core.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.settings">terra.core.settings module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#the-basics">The basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#designating-the-settings">Designating the settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#default-settings">Default settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#using-settings-in-python-code">Using settings in Python code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#altering-settings-at-runtime">Altering settings at runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#available-settings">Available settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#using-settings-without-setting-terra-settings-file">Using settings without setting TERRA_SETTINGS_FILE</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.signals">terra.core.signals module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.utils">terra.core.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terra.executor.html">terra.executor package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.celery.html">terra.executor.celery package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.celery.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.celery.html#terra-executor-celery-celeryconfig-module">terra.executor.celery.celeryconfig module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.celery.html#module-terra.executor.celery.executor">terra.executor.celery.executor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.celery.html#module-terra.executor.celery">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.dummy">terra.executor.dummy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.sync">terra.executor.sync module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.utils">terra.executor.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terra.utils.html">terra.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.cli">terra.utils.cli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.workflow">terra.utils.workflow module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-terra.logger">
+<span id="terra-logger-module"></span><h2>terra.logger module<a class="headerlink" href="#module-terra.logger" title="Permalink to this headline">¶</a></h2>
+<p>The logging module for all of terra apps.</p>
+<p>Whether a part of terra core or apps, cli, workflow, service, task, all modules
+should import <a class="reference internal" href="#module-terra.logger" title="terra.logger"><code class="xref py py-mod docutils literal notranslate"><span class="pre">terra.logger</span></code></a> to output all messages to user and developer.</p>
+<p>Logging, like everything is configured by <a class="reference internal" href="#terra.settings" title="terra.settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.settings</span></code></a>. Before the
+<a class="reference internal" href="#terra.settings" title="terra.settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.settings</span></code></a> is configured, the logger is setup to create an initial
+temporary log file in your systems temporary directory with the prefix
+<code class="docutils literal notranslate"><span class="pre">terra_initial_tmp_XXXXXXXX</span></code> (Where <code class="docutils literal notranslate"><span class="pre">X</span></code> are random characters). This
+initial log file will capture all levels of log messages (Down to
+<a class="reference internal" href="#terra.logger.DEBUG3" title="terra.logger.DEBUG3"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG3</span></code></a>). During this time, stdout will also emit message at the default
+level of <code class="xref py py-data docutils literal notranslate"><span class="pre">logging.WARNING</span></code>.</p>
+<p>This initial file in only useful in extremely rare circumstances where terra
+crashes before it is even configured.</p>
+<p>After the <a class="reference internal" href="#terra.settings" title="terra.settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.settings</span></code></a> are
+<a class="reference internal" href="terra.core.html#terra.core.signals.post_settings_configured" title="terra.core.signals.post_settings_configured"><code class="xref py py-data docutils literal notranslate"><span class="pre">initialized</span></code></a>, the
+<code class="docutils literal notranslate"><span class="pre">terra_initial_tmp_XXXXXXXX</span></code> file is removed, and another log file is used
+according to the <a class="reference internal" href="../terra/settings.html#settings-logging"><span class="std std-ref">Logging Settings</span></a>, named <code class="docutils literal notranslate"><span class="pre">terra_log</span></code> in your
+<a class="reference internal" href="terra.core.html#terra.core.settings.processing_dir" title="terra.core.settings.processing_dir"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.core.settings.processing_dir</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">terra_log</span></code> file is appended
+to if it already exists.</p>
+<p>All messages that are emitted before <a class="reference internal" href="#terra.settings" title="terra.settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.settings</span></code></a> is configured are
+then replayed for the newly configured logger handlers so that any messages of
+interest will be seen on stdout and saved in the final log file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the rare case any <code class="xref py py-data docutils literal notranslate"><span class="pre">logging.WARNING</span></code> or above messages that appear
+before <a class="reference internal" href="#terra.settings" title="terra.settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.settings</span></code></a> is configured, they may be display a second
+time on <code class="docutils literal notranslate"><span class="pre">stdout</span></code>. This repetition only occurs on <code class="docutils literal notranslate"><span class="pre">stdout</span></code> and is
+expected</p>
+</div>
+<p>See <a class="reference internal" href="../terra/settings.html#settings-logging"><span class="std std-ref">Logging Settings</span></a> for how to customize the logger</p>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>To use the logger, in any module always:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">from</span> <span class="pre">terra.logging</span> <span class="pre">import</span> <span class="pre">get_logger</span>
+<span class="pre">logger</span> <span class="pre">=</span> <span class="pre">get_logger(__name__)</span>
+<span class="pre">`</span></code></p>
+<p>And then use the <code class="docutils literal notranslate"><span class="pre">logger</span></code> object anywhere in the module. This logger is a
+python <code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code> logger with the following extra configuration</p>
+<ul class="simple">
+<li><p>Added <cite>debug1</cite>, <cite>debug2</cite>, and <cite>debug3</cite> levels (with <cite>debug3</cite> being the most
+verbose)</p></li>
+<li><p><cite>debug</cite> is really <cite>debug1</cite></p></li>
+<li><p><cite>debug3</cite> is best used for debugging math in an algorithm</p></li>
+<li><p><cite>debug2</cite> is best used for more verbose statements used only for development</p></li>
+<li><p><cite>debug1</cite> is best used for verbose statements used when running</p></li>
+<li><p>All logging level variables exist in <a class="reference internal" href="#module-terra.logger" title="terra.logger"><code class="xref py py-mod docutils literal notranslate"><span class="pre">terra.logger</span></code></a>: <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code>,
+<code class="docutils literal notranslate"><span class="pre">WARN</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG2</span></code>, etc…</p></li>
+</ul>
+<dl class="function">
+<dt id="terra.logger.getLogger">
+<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">getLogger</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">extra={'hostname': '928d3d9c0217'}</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="data">
+<dt id="terra.logger.DEBUG1">
+<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG1</code><em class="property"> = 10</em><a class="headerlink" href="#terra.logger.DEBUG1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Debug level one. Same as the original <code class="xref py py-data docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> level, but now
+called <a class="reference internal" href="#terra.logger.DEBUG1" title="terra.logger.DEBUG1"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG1</span></code></a>.</p>
+<p>Should be used for general runtime debug messages that would be useful for
+users to see</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="terra.logger.DEBUG2">
+<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG2</code><em class="property"> = 9</em><a class="headerlink" href="#terra.logger.DEBUG2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Debug level two, more verbose.</p>
+<p>Should be used for general development debug messages that would be useful for
+developer to see when debugging</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="terra.logger.DEBUG3">
+<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG3</code><em class="property"> = 8</em><a class="headerlink" href="#terra.logger.DEBUG3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Debug level three, even more verbose.</p>
+<p>Should be used for more specific development debug messages, such as math
+output used to debug algorithms</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.logger.Logger">
+<em class="property">class </em><code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">Logger</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">level=0</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Logger</span></code></p>
+<dl class="method">
+<dt id="terra.logger.Logger.findCaller">
+<code class="sig-name descname">findCaller</code><span class="sig-paren">(</span><em class="sig-param">stack_info=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.findCaller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the stack frame of the caller so that we can note the source
+file name, line number and function name.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-terra">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra" title="Permalink to this headline">¶</a></h2>
+<p>Terra in an infrastructure with the purpose of running algorithms in a compute
+architecture agnostic way. The goal is, once an algorithm (app) is setup, the
+same algorithm can be deployed on multiple compute arches</p>
+<dl class="envvar">
+<dt id="envvar-TERRA_UNITTEST">
+<code class="sig-name descname">TERRA_UNITTEST</code><a class="headerlink" href="#envvar-TERRA_UNITTEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>A environment variable that is <code class="docutils literal notranslate"><span class="pre">1</span></code> when running unit tests.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="terra.settings">
+<code class="sig-prename descclassname">terra.</code><code class="sig-name descname">settings</code><em class="property"> = &lt;LazySettings [Unevaluated]&gt;</em><a class="headerlink" href="#terra.settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>The settings object easily accessible from all
+of terra and any terra app</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="terra.core.html#terra.core.settings.Settings" title="terra.core.settings.Settings">terra.core.settings.Settings</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="terra.compute.html" class="btn btn-neutral float-right" title="terra.compute package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="terra" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, VSI
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

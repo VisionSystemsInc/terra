@@ -1,0 +1,650 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>terra.compute package &mdash; Terra 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="terra.core package" href="terra.core.html" />
+    <link rel="prev" title="terra package" href="terra.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Terra
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Logging Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/apps.html">Adding Apps</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">terra</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="terra.html">terra package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="terra.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">terra.compute package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html">terra.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html">terra.executor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html">terra.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.logger">terra.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/contributing.html">Contributing Guidlines</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Terra</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">terra</a> &raquo;</li>
+        
+          <li><a href="terra.html">terra package</a> &raquo;</li>
+        
+      <li>terra.compute package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/python/terra.compute.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="terra-compute-package">
+<h1>terra.compute package<a class="headerlink" href="#terra-compute-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-terra.compute.base">
+<span id="terra-compute-base-module"></span><h2>terra.compute.base module<a class="headerlink" href="#module-terra.compute.base" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="terra.compute.base.AlreadyRegisteredException">
+<em class="property">exception </em><code class="sig-prename descclassname">terra.compute.base.</code><code class="sig-name descname">AlreadyRegisteredException</code><a class="headerlink" href="#terra.compute.base.AlreadyRegisteredException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception thrown if a function has already been registered</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.compute.base.BaseCompute">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.base.</code><code class="sig-name descname">BaseCompute</code><a class="headerlink" href="#terra.compute.base.BaseCompute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The base class for all Terra Service Compute Arches</p>
+<dl class="method">
+<dt id="terra.compute.base.BaseCompute.configuration_map_service">
+<code class="sig-name descname">configuration_map_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.configuration_map_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mapping of volumes from the host to the remote</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Return a list of tuple pairs [(host, remote), … ] of the volumes
+mounted from the host to remote</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.base.BaseCompute.register">
+<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">service</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to register a function for a particular service using a specific
+compute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.base.BaseCompute.run_service">
+<code class="sig-name descname">run_service</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.run_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place holder for code to run an instance in the compute. Runs
+<code class="docutils literal notranslate"><span class="pre">create</span></code> and then runs and returns <code class="docutils literal notranslate"><span class="pre">start</span></code> by default.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.compute.base.BaseService">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.base.</code><code class="sig-name descname">BaseService</code><a class="headerlink" href="#terra.compute.base.BaseService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The base class for all Terra Service definitions</p>
+<p><code class="docutils literal notranslate"><span class="pre">super().__init__</span> <span class="pre">should</span></code> be called when inheriting a <a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseService</span></code></a>
+class’s <code class="docutils literal notranslate"><span class="pre">__init__</span></code></p>
+<p>Service definitions can define a <code class="docutils literal notranslate"><span class="pre">pre_{command}</span></code> and <code class="docutils literal notranslate"><span class="pre">post_{command}</span></code>
+function that will be called before and after a <code class="docutils literal notranslate"><span class="pre">{command}Service</span></code> call,
+if they exist</p>
+<dl class="method">
+<dt id="terra.compute.base.BaseService.add_volume">
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="terra.compute.base.BaseService.volumes">
+<code class="sig-name descname">volumes</code><em class="property"> = None</em><a class="headerlink" href="#terra.compute.base.BaseService.volumes" title="Permalink to this definition">¶</a></dt>
+<dd><p>A copy of the processes environment variables local to a service</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="terra.compute.base.ServiceRunFailed">
+<em class="property">exception </em><code class="sig-prename descclassname">terra.compute.base.</code><code class="sig-name descname">ServiceRunFailed</code><a class="headerlink" href="#terra.compute.base.ServiceRunFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception thrown when a service runner returns non-zero</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute.container">
+<span id="terra-compute-container-module"></span><h2>terra.compute.container module<a class="headerlink" href="#module-terra.compute.container" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.compute.container.ContainerService">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.container.</code><code class="sig-name descname">ContainerService</code><a class="headerlink" href="#terra.compute.container.ContainerService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a></p>
+<p>Base container service class</p>
+<dl class="method">
+<dt id="terra.compute.container.ContainerService.add_volume">
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.container.ContainerService.post_run">
+<code class="sig-name descname">post_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.post_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.container.ContainerService.pre_run">
+<code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.pre_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute.docker">
+<span id="terra-compute-docker-module"></span><h2>terra.compute.docker module<a class="headerlink" href="#module-terra.compute.docker" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.compute.docker.Compute">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">Compute</code><a class="headerlink" href="#terra.compute.docker.Compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseCompute" title="terra.compute.base.BaseCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseCompute</span></code></a></p>
+<p>Docker compute model, specifically <code class="docutils literal notranslate"><span class="pre">docker-compose</span></code></p>
+<dl class="method">
+<dt id="terra.compute.docker.Compute.config_service">
+<code class="sig-name descname">config_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.docker.Compute.config_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the <code class="docutils literal notranslate"><span class="pre">docker-compose</span> <span class="pre">config</span></code> output</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.docker.Compute.configuration_map_service">
+<code class="sig-name descname">configuration_map_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.docker.Compute.configuration_map_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mapping of volumes from the host to the container.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Return a list of tuple pairs [(host, remote), … ] of the volumes
+mounted from the host to container</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.docker.Compute.run_service">
+<code class="sig-name descname">run_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.docker.Compute.run_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the service class information to run the service runner in a docker
+using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just --wrap Just-docker-compose <span class="se">\</span>
+    -f <span class="o">{</span>service_info.compose_files<span class="o">}</span> ... <span class="se">\</span>
+    run <span class="o">{</span>service_info.compose_service_name<span class="o">}</span> <span class="se">\</span>
+    <span class="o">{</span>service_info.command<span class="o">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.compute.docker.Service">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">Service</code><a class="headerlink" href="#terra.compute.docker.Service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.container.ContainerService" title="terra.compute.container.ContainerService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.container.ContainerService</span></code></a></p>
+<p>Base docker service class</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="terra.compute.docker.docker_volume_re">
+<code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">docker_volume_re</code><em class="property"> = '^(([a-zA-Z]:[/\\\\])?[^:]*):(([a-zA-Z]:[/\\\\])?[^:]*)((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)$'</em><a class="headerlink" href="#terra.compute.docker.docker_volume_re" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to parse old style docker volume strings</p>
+<p>RE Groups</p>
+<ul class="simple">
+<li><p>0: Source</p></li>
+<li><p>1: Junk - source drive (windows)</p></li>
+<li><p>2: Target</p></li>
+<li><p>3: Junk - target drive (windows)</p></li>
+<li><p>4: Flags</p></li>
+<li><p>5: Junk - last flag</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute.dummy">
+<span id="terra-compute-dummy-module"></span><h2>terra.compute.dummy module<a class="headerlink" href="#module-terra.compute.dummy" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.compute.dummy.Compute">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.dummy.</code><code class="sig-name descname">Compute</code><a class="headerlink" href="#terra.compute.dummy.Compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseCompute" title="terra.compute.base.BaseCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseCompute</span></code></a></p>
+<p>Dummy computing model. Prints messages instead of running any actual
+services</p>
+<dl class="method">
+<dt id="terra.compute.dummy.Compute.create_service">
+<code class="sig-name descname">create_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Compute.create_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.dummy.Compute.remove_service">
+<code class="sig-name descname">remove_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Compute.remove_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.dummy.Compute.run_service">
+<code class="sig-name descname">run_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Compute.run_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Place holder for code to run an instance in the compute. Runs
+<code class="docutils literal notranslate"><span class="pre">create</span></code> and then runs and returns <code class="docutils literal notranslate"><span class="pre">start</span></code> by default.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.dummy.Compute.start_service">
+<code class="sig-name descname">start_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Compute.start_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.dummy.Compute.stop_service">
+<code class="sig-name descname">stop_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Compute.stop_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.compute.dummy.Service">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.dummy.</code><code class="sig-name descname">Service</code><a class="headerlink" href="#terra.compute.dummy.Service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a></p>
+<p>Dummy service class, prints pre_run and post_run steps</p>
+<dl class="method">
+<dt id="terra.compute.dummy.Service.post_run">
+<code class="sig-name descname">post_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Service.post_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.dummy.Service.pre_run">
+<code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Service.pre_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute.singularity">
+<span id="terra-compute-singularity-module"></span><h2>terra.compute.singularity module<a class="headerlink" href="#module-terra.compute.singularity" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.compute.singularity.Compute">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.singularity.</code><code class="sig-name descname">Compute</code><a class="headerlink" href="#terra.compute.singularity.Compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseCompute" title="terra.compute.base.BaseCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseCompute</span></code></a></p>
+<dl class="method">
+<dt id="terra.compute.singularity.Compute.config_service">
+<code class="sig-name descname">config_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.singularity.Compute.config_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the <code class="docutils literal notranslate"><span class="pre">singular-compose</span> <span class="pre">config-null</span></code> output</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.singularity.Compute.configuration_map_service">
+<code class="sig-name descname">configuration_map_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.singularity.Compute.configuration_map_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mapping of volumes from the host to the container.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Return a list of tuple pairs [(host, remote), … ] of the volumes
+mounted from the host to container</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.singularity.Compute.run_service">
+<code class="sig-name descname">run_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.singularity.Compute.run_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the service class information to run the service runner in a docker
+using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just --wrap singular-compose <span class="se">\</span>
+    run <span class="o">{</span>service_info.compose_service_name<span class="o">}</span> <span class="se">\</span>
+    <span class="o">{</span>service_info.command<span class="o">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.compute.singularity.Service">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.singularity.</code><code class="sig-name descname">Service</code><a class="headerlink" href="#terra.compute.singularity.Service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.container.ContainerService" title="terra.compute.container.ContainerService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.container.ContainerService</span></code></a></p>
+<p>Base docker service class</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute.utils">
+<span id="terra-compute-utils-module"></span><h2>terra.compute.utils module<a class="headerlink" href="#module-terra.compute.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.compute.utils.ComputeHandler">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.utils.</code><code class="sig-name descname">ComputeHandler</code><span class="sig-paren">(</span><em class="sig-param">override_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.utils.ComputeHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="terra.core.html#terra.core.utils.Handler" title="terra.core.utils.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.utils.Handler</span></code></a></p>
+<p>The <a class="reference internal" href="#terra.compute.utils.ComputeHandler" title="terra.compute.utils.ComputeHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComputeHandler</span></code></a> class gives a single entrypoint to interact with
+the compute architecture, no matter what arch type it is. A standard way to
+call <code class="docutils literal notranslate"><span class="pre">run</span></code>, etc…</p>
+<dl class="method">
+<dt id="terra.compute.utils.ComputeHandler._connect_backend">
+<code class="sig-name descname">_connect_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.utils.ComputeHandler._connect_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the compute’s backend’s base module, given either a fully qualified
+compute backend name, or a partial (<code class="docutils literal notranslate"><span class="pre">terra.compute.{partial}</span></code>), and
+then returns a connection to the backend</p>
+<p>A Backend should have two classes defined:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Compute</span></code> based off of <a class="reference internal" href="#terra.compute.base.BaseCompute" title="terra.compute.base.BaseCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseCompute</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Service</span></code> based off of <a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self._override_type</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, override the name of the backend to load.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="terra.compute.utils.compute">
+<code class="sig-prename descclassname">terra.compute.utils.</code><code class="sig-name descname">compute</code><em class="property"> = &lt;terra.compute.utils.ComputeHandler object&gt;</em><a class="headerlink" href="#terra.compute.utils.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>The compute handler that all apps will be interfacing with.
+For the most part, workflows will be interacting with <a class="reference internal" href="#terra.compute.utils.compute" title="terra.compute.utils.compute"><code class="xref py py-data docutils literal notranslate"><span class="pre">compute</span></code></a> to
+<code class="docutils literal notranslate"><span class="pre">run</span></code> services. Easier access via <code class="docutils literal notranslate"><span class="pre">terra.compute.compute</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#terra.compute.utils.ComputeHandler" title="terra.compute.utils.ComputeHandler">ComputeHandler</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="terra.compute.utils.get_default_service_class">
+<code class="sig-prename descclassname">terra.compute.utils.</code><code class="sig-name descname">get_default_service_class</code><span class="sig-paren">(</span><em class="sig-param">cls</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.utils.get_default_service_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a compute class’ default Service class from the class object.</p>
+<p>Since computes are named <code class="docutils literal notranslate"><span class="pre">Compute</span></code> in the base module, the class
+<code class="docutils literal notranslate"><span class="pre">Service</span></code> should be defined in the same file. This will return that
+<code class="docutils literal notranslate"><span class="pre">Service</span></code> class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cls</strong> (<em>type</em>) – The compute class whose service class you want</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="terra.compute.utils.just">
+<code class="sig-prename descclassname">terra.compute.utils.</code><code class="sig-name descname">just</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.utils.just" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a <code class="docutils literal notranslate"><span class="pre">just</span></code> command. Primarily used to run <code class="docutils literal notranslate"><span class="pre">--wrap</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>justfile</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, optional) – Optionally allow you to specify a custom <code class="docutils literal notranslate"><span class="pre">Justfile</span></code>. Defaults to
+Terra’s <code class="docutils literal notranslate"><span class="pre">Justfile</span></code> is used, which is the correct course of action
+most of the time</p></li>
+<li><p><strong>env</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – Sets environment variables. Same as Popen’s <code class="docutils literal notranslate"><span class="pre">env</span></code>, except
+<code class="docutils literal notranslate"><span class="pre">JUSTFILE</span></code> is programatically set, and cannot be overridden any other
+way than chaning the <code class="docutils literal notranslate"><span class="pre">justfile</span></code> variable</p></li>
+<li><p><strong>*args</strong> – List of arguments to be pass to <code class="docutils literal notranslate"><span class="pre">just</span></code></p></li>
+<li><p><strong>**kwargs</strong> – Arguments sent to <code class="docutils literal notranslate"><span class="pre">Popen</span></code> command</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="terra.compute.utils.load_service">
+<code class="sig-prename descclassname">terra.compute.utils.</code><code class="sig-name descname">load_service</code><span class="sig-paren">(</span><em class="sig-param">name_or_class</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.utils.load_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get (and optionally import) a service by name. Also accepts the class itself
+or an instance of a class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name_or_class</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">class</span></code> or instance) – The service being loaded</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Instead of the class specified. If <code class="docutils literal notranslate"><span class="pre">name_or_class</span></code> was already an
+instance, the same instance is returned</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute.virtualenv">
+<span id="terra-compute-virtualenv-module"></span><h2>terra.compute.virtualenv module<a class="headerlink" href="#module-terra.compute.virtualenv" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.compute.virtualenv.Compute">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.virtualenv.</code><code class="sig-name descname">Compute</code><a class="headerlink" href="#terra.compute.virtualenv.Compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseCompute" title="terra.compute.base.BaseCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseCompute</span></code></a></p>
+<p>Virtual env computing model</p>
+<dl class="method">
+<dt id="terra.compute.virtualenv.Compute.run_service">
+<code class="sig-name descname">run_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Compute.run_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a command, usually in a virtual env.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">settings.compute.virtualenv_dir</span></code> is set, then that directory is
+automatically prepended to the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> for the command to be executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, optional) – Sets environment variables. Same as Popen’s <code class="docutils literal notranslate"><span class="pre">env</span></code>, except
+<code class="docutils literal notranslate"><span class="pre">JUSTFILE</span></code> is programatically set, and cannot be overridden any other
+way than chaning the <code class="docutils literal notranslate"><span class="pre">justfile</span></code> variable</p></li>
+<li><p><strong>*args</strong> – List of arguments to be pass to <code class="docutils literal notranslate"><span class="pre">Popen</span></code></p></li>
+<li><p><strong>**kwargs</strong> – Arguments sent to <code class="docutils literal notranslate"><span class="pre">Popen</span></code> command</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.compute.virtualenv.Service">
+<em class="property">class </em><code class="sig-prename descclassname">terra.compute.virtualenv.</code><code class="sig-name descname">Service</code><a class="headerlink" href="#terra.compute.virtualenv.Service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a></p>
+<p>Virtualenv service class</p>
+<dl class="method">
+<dt id="terra.compute.virtualenv.Service.post_run">
+<code class="sig-name descname">post_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Service.post_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.virtualenv.Service.pre_run">
+<code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Service.pre_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.compute">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra.compute" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="terra.core.html" class="btn btn-neutral float-right" title="terra.core package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="terra.html" class="btn btn-neutral float-left" title="terra package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, VSI
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
