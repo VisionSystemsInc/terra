@@ -64,6 +64,21 @@ class TestServiceBase(TestCase):
     self.assertIn(Foo.TestService.__module__ + '.Foo.TestService',
                   base.services)
 
+    with self.assertRaises(base.AlreadyRegisteredException,
+                           msg='Compute command "car" does not have a service '
+                               'implementation "car_service"'):
+      base.BaseCompute.register(Foo.TestService)(lambda x: 1)
+
+  def test_getattr(self):
+    class Foo(base.BaseCompute):
+      def bar_service(self):
+        pass
+
+    foo = Foo()
+    foo.bar
+    with self.assertRaises(AttributeError):
+      foo.car
+
 
 class TestUnitTests(TestCase):
   def last_test_registered_services(self):

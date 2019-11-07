@@ -279,7 +279,8 @@ class Signal:
             receivers.append(receiver)
         if self.use_caching:
           if not receivers:
-            self.sender_receivers_cache[sender] = NO_RECEIVERS
+            self.sender_receivers_cache[sender] = \
+                NO_RECEIVERS
           else:
             # Note, we must cache the weakref versions.
             self.sender_receivers_cache[sender] = receivers

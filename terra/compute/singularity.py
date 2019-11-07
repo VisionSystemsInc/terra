@@ -23,21 +23,21 @@ class Compute(BaseCompute):
             {service_info.command}
     '''
     pid = just("singular-compose",
+               *sum([['-f', cf] for cf in service_info.compose_files], []),
                'run', service_info.compose_service_name,
-               *(service_info.command),
+               *service_info.command,
                env=service_info.env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
 
-  def config_service(self, service_info, extra_compose_files=[]):
+  def config_service(self, service_info):
     '''
     Returns the ``singular-compose config-null`` output
     '''
 
-    args = ["singular-compose",
-            '-f', service_info.compose_file] + \
-        sum([['-f', extra] for extra in extra_compose_files], []) + \
+    args = ["singular-compose"] + \
+        sum([['-f', cf] for cf in service_info.compose_files], []) + \
         ['config-null', service_info.compose_service_name]
 
     pid = just(*args, stdout=PIPE,
@@ -57,7 +57,7 @@ class Compute(BaseCompute):
 
     return data
 
-  def configuration_map_service(self, service_info, extra_compose_files=[]):
+  def configuration_map_service(self, service_info):
     '''
     Returns the mapping of volumes from the host to the container.
 
@@ -70,7 +70,7 @@ class Compute(BaseCompute):
     # TODO: Make an OrderedDict
     volume_map = []
 
-    config = self.config(service_info, extra_compose_files)
+    config = self.config(service_info)
 
     volumes = config.get('volumes', [])
 

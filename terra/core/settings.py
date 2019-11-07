@@ -266,7 +266,6 @@ global_templates = [
       "compute": {
         "arch": "terra.compute.dummy"
       },
-      "resume": False,
       'status_file': status_file,
       'processing_dir': processing_dir,
       'unittest': unittest,
@@ -370,6 +369,12 @@ class LazyObject:
     if self._wrapped is None:
       self._setup()
     del(self._wrapped[name])
+
+  def __len__(self):
+    '''Supported'''
+    if self._wrapped is None:
+      self._setup()
+    return self._wrapped.__len__()
 
   def __contains__(self, name):
     '''Supported'''

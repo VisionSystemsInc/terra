@@ -27,6 +27,7 @@ class ContainerService(BaseService):
     self.volumes_flags = []
     # For WCOW, set to 'windows'
     self.container_platform = 'linux'
+    self.extra_compose_files = []
 
   def pre_run(self):
     self.temp_dir = TemporaryDirectory()
@@ -54,7 +55,6 @@ class ContainerService(BaseService):
           volume_str
       env_volume_index += 1
 
-    # volume_map = compute.configuration_map(self, [str(temp_compose_file)])
     volume_map = compute.configuration_map(self)
 
     logger.debug3("Volume map: %s", volume_map)
@@ -64,7 +64,7 @@ class ContainerService(BaseService):
 
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
-    if os.name == "nt":
+    if os.name == "nt":  # pragma: no linux cover
       logger.warning("Windows volume mapping is experimental.")
 
       # Prevent the setting file name from being expanded.
@@ -75,6 +75,13 @@ class ContainerService(BaseService):
         if isinstance(value, str):
           value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
           for vol_from, vol_to in volume_map:
+            # pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
+
+            # if isinstance(value, str) and pattern.match(value):
+            #   value = pattern.sub(vol_to, value)
+            #   value = value.replace('\\', '/')
+            #   break
+
             vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
 
             try:
@@ -89,7 +96,7 @@ class ContainerService(BaseService):
             value /= remainder
             return str(value)
         return value
-    else:
+    else:  # pragma: no nt cover
       def patch_volume(value, volume_map):
         if isinstance(value, str):
           for vol_from, vol_to in volume_map:
@@ -122,19 +129,30 @@ class ContainerService(BaseService):
     else:
       path = posixpath
 
-    # If LCOW
-    if os.name == "nt" and self.container_platform == "linux":
-      # Convert to posix slashed
-      remote = remote.replace('\\', '/')
-      # Remove duplicates
-      remote = re.sub('//+', '/', remote)
-      # Split drive letter off
-      drive, remote = ntpath.splitdrive(remote)
-      if drive:
-        remote = posixpath.join('/', drive[0], remote.lstrip(r'\/'))
+    # WCOW
+    if self.container_platform == "windows":
+      if prefix:
+        remote_drive, remote = ntpath.splitdrive(remote)
+        prefix_drive, prefix = ntpath.splitdrive(prefix)
+        # If prefix drive is unset, copy from remote
+        if not prefix_drive:
+          prefix_drive = remote_drive
+        remote = ntpath.join(prefix_drive, '\\' + prefix.lstrip(r'\/'),
+                             remote.lstrip(r'\/'))
+    else:
+      # If LCOW
+      if os.name == "nt":
+        # Convert to posix slashed
+        remote = remote.replace('\\', '/')
+        # Remove duplicates
+        remote = re.sub('//+', '/', remote)
+        # Split drive letter off
+        drive, remote = ntpath.splitdrive(remote)
+        if drive:
+          remote = posixpath.join('/', drive[0], remote.lstrip(r'\/'))
 
-    if prefix:
-      remote = path.join(prefix, remote.lstrip(r'\/'))
+      if prefix:
+        remote = path.join(prefix, remote.lstrip(r'\/'))
 
     self.volumes.append((local, remote))
     self.volumes_flags.append(flags)

@@ -40,34 +40,33 @@ class Compute(BaseCompute):
     .. code-block:: bash
 
         just --wrap Just-docker-compose \\
-            -f {service_info.compose_file} \\
+            -f {service_info.compose_files} ... \\
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
     pid = just("--wrap", "Just-docker-compose",
-               '-f', service_info.compose_file,
+               *sum([['-f', cf] for cf in service_info.compose_files], []),
                'run', service_info.compose_service_name,
-               *(service_info.command),
+               *service_info.command,
                env=service_info.env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
 
-  def config_service(self, service_info, extra_compose_files=[]):
+  def config_service(self, service_info):
     '''
     Returns the ``docker-compose config`` output
     '''
 
-    args = ["--wrap", "Just-docker-compose",
-            '-f', service_info.compose_file] + \
-        sum([['-f', extra] for extra in extra_compose_files], []) + \
+    args = ["--wrap", "Just-docker-compose"] + \
+        sum([['-f', cf] for cf in service_info.compose_files], []) + \
         ['config']
 
     pid = just(*args, stdout=PIPE,
                env=service_info.env)
     return pid.communicate()[0]
 
-  def configuration_map_service(self, service_info, extra_compose_files=[]):
+  def configuration_map_service(self, service_info):
     '''
     Returns the mapping of volumes from the host to the container.
 
@@ -80,7 +79,7 @@ class Compute(BaseCompute):
     # TODO: Make an OrderedDict
     volume_map = []
 
-    config = yaml.load(self.config(service_info, extra_compose_files))
+    config = yaml.load(self.config(service_info))
 
     if 'services' in config and \
         service_info.compose_service_name in config['services'] and \

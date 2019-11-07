@@ -1,3 +1,4 @@
+import os
 import re
 from unittest import mock
 import warnings
@@ -68,7 +69,7 @@ class TestDockerRe(TestComputeDockerCase):
 
 
 class MockJustService:
-  compose_file = "file1"
+  compose_files = ["file1"]
   compose_service_name = "launch"
   command = ["ls"]
   env = {"BAR": "FOO"}
@@ -140,10 +141,12 @@ class TestDockerConfig(TestComputeDockerCase):
     self.assertEqual({'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
 
-  def test_config_with_custom_files(self):
+  def test_config_with_multiple_compose_files(self):
     compute = docker.Compute()
-    self.assertEqual(compute.config_service(MockJustService(),
-                                            ['file15.yml', 'file2.yaml']),
+    service = MockJustService()
+    service.compose_files = service.compose_files + ['file15.yml',
+                                                     'file2.yaml']
+    self.assertEqual(compute.config_service(service),
                      'out')
     self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
                       '-f', 'file15.yml', '-f', 'file2.yaml',
@@ -357,7 +360,7 @@ services:
       TZ: /usr/share/zoneinfo/America/New_York]
     image: terra:terra_me
     volumes:
-    - /tmp:/bar:ro
+    - /tmp\:/bar:ro
     - source: /opt/projects/terra/terra_dsm/external/terra
       target: /terra
       type: bind
@@ -415,7 +418,23 @@ class TestDockerMap(TestComputeDockerCase):
     self.assertEqual(volume_map, ans)
 
   @mock.patch.object(docker.Compute, 'config_service', mock_config)
+  @mock.patch.object(os, 'name', 'posix')
   def test_config_test_service(self):
+    compute = docker.Compute()
+    service = TestDockerMap.Service()
+
+    service.compose_service_name = "test"
+    volume_map = compute.configuration_map(service)
+    ans = [('/tmp\\', '/bar'),
+           ('/opt/projects/terra/terra_dsm/external/terra', '/terra'),
+           ('/tmp/.X11-unix', '/tmp/.X11-unix'),
+           ('/opt/projects/terra/terra_dsm/external/terra/external/vsi_common',
+            '/vsi')]
+    self.assertEqual(volume_map, ans)
+
+  @mock.patch.object(docker.Compute, 'config_service', mock_config)
+  @mock.patch.object(os, 'name', 'nt')
+  def test_config_test_service_nt(self):
     compute = docker.Compute()
     service = TestDockerMap.Service()
 

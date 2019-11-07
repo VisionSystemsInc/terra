@@ -193,7 +193,7 @@ class _SetupTerraLogger():
       try:
         logger.error("Uncaught exception",
                      exc_info=(exc_type, exc_value, exc_traceback))
-      except Exception:
+      except Exception:  # pragma: no cover
         print('There was an exception logging in the execpetion handler!')
         traceback.print_exc()
 
@@ -220,7 +220,7 @@ class _SetupTerraLogger():
 
       original_exception = InteractiveShell.showtraceback
 
-      def handle_traceback(*args, **kwargs):
+      def handle_traceback(*args, **kwargs):  # pragma: no cover
         getLogger(__name__).error("Uncaught exception",
                                   exc_info=sys.exc_info())
         return original_exception(*args, **kwargs)
@@ -394,14 +394,12 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
   it will call warnings.formatwarning and will log the resulting string to a
   warnings logger named "py.warnings" with level logging.WARNING.
   """
-  if file is not None:
-    if _warnings_showwarning is not None:
+  if file is not None:  # I don't actually know how this can be not None
+    if _warnings_showwarning is not None:  # pragma: no cover
       _warnings_showwarning(message, category, filename, lineno, file, line)
   else:
     s = warnings.formatwarning(message, category, filename, lineno, line)
     logger = getLogger("py.warnings")
-    # if not logger.handlers:
-    #   logger.addHandler(NullHandler())
     logger.warning("%s", s)
 
 

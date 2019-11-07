@@ -3,15 +3,15 @@ import io
 import os
 import sys
 import json
-from tempfile import NamedTemporaryFile as NamedTemporaryFileOrig
 import logging
 import uuid
 import tempfile
 import platform
+import warnings
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
-from .utils import TestCase, make_traceback
+from vsi.test.utils import TestCase, make_traceback, NamedTemporaryFileFactory
 from terra import logger
 from terra.core import signals
 
@@ -36,15 +36,6 @@ class TestHandlerLoggingContext(TestCase):
 
     self.assertNotIn(message2, str(handler_default.buffer))
     self.assertIn(message2, str(handler_swap.buffer))
-
-
-def NamedTemporaryFileFactory(test_self):
-  def NamedTemporaryFile(**kwargs):
-    kwargs['dir'] = test_self.temp_dir.name
-    rv = NamedTemporaryFileOrig(**kwargs)
-    test_self.temp_log_file = rv.name
-    return rv
-  return NamedTemporaryFile
 
 
 class TestLoggerCase(TestCase):
@@ -292,6 +283,12 @@ class TestLogger(TestLoggerCase):
     message = str(uuid.uuid4())
     with self.assertLogs(level=logger.DEBUG3) as cm:
       logger.getLogger(f'{__name__}.test_debug3').debug3(message)
+    self.assertIn(message, str(cm.output))
+
+  def test_warnings(self):
+    message = str(uuid.uuid4())
+    with self.assertLogs(level=logger.WARNING) as cm:
+      warnings.warn(message)
     self.assertIn(message, str(cm.output))
 
 
