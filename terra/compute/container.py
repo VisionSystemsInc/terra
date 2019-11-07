@@ -64,7 +64,7 @@ class ContainerService(BaseService):
 
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
-    if os.name == "nt":  # pragma: nt cover
+    if os.name == "nt":  # pragma: no linux cover
       logger.warning("Windows volume mapping is experimental.")
 
       # Prevent the setting file name from being expanded.
@@ -96,7 +96,7 @@ class ContainerService(BaseService):
             value /= remainder
             return str(value)
         return value
-    else:  # pragma: linux cover
+    else:  # pragma: no nt cover
       def patch_volume(value, volume_map):
         if isinstance(value, str):
           for vol_from, vol_to in volume_map:
