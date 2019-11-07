@@ -37,8 +37,8 @@ class Compute(BaseCompute):
     '''
 
     args = ["singular-compose"] + \
-            sum([['-f', cf] for cf in service_info.compose_files], []) + \
-            ['config-null', service_info.compose_service_name]
+        sum([['-f', cf] for cf in service_info.compose_files], []) + \
+        ['config-null', service_info.compose_service_name]
 
     pid = just(*args, stdout=PIPE,
                env=service_info.env)

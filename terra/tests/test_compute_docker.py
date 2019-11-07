@@ -144,7 +144,8 @@ class TestDockerConfig(TestComputeDockerCase):
   def test_config_with_multiple_compose_files(self):
     compute = docker.Compute()
     service = MockJustService()
-    service.compose_files = service.compose_files + ['file15.yml', 'file2.yaml']
+    service.compose_files = service.compose_files + ['file15.yml',
+                                                     'file2.yaml']
     self.assertEqual(compute.config_service(service),
                      'out')
     self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',

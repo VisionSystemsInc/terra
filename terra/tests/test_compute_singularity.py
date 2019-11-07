@@ -17,7 +17,8 @@ class TestComputeSingularityCase(TestCase):
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,
                           '_connection',
-                          mock.PropertyMock(return_value=singularity.Compute())))
+                          mock.PropertyMock(
+                              return_value=singularity.Compute())))
     super().setUp()
 
     # Configure for singularity
@@ -54,7 +55,8 @@ class TestSingular(TestComputeSingularityCase):
     # This part of the test looks fragile
     compute.run(MockJustService())
     # Run a singularity service
-    self.assertEqual(('singular-compose', '-f', 'file1', 'run', 'launch', 'ls'),
+    self.assertEqual(('singular-compose', '-f', 'file1', 'run', 'launch',
+                      'ls'),
                      self.just_args)
     self.assertEqual({'env': {'BAR': 'FOO'}}, self.just_kwargs)
 
@@ -82,6 +84,7 @@ class TestSingular(TestComputeSingularityCase):
     with self.assertRaises(base.ServiceRunFailed):
       compute.run(MockJustService())
 
+
 class TestSingularityConfig(TestComputeSingularityCase):
   def setUp(self):
     # Mock the just call for recording
@@ -97,7 +100,8 @@ class TestSingularityConfig(TestComputeSingularityCase):
     _self.just_kwargs = kwargs
     return type('blah', (object,),
                 {'communicate':
-        lambda self: (b'environment\0^foo\0.bar\0^stuff\0^boo\0.far', None)})()
+                 lambda self: (b'environment\0^foo\0.bar\0^stuff\0^boo\0.far',
+                               None)})()
 
   def test_config(self):
     compute = singularity.Compute()
@@ -128,15 +132,16 @@ def mock_config(self, service_info, *args, **kwargs):
   if service_info.compose_service_name == "foo":
     return {'volumes': []}
   elif service_info.compose_service_name == "bar":
-    return {'volumes': ['/tmp:/bar',
-           '/opt/projects/terra/terra_dsm/external/terra:/src',
-           '/opt/projects/terra/terra_dsm/external/terra:/terra',
-           '/tmp/.X11-unix:/tmp/.X11-unix',
-           '/opt/projects/terra/terra_dsm/external/terra/external/vsi_common:'
-           '/vsi']}
+    return {'volumes': [
+        '/tmp:/bar',
+        '/opt/projects/terra/terra_dsm/external/terra:/src',
+        '/opt/projects/terra/terra_dsm/external/terra:/terra',
+        '/tmp/.X11-unix:/tmp/.X11-unix',
+        '/opt/projects/terra/terra_dsm/external/terra/external/vsi_common:'
+        '/vsi']}
   elif service_info.compose_service_name == "test":
     return {'volumes': ['/tmp\\:/bar',
-           '/tmp/.X11-unix/:/tmp/.X11-unix']}
+                        '/tmp/.X11-unix/:/tmp/.X11-unix']}
 
 
 class TestSingularityMap(TestComputeSingularityCase):

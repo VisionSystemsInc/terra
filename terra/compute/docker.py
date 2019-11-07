@@ -59,8 +59,8 @@ class Compute(BaseCompute):
     '''
 
     args = ["--wrap", "Just-docker-compose"] + \
-           sum([['-f', cf] for cf in service_info.compose_files], []) + \
-           ['config']
+        sum([['-f', cf] for cf in service_info.compose_files], []) + \
+        ['config']
 
     pid = just(*args, stdout=PIPE,
                env=service_info.env)
