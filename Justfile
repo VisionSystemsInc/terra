@@ -9,12 +9,12 @@ source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
 
-cd "${TERRA_CWD}"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
   JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
 else
+  cd "${TERRA_CWD}"
   # Allow terra to be run as a non-plugin too
   function caseify()
   {
@@ -175,16 +175,16 @@ function terra_caseify()
       if [ "${OS-}" = "Windows_NT" ]; then
         report_rcfile="${TERRA_CWD}/.coveragerc_nt"
       fi
-      pushd "${TERRA_CWD}" >& /dev/null # Not needed because of a cd line above
+      pushd "${TERRA_CWD}" &> /dev/null # Not needed because of a cd line above
         Terra_Pipenv run env TERRA_UNITTEST=1 bash -c "coverage run && coverage report -m --rcfile '${report_rcfile}'"
-      popd >& /dev/null # but added this so an app developer would know to add it
+      popd &> /dev/null # but added this so an app developer would know to add it
       ;;
 
     # How do I know what error code causes a problem in autopep8? You don't!
     # At least not as far as I can tell.
     terra_pep8) # Check pep8 compliance in ./terra
       echo "Checking for autopep8..."
-      if ! Terra_Pipenv run sh -c "command -v autopep8" >& /dev/null; then
+      if ! Terra_Pipenv run sh -c "command -v autopep8" &> /dev/null; then
         justify terra pipenv sync --dev
       fi
 
