@@ -40,6 +40,7 @@ commands:
       - run:
           name: Smuggle repo to remote docker
           command: |
+            echo hi > redis_password.secret
             tar zc --exclude .git . | docker run -i -v /root/repo:/repo -w /repo alpine:3.6 tar zx
 
 
