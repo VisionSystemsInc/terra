@@ -232,7 +232,7 @@ function that will be called before and after a <code class="docutils literal no
 if they exist</p>
 <dl class="method">
 <dt id="terra.compute.base.BaseService.add_volume">
-<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -554,6 +554,11 @@ instance, the same instance is returned</p>
 <em class="property">class </em><code class="sig-prename descclassname">terra.compute.virtualenv.</code><code class="sig-name descname">Compute</code><a class="headerlink" href="#terra.compute.virtualenv.Compute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseCompute" title="terra.compute.base.BaseCompute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseCompute</span></code></a></p>
 <p>Virtual env computing model</p>
+<dl class="method">
+<dt id="terra.compute.virtualenv.Compute.add_volume">
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">directory</em>, <em class="sig-param">no_remote=None</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Compute.add_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="terra.compute.virtualenv.Compute.run_service">
 <code class="sig-name descname">run_service</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Compute.run_service" title="Permalink to this definition">¶</a></dt>
