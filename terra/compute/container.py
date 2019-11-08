@@ -124,6 +124,9 @@ class ContainerService(BaseService):
     # I did it this way.
 
   def add_volume(self, local, remote, flags=None, prefix=None):
+    if local is None or remote is None:
+      return
+
     if self.container_platform == "windows":
       path = ntpath
     else:

@@ -25,7 +25,10 @@ class BaseService:
     self.volumes = []
     ''' A copy of the processes environment variables local to a service '''
 
-  def add_volume(self, local, remote):
+  def add_volume(self, local, remote, flags=None, prefix=None):
+    if local is None or remote is None:
+      return
+
     self.volumes.append((local, remote))
 
 
