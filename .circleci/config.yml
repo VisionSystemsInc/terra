@@ -3,7 +3,7 @@ version: 2.1
 # -----
 # generic yaml anchors (reusable by multiple projects)
 # -----
-x-stuff:
+x-references:
   # container configuration & update
   container_config: &container_config
     working_directory: ~/repo
@@ -78,7 +78,7 @@ jobs:
           name: Generate docs
           command: |
             . setup.env
-            just sphinx build compile
+            SPHINXOPTS='-W' just sphinx build compile -n --all
       - run:
           name: Smuggle docs back from remote docker
           command: |
