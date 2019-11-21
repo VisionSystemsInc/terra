@@ -68,7 +68,7 @@ class Compute(BaseCompute):
     # Check if the executable was found in the virtualenv_dir.
     # If it wasn't, warn the user in case they made a mistake
     if settings.compute.virtualenv_dir is not None and \
-       is_subdir(executable, settings.compute.virtualenv_dir):
+       not is_subdir(executable, settings.compute.virtualenv_dir)[0]:
       logger.warning(f"Couldn't find command {service_info.command[0]} in "
                      f"virtualenv_dir {settings.compute.virtualenv_dir}. "
                      f"Using {executable} instead. If you meant to bypass the "
