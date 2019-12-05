@@ -209,7 +209,7 @@ function terra_caseify()
       justify git_submodule-update # For those users who don't remember!
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
-        Terra_Pipenv sync
+        justify terra_sync-pipenv
         justify terra build-services
       else
         justify terra build
@@ -219,8 +219,16 @@ function terra_caseify()
     terra_sync-singular) # Synchronize the many aspects of the project when new code changes \
           # are applied e.g. after "git checkout" for a singularity build
       justify git_submodule-update # For those users who don't remember!
-      Terra_Pipenv sync
-      justify terra_build-singular
+      justify terra_sync-pipenv
+      if command -v "${DOCKER_COMPOSE}" &> /dev/null; then
+        justify terra_build-singular
+      fi
+      ;;
+
+    terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
+                       #don't call this directly
+      Terra_Pipenv sync ${@+"${@}"}
+      extra_args=$#
       ;;
 
     terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \

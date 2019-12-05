@@ -54,8 +54,8 @@ CMD ["bash"]
 FROM dep_stage
 
 # Recipes
-COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
-COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=tini /usr/local /usr/local
+COPY --from=gosu /usr/local /usr/local
 # Allow non-privileged to run gosu (remove this to take root away from user)
 RUN chmod u+s /usr/local/bin/gosu
 COPY --from=pipenv_cache /venv /venv
