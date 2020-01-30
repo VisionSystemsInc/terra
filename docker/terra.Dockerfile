@@ -19,8 +19,8 @@ ENV WORKON_HOME=/venv \
     LC_ALL=C.UTF-8 \
     LANG=C.UTF-8
 
-COPY --from=pipenv /tmp/pipenv /tmp/pipenv
-RUN /tmp/pipenv/get-pipenv; rm -rf /tmp/pipenv || :
+COPY --from=pipenv /usr/local /usr/local
+RUN for patch in /usr/local/share/just/container_build_patch/*; do "${patch}"; done
 
 ###############################################################################
 
