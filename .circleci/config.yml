@@ -54,21 +54,31 @@ jobs:
           name: Build dockers
           command: |
             source setup.env
+            docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+            docker pull vsiri/ci_cache:terra || :
+            docker pull vsiri/ci_cache:terra_redis || :
+            docker pull vsiri/ci_cache:terra_pipenv || :
             just terra sync
             just terra pipenv sync --dev
+            docker tag terra:terra_$(id -un) vsiri/ci_cache:terra
+            docker tag terra:redis_$(id -un) vsiri/ci_cache:terra_redis
+            docker tag terra:terra_pipenv_$(id -un) vsiri/ci_cache:terra_pipenv
+            docker push vsiri/ci_cache:terra
+            docker push vsiri/ci_cache:terra_redis
+            docker push vsiri/ci_cache:terra_pipenv
 
-      - run:
-          name: Running test code
-          # no_output_timeout: 30m
-          command: |
-            source setup.env
-            just terra test ${CIRCLE_CI_TEST_FLAGS-}
+###       - run:
+###           name: Running test code
+###           # no_output_timeout: 30m
+###           command: |
+###             source setup.env
+###             just terra test ${CIRCLE_CI_TEST_FLAGS-}
 
-      - run:
-          name: Check pep8 compliance
-          command: |
-            source setup.env
-            just terra test-pep8
+###       - run:
+###           name: Check pep8 compliance
+###           command: |
+###             source setup.env
+###             just terra test-pep8
 
   compile_docs:
     <<: *container_config
@@ -118,7 +128,7 @@ workflows:
   vsi_common:
     jobs:
       - run_tests
-      - compile_docs
+###       - compile_docs
       - deploy_docs:
           requires:
             - compile_docs
