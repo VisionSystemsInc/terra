@@ -72,7 +72,7 @@ from terra.core.exceptions import ImproperlyConfigured
 
 from logging import (
   CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET,
-  getLogger as getLogger_original, _acquireLock, _releaseLock, currentframe,
+  getLogger, _acquireLock, _releaseLock, currentframe,
   _srcfile as logging_srcfile, Logger as Logger_original
 )
 
@@ -359,11 +359,11 @@ class Logger(Logger_original):
       break
     return rv
 
-
-class LoggerAdapter(logging.LoggerAdapter):
-  '''
-  Terra's :class:`logging.LoggerAdapter`
-  '''
+  # Define _log instead of logger adapter, this works better (setLoggerClass)
+  # https://stackoverflow.com/a/28050837/4166604
+  def _log(self, *args, **kwargs):
+    kwargs['extra'] = extra_logger_variables
+    return super()._log(*args, **kwargs)
 
   def debug1(self, msg, *args, **kwargs):
     '''
@@ -408,10 +408,6 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
     logger = getLogger("py.warnings")
     logger.warning("%s", s)
 
-
-def getLogger(name=None, extra=extra_logger_variables):
-  logger = getLogger_original(name)
-  return LoggerAdapter(logger, extra)
 
 
 _srcfiles = (logging_srcfile,
