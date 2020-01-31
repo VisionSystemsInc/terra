@@ -290,8 +290,10 @@ verbose)</p></li>
 </ul>
 <dl class="function">
 <dt id="terra.logger.getLogger">
-<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">getLogger</code><span class="sig-paren">(</span><em class="sig-param">name=None</em>, <em class="sig-param">extra={'hostname': 'e8b0e804e84b'}</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">getLogger</code><span class="sig-paren">(</span><em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a logger with the specified name, creating it if necessary.</p>
+<p>If no name is specified, return the root logger.</p>
+</dd></dl>
 
 <dl class="data">
 <dt id="terra.logger.DEBUG1">
@@ -322,6 +324,33 @@ output used to debug algorithms</p>
 <dt id="terra.logger.Logger">
 <em class="property">class </em><code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">Logger</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">level=0</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Logger</span></code></p>
+<dl class="method">
+<dt id="terra.logger.Logger.debug1">
+<code class="sig-name descname">debug1</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG1" title="terra.logger.DEBUG1"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG1</span></code></a> on this logger. Same as <code class="docutils literal notranslate"><span class="pre">debug</span></code>.
+The arguments are interpreted as for <code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.logger.Logger.debug2">
+<code class="sig-name descname">debug2</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG2" title="terra.logger.DEBUG2"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG2</span></code></a> on this logger. The arguments are
+interpreted as for <code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.logger.Logger.debug3">
+<code class="sig-name descname">debug3</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG3" title="terra.logger.DEBUG3"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG3</span></code></a> on this logger. The arguments are
+interpreted as for <code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="terra.logger.Logger.fatal">
+<code class="sig-name descname">fatal</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.fatal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delegate a critical call to the underlying logger.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="terra.logger.Logger.findCaller">
 <code class="sig-name descname">findCaller</code><span class="sig-paren">(</span><em class="sig-param">stack_info=False</em>, <em class="sig-param">stacklevel=1</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.findCaller" title="Permalink to this definition">¶</a></dt>
