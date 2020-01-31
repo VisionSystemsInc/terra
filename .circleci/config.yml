@@ -58,7 +58,6 @@ jobs:
             docker pull vsiri/ci_cache:terra || :
             docker pull vsiri/ci_cache:terra_redis || :
             docker pull vsiri/ci_cache:terra_pipenv || :
-            docker pull vsiri/ci_cache:terra_dep_stage || :
             just terra sync
             just terra pipenv sync --dev
             docker tag terra:terra_$(id -un) vsiri/ci_cache:terra
@@ -66,7 +65,6 @@ jobs:
             docker tag terra:terra_pipenv_$(id -un) vsiri/ci_cache:terra_pipenv
             # if [ "${CIRCLE_PROJECT_USERNAME}" = "visionsystemsinc" ] && [ "${CIRCLE_BRANCH}" != "master" ]; then
               docker push vsiri/ci_cache:terra
-              docker push vsiri/ci_cache:terra_dep_stage
               docker push vsiri/ci_cache:terra_redis
               docker push vsiri/ci_cache:terra_pipenv
             # fi

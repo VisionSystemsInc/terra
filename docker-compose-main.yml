@@ -7,6 +7,7 @@ services:
       dockerfile: docker/terra.Dockerfile
       cache_from:
         - vsiri/ci_cache:terra
+        - vsiri/ci_cache:terra_pipenv
     # prevent different users from clobbering each others images
     image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
     environment:
@@ -84,6 +85,8 @@ services:
     build:
       <<: *terra_build
       target: pipenv_run
+      cache_from:
+        - vsiri/ci_cache:terra_pipenv
     image: ${TERRA_DOCKER_REPO}:terra_pipenv_${TERRA_USERNAME}
     volumes:
       - <<: *terra_source_volume
