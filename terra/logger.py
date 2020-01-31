@@ -409,7 +409,6 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
     logger.warning("%s", s)
 
 
-
 _srcfiles = (logging_srcfile,
              os.path.normcase(Logger.debug1.__code__.co_filename))
 
