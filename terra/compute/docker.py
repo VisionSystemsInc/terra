@@ -45,8 +45,7 @@ class Compute(BaseCompute):
             {service_info.command}
     '''
     optional_args = {}
-    if hasattr(service_info, 'justfile'):
-      optional_args['justfile'] = service_info.justfile
+    optional_args['justfile'] = getattr(service_info, 'justfile', None)
 
     pid = just("--wrap", "Just-docker-compose",
                *sum([['-f', cf] for cf in service_info.compose_files], []),
@@ -64,8 +63,7 @@ class Compute(BaseCompute):
     '''
 
     optional_args = {}
-    if hasattr(service_info, 'justfile'):
-      optional_args['justfile'] = service_info.justfile
+    optional_args['justfile'] = getattr(service_info, 'justfile', None)
 
     args = ["--wrap", "Just-docker-compose"] + \
         sum([['-f', cf] for cf in service_info.compose_files], []) + \
