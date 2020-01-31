@@ -44,10 +44,15 @@ class Compute(BaseCompute):
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
+    optional_args = {}
+    if hasattr(service_info, 'justfile'):
+      optional_args['justfile']=service_info.justfile
+
     pid = just("--wrap", "Just-docker-compose",
                *sum([['-f', cf] for cf in service_info.compose_files], []),
                'run', service_info.compose_service_name,
                *service_info.command,
+               **optional_args,
                env=service_info.env)
 
     if pid.wait() != 0:
@@ -58,11 +63,16 @@ class Compute(BaseCompute):
     Returns the ``docker-compose config`` output
     '''
 
+    optional_args = {}
+    if hasattr(service_info, 'justfile'):
+      optional_args['justfile']=service_info.justfile
+
     args = ["--wrap", "Just-docker-compose"] + \
         sum([['-f', cf] for cf in service_info.compose_files], []) + \
         ['config']
 
     pid = just(*args, stdout=PIPE,
+               **optional_args,
                env=service_info.env)
     return pid.communicate()[0]
 

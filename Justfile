@@ -217,7 +217,7 @@ function terra_caseify()
       ;;
 
     terra_sync-singular) # Synchronize the many aspects of the project when new code changes \
-          # are applied e.g. after "git checkout" for a singularity build
+                         # are applied e.g. after "git checkout" for a singularity build
       justify git_submodule-update # For those users who don't remember!
       justify terra_sync-pipenv
       if command -v "${DOCKER_COMPOSE}" &> /dev/null; then
@@ -226,7 +226,7 @@ function terra_caseify()
       ;;
 
     terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
-                       #don't call this directly
+                       # don't call this directly
       Terra_Pipenv sync ${@+"${@}"}
       extra_args=$#
       ;;
