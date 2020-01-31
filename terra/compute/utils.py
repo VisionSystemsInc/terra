@@ -177,8 +177,9 @@ def just(*args, **kwargs):
       [quote(x) for x in ('just',) + args]))
 
   just_env = kwargs.pop('env', env).copy()
-  justfile = kwargs.pop(
-      'justfile', os.path.join(env['TERRA_TERRA_DIR'], 'Justfile'))
+  justfile = kwargs.pop('justfile', None)
+  if not justfile:
+    justfile = os.path.join(env['TERRA_TERRA_DIR'], 'Justfile')
   just_env['JUSTFILE'] = justfile
 
   if logger.getEffectiveLevel() <= DEBUG1:
