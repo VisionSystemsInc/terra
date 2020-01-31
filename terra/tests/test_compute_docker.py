@@ -102,7 +102,8 @@ class TestDockerRun(TestComputeDockerCase):
     self.assertEqual(('--wrap', 'Just-docker-compose',
                       '-f', 'file1', 'run', 'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'env': {'BAR': 'FOO'}}, self.just_kwargs)
+    self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO'}},
+                     self.just_kwargs)
 
     # Test a non-zero return value
     self.return_value = 1
@@ -138,7 +139,8 @@ class TestDockerConfig(TestComputeDockerCase):
     self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
                       'config'), self.just_args)
 
-    self.assertEqual({'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}},
+    self.assertEqual({'stdout': docker.PIPE, 'justfile': None,
+                      'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
 
   def test_config_with_multiple_compose_files(self):
@@ -152,7 +154,8 @@ class TestDockerConfig(TestComputeDockerCase):
                       '-f', 'file15.yml', '-f', 'file2.yaml',
                       'config'),
                      self.just_args)
-    self.assertEqual({'stdout': docker.PIPE, 'env': {'BAR': 'FOO'}},
+    self.assertEqual({'stdout': docker.PIPE, 'justfile': None,
+                      'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
 
 

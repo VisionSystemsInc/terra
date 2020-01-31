@@ -22,7 +22,7 @@ class TestHandlerLoggingContext(TestCase):
     test_logger.setLevel(logging.INFO)
     handler_default = logging.handlers.MemoryHandler(1000)
     handler_swap = logging.handlers.MemoryHandler(1000)
-    test_logger.logger.addHandler(handler_default)
+    test_logger.addHandler(handler_default)
 
     # Test normal case
     message1 = str(uuid.uuid4())
@@ -161,16 +161,16 @@ class TestLogger(TestLoggerCase):
   def test_hostname(self):
     test_logger = logger.getLogger(f'{__name__}.test_hostname')
 
-    record = test_logger.logger.makeRecord(__name__, logger.ERROR, __file__, 0,
-                                           "Hiya", (), None,
-                                           extra=test_logger.extra)
+    record = test_logger.makeRecord(__name__, logger.ERROR, __file__, 0,
+                                    "Hiya", (), None,
+                                    extra=logger.extra_logger_variables)
     self.assertIn('(preconfig)', self._logs.stderr_handler.format(record))
 
     settings._setup()
 
-    record = test_logger.logger.makeRecord(__name__, logger.ERROR, __file__, 0,
-                                           "Hiya", (), None,
-                                           extra=test_logger.extra)
+    record = test_logger.makeRecord(__name__, logger.ERROR, __file__, 0,
+                                    "Hiya", (), None,
+                                    extra=logger.extra_logger_variables)
     self.assertIn(f'({platform.node()})',
                   self._logs.stderr_handler.format(record))
 
@@ -182,7 +182,7 @@ class TestLogger(TestLoggerCase):
     handler = logging.StreamHandler(stream)
     handler.setFormatter(formatter)
     handler.setLevel(logger.DEBUG2)
-    test_logger.logger.addHandler(handler)
+    test_logger.addHandler(handler)
     test_logger.setLevel(logger.DEBUG2)
 
     test_logger.debug2('hiya')
@@ -196,7 +196,7 @@ class TestLogger(TestLoggerCase):
     handler = logging.StreamHandler(stream)
     handler.setFormatter(formatter)
     handler.setLevel(logger.DEBUG2)
-    test_logger.logger.addHandler(handler)
+    test_logger.addHandler(handler)
     test_logger.setLevel(logger.DEBUG2)
 
     test_logger.debug2('byeee', stack_info=True)

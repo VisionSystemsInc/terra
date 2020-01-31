@@ -411,7 +411,7 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
 
 
 _srcfiles = (logging_srcfile,
-             os.path.normcase(getLogger.__code__.co_filename))
+             os.path.normcase(Logger.debug1.__code__.co_filename))
 
 
 DEBUG1 = 10
