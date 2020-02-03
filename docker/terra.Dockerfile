@@ -28,8 +28,8 @@ FROM dep_stage as pipenv_cache
 
 RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers
 
-ADD external/vsi_common/setup.py /terra/external/vsi_common/
-ADD setup.py Pipfile Pipfile.lock /terra/
+COPY external/vsi_common/setup.py /terra/external/vsi_common/
+COPY setup.py Pipfile Pipfile.lock /terra/
 
     # Install all packages into the image
 RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
@@ -62,8 +62,8 @@ COPY --from=pipenv_cache /venv /venv
 COPY --from=vsi /vsi /vsi
 
 # Terra
-ADD terra.env /terra/
-ADD docker/terra.Justfile /terra/docker/
+COPY terra.env /terra/
+COPY docker/terra.Justfile /terra/docker/
 
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
 

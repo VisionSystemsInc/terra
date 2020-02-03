@@ -58,6 +58,7 @@ jobs:
             docker pull vsiri/ci_cache:terra || :
             docker pull vsiri/ci_cache:terra_redis || :
             docker pull vsiri/ci_cache:terra_pipenv || :
+            docker build --target pipenv_cache --cache-from vsiri/ci_cache:terra_pipenv --file docker/terra.Dockerfile .
             just terra sync
             just terra pipenv sync --dev
             docker tag terra:terra_$(id -un) vsiri/ci_cache:terra

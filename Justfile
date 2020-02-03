@@ -62,6 +62,21 @@ function terra_caseify()
       fi
       ;;
 
+    ci_save) # Build and save images to CI.
+      local stage stage_names
+      justify build recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
+      justify docker-compose_tag-all-stages "${TERRA_CWD}/docker-compose-main.yml" terra
+
+      docker push vsiri/ci_cache:final_terra
+      for stage in ${stage_names[@]+"${stage_names[@]}"}; do
+        docker push "vsiri/ci_cache:terra_${stage}"
+      done
+      ;;
+
+    ci_load) # $1 - docker-compose file, $2 - Service name
+      
+      ;;
+
     terra_build-services) # Build services. Takes arguments that are passed to the \
                     # docker-compose build command, such as "redis"
       Docker-compose -f "${TERRA_CWD}/docker-compose.yml" build ${@+"${@}"}
