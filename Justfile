@@ -66,7 +66,8 @@ function terra_caseify()
 
     ci_load) # Load images and rebuild from dockerhub cache
       # justify build recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
-      justify docker-compose_ci-load "${TERRA_CWD}/docker-compose-main.yml" terra # terra_pipenv
+      justify docker-compose_ci-load "${TERRA_CWD}/docker-compose-main.yml" terra terra_pipenv
+      # terra_pipenv is needed for `justify terra pipenv sync --dev` in terra_pep8
       ;;
 
     terra_build-services) # Build services. Takes arguments that are passed to the \
