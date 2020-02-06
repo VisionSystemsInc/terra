@@ -55,20 +55,13 @@ jobs:
           command: |
             source setup.env
             docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
-            docker pull vsiri/ci_cache:terra || :
-            docker pull vsiri/ci_cache:terra_redis || :
-            docker pull vsiri/ci_cache:terra_pipenv || :
-            docker build --target pipenv_cache --cache-from vsiri/ci_cache:terra_pipenv --file docker/terra.Dockerfile .
-            just terra sync
-            just terra pipenv sync --dev
-            docker tag terra:terra_$(id -un) vsiri/ci_cache:terra
-            docker tag terra:redis_$(id -un) vsiri/ci_cache:terra_redis
-            docker tag terra:terra_pipenv_$(id -un) vsiri/ci_cache:terra_pipenv
-            # if [ "${CIRCLE_PROJECT_USERNAME}" = "visionsystemsinc" ] && [ "${CIRCLE_BRANCH}" != "master" ]; then
-              docker push vsiri/ci_cache:terra
-              docker push vsiri/ci_cache:terra_redis
-              docker push vsiri/ci_cache:terra_pipenv
-            # fi
+            # The new better docker build system, should be faster
+            # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
+            if [ "${CIRCLE_BRANCH}" != "master" ]; then
+              export JUST_DOCKER_COMPOSE_PUSH=0
+            fi
+            just ci load
+            just terra_sync-pipenv # Only part of terra_sync still need to do
 
 ###       - run:
 ###           name: Running test code

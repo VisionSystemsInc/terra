@@ -55,26 +55,18 @@ function terra_caseify()
         Docker-compose build ${@+"${@}"}
         extra_args=$#
       else
-        justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
+        justify build recipes-auto "${TERRA_CWD}/docker/"*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
-        COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+        if [[ ${TERRA_LOCAL-} == 0 ]]; then
+          COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+        fi
         justify terra build-services
       fi
       ;;
 
-    ci_save) # Build and save images to CI.
-      local stage stage_names
-      justify build recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
-      justify docker-compose_tag-all-stages "${TERRA_CWD}/docker-compose-main.yml" terra
-
-      docker push vsiri/ci_cache:final_terra
-      for stage in ${stage_names[@]+"${stage_names[@]}"}; do
-        docker push "vsiri/ci_cache:terra_${stage}"
-      done
-      ;;
-
-    ci_load) # $1 - docker-compose file, $2 - Service name
-      
+    ci_load) # Load images and rebuild from dockerhub cache
+      # justify build recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
+      justify docker-compose_ci-load "${TERRA_CWD}/docker-compose-main.yml" terra # terra_pipenv
       ;;
 
     terra_build-services) # Build services. Takes arguments that are passed to the \
@@ -222,7 +214,7 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       justify git_submodule-update # For those users who don't remember!
-      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+      if [[ ${TERRA_LOCAL-} == 0 ]]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         justify terra_sync-pipenv
         justify terra build-services
