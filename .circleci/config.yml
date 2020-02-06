@@ -57,24 +57,24 @@ jobs:
             docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
             # The new better docker build system, should be faster
             # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
-            if [ "${CIRCLE_BRANCH}" != "master" ]; then
-              export JUST_DOCKER_COMPOSE_PUSH=0
-            fi
+            ### if [ "${CIRCLE_BRANCH}" != "master" ]; then
+            ###   export JUST_DOCKER_COMPOSE_PUSH=0
+            ### fi
             just ci load
             just terra_sync-pipenv # Only part of terra_sync still need to do
 
-      - run:
-          name: Running test code
-          # no_output_timeout: 30m
-          command: |
-            source setup.env
-            just terra test ${CIRCLE_CI_TEST_FLAGS-}
+###       - run:
+###           name: Running test code
+###           # no_output_timeout: 30m
+###           command: |
+###             source setup.env
+###             just terra test ${CIRCLE_CI_TEST_FLAGS-}
 
-      - run:
-          name: Check pep8 compliance
-          command: |
-            source setup.env
-            just terra test-pep8
+###       - run:
+###           name: Check pep8 compliance
+###           command: |
+###             source setup.env
+###             just terra test-pep8
 
   compile_docs:
     <<: *container_config
@@ -124,11 +124,11 @@ workflows:
   terra:
     jobs:
       - run_tests
-      - compile_docs
-      - deploy_docs:
-          requires:
-            - compile_docs
-          filters:
-            branches:
-              only:
-                - master
+###       - compile_docs
+###       - deploy_docs:
+###           requires:
+###             - compile_docs
+###           filters:
+###             branches:
+###               only:
+###                 - master
