@@ -234,7 +234,7 @@ function terra_caseify()
 
     terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
                        # don't call this directly
-      Terra_Pipenv sync ${@+"${@}"}
+      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
       extra_args=$#
       ;;
 
