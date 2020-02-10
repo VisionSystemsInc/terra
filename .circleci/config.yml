@@ -57,9 +57,9 @@ jobs:
             docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
             # The new better docker build system, should be faster
             # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
-            ### if [ "${CIRCLE_BRANCH}" != "master" ]; then
-            ###   export JUST_DOCKER_COMPOSE_PUSH=0
-            ### fi
+            if [ "${CIRCLE_BRANCH}" != "master" ]; then
+              export JUST_DOCKER_COMPOSE_PUSH=0
+            fi
             just ci load
 
       - run:
@@ -73,6 +73,9 @@ jobs:
           name: Check pep8 compliance
           command: |
             source setup.env
+            # This is faster than pipenv sync --dev. pyzmq (via ipykernel)
+            # wastes several minutes, and I don't need it
+            just terra pipenv run pip install autopep8 flake8
             just terra test-pep8
 
   compile_docs:

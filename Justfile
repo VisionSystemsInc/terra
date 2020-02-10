@@ -196,12 +196,13 @@ function terra_caseify()
         justify terra pipenv sync --dev
       fi
 
-      echo "Running for autopep8..."
+      echo "Running autopep8..."
       Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
     terra_test-pep8) # Run pep8 test
       justify terra pep8
+      echo "Running flake8..."
       Terra_Pipenv run bash -c 'flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
