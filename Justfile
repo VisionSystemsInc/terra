@@ -55,11 +55,19 @@ function terra_caseify()
         Docker-compose build ${@+"${@}"}
         extra_args=$#
       else
-        justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
+        justify build recipes-auto "${TERRA_CWD}/docker/"*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
-        COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+        if [[ ${TERRA_LOCAL-} == 0 ]]; then
+          COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+        fi
         justify terra build-services
       fi
+      ;;
+
+    ci_load) # Load images and rebuild from dockerhub cache
+      # justify build recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
+      justify docker-compose_ci-load "${TERRA_CWD}/docker-compose-main.yml" terra terra_pipenv
+      # terra_pipenv is needed for `justify terra pipenv sync --dev` in terra_pep8
       ;;
 
     terra_build-services) # Build services. Takes arguments that are passed to the \
@@ -188,12 +196,13 @@ function terra_caseify()
         justify terra pipenv sync --dev
       fi
 
-      echo "Running for autopep8..."
+      echo "Running autopep8..."
       Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
     terra_test-pep8) # Run pep8 test
       justify terra pep8
+      echo "Running flake8..."
       Terra_Pipenv run bash -c 'flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
@@ -207,7 +216,7 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       justify git_submodule-update # For those users who don't remember!
-      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+      if [[ ${TERRA_LOCAL-} == 0 ]]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         justify terra_sync-pipenv
         justify terra build-services
@@ -227,7 +236,7 @@ function terra_caseify()
 
     terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
                        # don't call this directly
-      Terra_Pipenv sync ${@+"${@}"}
+      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
       extra_args=$#
       ;;
 

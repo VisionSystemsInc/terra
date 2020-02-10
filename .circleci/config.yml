@@ -54,8 +54,13 @@ jobs:
           name: Build dockers
           command: |
             source setup.env
-            just terra sync
-            just terra pipenv sync --dev
+            docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+            # The new better docker build system, should be faster
+            # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
+            if [ "${CIRCLE_BRANCH}" != "master" ]; then
+              export JUST_DOCKER_COMPOSE_PUSH=0
+            fi
+            just ci load
 
       - run:
           name: Running test code
@@ -68,6 +73,9 @@ jobs:
           name: Check pep8 compliance
           command: |
             source setup.env
+            # This is faster than pipenv sync --dev. pyzmq (via ipykernel)
+            # wastes several minutes, and I don't need it
+            just terra pipenv run pip install autopep8 flake8
             just terra test-pep8
 
   compile_docs:
@@ -115,7 +123,7 @@ jobs:
 # CircleCI workflows
 # -----
 workflows:
-  vsi_common:
+  terra:
     jobs:
       - run_tests
       - compile_docs
