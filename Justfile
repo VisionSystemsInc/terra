@@ -221,7 +221,7 @@ function terra_caseify()
         justify terra_sync-pipenv
         justify terra build-services
       else
-        justify terra build
+        justify terra sync-pipenv
       fi
       ;;
 
