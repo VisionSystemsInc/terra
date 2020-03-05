@@ -5,7 +5,6 @@ Utilities that will be used by apps
 import os
 import shutil
 import json
-import inspect
 from vsi.tools.python import BasicDecorator, args_to_kwargs
 
 from terra.core.settings import ObjectDict
@@ -61,7 +60,7 @@ class resumable(BasicDecorator):
     self.stage_self = all_kwargs['self']
 
     # Create a unique name for the function
-    stage_name = f'{inspect.getfile(self.fun)}//{self.fun.__qualname__}'
+    stage_name = f'{self.fun.__module__}.{self.fun.__qualname__}'
 
     # Load/create status file
     if not os.path.exists(settings.status_file):
