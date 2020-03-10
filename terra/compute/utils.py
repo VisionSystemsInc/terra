@@ -33,12 +33,15 @@ from os import environ as env
 from shlex import quote
 from subprocess import Popen
 import distutils.spawn
+import pathlib
 
 from vsi.tools.diff import dict_diff
+from vsi.tools.python import nested_patch
 
 from terra.core.utils import Handler
 from terra import settings
 import terra.compute.base
+from terra.core.settings import filename_suffixes
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
@@ -198,3 +201,52 @@ def just(*args, **kwargs):
   # Have to call bash for windows compatibility, no shebang support
   pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
   return pid
+
+
+def translate_settings_paths(container_config, volume_map,
+                             container_platform='linux'):
+
+  if os.name == "nt":  # pragma: no linux cover
+    logger.warning("Windows volume mapping is experimental.")
+
+    def patch_volume(value, volume_map):
+      if isinstance(value, str):
+        value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
+        for vol_from, vol_to in volume_map:
+          # pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
+
+          # if isinstance(value, str) and pattern.match(value):
+          #   value = pattern.sub(vol_to, value)
+          #   value = value.replace('\\', '/')
+          #   break
+
+          vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
+
+          try:
+            remainder = value_path.relative_to(vol_from)
+          except ValueError:
+            continue
+          if container_platform == "windows":
+            value = pathlib.PureWindowsPath(vol_to)
+          else:
+            value = pathlib.PurePosixPath(vol_to)
+
+          value /= remainder
+          return str(value)
+      return value
+  else:  # pragma: no nt cover
+    def patch_volume(value, volume_map):
+      if isinstance(value, str):
+        for vol_from, vol_to in volume_map:
+          if value.startswith(vol_from):
+            return value.replace(vol_from, vol_to, 1)
+      return value
+
+  # Apply map translation to settings configuration
+  return nested_patch(
+      container_config,
+      lambda key, value: (isinstance(key, str)
+                          and any(key.endswith(pattern)
+                                  for pattern in filename_suffixes)),
+      lambda key, value: patch_volume(value, reversed(volume_map))
+  )

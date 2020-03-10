@@ -4,6 +4,7 @@ import re
 
 import yaml
 
+from terra.utils.cli import extra_arguments
 from terra.compute.base import BaseCompute, ServiceRunFailed
 from terra.compute.container import ContainerService
 from terra.compute.utils import just
@@ -50,7 +51,7 @@ class Compute(BaseCompute):
     pid = just("--wrap", "Just-docker-compose",
                *sum([['-f', cf] for cf in service_info.compose_files], []),
                'run', service_info.compose_service_name,
-               *service_info.command,
+               *service_info.command + extra_arguments,
                **optional_args,
                env=service_info.env)
 

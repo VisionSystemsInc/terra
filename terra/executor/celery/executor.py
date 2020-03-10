@@ -95,7 +95,7 @@ class CeleryExecutor(Executor):
   """
 
   def __init__(self, predelay=None, postdelay=None, applyasync_kwargs=None,
-               retry_kwargs=None, retry_queue='', update_delay=0.1):
+               retry_kwargs=None, retry_queue='', update_delay=0.1, max_workers=None):
     # Options about calling the Task
     self._predelay = predelay
     self._postdelay = postdelay
