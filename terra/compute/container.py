@@ -54,9 +54,9 @@ class ContainerService(BaseService):
           volume_str
       env_volume_index += 1
 
-    volume_map = compute.configuration_map(self)
+    volume_map, config = compute.configuration_map(self)
 
-    logger.debug3("Volume map: %s", volume_map)
+    logger.debug3("Compute Volume map: %s", volume_map)
 
     # Setup config file for container
 
@@ -78,7 +78,10 @@ class ContainerService(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 
+    super().pre_run(config)
+
   def post_run(self):
+    super().post_run()
     # Delete temp_dir
     self.temp_dir.cleanup()
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason

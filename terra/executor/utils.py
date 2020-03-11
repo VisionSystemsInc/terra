@@ -45,6 +45,10 @@ class ExecutorHandler(ClassHandler):
       module = import_module(f'{module_name[0]}')
       return getattr(module, module_name[1])
 
+  def configuration_map(self, config):
+    if not hasattr(self._connection, 'configuration_map'):
+      return {}
+    return self._connection.configuration_map(config)
 
 Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing

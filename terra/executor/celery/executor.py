@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from os import environ as env
 from concurrent.futures import Future, Executor, as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
                                       CANCELLED_AND_NOTIFIED)
@@ -202,3 +203,30 @@ class CeleryExecutor(Executor):
       except RuntimeError:  # pragma: no cover
         # Thread never started. Cannot join
         pass
+
+
+  @staticmethod
+  def configuration_map(config):
+    from terra.compute import compute
+    service_name = env['TERRA_CELERY_SERVICE']
+
+    volume_map = compute.get_volume_map(config, service_name)
+
+    # # In the case of docker, the config has /tmp_settings in there, this should
+    # # be removed, as it is not in the celery worker. I don't think it would
+    # # cause any problems, but it's inaccurate.
+    # volume_map = [v for v in volume_map if v[1] != '/tmp_settings']
+
+    return volume_map
+
+    # optional_args = {}
+    # optional_args['justfile'] = justfile
+
+    # args = ["--wrap", "Just-docker-compose"] + \
+    #     sum([['-f', cf] for cf in compose_files], []) + \
+    #     ['config']
+
+    # pid = just(*args, stdout=PIPE,
+    #            **optional_args,
+    #            env=service_info.env)
+    # return pid.communicate()[0]

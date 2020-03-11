@@ -75,25 +75,14 @@ class Compute(BaseCompute):
                env=service_info.env)
     return pid.communicate()[0]
 
-  def configuration_map_service(self, service_info):
-    '''
-    Returns the mapping of volumes from the host to the container.
-
-    Returns
-    -------
-    list
-        Return a list of tuple pairs [(host, remote), ... ] of the volumes
-        mounted from the host to container
-    '''
+  def get_volume_map(self, config, service_name, additional_volumes=[]):
     # TODO: Make an OrderedDict
     volume_map = []
 
-    config = yaml.load(self.config(service_info))
-
     if 'services' in config and \
-        service_info.compose_service_name in config['services'] and \
-        config['services'][service_info.compose_service_name]:
-      volumes = config['services'][service_info.compose_service_name].get(
+        service_name in config['services'] and \
+        config['services'][service_name]:
+      volumes = config['services'][service_name].get(
         'volumes', [])
     else:
       volumes = []
@@ -107,7 +96,7 @@ class Compute(BaseCompute):
           ans = re.match(docker_volume_re, volume).groups()
           volume_map.append((ans[0], ans[2]))
 
-    volume_map = volume_map + service_info.volumes
+    volume_map = volume_map + additional_volumes
 
     slashes = '/'
     if os.name == 'nt':
@@ -116,6 +105,26 @@ class Compute(BaseCompute):
     # Strip trailing /'s to make things look better
     return [(volume_host.rstrip(slashes), volume_remote.rstrip(slashes))
             for volume_host, volume_remote in volume_map]
+
+  def configuration_map_service(self, service_info):
+    '''
+    Returns the mapping of volumes from the host to the container.
+
+    Returns
+    -------
+    list
+        Return a list of tuple pairs [(host, remote), ... ] of the volumes
+        mounted from the host to container
+    dict
+        Returns the full configuration object, that might be used for other
+        configuration adaptations down the line.
+    '''
+
+    config = yaml.load(self.config(service_info))
+
+    return self.get_volume_map(config,
+                               service_info.compose_service_name,
+                               service_info.volumes), config
 
 
 class Service(ContainerService):

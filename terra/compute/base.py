@@ -1,6 +1,9 @@
 import os
 
 import terra.compute.utils
+from terra.executor import Executor
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 
 class ServiceRunFailed(Exception):
@@ -30,6 +33,36 @@ class BaseService:
       return
 
     self.volumes.append((local, remote))
+
+  def get_volume_map(self, config, service_name, additional_volumes=[]):
+    return []
+
+  '''
+  A function that runs before the run service
+
+  All service classes should implement at least ``run_service``, as this is the
+  quintessential call in running a service. ``pre_run`` in :class:`BaseService`
+  is mainly responsible for handling Executors that need a separate volume
+  translation
+
+  Parameters
+  ----------
+  config : :class:`dict`, optional
+      The config object, that can be passed to a compute's parse function
+  '''
+  def pre_run(self, config=None):
+    # Only computes that contain volume translations pass a config to pre_run.
+    # If there is a config, then pass the configuration to the Executor to get
+    # it's map.
+
+    import vsi.tools.vdb_ipdb as vdb
+    vdb.set_trace()
+
+    if config is not None:
+      configuration_map = Executor.configuration_map(config)
+
+  def post_run(self):
+    pass
 
 
 class AlreadyRegisteredException(Exception):

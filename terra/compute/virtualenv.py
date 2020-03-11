@@ -96,6 +96,8 @@ class Service(BaseService):
     """
 
     """
+    super().pre_run()
+
     # Create a temp directory, store it in this instance
     self.temp_dir = TemporaryDirectory()
 
@@ -114,5 +116,6 @@ class Service(BaseService):
     self.env['TERRA_SETTINGS_FILE'] = temp_config_file
 
   def post_run(self):
+    super().post_run()
     # Delete temp_dir
     self.temp_dir.cleanup()
