@@ -73,16 +73,16 @@ class Compute(BaseCompute):
     pid = just(*args, stdout=PIPE,
                **optional_args,
                env=service_info.env)
-    return pid.communicate()[0]
+    return yaml.load(pid.communicate()[0])
 
-  def get_volume_map(self, config, service_name, additional_volumes=[]):
+  def get_volume_map(self, config, service_info):
     # TODO: Make an OrderedDict
     volume_map = []
 
     if 'services' in config and \
-        service_name in config['services'] and \
-        config['services'][service_name]:
-      volumes = config['services'][service_name].get(
+        service_info.compose_service_name in config['services'] and \
+        config['services'][service_info.compose_service_name]:
+      volumes = config['services'][service_info.compose_service_name].get(
         'volumes', [])
     else:
       volumes = []
@@ -96,7 +96,7 @@ class Compute(BaseCompute):
           ans = re.match(docker_volume_re, volume).groups()
           volume_map.append((ans[0], ans[2]))
 
-    volume_map = volume_map + additional_volumes
+    volume_map = volume_map + service_info.volumes
 
     slashes = '/'
     if os.name == 'nt':
@@ -120,11 +120,9 @@ class Compute(BaseCompute):
         configuration adaptations down the line.
     '''
 
-    config = yaml.load(self.config(service_info))
+    config = self.config(service_info)
 
-    return self.get_volume_map(config,
-                               service_info.compose_service_name,
-                               service_info.volumes), config
+    return self.get_volume_map(config, service_info)
 
 
 class Service(ContainerService):

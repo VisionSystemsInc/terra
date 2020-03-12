@@ -54,7 +54,7 @@ class ContainerService(BaseService):
           volume_str
       env_volume_index += 1
 
-    volume_map, config = compute.configuration_map(self)
+    volume_map = compute.configuration_map(self)
 
     logger.debug3("Compute Volume map: %s", volume_map)
 
@@ -78,7 +78,7 @@ class ContainerService(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 
-    super().pre_run(config)
+    super().pre_run()
 
   def post_run(self):
     super().post_run()

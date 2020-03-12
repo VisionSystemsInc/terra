@@ -34,7 +34,7 @@ class BaseService:
 
     self.volumes.append((local, remote))
 
-  def get_volume_map(self, config, service_name, additional_volumes=[]):
+  def get_volume_map(self, config, service_info):
     return []
 
   '''
@@ -44,22 +44,9 @@ class BaseService:
   quintessential call in running a service. ``pre_run`` in :class:`BaseService`
   is mainly responsible for handling Executors that need a separate volume
   translation
-
-  Parameters
-  ----------
-  config : :class:`dict`, optional
-      The config object, that can be passed to a compute's parse function
   '''
-  def pre_run(self, config=None):
-    # Only computes that contain volume translations pass a config to pre_run.
-    # If there is a config, then pass the configuration to the Executor to get
-    # it's map.
-
-    import vsi.tools.vdb_ipdb as vdb
-    vdb.set_trace()
-
-    if config is not None:
-      configuration_map = Executor.configuration_map(config)
+  def pre_run(self):
+    executor_configuration_map = Executor.configuration_map(self)
 
   def post_run(self):
     pass

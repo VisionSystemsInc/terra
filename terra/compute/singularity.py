@@ -31,16 +31,20 @@ class Compute(BaseCompute):
     if pid.wait() != 0:
       raise ServiceRunFailed()
 
-  def config_service(self, service_info, service_name):
+  def config_service(self, service_info):
     '''
     Returns the ``singular-compose config-null`` output
     '''
 
+    optional_args = {}
+    optional_args['justfile'] = getattr(service_info, 'justfile', None)
+
     args = ["singular-compose"] + \
         sum([['-f', cf] for cf in service_info.compose_files], []) + \
-        ['config-null', service_name]
+        ['config-null', service_info.compose_service_name]
 
     pid = just(*args, stdout=PIPE,
+               **optional_args,
                env=service_info.env)
     data = pid.communicate()[0]
 
@@ -57,8 +61,7 @@ class Compute(BaseCompute):
 
     return data
 
-  def get_volume_map(self, service_info, service_name, additional_volumes=[]):
-    config = self.config(service_info, service_name)
+  def get_volume_map(self, config, service_info):
 
     # TODO: Make an OrderedDict
     volume_map = []
@@ -92,11 +95,9 @@ class Compute(BaseCompute):
         Returns the full configuration object, that might be used for other
         configuration adaptations down the line.
     '''
+    config = self.config(service_info)
 
-    return self.get_volume_map(service_info,
-                               service_info.compose_service_name,
-                               service_info.volumes), service_info
-
+    return self.get_volume_map(config, service_info)
 
 class Service(ContainerService):
   '''

@@ -206,11 +206,30 @@ class CeleryExecutor(Executor):
 
 
   @staticmethod
-  def configuration_map(config):
+  def configuration_map(service_info):
     from terra.compute import compute
     service_name = env['TERRA_CELERY_SERVICE']
 
-    volume_map = compute.get_volume_map(config, service_name)
+    class ServiceClone:
+      def __init__(self, service_info):
+        self.compose_service_name = service_name
+
+        if hasattr(service_info, 'justfile'):
+          self.justfile = service_info.justfile
+        if hasattr(service_info, 'compose_files'):
+          self.compose_files = service_info.compose_files
+
+        self.env = env # .copy()
+        self.volumes = []
+
+    service_clone = ServiceClone(service_info)
+
+    if hasattr(compute, 'config'):
+      config = compute.config(service_clone)
+    else:
+      config = None
+
+    volume_map = compute.get_volume_map(config, service_clone)
 
     # # In the case of docker, the config has /tmp_settings in there, this should
     # # be removed, as it is not in the celery worker. I don't think it would
