@@ -37,7 +37,7 @@ class cached_property:
 
   Parameters
   ----------
-  func : func
+  func : :term:`function`
       The function being wrapped
   name : :class:`str`, optional
       When not used as a decorator, allows you to make cached properties of

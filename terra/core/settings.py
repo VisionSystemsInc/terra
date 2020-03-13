@@ -187,7 +187,7 @@ def settings_property(func):
 
   Arguments
   ---------
-  func : func
+  func : :term:`function`
       Function being decorated
   '''
 
