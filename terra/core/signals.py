@@ -98,7 +98,7 @@ class Signal:
 
     Parameters
     ----------
-    receiver : func
+    receiver : :term:`function`
         A function or an instance method which is to receive signals.
         Receivers must be hashable objects.
         If weak is True, then receiver must be weak referenceable.
@@ -150,7 +150,7 @@ class Signal:
 
     Parameters
     ----------
-    receiver : func
+    receiver : :term:`function`
         The registered receiver to disconnect. May be none if
         dispatch_uid is specified.
     sender : object

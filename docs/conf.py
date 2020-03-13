@@ -43,8 +43,15 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
+    'sphinx.ext.intersphinx',
     'vsi_domains'
 ]
+
+# Link to other documentation (e.g., numpy, python, terra, etc.)
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.6', None),
+    'vsi_common': ('https://visionsystemsinc.github.io/vsi_common/', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -82,52 +89,24 @@ napoleon_include_special_with_doc = True
 
 # Autodoc parameters
 
-autodoc_mock_imports = ["vsi",
-                        "vxl",
-                        "terra._terra",
+autodoc_mock_imports = [
+    "vsi",
+    "terra._terra",
+    "yaml",
+    "celery",
+]
 
-                        "envcontext",
-                        "yaml",
-                        "celery"]
-
-nitpick_ignore = [('py:class', 'bool'),
-                  ('py:class', 'array_like'),
-                  ('py:class', 'object'),
-                  ('py:class', 'str'),
-                  ('py:class', 'int'),
-                  ('py:class', 'float'),
-                  ('py:class', 'func'),
-                  ('py:class', 'dict'),
-                  ('py:class', 'iterable'),
-                  ('py:class', 'list'),
-                  ('py:class', 'class'),
-                  ('py:class', 'tuple'),
-                  ('py:class', 'module'),
-                  ('py:class', 'var'),
-                  ('py:class', 'file_like'),
-                  ('py:class', 'Exception'),
-                  ('py:class', 'type'),
-
-                  ('py:class', 'argparse.Action'),
-                  ('py:class', 'vsi.tools.python.BasicDecorator'),
-                  ('py:func',  'vsi.tools.python.nested_update'),
-
-                  ('py:mod',   'django.conf'),
-                  ('py:class', 'django.db.utils.ConnectionHandler'),
-
-                  ('py:class', 'weakref.WeakKeyDictionary'),
-                  ('py:class', 'json.encoder.JSONEncoder'),
-                  ('py:class', 'concurrent.futures._base.Executor'),
-                  ('py:class', 'concurrent.futures._base.Future'),
-                  ('py:class', 'argparse._AppendAction'),
-
-                  ('py:mod',   'logging'),
-                  ('py:data',  'logging.DEBUG'),
-                  ('py:data',  'logging.WARNING'),
-                  ('py:class', 'logging.Logger'),
-                  ('py:func',  'logging.debug'),
-
-                  ('py:exc',   'NotImplementedError')]
+nitpick_ignore = [
+    ('py:class', 'vsi.tools.python.BasicDecorator'),
+    ('py:mod',   'django.conf'),
+    ('py:class', 'django.db.utils.ConnectionHandler'),
+    ('py:class', 'json.encoder.JSONEncoder'),
+    ('py:class', 'concurrent.futures._base.Executor'),
+    ('py:class', 'concurrent.futures._base.Future'),
+    ('py:class', 'argparse._AppendAction'),
+    ('py:data',  'logging.DEBUG'),
+    ('py:data',  'logging.WARNING'),
+]
 
 # -- Options for HTML output -------------------------------------------------
 
