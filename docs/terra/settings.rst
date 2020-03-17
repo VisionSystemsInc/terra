@@ -1,6 +1,21 @@
 
 .. _settings:
 
+Workflow Settings
+-----------------
+
+.. option:: service_start
+
+    For :py:class:`terra.workflow.PipelineWorkflow`, choose which service to start at, if you'd like to skip some of the initial services. Inclusive, so this first service will be run. Options are and of the services in the ``pipeline``, case insensitive.
+
+    Default: ``{First service}``
+
+.. option:: service_end
+
+    For :py:class:`terra.workflow.PipelineWorkflow`, choose which service to end at, if you don't want to run all the way to the end. Inclusive, so this last service will be run. Options are and of the services in the ``pipeline``, case insensitive.
+
+    Default: ``{Last Service}``
+
 .. _settings_logging:
 
 Logging Settings
