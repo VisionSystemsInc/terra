@@ -82,7 +82,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="terra/getting_started.html">What is Terra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Logging Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Adding Apps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="python/modules.html">terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/contributing.html">Contributing Guidlines</a></li>
@@ -267,6 +268,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseService">BaseService (class in terra.compute.base)</a>
 </li>
+      <li><a href="python/terra.html#terra.workflow.BaseWorkflow">BaseWorkflow (class in terra.workflow)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -303,7 +306,13 @@
 </li>
         <li><a href="terra/settings.html#cmdoption-arg-logging-level">logging.level</a>
 </li>
+        <li><a href="terra/settings.html#cmdoption-arg-service-end">service_end</a>
+</li>
+        <li><a href="terra/settings.html#cmdoption-arg-service-start">service_start</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.docker.Compute">Compute (class in terra.compute.docker)</a>
 
       <ul>
@@ -314,8 +323,6 @@
         <li><a href="python/terra.compute.html#terra.compute.virtualenv.Compute">(class in terra.compute.virtualenv)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.utils.compute">compute (in module terra.compute.utils)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.utils.ComputeHandler">ComputeHandler (class in terra.compute.utils)</a>
@@ -531,6 +538,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.html#terra.workflow.PipelineWorkflow">PipelineWorkflow (class in terra.workflow)</a>
+</li>
       <li><a href="python/terra.compute.html#terra.compute.container.ContainerService.post_run">post_run() (terra.compute.container.ContainerService method)</a>
 
       <ul>
@@ -539,10 +548,10 @@
         <li><a href="python/terra.compute.html#terra.compute.virtualenv.Service.post_run">(terra.compute.virtualenv.Service method)</a>
 </li>
       </ul></li>
-      <li><a href="python/terra.core.html#terra.core.signals.post_settings_configured">post_settings_configured (in module terra.core.signals)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.core.html#terra.core.signals.post_settings_configured">post_settings_configured (in module terra.core.signals)</a>
+</li>
       <li><a href="python/terra.compute.html#terra.compute.container.ContainerService.pre_run">pre_run() (terra.compute.container.ContainerService method)</a>
 
       <ul>
@@ -569,6 +578,12 @@
 </li>
       <li><a href="python/terra.utils.html#terra.utils.workflow.resumable">resumable (class in terra.utils.workflow)</a>
 </li>
+      <li><a href="python/terra.html#terra.workflow.BaseWorkflow.run">run() (terra.workflow.BaseWorkflow method)</a>
+
+      <ul>
+        <li><a href="python/terra.html#terra.workflow.PipelineWorkflow.run">(terra.workflow.PipelineWorkflow method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.run_service">run_service() (terra.compute.base.BaseCompute method)</a>
@@ -609,18 +624,34 @@
         <li><a href="python/terra.compute.html#terra.compute.virtualenv.Service">(class in terra.compute.virtualenv)</a>
 </li>
       </ul></li>
+      <li>
+    service_end
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-service-end">command line option</a>
+</li>
+      </ul></li>
+      <li><a href="python/terra.html#terra.workflow.PipelineWorkflow.service_index">service_index() (terra.workflow.PipelineWorkflow method)</a>
+</li>
+      <li>
+    service_start
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-service-start">command line option</a>
+</li>
+      </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.base.ServiceRunFailed">ServiceRunFailed</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.Settings">Settings (class in terra.core.settings)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.html#terra.settings">settings (in module terra)</a>
 
       <ul>
         <li><a href="python/terra.core.html#terra.core.settings.settings">(in module terra.core.settings)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.settings_property">settings_property() (in module terra.core.settings)</a>
 </li>
       <li><a href="python/terra.executor.celery.html#terra.executor.celery.CeleryExecutor.shutdown">shutdown() (terra.executor.celery.CeleryExecutor method)</a>
@@ -710,6 +741,8 @@
       <li><a href="python/terra.utils.html#module-terra.utils.cli">terra.utils.cli (module)</a>
 </li>
       <li><a href="python/terra.utils.html#module-terra.utils.workflow">terra.utils.workflow (module)</a>
+</li>
+      <li><a href="python/terra.html#module-terra.workflow">terra.workflow (module)</a>
 </li>
       <li><a href="python/terra.core.html#index-0">TERRA_SETTINGS_FILE</a>, <a href="python/terra.core.html#index-1">[1]</a>, <a href="python/terra.core.html#index-2">[2]</a>, <a href="terra/getting_started.html#index-0">[3]</a>
 </li>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Logging Settings &mdash; Terra 0.0.1 documentation</title>
+  <title>Workflow Settings &mdash; Terra 0.0.1 documentation</title>
   
 
   
@@ -83,7 +83,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">What is Terra</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Logging Settings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="apps.html">Adding Apps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../python/modules.html">terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
@@ -132,7 +133,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Logging Settings</li>
+      <li>Workflow Settings</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -151,8 +152,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="logging-settings">
-<span id="settings-logging"></span><span id="settings"></span><h1>Logging Settings<a class="headerlink" href="#logging-settings" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="workflow-settings">
+<span id="settings"></span><h1>Workflow Settings<a class="headerlink" href="#workflow-settings" title="Permalink to this headline">¶</a></h1>
+<dl class="option">
+<dt id="cmdoption-arg-service-start">
+<code class="sig-name descname">service_start</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service-start" title="Permalink to this definition">¶</a></dt>
+<dd><p>For <a class="reference internal" href="../python/terra.html#terra.workflow.PipelineWorkflow" title="terra.workflow.PipelineWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.PipelineWorkflow</span></code></a>, choose which service to start at, if you’d like to skip some of the initial services. Inclusive, so this first service will be run. Options are and of the services in the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, case insensitive.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">{First</span> <span class="pre">service}</span></code></p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-arg-service-end">
+<code class="sig-name descname">service_end</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service-end" title="Permalink to this definition">¶</a></dt>
+<dd><p>For <a class="reference internal" href="../python/terra.html#terra.workflow.PipelineWorkflow" title="terra.workflow.PipelineWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.PipelineWorkflow</span></code></a>, choose which service to end at, if you don’t want to run all the way to the end. Inclusive, so this last service will be run. Options are and of the services in the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, case insensitive.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">{Last</span> <span class="pre">Service}</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="logging-settings">
+<span id="settings-logging"></span><h1>Logging Settings<a class="headerlink" href="#logging-settings" title="Permalink to this headline">¶</a></h1>
 <dl class="option">
 <dt id="cmdoption-arg-logging-level">
 <code class="sig-name descname">logging.level</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging-level" title="Permalink to this definition">¶</a></dt>

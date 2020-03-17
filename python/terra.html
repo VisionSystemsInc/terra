@@ -83,7 +83,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Logging Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/apps.html">Adding Apps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">terra</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">terra package</a><ul>
@@ -99,6 +100,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-terra.workflow">terra.workflow module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-terra">Module contents</a></li>
 </ul>
 </li>
@@ -361,6 +363,39 @@ file name, line number and function name.</p>
 </dd></dl>
 
 </div>
+</div>
+<div class="section" id="module-terra.workflow">
+<span id="terra-workflow-module"></span><h2>terra.workflow module<a class="headerlink" href="#module-terra.workflow" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.workflow.BaseWorkflow">
+<em class="property">class </em><code class="sig-prename descclassname">terra.workflow.</code><code class="sig-name descname">BaseWorkflow</code><a class="headerlink" href="#terra.workflow.BaseWorkflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The base class for all Terra Workflows</p>
+<dl class="method">
+<dt id="terra.workflow.BaseWorkflow.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.BaseWorkflow.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.workflow.PipelineWorkflow">
+<em class="property">class </em><code class="sig-prename descclassname">terra.workflow.</code><code class="sig-name descname">PipelineWorkflow</code><a class="headerlink" href="#terra.workflow.PipelineWorkflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A simple workflow that runs a set of services, serially.</p>
+<p>self.pipeline need to be set to a list of services calls.</p>
+<dl class="method">
+<dt id="terra.workflow.PipelineWorkflow.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.workflow.PipelineWorkflow.service_index">
+<code class="sig-name descname">service_index</code><span class="sig-paren">(</span><em class="sig-param">service_name=None</em>, <em class="sig-param">default_index=0</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.service_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-terra">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra" title="Permalink to this headline">¶</a></h2>

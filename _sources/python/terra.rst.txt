@@ -22,6 +22,14 @@ terra.logger module
    :undoc-members:
    :show-inheritance:
 
+terra.workflow module
+---------------------
+
+.. automodule:: terra.workflow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
