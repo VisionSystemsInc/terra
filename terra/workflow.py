@@ -2,6 +2,7 @@ from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+
 class BaseWorkflow:
   '''
   The base class for all Terra Workflows
@@ -10,14 +11,16 @@ class BaseWorkflow:
   def run(self):
     pass
 
+
 class PipelineWorkflow:
   '''
   A simple workflow that runs a set of services, serially.
 
   self.pipeline need to be set to a list of services calls.
   '''
+
   def __init__(self):
-    self.pipeline=list()
+    self.pipeline = list()
 
   # locate index of service name in workflow pipeline
   def service_index(self, service_name=None, default_index=0):
@@ -47,8 +50,10 @@ class PipelineWorkflow:
                                    len(self.pipeline) - 1)
 
     if (start_index > end_index):
-      raise ValueError(f"Start service {self.pipeline[start_index].__name__} "
-          f"must precede end service {self.pipeline[end_index].__name__}")
+      raise ValueError(
+          f"Start service {self.pipeline[start_index].__name__} "
+          f"must precede end service {self.pipeline[end_index].__name__}"
+      )
 
     # slice pipeline to requested services
     pipeline = self.pipeline[start_index:end_index + 1]

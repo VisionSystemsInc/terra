@@ -117,7 +117,7 @@ def load_service(name_or_class):
 
   Parameters
   ----------
-  name_or_class : :class:`str` or :class:`class` or instance
+  name_or_class : :class:`str` or :term:`class` or instance
       The service being loaded
 
   Returns

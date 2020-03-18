@@ -87,7 +87,7 @@ jobs:
           name: Generate docs
           command: |
             . setup.env
-            SPHINXOPTS='-W' just sphinx build compile -n --all
+            SPHINXOPTS='-W --keep-going' just sphinx build compile -n --all
       - run:
           name: Smuggle docs back from remote docker
           command: |
