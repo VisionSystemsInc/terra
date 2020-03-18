@@ -428,6 +428,17 @@ class LazySettings(LazyObject):
       self.configure(json.load(fid))
     self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
 
+  def __getstate__(self):
+    if self._wrapped is None:
+      self._setup()
+    return {'_wrapped': self._wrapped}
+
+  def __setstate__(self, state):
+    self._wrapped = state['_wrapped']
+
+    from terra.core.signals import post_settings_configured
+    post_settings_configured.send(sender=self)
+
   def __repr__(self):
     # Hardcode the class name as otherwise it yields 'Settings'.
     if self._wrapped is None:
