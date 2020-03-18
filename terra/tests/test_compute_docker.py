@@ -3,6 +3,8 @@ import re
 from unittest import mock
 import warnings
 
+import yaml
+
 from terra import settings
 from terra.compute import base
 from terra.compute import docker
@@ -385,7 +387,7 @@ volumes:
 
 
 def mock_config(*args, **kwargs):
-  return mock_yaml
+  return yaml.load(mock_yaml)
 
 
 class TestDockerMap(TestComputeDockerCase):

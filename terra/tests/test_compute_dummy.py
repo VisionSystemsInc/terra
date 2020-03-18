@@ -1,6 +1,7 @@
 from unittest import mock
 
 from terra import settings
+from terra.executor.utils import Executor
 from terra.compute import base
 from terra.compute import dummy
 import terra.compute.utils
@@ -76,10 +77,13 @@ class TestServiceDummy(TestComputeDummyCase):
   test_service_name = TestService.__module__ + '.TestService'
 
   def setUp(self):
+    # self.run calls pre_run which trigger Executor
+    self.patches.append(mock.patch.dict(Executor.__dict__))
     super().setUp()
     self.dummyCompute = dummy.Compute()
 
   def test_run(self):
+    settings.configure({})
     with self.assertLogs(dummy.__name__, level="INFO") as cm:
       self.dummyCompute.run(self.test_service_name)
 

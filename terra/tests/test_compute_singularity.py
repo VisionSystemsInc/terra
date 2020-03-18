@@ -111,7 +111,8 @@ class TestSingularityConfig(TestComputeSingularityCase):
     self.assertEqual(('singular-compose', '-f', 'file1',
                       'config-null', 'launch'), self.just_args)
 
-    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO'}},
+    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO'},
+                      'justfile': None},
                      self.just_kwargs)
 
   def test_config_with_multiple_compose_files(self):
@@ -124,7 +125,8 @@ class TestSingularityConfig(TestComputeSingularityCase):
                       '-f', 'file15.env', '-f', 'file2.env',
                       'config-null', 'launch'),
                      self.just_args)
-    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO'}},
+    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO'},
+                      'justfile': None},
                      self.just_kwargs)
 
 

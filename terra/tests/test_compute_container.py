@@ -5,6 +5,7 @@ import tempfile
 from unittest import mock, skipIf
 
 from terra import settings
+from terra.executor.utils import Executor
 from terra.compute import base
 import terra.compute.container
 from vsi.test.utils import TestCase, NamedTemporaryFileFactory
@@ -57,6 +58,8 @@ class TestContainerService(TestComputeContainerCase):
     self.patches.append(mock.patch.object(tempfile, 'NamedTemporaryFile',
                                           NamedTemporaryFileFactory(self)))
     self.patches.append(mock.patch.object(json, 'dump', self.json_dump))
+    # self.common calls service.pre_run which trigger Executor
+    self.patches.append(mock.patch.dict(Executor.__dict__))
     super().setUp()
 
   def json_dump(self, config, fid):
