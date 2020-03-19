@@ -32,7 +32,18 @@ class BaseService:
                        check_remote=True,
                        local_must_exist=False):
     '''
-    Validate volume inputs
+    Validate volume inputs. Raise a :class:`ValueError` under any of the
+    following conditions:
+
+    - ``local`` is empty or None
+    - ``check_remote`` is True and ``remote`` is empty or None
+    - ``local_must_exist`` is True and ``local`` file/folder does not exist
+
+    Raises
+    ------
+    ValueError
+      see conditions above
+
     '''
 
     if not local:
