@@ -43,8 +43,8 @@ class BaseService:
 
     All service classes should implement at least ``run_service``, as this is
     the quintessential call in running a service. ``pre_run`` in
-    :class:`BaseService` is mainly responsible for handling Executors that need
-    a separate volume translation
+    :class:`terra.compute.base.BaseService` is mainly responsible for handling
+    Executors that need a separate volume translation
     '''
     self.executor_configuration_map = Executor.configuration_map(self)
 
