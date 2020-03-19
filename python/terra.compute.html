@@ -233,9 +233,27 @@ class’s <code class="docutils literal notranslate"><span class="pre">__init__<
 function that will be called before and after a <code class="docutils literal notranslate"><span class="pre">{command}Service</span></code> call,
 if they exist</p>
 <dl class="method">
+<dt id="terra.compute.base.BaseService._validate_volume">
+<code class="sig-name descname">_validate_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">check_remote=True</em>, <em class="sig-param">local_must_exist=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService._validate_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate volume inputs. Raise a <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> under any of the
+following conditions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">local</span></code> is empty or None</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">check_remote</span></code> is True and <code class="docutils literal notranslate"><span class="pre">remote</span></code> is empty or None</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local_must_exist</span></code> is True and <code class="docutils literal notranslate"><span class="pre">local</span></code> file/folder does not exist</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – see conditions above</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="terra.compute.base.BaseService.add_volume">
-<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">local_must_exist=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a volume to the service</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="terra.compute.base.BaseService.get_volume_map">
@@ -282,8 +300,9 @@ Executors that need a separate volume translation</p>
 <p>Base container service class</p>
 <dl class="method">
 <dt id="terra.compute.container.ContainerService.add_volume">
-<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">local_must_exist=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a volume to the service</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="terra.compute.container.ContainerService.post_run">
@@ -607,8 +626,9 @@ instance, the same instance is returned</p>
 <p>Virtual env computing model</p>
 <dl class="method">
 <dt id="terra.compute.virtualenv.Compute.add_volume">
-<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">directory</em>, <em class="sig-param">no_remote=None</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Compute.add_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">no_remote=None</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">local_must_exist=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Compute.add_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a volume to the service</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="terra.compute.virtualenv.Compute.run_service">
