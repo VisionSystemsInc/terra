@@ -82,9 +82,15 @@ class Compute(BaseCompute):
     if pid.wait() != 0:
       raise ServiceRunFailed()
 
-  def add_volume(self, directory, no_remote=None, flags=None, prefix=None):
-    if directory is not None:
-      self.volumes.append(directory)
+  def add_volume(self, local, no_remote=None, flags=None, prefix=None,
+                 local_must_exist=False):
+    '''
+    Add a volume to the service
+    '''
+
+    self._validate_volume(local, None, check_remote=False,
+                          local_must_exist=local_must_exist)
+    self.volumes.append(local)
 
 
 class Service(BaseService):
