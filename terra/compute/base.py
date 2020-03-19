@@ -28,10 +28,39 @@ class BaseService:
     self.volumes = []
     ''' A copy of the processes environment variables local to a service '''
 
-  def add_volume(self, local, remote, flags=None, prefix=None):
-    if local is None or remote is None:
-      return
+  def _validate_volume(self, local, remote,
+                       check_remote=True,
+                       local_must_exist=False):
+    '''
+    Validate volume inputs. Raise a :class:`ValueError` under any of the
+    following conditions:
 
+    - ``local`` is empty or None
+    - ``check_remote`` is True and ``remote`` is empty or None
+    - ``local_must_exist`` is True and ``local`` file/folder does not exist
+
+    Raises
+    ------
+    ValueError
+      see conditions above
+
+    '''
+
+    if not local:
+      raise ValueError('local file/folder must be specified')
+    elif check_remote and not remote:
+      raise ValueError('remote file/folder must be specified')
+    elif local_must_exist and not os.path.exists(local):
+      raise ValueError('local file/folder does not exist {}'
+                       .format(local))
+
+  def add_volume(self, local, remote, flags=None, prefix=None,
+                 local_must_exist=False):
+    '''
+    Add a volume to the service
+    '''
+
+    self._validate_volume(local, remote, local_must_exist=local_must_exist)
     self.volumes.append((local, remote))
 
   def get_volume_map(self, config, service_info):

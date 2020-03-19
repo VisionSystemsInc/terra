@@ -87,9 +87,13 @@ class ContainerService(BaseService):
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
     # I did it this way.
 
-  def add_volume(self, local, remote, flags=None, prefix=None):
-    if local is None or remote is None:
-      return
+  def add_volume(self, local, remote, flags=None, prefix=None,
+                 local_must_exist=False):
+    '''
+    Add a volume to the service
+    '''
+
+    self._validate_volume(local, remote, local_must_exist=local_must_exist)
 
     if self.container_platform == "windows":
       path = ntpath
