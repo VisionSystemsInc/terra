@@ -36,11 +36,15 @@ class Compute(BaseCompute):
     Returns the ``singular-compose config-null`` output
     '''
 
+    optional_args = {}
+    optional_args['justfile'] = getattr(service_info, 'justfile', None)
+
     args = ["singular-compose"] + \
         sum([['-f', cf] for cf in service_info.compose_files], []) + \
         ['config-null', service_info.compose_service_name]
 
     pid = just(*args, stdout=PIPE,
+               **optional_args,
                env=service_info.env)
     data = pid.communicate()[0]
 
@@ -57,20 +61,10 @@ class Compute(BaseCompute):
 
     return data
 
-  def configuration_map_service(self, service_info):
-    '''
-    Returns the mapping of volumes from the host to the container.
+  def get_volume_map(self, config, service_info):
 
-    Returns
-    -------
-    list
-        Return a list of tuple pairs [(host, remote), ... ] of the volumes
-        mounted from the host to container
-    '''
     # TODO: Make an OrderedDict
     volume_map = []
-
-    config = self.config(service_info)
 
     volumes = config.get('volumes', [])
 
@@ -87,6 +81,23 @@ class Compute(BaseCompute):
     # Strip trailing /'s to make things look better
     return [(volume_host.rstrip(slashes), volume_remote.rstrip(slashes))
             for volume_host, volume_remote in volume_map]
+
+  def configuration_map_service(self, service_info):
+    '''
+    Returns the mapping of volumes from the host to the container.
+
+    Returns
+    -------
+    list
+        Return a list of tuple pairs [(host, remote), ... ] of the volumes
+        mounted from the host to container
+    dict
+        Returns the full configuration object, that might be used for other
+        configuration adaptations down the line.
+    '''
+    config = self.config(service_info)
+
+    return self.get_volume_map(config, service_info)
 
 
 class Service(ContainerService):

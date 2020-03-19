@@ -661,7 +661,7 @@ class TerraJSONEncoder(JSONEncoder):
         lambda k, v: v(obj))
 
   @staticmethod
-  def dumps(obj):
+  def dumps(obj, **kwargs):
     '''
     Convenience function for running `dumps` using this encoder.
 
@@ -670,7 +670,7 @@ class TerraJSONEncoder(JSONEncoder):
     obj: :class:`LazySettings`
         Object to be converted to json friendly :class:`dict`
     '''
-    return json.dumps(obj, cls=TerraJSONEncoder)
+    return json.dumps(obj, cls=TerraJSONEncoder, **kwargs)
 
 
 import terra.logger  # noqa

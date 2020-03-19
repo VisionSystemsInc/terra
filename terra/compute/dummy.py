@@ -36,7 +36,9 @@ class Service(BaseService):
     logger.info(f'Created on {str(self)}')
 
   def pre_run(self):
+    super().pre_run()
     logger.info(f'Pre run: {str(self)}')
 
   def post_run(self):
+    super().post_run()
     logger.info(f'Post run: {str(self)}')

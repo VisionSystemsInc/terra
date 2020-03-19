@@ -2,6 +2,7 @@ import os
 from unittest import mock
 
 from terra import settings
+from terra.executor.utils import Executor
 from terra.compute import base
 from terra.compute import virtualenv
 import terra.compute.utils
@@ -20,6 +21,8 @@ class TestVirtualEnv(TestCase):
   def setUp(self):
     # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    # self.run trigger Executor
+    self.patches.append(mock.patch.dict(Executor.__dict__))
     # This will resets the _connection to an uninitialized state
     self.patches.append(
         mock.patch.object(

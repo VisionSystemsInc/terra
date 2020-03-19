@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from os import environ as env
 from concurrent.futures import Future, Executor, as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
                                       CANCELLED_AND_NOTIFIED)
@@ -95,7 +96,8 @@ class CeleryExecutor(Executor):
   """
 
   def __init__(self, predelay=None, postdelay=None, applyasync_kwargs=None,
-               retry_kwargs=None, retry_queue='', update_delay=0.1):
+               retry_kwargs=None, retry_queue='', update_delay=0.1,
+               max_workers=None):
     # Options about calling the Task
     self._predelay = predelay
     self._postdelay = postdelay
@@ -202,3 +204,48 @@ class CeleryExecutor(Executor):
       except RuntimeError:  # pragma: no cover
         # Thread never started. Cannot join
         pass
+
+  @staticmethod
+  def configuration_map(service_info):
+    from terra.compute import compute
+    service_name = env['TERRA_CELERY_SERVICE']
+
+    class ServiceClone:
+      def __init__(self, service_info):
+        self.compose_service_name = service_name
+
+        if hasattr(service_info, 'justfile'):
+          self.justfile = service_info.justfile
+        if hasattr(service_info, 'compose_files'):
+          self.compose_files = service_info.compose_files
+
+        self.env = env  # .copy()
+        self.volumes = []
+
+    service_clone = ServiceClone(service_info)
+
+    if hasattr(compute, 'config'):
+      config = compute.config(service_clone)
+    else:
+      config = None
+
+    volume_map = compute.get_volume_map(config, service_clone)
+
+    # # In the case of docker, the config has /tmp_settings in there, this
+    # # should be removed, as it is not in the celery worker. I don't think it
+    # # would cause any problems, but it's inaccurate.
+    # volume_map = [v for v in volume_map if v[1] != '/tmp_settings']
+
+    return volume_map
+
+    # optional_args = {}
+    # optional_args['justfile'] = justfile
+
+    # args = ["--wrap", "Just-docker-compose"] + \
+    #     sum([['-f', cf] for cf in compose_files], []) + \
+    #     ['config']
+
+    # pid = just(*args, stdout=PIPE,
+    #            **optional_args,
+    #            env=service_info.env)
+    # return pid.communicate()[0]

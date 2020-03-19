@@ -62,11 +62,11 @@ import logging.handlers
 import sys
 import tempfile
 import platform
-import pprint
 import os
 import traceback
 import io
 import warnings
+from datetime import datetime, timezone
 
 from terra.core.exceptions import ImproperlyConfigured
 
@@ -237,6 +237,7 @@ class _SetupTerraLogger():
     '''
 
     from terra import settings
+    from terra.core.settings import TerraJSONEncoder
 
     if self._configured:
       self.root_logger.error("Configure logger called twice, this is "
@@ -273,14 +274,11 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_file_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    # Log the settings only to the file handler
-    with HandlerLoggingContext(self.root_logger, [self.file_handler]):
-      self.root_logger.log(DEBUG1,
-                           "Settings:\n" + pprint.pformat(dict(settings)),
-                           extra=extra_logger_variables)
-      # For some reason python doesn't make the root logger the designated
-      # class, so much add extra manually here. Not even sure why I chose
-      # root_logger here...
+    settings_dump = os.path.join(settings.processing_dir,
+                                 datetime.now(timezone.utc).strftime(
+                                     'settings_%Y_%m_%d_%H_%M_%S_%f.json'))
+    with open(settings_dump, 'w') as fid:
+      fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 
     # filter the stderr buffer
     self.preconfig_stderr_handler.buffer = \

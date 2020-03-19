@@ -4,6 +4,58 @@ Utilities to help write CLIs
 import os
 import argparse
 
+extra_arguments = list()
+
+
+class DbStopAction(argparse.Action):
+  # def __init__(self, option_strings, dest, nargs=None, **kwargs):
+  #   if nargs is not None:
+  #     raise ValueError("nargs not allowed")
+  #   super().__init__(option_strings, dest, **kwargs)
+  def __call__(self, parser, namespace, values, option_string=None):
+    # This is a slight misuse of the "default", but I'm ok with that. Basically
+    # default here means if the optional argument is not specified, since this
+    # is a custom action, having a slightly different behavior here is ok.
+    debugger = values or parser.get_default('dbstop_if_error')
+
+    extra_arguments.extend(['--dbstop-if-error', debugger])
+
+    try:
+      if debugger == "pdb":
+        # This doesn't exist, and will cause an ImportError
+        import vsi.tools.vdb_pdb
+        vsi.tools.vdb_pdb.dbstop_if_error()
+      elif debugger == "ipdb":
+        import vsi.tools.vdb_ipdb
+        vsi.tools.vdb_ipdb.dbstop_if_error()
+      elif debugger == "rpdb":
+        import vsi.tools.vdb_rpdb
+        vsi.tools.vdb_rpdb.dbstop_if_error()
+      elif debugger == "rpdb2":
+        import vsi.tools.vdb_rpdb2
+        vsi.tools.vdb_rpdb2.dbstop_if_error()
+      else:
+        raise ValueError(f"Unexpected debugger: {debugger}")
+    except ImportError:
+      import pdb
+      import sys
+      original_hook = sys.excepthook
+
+      def hook(type, value, tb):
+        pdb.pm()
+        original_hook(type, value, tb)
+      sys.excepthook = hook
+
+
+class ArgumentParser(argparse.ArgumentParser):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.add_argument('--dbstop-if-error', nargs='?', default='pdb', type=str,
+                      choices=['pdb', 'ipdb', 'rpdb', 'rpdb2'],
+                      action=DbStopAction,
+                      help="Automatically runs debugger's set_trace on an "
+                           "unexpected exception")
+
 
 def clean_path(path):
   return os.path.abspath(os.path.expanduser(path))

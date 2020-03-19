@@ -7,11 +7,10 @@ import pathlib
 from tempfile import TemporaryDirectory
 import json
 
-from vsi.tools.python import nested_patch
-
 from terra import settings
-from terra.core.settings import TerraJSONEncoder, filename_suffixes
+from terra.core.settings import TerraJSONEncoder
 from terra.compute import compute
+from terra.compute.utils import translate_settings_paths
 from terra.compute.base import BaseService
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -57,67 +56,32 @@ class ContainerService(BaseService):
 
     volume_map = compute.configuration_map(self)
 
-    logger.debug3("Volume map: %s", volume_map)
+    logger.debug3("Compute Volume map: %s", volume_map)
 
     # Setup config file for container
-    container_config = TerraJSONEncoder.serializableSettings(settings)
 
     self.env['TERRA_SETTINGS_FILE'] = '/tmp_settings/config.json'
 
+    container_config = translate_settings_paths(
+        TerraJSONEncoder.serializableSettings(settings),
+        volume_map,
+        self.container_platform)
+
     if os.name == "nt":  # pragma: no linux cover
-      logger.warning("Windows volume mapping is experimental.")
+      # logger.warning("Windows volume mapping is experimental.")
 
       # Prevent the setting file name from being expanded.
       self.env['TERRA_AUTO_ESCAPE'] = self.env['TERRA_AUTO_ESCAPE'] \
           + '|TERRA_SETTINGS_FILE'
 
-      def patch_volume(value, volume_map):
-        if isinstance(value, str):
-          value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
-          for vol_from, vol_to in volume_map:
-            # pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
-
-            # if isinstance(value, str) and pattern.match(value):
-            #   value = pattern.sub(vol_to, value)
-            #   value = value.replace('\\', '/')
-            #   break
-
-            vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
-
-            try:
-              remainder = value_path.relative_to(vol_from)
-            except ValueError:
-              continue
-            if self.container_platform == "windows":
-              value = pathlib.PureWindowsPath(vol_to)
-            else:
-              value = pathlib.PurePosixPath(vol_to)
-
-            value /= remainder
-            return str(value)
-        return value
-    else:  # pragma: no nt cover
-      def patch_volume(value, volume_map):
-        if isinstance(value, str):
-          for vol_from, vol_to in volume_map:
-            if value.startswith(vol_from):
-              return value.replace(vol_from, vol_to, 1)
-        return value
-
-    # Apply map translation to settings configuration
-    container_config = nested_patch(
-        container_config,
-        lambda key, value: (isinstance(key, str)
-                            and any(key.endswith(pattern)
-                                    for pattern in filename_suffixes)),
-        lambda key, value: patch_volume(value, reversed(volume_map))
-    )
-
     # Dump the settings
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 
+    super().pre_run()
+
   def post_run(self):
+    super().post_run()
     # Delete temp_dir
     self.temp_dir.cleanup()
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason

@@ -13,13 +13,14 @@ services:
       - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
       - DOCKER_USERNAME=user
       - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/redis.Justfile
+      - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
       - TZ
     volumes:
-      # # vsi_common
-      # - type: ${TERRA_TERRA_DIR_TYPE}
-      #   source: ${TERRA_TERRA_DIR}/external/vsi_common
-      #   target: /vsi
-      #   read_only: true
+      # vsi_common
+      - type: ${TERRA_TERRA_DIR_TYPE}
+        source: ${TERRA_TERRA_DIR}/external/vsi_common
+        target: /vsi
+        read_only: true
       - type: ${TERRA_REDIS_DIR_TYPE}
         source: ${TERRA_REDIS_DIR}
         target: ${TERRA_REDIS_DIR_DOCKER}
