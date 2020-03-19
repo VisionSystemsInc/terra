@@ -186,7 +186,7 @@
 <span id="terra-executor-celery-executor-module"></span><h2>terra.executor.celery.executor module<a class="headerlink" href="#module-terra.executor.celery.executor" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="terra.executor.celery.executor.CeleryExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.executor.</code><code class="sig-name descname">CeleryExecutor</code><span class="sig-paren">(</span><em class="sig-param">predelay=None</em>, <em class="sig-param">postdelay=None</em>, <em class="sig-param">applyasync_kwargs=None</em>, <em class="sig-param">retry_kwargs=None</em>, <em class="sig-param">retry_queue=''</em>, <em class="sig-param">update_delay=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.executor.</code><code class="sig-name descname">CeleryExecutor</code><span class="sig-paren">(</span><em class="sig-param">predelay=None</em>, <em class="sig-param">postdelay=None</em>, <em class="sig-param">applyasync_kwargs=None</em>, <em class="sig-param">retry_kwargs=None</em>, <em class="sig-param">retry_queue=''</em>, <em class="sig-param">update_delay=0.1</em>, <em class="sig-param">max_workers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
 <p>Executor implementation using celery tasks.</p>
 <dl class="field-list simple">
@@ -201,6 +201,11 @@
 </ul>
 </dd>
 </dl>
+<dl class="method">
+<dt id="terra.executor.celery.executor.CeleryExecutor.configuration_map">
+<em class="property">static </em><code class="sig-name descname">configuration_map</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor.configuration_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="terra.executor.celery.executor.CeleryExecutor.shutdown">
 <code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><em class="sig-param">wait=True</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor.shutdown" title="Permalink to this definition">¶</a></dt>
@@ -243,7 +248,7 @@ cannot be cancelled if it is running or has already completed.</p>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra.executor.celery" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="terra.executor.celery.CeleryExecutor">
-<em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.</code><code class="sig-name descname">CeleryExecutor</code><span class="sig-paren">(</span><em class="sig-param">predelay=None</em>, <em class="sig-param">postdelay=None</em>, <em class="sig-param">applyasync_kwargs=None</em>, <em class="sig-param">retry_kwargs=None</em>, <em class="sig-param">retry_queue=''</em>, <em class="sig-param">update_delay=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.</code><code class="sig-name descname">CeleryExecutor</code><span class="sig-paren">(</span><em class="sig-param">predelay=None</em>, <em class="sig-param">postdelay=None</em>, <em class="sig-param">applyasync_kwargs=None</em>, <em class="sig-param">retry_kwargs=None</em>, <em class="sig-param">retry_queue=''</em>, <em class="sig-param">update_delay=0.1</em>, <em class="sig-param">max_workers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
 <p>Executor implementation using celery tasks.</p>
 <dl class="field-list simple">
@@ -258,6 +263,11 @@ cannot be cancelled if it is running or has already completed.</p>
 </ul>
 </dd>
 </dl>
+<dl class="method">
+<dt id="terra.executor.celery.CeleryExecutor.configuration_map">
+<em class="property">static </em><code class="sig-name descname">configuration_map</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor.configuration_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="terra.executor.celery.CeleryExecutor.shutdown">
 <code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><em class="sig-param">wait=True</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor.shutdown" title="Permalink to this definition">¶</a></dt>

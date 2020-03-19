@@ -237,6 +237,26 @@ if they exist</p>
 <code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="terra.compute.base.BaseService.get_volume_map">
+<code class="sig-name descname">get_volume_map</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.get_volume_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.base.BaseService.post_run">
+<code class="sig-name descname">post_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.post_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.base.BaseService.pre_run">
+<code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.pre_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>A function that runs before the run service</p>
+<p>All service classes should implement at least <code class="docutils literal notranslate"><span class="pre">run_service</span></code>, as this is
+the quintessential call in running a service. <code class="docutils literal notranslate"><span class="pre">pre_run</span></code> in
+<a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a> is mainly responsible for handling
+Executors that need a separate volume translation</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="terra.compute.base.BaseService.volumes">
 <code class="sig-name descname">volumes</code><em class="property"> = None</em><a class="headerlink" href="#terra.compute.base.BaseService.volumes" title="Permalink to this definition">¶</a></dt>
@@ -273,7 +293,12 @@ if they exist</p>
 <dl class="method">
 <dt id="terra.compute.container.ContainerService.pre_run">
 <code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.pre_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A function that runs before the run service</p>
+<p>All service classes should implement at least <code class="docutils literal notranslate"><span class="pre">run_service</span></code>, as this is
+the quintessential call in running a service. <code class="docutils literal notranslate"><span class="pre">pre_run</span></code> in
+<a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a> is mainly responsible for handling
+Executors that need a separate volume translation</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -297,14 +322,21 @@ if they exist</p>
 <dd><p>Returns the mapping of volumes from the host to the container.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Return a list of tuple pairs [(host, remote), … ] of the volumes
-mounted from the host to container</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>list</em> – Return a list of tuple pairs [(host, remote), … ] of the volumes
+mounted from the host to container</p></li>
+<li><p><em>dict</em> – Returns the full configuration object, that might be used for other
+configuration adaptations down the line.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.docker.Compute.get_volume_map">
+<code class="sig-name descname">get_volume_map</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.docker.Compute.get_volume_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="terra.compute.docker.Compute.run_service">
@@ -399,7 +431,12 @@ services</p>
 <dl class="method">
 <dt id="terra.compute.dummy.Service.pre_run">
 <code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.dummy.Service.pre_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A function that runs before the run service</p>
+<p>All service classes should implement at least <code class="docutils literal notranslate"><span class="pre">run_service</span></code>, as this is
+the quintessential call in running a service. <code class="docutils literal notranslate"><span class="pre">pre_run</span></code> in
+<a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a> is mainly responsible for handling
+Executors that need a separate volume translation</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -422,14 +459,21 @@ services</p>
 <dd><p>Returns the mapping of volumes from the host to the container.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Return a list of tuple pairs [(host, remote), … ] of the volumes
-mounted from the host to container</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>list</em> – Return a list of tuple pairs [(host, remote), … ] of the volumes
+mounted from the host to container</p></li>
+<li><p><em>dict</em> – Returns the full configuration object, that might be used for other
+configuration adaptations down the line.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.singularity.Compute.get_volume_map">
+<code class="sig-name descname">get_volume_map</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.singularity.Compute.get_volume_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="terra.compute.singularity.Compute.run_service">
@@ -547,6 +591,11 @@ instance, the same instance is returned</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="function">
+<dt id="terra.compute.utils.translate_settings_paths">
+<code class="sig-prename descclassname">terra.compute.utils.</code><code class="sig-name descname">translate_settings_paths</code><span class="sig-paren">(</span><em class="sig-param">container_config</em>, <em class="sig-param">volume_map</em>, <em class="sig-param">container_platform='linux'</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.utils.translate_settings_paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-terra.compute.virtualenv">
