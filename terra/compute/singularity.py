@@ -99,6 +99,7 @@ class Compute(BaseCompute):
 
     return self.get_volume_map(config, service_info)
 
+
 class Service(ContainerService):
   '''
   Base docker service class

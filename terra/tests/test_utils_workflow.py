@@ -54,7 +54,8 @@ class TestResumable(TestCase):
     with open(settings.status_file, 'r') as fid:
       status = json.load(fid)
     self.assertEqual(status['stage_status'], 'done')
-    self.assertEqual(status['stage'], f'{test1.__module__}.{test1.__qualname__}')
+    self.assertEqual(
+        status['stage'], f'{test1.__module__}.{test1.__qualname__}')
 
   def test_status_file_stop_in_middle(self):
     @resumable
@@ -69,7 +70,8 @@ class TestResumable(TestCase):
     with open(settings.status_file, 'r') as fid:
       status = json.load(fid)
     self.assertEqual(status['stage_status'], 'done')
-    self.assertEqual(status['stage'], f'{test1.__module__}.{test1.__qualname__}')
+    self.assertEqual(status['stage'],
+                     f'{test1.__module__}.{test1.__qualname__}')
 
     with self.assertRaisesRegex(RuntimeError, '^foobar$'):
       test2(Klass())
@@ -77,7 +79,8 @@ class TestResumable(TestCase):
     with open(settings.status_file, 'r') as fid:
       status = json.load(fid)
     self.assertEqual(status['stage_status'], 'starting')
-    self.assertEqual(status['stage'], f'{test2.__module__}.{test2.__qualname__}')
+    self.assertEqual(status['stage'],
+                     f'{test2.__module__}.{test2.__qualname__}')
 
   def test_resuming(self):
     @resumable

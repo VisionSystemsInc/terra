@@ -200,6 +200,7 @@ class TestClassHandler(TestCase):
     Ch = ClassHandler(override_type=Bar)
     self.assertIsInstance(Ch(x=12), Bar)
 
+
 class TestThreadedHandler(TestCase):
   def test_class_handler(self):
     pass

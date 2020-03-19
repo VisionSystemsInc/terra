@@ -37,16 +37,16 @@ class BaseService:
   def get_volume_map(self, config, service_info):
     return []
 
-  '''
-  A function that runs before the run service
-
-  All service classes should implement at least ``run_service``, as this is the
-  quintessential call in running a service. ``pre_run`` in :class:`BaseService`
-  is mainly responsible for handling Executors that need a separate volume
-  translation
-  '''
   def pre_run(self):
-    executor_configuration_map = Executor.configuration_map(self)
+    '''
+    A function that runs before the run service
+
+    All service classes should implement at least ``run_service``, as this is
+    the quintessential call in running a service. ``pre_run`` in
+    :class:`BaseService` is mainly responsible for handling Executors that need
+    a separate volume translation
+    '''
+    self.executor_configuration_map = Executor.configuration_map(self)
 
   def post_run(self):
     pass

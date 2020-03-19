@@ -50,6 +50,7 @@ class ExecutorHandler(ClassHandler):
       return {}
     return self._connection.configuration_map(service_info)
 
+
 Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.

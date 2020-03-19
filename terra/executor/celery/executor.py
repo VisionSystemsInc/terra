@@ -96,7 +96,8 @@ class CeleryExecutor(Executor):
   """
 
   def __init__(self, predelay=None, postdelay=None, applyasync_kwargs=None,
-               retry_kwargs=None, retry_queue='', update_delay=0.1, max_workers=None):
+               retry_kwargs=None, retry_queue='', update_delay=0.1,
+               max_workers=None):
     # Options about calling the Task
     self._predelay = predelay
     self._postdelay = postdelay
@@ -204,7 +205,6 @@ class CeleryExecutor(Executor):
         # Thread never started. Cannot join
         pass
 
-
   @staticmethod
   def configuration_map(service_info):
     from terra.compute import compute
@@ -219,7 +219,7 @@ class CeleryExecutor(Executor):
         if hasattr(service_info, 'compose_files'):
           self.compose_files = service_info.compose_files
 
-        self.env = env # .copy()
+        self.env = env  # .copy()
         self.volumes = []
 
     service_clone = ServiceClone(service_info)
@@ -231,9 +231,9 @@ class CeleryExecutor(Executor):
 
     volume_map = compute.get_volume_map(config, service_clone)
 
-    # # In the case of docker, the config has /tmp_settings in there, this should
-    # # be removed, as it is not in the celery worker. I don't think it would
-    # # cause any problems, but it's inaccurate.
+    # # In the case of docker, the config has /tmp_settings in there, this
+    # # should be removed, as it is not in the celery worker. I don't think it
+    # # would cause any problems, but it's inaccurate.
     # volume_map = [v for v in volume_map if v[1] != '/tmp_settings']
 
     return volume_map

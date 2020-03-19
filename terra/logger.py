@@ -62,7 +62,6 @@ import logging.handlers
 import sys
 import tempfile
 import platform
-import pprint
 import os
 import traceback
 import io
@@ -276,8 +275,8 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.tmp_handler)
 
     settings_dump = os.path.join(settings.processing_dir,
-        datetime.now(timezone.utc).strftime(
-            'settings_%Y_%m_%d_%H_%M_%S_%f.json'))
+                                 datetime.now(timezone.utc).strftime(
+                                     'settings_%Y_%m_%d_%H_%M_%S_%f.json'))
     with open(settings_dump, 'w') as fid:
       fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 

@@ -6,6 +6,7 @@ import argparse
 
 extra_arguments = list()
 
+
 class DbStopAction(argparse.Action):
   # def __init__(self, option_strings, dest, nargs=None, **kwargs):
   #   if nargs is not None:
@@ -36,8 +37,10 @@ class DbStopAction(argparse.Action):
       else:
         raise ValueError(f"Unexpected debugger: {debugger}")
     except ImportError:
-      import pdb, sys
+      import pdb
+      import sys
       original_hook = sys.excepthook
+
       def hook(type, value, tb):
         pdb.pm()
         original_hook(type, value, tb)
@@ -48,10 +51,10 @@ class ArgumentParser(argparse.ArgumentParser):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.add_argument('--dbstop-if-error', nargs='?', default='pdb', type=str,
-        choices=['pdb', 'ipdb', 'rpdb', 'rpdb2'],
-        action=DbStopAction,
-        help="Automatically runs debugger's set_trace on an unexpected "
-             "exception")
+                      choices=['pdb', 'ipdb', 'rpdb', 'rpdb2'],
+                      action=DbStopAction,
+                      help="Automatically runs debugger's set_trace on an "
+                           "unexpected exception")
 
 
 def clean_path(path):
