@@ -130,6 +130,13 @@ function terra_caseify()
       Terra_Pipenv run celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
       ;;
 
+    run_flower) # Start the flower server
+      Terra_Pipenv run celery -A terra.executor.celery.app flower
+      ;;
+    shutdown_celery) # Shuts down all celery works on all nodes
+      Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"
+      ;;
+
     ### Run Debugging containers ###
     generate-redis-commander-hash) # Generate a redis commander hash
       touch "${TERRA_REDIS_COMMANDER_SECRET_FILE}"

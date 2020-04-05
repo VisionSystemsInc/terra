@@ -436,8 +436,11 @@ class LazySettings(LazyObject):
   def __setstate__(self, state):
     self._wrapped = state['_wrapped']
 
-    from terra.core.signals import post_settings_configured
-    post_settings_configured.send(sender=self)
+    # This should NOT be done on a pre instance basis, this if only for
+    # the global terra.settings. So maybe this should be done in context
+    # manager??
+    # from terra.core.signals import post_settings_configured
+    # post_settings_configured.send(sender=self)
 
   def __repr__(self):
     # Hardcode the class name as otherwise it yields 'Settings'.
