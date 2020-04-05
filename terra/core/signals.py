@@ -353,6 +353,8 @@ element in the settings (which is done automatically), or in rare cases after a
 manual call to :func:`terra.core.settings.LazySettings.configure`.
 '''
 
+post_settings_context = Signal()
+
 from terra.logger import getLogger  # noqa
 logger = getLogger(__name__)
 # Must be after post_settings_configured to prevent circular import errors.

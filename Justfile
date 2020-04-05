@@ -127,7 +127,14 @@ function terra_caseify()
         node_name="docker@%h"
       fi
 
-      Terra_Pipenv run celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
+      # Untested
+      if [ "${OS-}" = "Windows_NT" ]; then
+        # https://www.distributedpython.com/2018/08/21/celery-4-windows/
+        local FORKED_BY_MULTIPROCESSING
+        export FORKED_BY_MULTIPROCESSING=1
+      fi
+
+      TERRA_IS_CELERY_WORKER=1 Terra_Pipenv run celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
       ;;
 
     run_flower) # Start the flower server

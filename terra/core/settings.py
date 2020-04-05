@@ -533,7 +533,13 @@ class LazySettings(LazyObject):
     return self._wrapped.__enter__()
 
   def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-    return self._wrapped.__exit__(exc_type, exc_value, traceback)
+    return_value = self._wrapped.__exit__(exc_type, exc_value, traceback)
+
+    # Incase the logger was messed with in the context, reset it.
+    from terra.core.signals import post_settings_context
+    post_settings_context.send(sender=self)
+
+    return return_value
 
 
 class ObjectDict(dict):

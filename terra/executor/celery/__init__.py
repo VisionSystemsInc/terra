@@ -13,6 +13,12 @@ __all__ = ['CeleryExecutor']
 app = Celery(env['TERRA_CELERY_MAIN_NAME'])
 app.config_from_object(env['TERRA_CELERY_CONF'])
 
+# app.running = False
+# from celery.signals import worker_process_init
+# @worker_process_init.connect
+# def set_running(*args, **kwargs):
+#     app.running = True
+
 # import traceback
 # traceback.print_stack()
 

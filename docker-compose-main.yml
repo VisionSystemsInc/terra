@@ -6,7 +6,7 @@ services:
       dockerfile: docker/terra.Dockerfile
     # prevent different users from clobbering each others images
     image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
-    environment:
+    environment: &terra_environment
       # Variables for docker_entrypoint.bsh
       - DOCKER_UID=${TERRA_UID}
       - DOCKER_GIDS=${TERRA_GIDS}
@@ -17,6 +17,7 @@ services:
       - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
       - PYTHONPATH=${TERRA_PYTHONPATH-}
       - TZ
+      - TERRA_IS_CELERY_WORKER=${TERRA_IS_CELERY_WORKER-0}
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:

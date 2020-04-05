@@ -1,7 +1,11 @@
+import os
+import logging
 import concurrent.futures
+from importlib import import_module
+
 from terra import settings
 from terra.core.utils import ClassHandler
-from importlib import import_module
+import terra.logger
 
 
 class ExecutorHandler(ClassHandler):
@@ -49,6 +53,37 @@ class ExecutorHandler(ClassHandler):
     if not hasattr(self._connection, 'configuration_map'):
       return {}
     return self._connection.configuration_map(service_info)
+
+  def reconfigure_logger(self, logging_handler):
+    # The default logging handler is a StreamHandler. This will reconfigure the
+    # Stream handler, should
+    log_file = os.path.join(settings.processing_dir,
+                            terra.logger._logs.default_log_prefix)
+
+    if not os.path.samefile(log_file, self._log_file.name):
+      os.makedirs(settings.processing_dir, exist_ok=True)
+      log_file = open(log_file, 'a')
+
+  def configure_logger(self):
+    # ThreadPoolExecutor will work just fine with a normal StreamHandler
+
+    try:
+      self._configure_logger()
+      # In CeleryPoolExecutor, use the Celery logger.
+      # Use this to determine if main process or just a worker?
+      # https://stackoverflow.com/a/45022530/4166604
+      # Use JUST_IS_CELERY_WORKER
+    except AttributeError:
+      # Setup log file for use in configure
+      self._log_file = os.path.join(settings.processing_dir,
+                                    terra.logger._logs.default_log_prefix)
+      os.makedirs(settings.processing_dir, exist_ok=True)
+      self._log_file = open(self._log_file, 'a')
+
+      self._logging_handler = logging.StreamHandler(stream=self._log_file)
+      return self._logging_handler
+
+      # TODO: ProcessPool - Log server
 
 
 Executor = ExecutorHandler()

@@ -156,11 +156,11 @@ class _SetupTerraLogger():
     self.preconfig_stderr_handler.setFormatter(self.default_formatter)
     self.root_logger.addHandler(self.preconfig_stderr_handler)
 
-    self.preconfig_file_handler = \
+    self.preconfig_main_log_handler = \
         logging.handlers.MemoryHandler(capacity=1000)
-    self.preconfig_file_handler.setLevel(0)
-    self.preconfig_file_handler.setFormatter(self.default_formatter)
-    self.root_logger.addHandler(self.preconfig_file_handler)
+    self.preconfig_main_log_handler.setLevel(0)
+    self.preconfig_main_log_handler.setFormatter(self.default_formatter)
+    self.root_logger.addHandler(self.preconfig_main_log_handler)
 
     # Replace the exception hook with our exception handler
     self.setup_logging_exception_hook()
@@ -230,6 +230,36 @@ class _SetupTerraLogger():
     except ImportError:  # pragma: no cover
       pass
 
+  def reconfigure_logger(self, sender=None, **kwargs):
+    if not self._configured:
+      self.root_logger.error("It is unexpected for reconfigure_logger to be "
+                             "called, without first calling configure_logger. "
+                             "This is not critical, but should not happen.")
+
+    self.set_level_and_formatter()
+
+    # Must be imported after settings configed
+    from terra.executor import Executor
+    Executor.reconfigure_logger(self.main_log_handler)
+
+  def set_level_and_formatter(self):
+    from terra import settings
+    formatter = logging.Formatter(fmt=settings.logging.format,
+                                  datefmt=settings.logging.date_format,
+                                  style=settings.logging.style)
+
+    # Configure log level
+    level = settings.logging.level
+    if isinstance(level, str):
+      # make level case insensitive
+      level = level.upper()
+    self.stderr_handler.setLevel(level)
+    self.main_log_handler.setLevel(level)
+
+    # Configure format
+    self.main_log_handler.setFormatter(formatter)
+    self.stderr_handler.setFormatter(formatter)
+
   def configure_logger(self, sender, **kwargs):
     '''
     Call back function to configure the logger after settings have been
@@ -244,34 +274,16 @@ class _SetupTerraLogger():
                              "unexpected")
       raise ImproperlyConfigured()
 
-    formatter = logging.Formatter(fmt=settings.logging.format,
-                                  datefmt=settings.logging.date_format,
-                                  style=settings.logging.style)
+    # Must be imported after settings configed
+    from terra.executor import Executor
+    self.main_log_handler = Executor.configure_logger()
 
-    # Setup log file for use in configure
-    self.log_file = os.path.join(settings.processing_dir,
-                                 self.default_log_prefix)
-    os.makedirs(settings.processing_dir, exist_ok=True)
-    self.log_file = open(self.log_file, 'a')
-
-    self.file_handler = logging.StreamHandler(stream=self.log_file)
-
-    # Configure log level
-    level = settings.logging.level
-    if isinstance(level, str):
-      # make level case insensitive
-      level = level.upper()
-    self.stderr_handler.setLevel(level)
-    self.file_handler.setLevel(level)
-
-    # Configure format
-    self.file_handler.setFormatter(formatter)
-    self.stderr_handler.setFormatter(formatter)
+    self.set_level_and_formatter()
 
     # Swap some handlers
-    self.root_logger.addHandler(self.file_handler)
+    self.root_logger.addHandler(self.main_log_handler)
     self.root_logger.removeHandler(self.preconfig_stderr_handler)
-    self.root_logger.removeHandler(self.preconfig_file_handler)
+    self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
     settings_dump = os.path.join(settings.processing_dir,
@@ -294,17 +306,17 @@ class _SetupTerraLogger():
 
     # Filter file buffer. Never remove default_stderr_handler_level message,
     # they won't be in the new output file
-    self.preconfig_file_handler.buffer = \
-        [x for x in self.preconfig_file_handler.buffer
-         if (x.levelno >= self.file_handler.level)]
+    self.preconfig_main_log_handler.buffer = \
+        [x for x in self.preconfig_main_log_handler.buffer
+         if (x.levelno >= self.main_log_handler.level)]
 
     # Flush the buffers
     self.preconfig_stderr_handler.setTarget(self.stderr_handler)
     self.preconfig_stderr_handler.flush()
     self.preconfig_stderr_handler = None
-    self.preconfig_file_handler.setTarget(self.file_handler)
-    self.preconfig_file_handler.flush()
-    self.preconfig_file_handler = None
+    self.preconfig_main_log_handler.setTarget(self.main_log_handler)
+    self.preconfig_main_log_handler.flush()
+    self.preconfig_main_log_handler = None
     self.tmp_handler = None
 
     # Remove the temporary file now that you are done with it
@@ -455,3 +467,6 @@ if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
 
   # register post_configure with settings
   terra.core.signals.post_settings_configured.connect(_logs.configure_logger)
+
+  # Handle a "with" settings context manager
+  terra.core.signals.post_settings_context.connect(_logs.reconfigure_logger)
