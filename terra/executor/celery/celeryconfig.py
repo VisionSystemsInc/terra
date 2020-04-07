@@ -21,7 +21,9 @@ broker_url = f'redis://:{password}@{env["TERRA_REDIS_HOSTNAME"]}:' \
 result_backend = broker_url
 
 task_serializer = 'pickle'
+result_serializer = 'pickle'
 accept_content = ['json', 'pickle']
+result_accept_content = ['json', 'pickle']
 result_expires = 3600
 
 # App needs to define include
