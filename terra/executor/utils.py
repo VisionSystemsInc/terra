@@ -60,9 +60,11 @@ class ExecutorHandler(ClassHandler):
     log_file = os.path.join(settings.processing_dir,
                             terra.logger._logs.default_log_prefix)
 
-    if not os.path.samefile(log_file, self._log_file.name):
+    # if not os.path.samefile(log_file, self._log_file.name):
+    if log_file != self._log_file.name:
       os.makedirs(settings.processing_dir, exist_ok=True)
-      log_file = open(log_file, 'a')
+      self._log_file.close()
+      self._log_file = open(log_file, 'a')
 
   def configure_logger(self):
     # ThreadPoolExecutor will work just fine with a normal StreamHandler

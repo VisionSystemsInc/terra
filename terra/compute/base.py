@@ -2,7 +2,6 @@ import os
 import json
 
 from terra import settings
-from terra.core.settings import TerraJSONEncoder
 import terra.compute.utils
 from terra.executor import Executor
 from terra.logger import getLogger
@@ -78,21 +77,14 @@ class BaseService:
     :class:`terra.compute.base.BaseService` is mainly responsible for handling
     Executors that need a separate volume translation
     '''
-    executor_volume_map = Executor.configuration_map(self)
 
-    # If there is a non-empty mapping, then create a custom executor settings
-    if executor_volume_map:
-      executor_settings = terra.compute.utils.translate_settings_paths(
-          TerraJSONEncoder.serializableSettings(settings),
-          executor_volume_map)
+    # The executor volume map is calculated on the host side, where all the
+    # information is available. For example if using docker and celery, then
+    # docker config need to be run to get the container volumes, and that has
+    # to be run on the host machine. So this is calculated here.
+    settings.executor_volume_map = Executor.configuration_map(self)
+    logger.critical(settings.executor_volume_map)
 
-      with open(os.path.join(self.temp_dir.name,
-                            'executor_config.json'), 'w') as fid:
-        json.dump(executor_settings, fid)
-
-      # Tell the executor, you have your own settings file.
-      self.env['TERRA_EXECUTOR_SETTINGS_FILE'] = \
-          '/tmp_settings/executor_config.json'
 
   def post_run(self):
     pass

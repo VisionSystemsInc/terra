@@ -321,7 +321,8 @@ class _SetupTerraLogger():
 
     # Remove the temporary file now that you are done with it
     self.tmp_file.close()
-    os.unlink(self.tmp_file.name)
+    if os.path.exists(self.tmp_file.name):
+      os.unlink(self.tmp_file.name)
     self.tmp_file = None
 
     self._configured = True
