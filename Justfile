@@ -28,6 +28,11 @@ JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 function Terra_Pipenv()
 {
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
+    if [ -n "${VIRTUAL_ENV+set}" ]; then
+      echo "Warning: You appear to be in a virtual env" >&2
+      echo "Deactivate external virtual envs before running just" >&2
+      ask_question "Continue?" n
+    fi
     PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?

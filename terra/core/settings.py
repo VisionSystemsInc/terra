@@ -149,12 +149,14 @@ framework instead of a larger application.
 import os
 from inspect import isfunction
 from functools import wraps
+from json import JSONEncoder
 
 from terra.core.exceptions import ImproperlyConfigured
+# Do not import terra.logger or terra.signals here, or any module that
+# imports them
 from vsi.tools.python import (
     nested_patch_inplace, nested_patch, nested_update, nested_in_dict
 )
-from json import JSONEncoder
 
 try:
   import jstyleson as json
@@ -265,6 +267,9 @@ global_templates = [
       },
       "compute": {
         "arch": "terra.compute.dummy"
+      },
+      'terra': {
+        'zone': 'controller',
       },
       'status_file': status_file,
       'processing_dir': processing_dir,
@@ -675,10 +680,21 @@ class TerraJSONEncoder(JSONEncoder):
     if isinstance(obj, LazySettings):
       obj = obj._wrapped
 
-    return nested_patch(
+    # I do not os.path.expandvars(val) here, because the Just-docker-compose
+    # takes care of that for me, so I can still use the envvar names in the
+    # containers
+
+    obj = nested_patch(
         obj,
         lambda k, v: isfunction(v) and hasattr(v, 'settings_property'),
         lambda k, v: v(obj))
+
+    obj = nested_patch(
+        obj,
+        lambda k, v: any(v is not None and k.endswith(pattern) for pattern in filename_suffixes),
+        lambda k, v: os.path.expanduser(v))
+
+    return obj
 
   @staticmethod
   def dumps(obj, **kwargs):

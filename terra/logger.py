@@ -69,6 +69,8 @@ import warnings
 from datetime import datetime, timezone
 
 from terra.core.exceptions import ImproperlyConfigured
+# Do not import terra.settings or terra.signals here, or any module that
+# imports them
 
 from logging import (
   CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET,

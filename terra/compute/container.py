@@ -29,6 +29,10 @@ class ContainerService(BaseService):
     self.extra_compose_files = []
 
   def pre_run(self):
+    # Need to run Base's pre_run first, so it has a change to update settings
+    # for special exectutors, etc...
+    super().pre_run()
+
     self.temp_dir = TemporaryDirectory()
     temp_dir = pathlib.Path(self.temp_dir.name)
 
@@ -78,7 +82,10 @@ class ContainerService(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 
-    super().pre_run()
+    # Dump the original setting too, incase an executor needs to perform map
+    # translation too
+    with open(temp_dir / 'config.json.orig', 'w') as fid:
+      json.dump(TerraJSONEncoder.serializableSettings(settings), fid)
 
   def post_run(self):
     super().post_run()

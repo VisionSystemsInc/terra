@@ -1,4 +1,6 @@
+import json
 from os import environ as env
+import os
 from tempfile import gettempdir
 
 from celery import Task, shared_task as original_shared_task
@@ -8,6 +10,8 @@ from terra.core.settings import TerraJSONEncoder
 from terra.executor import Executor
 import terra.logger
 import terra.compute.utils
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 __all__ = ['TerraTask', 'shared_task']
 
@@ -42,8 +46,10 @@ class TerraTask(Task):
 
   def apply_async(self, args=None, kwargs=None, task_id=None, user=None,
                   *args2, **kwargs2):
+    with open(f'{env["TERRA_SETTINGS_FILE"]}.orig', 'r') as fid:
+      original_settings = json.load(fid)
     return super().apply_async(args=args, kwargs=kwargs,
-                               task_id=task_id, *args2, headers={'settings': TerraJSONEncoder.serializableSettings(settings)},
+                               task_id=task_id, *args2, headers={'settings': original_settings},
                                **kwargs2)
 
   # def apply(self, *args, **kwargs):
@@ -51,19 +57,21 @@ class TerraTask(Task):
   #   return super().apply(*args, settings={'X': 15}, **kwargs)
 
   def __call__(self, *args, **kwargs):
-    print('111')
     if getattr(self.request, 'settings', None):
-      print('222')
       if not settings.configured:
-        print('333')
         settings.configure({'processing_dir': gettempdir()})
       with settings:
-        print('444')
-        print(settings)
+        logger.critical(settings)
         settings._wrapped.clear()
         settings._wrapped.update(self.serialize_settings())
-        print(settings)
-        settings.processing_dir=gettempdir()
+        if not os.path.exists(settings.processing_dir):
+          logger.critical(f'Dir "{settings.processing_dir}" is not accessible '
+                          'by the executor, please make sure the worker has '
+                          'access to this directory')
+          settings.processing_dir = gettempdir()
+          logger.warning('Using temporary directory: '
+                         f'"{settings.processing_dir}" for the processing dir')
+        logger.critical(settings)
         terra.logger._logs.reconfigure_logger()
         return_value = self.run(*args, **kwargs)
     else:
