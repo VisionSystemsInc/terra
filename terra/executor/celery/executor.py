@@ -191,7 +191,7 @@ class CeleryExecutor(Executor):
   def shutdown(self, wait=True):
     with self._shutdown_lock:
       self._shutdown = True
-      for fut in self._futures:
+      for fut in tuple(self._futures):
         fut.cancel()
 
     if wait:

@@ -127,7 +127,8 @@ class _SetupTerraLogger():
   after :data:`terra.settings` is configured
   '''
   default_formatter = logging.Formatter('%(asctime)s (%(hostname)s:%(zone)s) :'
-                                        ' %(levelname)s - %(message)s')
+                                        ' %(levelname)s - %(filename)s -'
+                                        ' %(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
   default_log_prefix = "terra_log"
@@ -178,6 +179,12 @@ class _SetupTerraLogger():
 
     # Enable warnings to default
     warnings.simplefilter('default')
+    warnings.filterwarnings("ignore",
+        category=DeprecationWarning, module='yaml',
+        message="ABCs from 'collections' instead of from 'collections.abc'")
+    warnings.filterwarnings("ignore",
+        category=DeprecationWarning, module='osgeo',
+        message="the imp module is deprecated")
 
   def setup_logging_exception_hook(self):
     '''

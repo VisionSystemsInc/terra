@@ -79,6 +79,7 @@ class ContainerService(BaseService):
           + '|TERRA_SETTINGS_FILE'
 
     # Dump the settings
+    container_config['terra']['zone'] = 'runner'
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 

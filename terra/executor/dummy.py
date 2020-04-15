@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 
 class DummyExecutor(Executor):
   """
-  Executor that does the nothin, just logs what would happen.
+  Executor that does nothing, just logs what would happen.
   """
 
   def __init__(self, *arg, **kwargs):
@@ -21,12 +21,16 @@ class DummyExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      f = Future()
-      logger.info(f'Run function: {fn}')
-      logger.info(f'With args: {args}')
-      logger.info(f'With kwargs: {kwargs}')
-      f.set_result(None)
-      return f
+      from terra import settings
+
+      with settings:
+        settings.terra.zone = 'task'
+        f = Future()
+        logger.info(f'Run function: {fn}')
+        logger.info(f'With args: {args}')
+        logger.info(f'With kwargs: {kwargs}')
+        f.set_result(None)
+        return f
 
   def shutdown(self, wait=True):
     with self._shutdown_lock:

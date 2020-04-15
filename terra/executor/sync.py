@@ -3,8 +3,6 @@ from threading import Lock
 
 
 # No need for a global shutdown lock here, not multi-threaded/process
-
-
 class SyncExecutor(Executor):
   """
   Executor that does the job synchronously.
@@ -27,15 +25,19 @@ class SyncExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      f = Future()
-      try:
-        result = fn(*args, **kwargs)
-      except BaseException as e:
-        f.set_exception(e)
-      else:
-        f.set_result(result)
+      from terra import settings
+      with settings:
+        settings.terra.zone = 'task'
 
-      return f
+        f = Future()
+        try:
+          result = fn(*args, **kwargs)
+        except BaseException as e:
+          f.set_exception(e)
+        else:
+          f.set_result(result)
+
+        return f
 
   def shutdown(self, wait=True):
     with self._shutdown_lock:

@@ -72,6 +72,7 @@ class TerraTask(Task):
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
         logger.critical(settings)
+        settings.terra.zone = 'task'
         terra.logger._logs.reconfigure_logger()
         return_value = self.run(*args, **kwargs)
     else:
