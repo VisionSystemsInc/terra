@@ -258,7 +258,7 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": f"%(asctime)s (%(hostname)s): %(levelname)s - %(message)s",
+        "format": f"%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s - %(message)s",
         "date_format": None,
         "style": "%"
       },

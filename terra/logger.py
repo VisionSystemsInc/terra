@@ -73,14 +73,15 @@ from terra.core.exceptions import ImproperlyConfigured
 # imports them
 
 from logging import (
-  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET,
+  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, Filter,
   getLogger, _acquireLock, _releaseLock, currentframe,
   _srcfile as logging_srcfile, Logger as Logger_original
 )
 
 
 __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
-           'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3', 'Logger']
+           'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3', 'DEBUG4',
+           'Logger']
 
 
 class HandlerLoggingContext(object):
@@ -125,8 +126,8 @@ class _SetupTerraLogger():
   A simple logger class used internally to configure the logger before and
   after :data:`terra.settings` is configured
   '''
-  default_formatter = logging.Formatter('%(asctime)s (preconfig) : '
-                                        '%(levelname)s - %(message)s')
+  default_formatter = logging.Formatter('%(asctime)s (%(hostname)s:%(zone)s) :'
+                                        ' %(levelname)s - %(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
   default_log_prefix = "terra_log"
@@ -330,11 +331,24 @@ class _SetupTerraLogger():
     self._configured = True
 
 
-extra_logger_variables = {'hostname': platform.node()}
-'''dict: Extra logger variables that can be reference in log messages'''
+class TerraFilter(logging.Filter):
+  def filter(self, record):
+    record.hostname = platform.node()
+    if terra.settings.configured:
+      record.zone = terra.settings.terra.zone
+    else:
+      record.zone = 'preconfig'
+    return True
 
 
 class Logger(Logger_original):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    # I like https://stackoverflow.com/a/17558764/4166604 better than
+    # https://stackoverflow.com/a/28050837/4166604, it has the ability to add
+    # logic/function calls, if I so desire
+    self.addFilter(TerraFilter())
+
   def findCaller(self, stack_info=False, stacklevel=1):
     """
     Find the stack frame of the caller so that we can note the source
@@ -375,7 +389,7 @@ class Logger(Logger_original):
   # Define _log instead of logger adapter, this works better (setLoggerClass)
   # https://stackoverflow.com/a/28050837/4166604
   def _log(self, *args, **kwargs):
-    kwargs['extra'] = extra_logger_variables
+    # kwargs['extra'] = extra_logger_variables
     return super()._log(*args, **kwargs)
 
   def debug1(self, msg, *args, **kwargs):
@@ -398,6 +412,13 @@ class Logger(Logger_original):
     interpreted as for :func:`logging.debug`
     '''
     self.log(DEBUG3, msg, *args, **kwargs)
+
+  def debug4(self, msg, *args, **kwargs):
+    '''
+    Logs a message with level :data:`DEBUG4` on this logger. The arguments are
+    interpreted as for :func:`logging.debug`
+    '''
+    self.log(DEBUG4, msg, *args, **kwargs)
 
   fatal = logging.LoggerAdapter.critical
 
@@ -449,9 +470,18 @@ Should be used for more specific development debug messages, such as math
 output used to debug algorithms
 '''
 
+DEBUG4 = 7
+'''
+Debug level four, even more verbose.
+
+Should be used for spamming the screen
+'''
+
+
 logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
+logging.addLevelName(DEBUG4, "DEBUG4")
 
 logging.setLoggerClass(Logger)
 
