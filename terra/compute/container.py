@@ -58,9 +58,8 @@ class ContainerService(BaseService):
           volume_str
       env_volume_index += 1
 
-    volume_map = compute.configuration_map(self)
-
-    logger.debug3("Compute Volume map: %s", volume_map)
+    settings.compute.volume_map = compute.configuration_map(self)
+    logger.debug4("Compute Volume map: %s", settings.compute.volume_map)
 
     # Setup config file for container
 
@@ -68,7 +67,7 @@ class ContainerService(BaseService):
 
     container_config = translate_settings_paths(
         TerraJSONEncoder.serializableSettings(settings),
-        volume_map,
+        settings.compute.volume_map,
         self.container_platform)
 
     if os.name == "nt":  # pragma: no linux cover

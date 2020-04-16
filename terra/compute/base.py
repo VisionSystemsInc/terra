@@ -82,8 +82,8 @@ class BaseService:
     # information is available. For example if using docker and celery, then
     # docker config need to be run to get the container volumes, and that has
     # to be run on the host machine. So this is calculated here.
-    settings.executor_volume_map = Executor.configuration_map(self)
-    logger.debug3("Executor Volume map: %s", settings.executor_volume_map)
+    settings.executor.volume_map = Executor.configuration_map(self)
+    logger.debug4("Executor Volume map: %s", settings.executor.volume_map)
 
   def post_run(self):
     pass

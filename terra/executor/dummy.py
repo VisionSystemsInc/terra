@@ -1,6 +1,7 @@
 from concurrent.futures import Future, Executor
 from threading import Lock
 
+from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -21,12 +22,14 @@ class DummyExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      f = Future()
-      logger.info(f'Run function: {fn}')
-      logger.info(f'With args: {args}')
-      logger.info(f'With kwargs: {kwargs}')
-      f.set_result(None)
-      return f
+      with settings:
+        settings.terra.zone = 'task'
+        f = Future()
+        logger.info(f'Run function: {fn}')
+        logger.info(f'With args: {args}')
+        logger.info(f'With kwargs: {kwargs}')
+        f.set_result(None)
+        return f
 
   def shutdown(self, wait=True):
     with self._shutdown_lock:
