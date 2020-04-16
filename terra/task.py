@@ -15,10 +15,12 @@ logger = getLogger(__name__)
 
 __all__ = ['TerraTask', 'shared_task']
 
+
 def shared_task(*args, **kwargs):
-  kwargs['bind'] = True
-  kwargs['base'] = TerraTask
+  kwargs['bind'] = kwargs.pop('bind', True)
+  kwargs['base'] = kwargs.pop('base', TerraTask)
   return original_shared_task(*args, **kwargs)
+
 
 class TerraTask(Task):
   settings = None
@@ -76,6 +78,9 @@ class TerraTask(Task):
         terra.logger._logs.reconfigure_logger()
         return_value = self.run(*args, **kwargs)
     else:
+      original_zone = settings.terra.zone
+      settings.terra.zone = 'task'
       return_value = self.run(*args, **kwargs)
+      settings.terra.zone = original_zone
     self.settings = None
     return return_value
