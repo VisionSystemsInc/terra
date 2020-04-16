@@ -17,7 +17,7 @@ __all__ = ['TerraTask', 'shared_task']
 
 
 def shared_task(*args, **kwargs):
-  kwargs['bind'] = kwargs.pop('bin', True)
+  kwargs['bind'] = kwargs.pop('bind', True)
   kwargs['base'] = kwargs.pop('base', TerraTask)
   return original_shared_task(*args, **kwargs)
 
