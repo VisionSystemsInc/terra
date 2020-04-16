@@ -25,19 +25,15 @@ class SyncExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      from terra import settings
-      with settings:
-        settings.terra.zone = 'task'
+      f = Future()
+      try:
+        result = fn(*args, **kwargs)
+      except BaseException as e:
+        f.set_exception(e)
+      else:
+        f.set_result(result)
 
-        f = Future()
-        try:
-          result = fn(*args, **kwargs)
-        except BaseException as e:
-          f.set_exception(e)
-        else:
-          f.set_result(result)
-
-        return f
+      return f
 
   def shutdown(self, wait=True):
     with self._shutdown_lock:
