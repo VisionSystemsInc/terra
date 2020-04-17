@@ -77,6 +77,7 @@ class TerraTask(Task):
     with open(env["TERRA_SETTINGS_FILE"], 'r') as fid:
       current_settings = json.load(fid)
     return super().apply_async(args=args, kwargs=kwargs,
+                               # use settings._wrapped instead of current_settings?
                                headers={'settings': current_settings},
                                task_id=task_id, *args2, **kwargs2)
 

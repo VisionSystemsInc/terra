@@ -22,14 +22,16 @@ class DummyExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      with settings:
-        settings.terra.zone = 'task'
-        f = Future()
-        logger.info(f'Run function: {fn}')
-        logger.info(f'With args: {args}')
-        logger.info(f'With kwargs: {kwargs}')
-        f.set_result(None)
-        return f
+      original_zone = settings.terra.zone
+      # Fake the zone for the log messages
+      settings.terra.zone = 'task'
+      f = Future()
+      logger.info(f'Run function: {fn}')
+      logger.info(f'With args: {args}')
+      logger.info(f'With kwargs: {kwargs}')
+      f.set_result(None)
+      settings.terra.zone = original_zone
+      return f
 
   def shutdown(self, wait=True):
     with self._shutdown_lock:
