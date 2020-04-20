@@ -80,7 +80,9 @@ class TerraTask(Task):
     else:
       original_zone = settings.terra.zone
       settings.terra.zone = 'task'
-      return_value = self.run(*args, **kwargs)
-      settings.terra.zone = original_zone
+      try:
+        return_value = self.run(*args, **kwargs)
+      finally:
+        settings.terra.zone = original_zone
     self.settings = None
     return return_value
