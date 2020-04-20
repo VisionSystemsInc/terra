@@ -5,6 +5,8 @@ from tempfile import gettempdir
 
 from celery import Task, shared_task as original_shared_task
 
+from vsi.tools.python import args_to_kwargs, ARGS, KWARGS
+
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
 from terra.executor import Executor
@@ -36,36 +38,68 @@ class TerraTask(Task):
   #     else:
   #       kwargs['settings'] = settings
 
-  def serialize_settings(self):
-    # If there is a non-empty mapping, then create a custom executor settings
-    executor_volume_map = self.request.settings.pop('executor_volume_map',
-                                                    None)
+  def _get_volume_mappings(self):
+    executor_volume_map = self.request.settings['executor']['volume_map']
+
     if executor_volume_map:
-      return terra.compute.utils.translate_settings_paths(
-          TerraJSONEncoder.serializableSettings(self.request.settings),
-          executor_volume_map)
-    return self.request.settings
+      reverse_compute_volume_map = \
+          self.request.settings['compute']['volume_map']
+      # Flip each mount point, so it goes from runner to controller
+      reverse_compute_volume_map = [[x[1], x[0]]
+                                    for x in reverse_compute_volume_map]
+      # Revere order. This will be important in case one mount point mounts
+      # inside another
+      reverse_compute_volume_map.reverse()
+    else:
+      reverse_compute_volume_map = []
 
-  def apply_async(self, args=None, kwargs=None, task_id=None, user=None,
+    return (reverse_compute_volume_map, executor_volume_map)
+
+  def translate_paths(self, payload, reverse_compute_volume_map,
+                      executor_volume_map):
+    if reverse_compute_volume_map or executor_volume_map:
+      # If either translation is needed, start by applying the ~ home dir
+      # expansion and settings_property(which wouldn't have made it through
+      # pure json conversion, but the ~ will
+      payload = TerraJSONEncoder.serializableSettings(payload)
+      # Go from compute runner to master controller
+      if reverse_compute_volume_map:
+        payload = terra.compute.utils.translate_settings_paths(
+            payload, reverse_compute_volume_map)
+      # Go from master controller to exector
+      if executor_volume_map:
+        payload = terra.compute.utils.translate_settings_paths(
+            payload, executor_volume_map)
+    return payload
+
+  def apply_async(self, args=None, kwargs=None, task_id=None,
                   *args2, **kwargs2):
-    with open(f'{env["TERRA_SETTINGS_FILE"]}.orig', 'r') as fid:
-      original_settings = json.load(fid)
+    with open(env["TERRA_SETTINGS_FILE"], 'r') as fid:
+      current_settings = json.load(fid)
     return super().apply_async(args=args, kwargs=kwargs,
-                               task_id=task_id, *args2, headers={'settings': original_settings},
-                               **kwargs2)
+                               # use settings._wrapped instead of current_settings?
+                               headers={'settings': current_settings},
+                               task_id=task_id, *args2, **kwargs2)
 
+  # Don't need to apply translations for apply, it runs locally
   # def apply(self, *args, **kwargs):
   #   # TerraTask._patch_settings(args, kwargs)
   #   return super().apply(*args, settings={'X': 15}, **kwargs)
 
   def __call__(self, *args, **kwargs):
+    # this is only set when apply_async was called.
     if getattr(self.request, 'settings', None):
       if not settings.configured:
+        # Cover a potential (unlikely) corner case where setting might not be
+        # configured yet
         settings.configure({'processing_dir': gettempdir()})
       with settings:
-        logger.critical(settings)
+        reverse_compute_volume_map, executor_volume_map = \
+            self._get_volume_mappings()
+
         settings._wrapped.clear()
-        settings._wrapped.update(self.serialize_settings())
+        settings._wrapped.update(self.translate_paths(self.request.settings,
+            reverse_compute_volume_map, executor_volume_map))
         if not os.path.exists(settings.processing_dir):
           logger.critical(f'Dir "{settings.processing_dir}" is not accessible '
                           'by the executor, please make sure the worker has '
@@ -73,10 +107,14 @@ class TerraTask(Task):
           settings.processing_dir = gettempdir()
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
-        logger.critical(settings)
         settings.terra.zone = 'task'
+        kwargs = args_to_kwargs(self.run, args, kwargs)
+        args_only = kwargs.pop(ARGS, ())
+        kwargs.update(kwargs.pop(KWARGS, ()))
+        kwargs = self.translate_paths(kwargs,
+            reverse_compute_volume_map, executor_volume_map)
         terra.logger._logs.reconfigure_logger()
-        return_value = self.run(*args, **kwargs)
+        return_value = self.run(*args_only, **kwargs)
     else:
       original_zone = settings.terra.zone
       settings.terra.zone = 'task'

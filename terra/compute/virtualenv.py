@@ -56,7 +56,7 @@ class Compute(BaseCompute):
     if logger.getEffectiveLevel() <= DEBUG1:
       dd = dict_diff(os.environ, env)[3]
       if dd:
-        logger.debug1('Environment Modification:\n' + '\n'.join(dd))
+        logger.debug4('Environment Modification:\n' + '\n'.join(dd))
 
     # Similar (but different) to a bug in docker compute, the right python
     # executable is not found on the path, possibly because Popen doesn't

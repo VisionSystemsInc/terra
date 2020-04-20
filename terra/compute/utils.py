@@ -189,7 +189,7 @@ def just(*args, **kwargs):
   if logger.getEffectiveLevel() <= DEBUG1:
     dd = dict_diff(env, just_env)[3]
     if dd:
-      logger.debug1('Environment Modification:\n' + '\n'.join(dd))
+      logger.debug4('Environment Modification:\n' + '\n'.join(dd))
 
   # Get bash path for windows compatibility. I can't explain this error, but
   # while the PATH is set right, I can't call "bash" because the WSL bash is

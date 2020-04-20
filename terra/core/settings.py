@@ -263,13 +263,15 @@ global_templates = [
         "style": "%"
       },
       "executor": {
-        "type": "ThreadPoolExecutor"
+        "type": "ThreadPoolExecutor",
+        'volume_map': []
       },
       "compute": {
-        "arch": "terra.compute.dummy"
+        "arch": "terra.compute.dummy",
+        'volume_map': []
       },
       'terra': {
-        'zone': 'controller',
+        'zone': 'controller'
       },
       'status_file': status_file,
       'processing_dir': processing_dir,
