@@ -139,7 +139,8 @@ function terra_caseify()
         export FORKED_BY_MULTIPROCESSING=1
       fi
 
-      TERRA_IS_CELERY_WORKER=1 Terra_Pipenv run celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
+      # We might be able to use CELERY_LOADER to avoid the -A argument
+      TERRA_IS_CELERY_WORKER=1 Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
       ;;
 
     run_flower) # Start the flower server
