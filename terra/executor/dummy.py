@@ -9,6 +9,8 @@ logger = getLogger(__name__)
 class DummyExecutor(Executor):
   """
   Executor that does nothing, just logs what would happen.
+
+  Note: Don't base new executors off of this example
   """
 
   def __init__(self, *arg, **kwargs):

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 from os import environ as env
 
@@ -17,7 +15,7 @@ if main_name is None:
   try:
     main_name = sys.modules['__main__'].__spec__.name
   except:
-    main_name = "main_name_unset_Set_TERRA_CELERY_MAIN_NAME"
+    main_name = "main_name_unset__set_TERRA_CELERY_MAIN_NAME"
 app = Celery(main_name)
 
 app.config_from_object(env['TERRA_CELERY_CONF'])
@@ -33,6 +31,3 @@ app.config_from_object(env['TERRA_CELERY_CONF'])
 
 # Running on windows.
 # https://stackoverflow.com/questions/37255548/how-to-run-celery-on-windows
-
-if __name__ == '__main__':  # pragma: no cover
-  app.start()
