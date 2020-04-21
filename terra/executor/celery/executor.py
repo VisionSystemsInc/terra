@@ -134,7 +134,7 @@ class CeleryExecutor(Executor):
         ar.ready()  # Just trigger the AsyncResult state update check
 
         if ar.state == 'REVOKED':
-          logger.debug1('Celery task "%s" canceled.', ar.id)
+          logger.warning('Celery task "%s" canceled.', ar.id)
           if not fut.cancelled():
             if not fut.cancel():  # pragma: no cover
               logger.error('Future was not running but failed to be cancelled')
@@ -142,18 +142,18 @@ class CeleryExecutor(Executor):
           # Future is CANCELLED -> CANCELLED_AND_NOTIFIED
 
         elif ar.state in ('RUNNING', 'RETRY'):
-          logger.debug1('Celery task "%s" running.', ar.id)
+          logger.debug4('Celery task "%s" running.', ar.id)
           if not fut.running():
             fut.set_running_or_notify_cancel()
           # Future is RUNNING
 
         elif ar.state == 'SUCCESS':
-          logger.debug1('Celery task "%s" resolved.', ar.id)
+          logger.debug4('Celery task "%s" resolved.', ar.id)
           fut.set_result(ar.get(disable_sync_subtasks=False))
           # Future is FINISHED
 
         elif ar.state == 'FAILURE':
-          logger.debug1('Celery task "%s" resolved with error.', ar.id)
+          logger.info('Celery task "%s" resolved with error.', ar.id)
           fut.set_exception(ar.result)
           # Future is FINISHED
 
