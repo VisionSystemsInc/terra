@@ -42,18 +42,26 @@ class TerraTask(Task):
     executor_volume_map = self.request.settings['executor']['volume_map']
 
     if executor_volume_map:
-      reverse_compute_volume_map = \
+      compute_volume_map = \
           self.request.settings['compute']['volume_map']
       # Flip each mount point, so it goes from runner to controller
       reverse_compute_volume_map = [[x[1], x[0]]
-                                    for x in reverse_compute_volume_map]
+                                    for x in compute_volume_map]
       # Revere order. This will be important in case one mount point mounts
       # inside another
       reverse_compute_volume_map.reverse()
+
+      reverse_executor_volume_map = [[x[1], x[0]]
+                                    for x in executor_volume_map]
+      reverse_executor_volume_map.reverse()
+
     else:
       reverse_compute_volume_map = []
+      compute_volume_map = []
+      reverse_executor_volume_map = []
 
-    return (reverse_compute_volume_map, executor_volume_map)
+    return (compute_volume_map, reverse_compute_volume_map,
+            executor_volume_map, reverse_executor_volume_map)
 
   def translate_paths(self, payload, reverse_compute_volume_map,
                       executor_volume_map):
@@ -74,10 +82,8 @@ class TerraTask(Task):
 
   def apply_async(self, args=None, kwargs=None, task_id=None,
                   *args2, **kwargs2):
-    with open(env["TERRA_SETTINGS_FILE"], 'r') as fid:
-      current_settings = json.load(fid)
+    current_settings = TerraJSONEncoder.serializableSettings(settings)
     return super().apply_async(args=args, kwargs=kwargs,
-                               # use settings._wrapped instead of current_settings?
                                headers={'settings': current_settings},
                                task_id=task_id, *args2, **kwargs2)
 
@@ -94,7 +100,8 @@ class TerraTask(Task):
         # configured yet
         settings.configure({'processing_dir': gettempdir()})
       with settings:
-        reverse_compute_volume_map, executor_volume_map = \
+        compute_volume_map, reverse_compute_volume_map, \
+        executor_volume_map, reverse_executor_volume_map = \
             self._get_volume_mappings()
 
         settings._wrapped.clear()
@@ -115,7 +122,12 @@ class TerraTask(Task):
             reverse_compute_volume_map, executor_volume_map)
         terra.logger._logs.reconfigure_logger()
         return_value = self.run(*args_only, **kwargs)
+
+        return_value = self.translate_paths(return_value,
+            reverse_executor_volume_map, compute_volume_map)
     else:
+      # Must by just apply (synchronous), or a normal call with no volumes
+      # mapping
       original_zone = settings.terra.zone
       settings.terra.zone = 'task'
       try:

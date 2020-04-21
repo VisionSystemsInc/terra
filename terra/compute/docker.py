@@ -96,7 +96,9 @@ class Compute(BaseCompute):
           ans = re.match(docker_volume_re, volume).groups()
           volume_map.append((ans[0], ans[2]))
 
-    volume_map = volume_map + service_info.volumes
+    # This is not needed, because service_info.volumes are already in
+    # service_info.env, added by terra.compute.base.BaseService.pre_run
+    # volume_map = volume_map + service_info.volumes
 
     slashes = '/'
     if os.name == 'nt':
