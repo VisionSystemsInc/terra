@@ -33,7 +33,9 @@ class ContainerService(BaseService):
     # for special exectutors, etc...
     super().pre_run()
 
-    self.temp_dir = TemporaryDirectory()
+    self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")
+    if env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
+      self.temp_dir._finalizer.detach()
     temp_dir = pathlib.Path(self.temp_dir.name)
 
     # Check to see if and are already defined, this will play nicely with
@@ -82,15 +84,11 @@ class ContainerService(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 
-    # Dump the original setting too, incase an executor needs to perform map
-    # translation too
-    with open(temp_dir / 'config.json.orig', 'w') as fid:
-      json.dump(TerraJSONEncoder.serializableSettings(settings), fid)
-
   def post_run(self):
     super().post_run()
     # Delete temp_dir
-    self.temp_dir.cleanup()
+    if env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
+      self.temp_dir.cleanup()
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
     # I did it this way.
 

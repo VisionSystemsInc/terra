@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 from os import environ as env
 
 from celery import Celery
@@ -10,7 +11,15 @@ logger = getLogger(__name__)
 
 __all__ = ['CeleryExecutor']
 
-app = Celery(env['TERRA_CELERY_MAIN_NAME'])
+
+main_name = env.get('TERRA_CELERY_MAIN_NAME', None)
+if main_name is None:
+  try:
+    main_name = sys.modules['__main__'].__spec__.name
+  except:
+    main_name = "main_name_unset_Set_TERRA_CELERY_MAIN_NAME"
+app = Celery(main_name)
+
 app.config_from_object(env['TERRA_CELERY_CONF'])
 
 # app.running = False

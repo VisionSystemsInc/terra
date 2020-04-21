@@ -72,7 +72,8 @@ class Compute(BaseCompute):
       volume = volume.split(':')
       volume_map.append((volume[0], volume[1]))
 
-    volume_map = volume_map + service_info.volumes
+    # I think this causes duplicates, just like in the docker
+    # volume_map = volume_map + service_info.volumes
 
     slashes = '/'
     if os.name == 'nt':
