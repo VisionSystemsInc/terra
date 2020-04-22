@@ -693,7 +693,7 @@ class TerraJSONEncoder(JSONEncoder):
 
     obj = nested_patch(
         obj,
-        lambda k, v: any(v is not None and k.endswith(pattern) for pattern in filename_suffixes),
+        lambda k, v: any(v is not None and isinstance(k, str) and k.endswith(pattern) for pattern in filename_suffixes),
         lambda k, v: os.path.expanduser(v))
 
     return obj
