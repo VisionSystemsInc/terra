@@ -80,6 +80,20 @@ class ExecutorHandler(ClassHandler):
       self._log_file.close()
       self._log_file = open(log_file, 'a')
 
+    #self._reconfigure_logger(logging_handler)
+
+  def _reconfigure_logger(self, logging_handler):
+    # FIXME no idea how to reset this
+    # setup the logging when a task is reconfigured; e.g., changing logging
+    # level or hostname
+
+    if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
+      print("SGR - reconfigure runner/task logging")
+
+      # when the celery task is done, its logger is automatically reconfigured;
+      # use that opportunity to close the stream
+      #self._socket_handler.close()
+
   def configure_logger(self):
     # ThreadPoolExecutor will work just fine with a normal StreamHandler
 
@@ -136,8 +150,7 @@ class ExecutorHandler(ClassHandler):
 
       return self._socket_handler
     elif settings.terra.zone == 'task_controller':
-      # TODO log to disk
-      pass
+      raise AttributeError
     else:
       assert False, 'unknown zone: ' + settings.terra.zone
 
@@ -207,7 +220,6 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
     self.abort = 0
     self.timeout = 1
     self.logname = None
-    #self.request_queue_size = 20
 
   def serve_until_stopped(self):
     import select
