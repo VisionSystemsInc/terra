@@ -249,6 +249,7 @@ class _SetupTerraLogger():
     self.set_level_and_formatter()
 
     # Must be imported after settings configed
+    # TODO: Replace these two lines with reconfigure_signal
     from terra.executor import Executor
     Executor.reconfigure_logger(self.main_log_handler)
 
@@ -263,6 +264,7 @@ class _SetupTerraLogger():
     if isinstance(level, str):
       # make level case insensitive
       level = level.upper()
+    print('SGR - log level ' + level)
     self.stderr_handler.setLevel(level)
     self.main_log_handler.setLevel(level)
 
@@ -285,6 +287,7 @@ class _SetupTerraLogger():
       raise ImproperlyConfigured()
 
     # Must be imported after settings configed
+    # TODO: Replace these two lines with configure_signal below
     from terra.executor import Executor
     self.main_log_handler = Executor.configure_logger()
 
@@ -335,8 +338,20 @@ class _SetupTerraLogger():
       os.unlink(self.tmp_file.name)
     self.tmp_file = None
 
+    print('SGR - logging configured for zone ' + settings.terra.zone)
+    #show_logs_and_handlers()
+    if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
+      self.root_logger.removeHandler(self.stderr_handler)
+
     self._configured = True
 
+    # TODO: Send logging configured signal
+
+from celery.signals import setup_logging
+
+@setup_logging.connect
+def setup_loggers(*args, **kwargs):
+  print("SGR - celery logger")
 
 class TerraFilter(logging.Filter):
   def filter(self, record):
@@ -348,6 +363,27 @@ class TerraFilter(logging.Filter):
       else:
         record.zone = 'preconfig'
     return True
+
+
+def show_log(k, v):
+  def show_dict_fields(prefix, dict1):
+    for fld,val in dict1.items():
+      print('%s%s=%s' %(prefix, fld,val) )
+
+  if not isinstance(v, logging.PlaceHolder):
+    print('+ [%s] {%s} (%s) ' % (str.ljust( k, 20), str(v.__class__)[8:-2], logging.getLevelName(v.level)) ) 
+    print(str.ljust( '-------------------------',20) )
+    show_dict_fields('   -', v.__dict__)
+
+    for h in v.handlers:
+      print('     +++%s (%s)' %(str(h.__class__)[8:-2], logging.getLevelName(h.level) ))
+      show_dict_fields('   -', h.__dict__)
+
+# from https://github.com/mickeyperlstein/logging_debugger/blob/master/__init__.py
+def show_logs_and_handlers():
+  show_log('root', logging.getLogger(''))
+  for k,v in logging.Logger.manager.loggerDict.items():
+    show_log(k,v)
 
 
 class Logger(Logger_original):

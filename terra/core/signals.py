@@ -342,7 +342,8 @@ def receiver(signal, **kwargs):
   return _decorator
 
 
-__all__ = ['Signal', 'receiver', 'post_settings_configured']
+__all__ = ['Signal', 'receiver', 'post_settings_configured',
+           'post_settings_context']
 
 # a signal for settings done being loaded
 post_settings_configured = Signal()

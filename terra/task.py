@@ -100,13 +100,16 @@ class TerraTask(Task):
         # configured yet
         settings.configure({'processing_dir': gettempdir()})
       with settings:
+        # Calculate the exector's mapped version of the runner's settings
         compute_volume_map, reverse_compute_volume_map, \
         executor_volume_map, reverse_executor_volume_map = \
             self._get_volume_mappings()
 
+        # Load the executor version of the runner's settings
         settings._wrapped.clear()
         settings._wrapped.update(self.translate_paths(self.request.settings,
             reverse_compute_volume_map, executor_volume_map))
+        # Just in case processing dir doesn't exists
         if not os.path.exists(settings.processing_dir):
           logger.critical(f'Dir "{settings.processing_dir}" is not accessible '
                           'by the executor, please make sure the worker has '
@@ -114,20 +117,26 @@ class TerraTask(Task):
           settings.processing_dir = gettempdir()
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
-        settings.terra.zone = 'task'
+
+        logger.error('SGR - TERRA ZONE ' + str(settings.terra.zone))
+
+        settings.terra.zone = 'task' # was runner
+        # Calculate the exector's mapped version of the arguments
         kwargs = args_to_kwargs(self.run, args, kwargs)
         args_only = kwargs.pop(ARGS, ())
         kwargs.update(kwargs.pop(KWARGS, ()))
         kwargs = self.translate_paths(kwargs,
             reverse_compute_volume_map, executor_volume_map)
+        # Set up logger to talk to master controller
         terra.logger._logs.reconfigure_logger()
         return_value = self.run(*args_only, **kwargs)
 
+        # Calculate the runner mapped version of the executor's return value
         return_value = self.translate_paths(return_value,
             reverse_executor_volume_map, compute_volume_map)
     else:
-      # Must by just apply (synchronous), or a normal call with no volumes
-      # mapping
+      # Must call (synchronous) apply or python __call__ with no volume
+      # mappings
       original_zone = settings.terra.zone
       settings.terra.zone = 'task'
       try:
