@@ -340,11 +340,13 @@ class _SetupTerraLogger():
 
 class TerraFilter(logging.Filter):
   def filter(self, record):
-    record.hostname = platform.node()
-    if terra.settings.configured:
-      record.zone = terra.settings.terra.zone
-    else:
-      record.zone = 'preconfig'
+    if not hasattr(record, 'hostname'):
+      record.hostname = platform.node()
+    if not hasattr(record, 'zone'):
+      if terra.settings.configured:
+        record.zone = terra.settings.terra.zone
+      else:
+        record.zone = 'preconfig'
     return True
 
 
