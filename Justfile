@@ -31,7 +31,8 @@ function Terra_Pipenv()
     if [ -n "${VIRTUAL_ENV+set}" ]; then
       echo "Warning: You appear to be in a virtual env" >&2
       echo "Deactivate external virtual envs before running just" >&2
-      ask_question "Continue?" n
+      ask_question "Continue?" answer_continue n
+      [ "$answer_continue" == "0" ] && return 1
     fi
     PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
