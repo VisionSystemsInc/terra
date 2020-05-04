@@ -154,15 +154,6 @@ class ExecutorHandler(ClassHandler):
     else:
       assert False, 'unknown zone: ' + settings.terra.zone
 
-  def reconfigure_logger(self, logging_handler):
-    # setup the logging when a task is reconfigured; e.g., changing logging
-    # level or hostname
-    pass
-
-    #if settings.hostname != self._hostname:
-    #  # FIXME no idea how to reset this
-    #  pass
-
 # from https://docs.python.org/3/howto/logging-cookbook.html
 class LogRecordStreamHandler(socketserver.StreamRequestHandler):
   """Handler for a streaming logging request.
