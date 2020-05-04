@@ -118,7 +118,7 @@ class TerraTask(Task):
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
 
-        logger.error('SGR - TERRA ZONE ' + str(settings.terra.zone))
+        logger.error('SGR - TerraTask ZONE ' + str(settings.terra.zone))
 
         settings.terra.zone = 'task' # was runner
         # Calculate the exector's mapped version of the arguments
@@ -130,6 +130,8 @@ class TerraTask(Task):
         # Set up logger to talk to master controller
         terra.logger._logs.reconfigure_logger()
         return_value = self.run(*args_only, **kwargs)
+        # REVIEW the problem is the zone changes when this gets called on scope __exit__
+        terra.logger._logs.reconfigure_logger()
 
         # Calculate the runner mapped version of the executor's return value
         return_value = self.translate_paths(return_value,
@@ -145,3 +147,9 @@ class TerraTask(Task):
         settings.terra.zone = original_zone
     self.settings = None
     return return_value
+
+class LogErrorsTask(TerraTask):
+  # from https://stackoverflow.com/a/45333231/1771778
+  def on_failure(self, exc, task_id, args, kwargs, einfo):
+    logger.exception('Celery task failure!!!1', exc_info=exc)
+    super(LogErrorsTask, self).on_failure(exc, task_id, args, kwargs, einfo)

@@ -69,18 +69,18 @@ class ExecutorHandler(ClassHandler):
     # output stream
 
     print("SGR - reconfigure logging")
-    return
 
-    log_file = os.path.join(settings.processing_dir,
-                            terra.logger._logs.default_log_prefix)
+    if settings.terra.zone == 'controller' or settings.terra.zone == 'task_controller':
+      log_file = os.path.join(settings.processing_dir,
+                              terra.logger._logs.default_log_prefix)
 
-    # if not os.path.samefile(log_file, self._log_file.name):
-    if log_file != self._log_file.name:
-      os.makedirs(settings.processing_dir, exist_ok=True)
-      self._log_file.close()
-      self._log_file = open(log_file, 'a')
+      # if not os.path.samefile(log_file, self._log_file.name):
+      if log_file != self._log_file.name:
+        os.makedirs(settings.processing_dir, exist_ok=True)
+        self._log_file.close()
+        self._log_file = open(log_file, 'a')
 
-    #self._reconfigure_logger(logging_handler)
+    self._reconfigure_logger(logging_handler)
 
   def _reconfigure_logger(self, logging_handler):
     # FIXME no idea how to reset this
@@ -92,10 +92,13 @@ class ExecutorHandler(ClassHandler):
 
       # when the celery task is done, its logger is automatically reconfigured;
       # use that opportunity to close the stream
-      #self._socket_handler.close()
+      if hasattr(self, '_socket_handler'):
+        self._socket_handler.close()
 
   def configure_logger(self):
     # ThreadPoolExecutor will work just fine with a normal StreamHandler
+
+    print('SGR - configure logging ' + settings.terra.zone)
 
     try:
       return self._configure_logger()
@@ -150,6 +153,8 @@ class ExecutorHandler(ClassHandler):
 
       return self._socket_handler
     elif settings.terra.zone == 'task_controller':
+      print("SGR - setting up task_controller logging")
+
       raise AttributeError
     else:
       assert False, 'unknown zone: ' + settings.terra.zone
