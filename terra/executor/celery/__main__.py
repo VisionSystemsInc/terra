@@ -14,6 +14,7 @@ def main():
     settings.configure(
       {
         'executor': {'type': 'CeleryExecutor'},
+        # FIXME
         'terra': {'zone': 'task'},
         #'terra': {'zone': 'task_controller'},
         'logging': {'level': 'NOTSET'}
