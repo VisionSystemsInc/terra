@@ -11,6 +11,11 @@ from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
 from .utils import TestCase, make_traceback, TestLoggerConfigureCase
 from terra import logger
+<<<<<<< HEAD
+=======
+from terra.core import signals
+from terra.executor.utils import Executor
+>>>>>>> Fixing tests
 
 
 class TestHandlerLoggingContext(TestCase):
@@ -127,7 +132,7 @@ class TestLogger(TestLoggerConfigureCase):
                                     "Hiya", (), None)
     self.assertTrue(test_logger.filter(record))
     self.assertTrue(self._logs.stderr_handler.filter(record))
-    self.assertIn(':preconfig)', self._logs.stderr_handler.format(record))
+    self.assertIn(f'({platform.node()}:preconfig)', self._logs.stderr_handler.format(record))
 
     settings._setup()
 
@@ -135,7 +140,7 @@ class TestLogger(TestLoggerConfigureCase):
                                     "Hiya", (), None)
     self.assertTrue(test_logger.filter(record))
     self.assertTrue(self._logs.stderr_handler.filter(record))
-    self.assertIn(f'({platform.node()}:',
+    self.assertIn(f'({platform.node()}:controller)',
                   self._logs.stderr_handler.format(record))
 
   # Test https://stackoverflow.com/q/19615876/4166604
@@ -268,3 +273,10 @@ class TestUnitTests(TestCase):
         "prevented for you automatically. If you are seeing this, you "
         "have configured logging manually, and should make sure you "
         "restore it.")
+
+  def last_test_executor_logfile(self):
+    from terra.executor.utils import Executor
+
+    self.assertIsNone(getattr(Executor, '_log_file', None))
+    # self.assertIsNone(getattr(Executor, '_logging_handler', None))
+    # self.assertFalse(True)

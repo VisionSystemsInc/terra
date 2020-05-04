@@ -129,12 +129,14 @@ class TerraTask(Task):
     else:
       # Must call (synchronous) apply or python __call__ with no volume
       # mappings
-      original_zone = settings.terra.zone
+      if settings.configured:
+        original_zone = settings.terra.zone
       settings.terra.zone = 'task'
       try:
         return_value = self.run(*args, **kwargs)
       finally:
-        settings.terra.zone = original_zone
+        if settings.configured:
+          settings.terra.zone = original_zone
     return return_value
 
   # # from https://stackoverflow.com/a/45333231/1771778

@@ -527,7 +527,9 @@ class LazySettings(LazyObject):
 
     nested_patch_inplace(
         self._wrapped,
-        lambda key, value: (isinstance(key, str)
+        lambda key, value: (isinstance(key, str) and
+                            (isinstance(value, str) or
+                             getattr(value, 'settings_property', False))
                             and any(key.endswith(pattern)
                                     for pattern in json_include_suffixes)),
         lambda key, value: read_json(value))

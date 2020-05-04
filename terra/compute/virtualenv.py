@@ -99,9 +99,6 @@ class Service(BaseService):
   '''
 
   def pre_run(self):
-    """
-
-    """
     super().pre_run()
 
     # Create a temp directory, store it in this instance
@@ -128,4 +125,7 @@ class Service(BaseService):
     super().post_run()
     # Delete temp_dir
     if self.env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
+      # Calling this just prevents the annoying warning from saying "Hey, you
+      # know that automatic cleanup? It happened! Maybe you should manually
+      # call  the automatic cleanup, cause yeah, that makes sense!"
       self.temp_dir.cleanup()

@@ -213,6 +213,12 @@ class _SetupTerraLogger():
 
   def __init__(self):
     self._configured = False
+    self.root_logger = None
+    self.stderr_handler = None
+
+  def setup(self):
+    # This must always use logging's getLogger. If a custom Terra getLogger is
+    # ever defined, don't use it to get the root logger
     self.root_logger = logging.getLogger(None)
     self.root_logger.setLevel(0)
 
@@ -613,6 +619,10 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
   it will call warnings.formatwarning and will log the resulting string to a
   warnings logger named "py.warnings" with level logging.WARNING.
   """
+
+  # import traceback
+  # traceback.print_stack()
+
   if file is not None:  # I don't actually know how this can be not None
     if _warnings_showwarning is not None:  # pragma: no cover
       _warnings_showwarning(message, category, filename, lineno, file, line)
@@ -622,8 +632,13 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
     logger.warning("%s", s)
 
 
+# Ordinarily we would use __file__ for this, but frozen modules don't always
+# have __file__ set, for some reason (see Issue CPython#21736). Thus, we get
+# the filename from a handy code object from a function defined in this
+# module. (There's no particular reason for picking debug1.)
 _srcfiles = (logging_srcfile,
-             os.path.normcase(Logger.debug1.__code__.co_filename))
+             os.path.normcase(Logger.debug1.__code__.co_filename),
+             warnings.showwarning.__code__.co_filename)
 
 
 DEBUG1 = 10
