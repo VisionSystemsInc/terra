@@ -504,7 +504,10 @@ class LazySettings(LazyObject):
                                     for pattern in json_include_suffixes)),
         lambda key, value: read_json(value))
 
-    #TODO : Load compute and executor class and call _connect_backend
+    # Importing these here is intentional
+    from terra.executor import Executor
+    from terra.compute import compute
+    # compute._connection # call a cached property
 
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')

@@ -248,10 +248,15 @@ class _SetupTerraLogger():
 
     self.set_level_and_formatter()
 
-    # Must be imported after settings configed
-    # TODO: Replace these two lines with reconfigure_signal
-    from terra.executor import Executor
-    Executor.reconfigure_logger(self.main_log_handler)
+    # This sends a signal to the current Executor type, a module level variable
+    # which has already been imported at the end of LasySettings.configure.
+    # Executor is setup automatically, via
+    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+    # when the signal is sent to Executor._reconfigure_logger.
+    # We import Executor in LasySettings.configure instead of here to reduce
+    # the concerns of this module
+    import terra.core.signals
+    terra.core.signals.logger_reconfigure.send(sender=self)
 
   def set_level_and_formatter(self):
     from terra import settings
@@ -286,10 +291,17 @@ class _SetupTerraLogger():
                              "unexpected")
       raise ImproperlyConfigured()
 
-    # Must be imported after settings configed
-    # TODO: Replace these two lines with configure_signal below
-    from terra.executor import Executor
-    self.main_log_handler = Executor.configure_logger()
+    print('SGR - sending logger_configure signal')
+
+    # This sends a signal to the current Executor type, a module level variable
+    # which has already been imported at the end of LasySettings.configure.
+    # Executor is setup automatically, via
+    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+    # when the signal is sent to Executor._configure_logger.
+    # We import Executor in LasySettings.configure instead of here to reduce
+    # the concerns of this module
+    import terra.core.signals
+    terra.core.signals.logger_configure.send(sender=self)
 
     self.set_level_and_formatter()
 
@@ -344,14 +356,6 @@ class _SetupTerraLogger():
       self.root_logger.removeHandler(self.stderr_handler)
 
     self._configured = True
-
-    # TODO: Send logging configured signal
-
-from celery.signals import setup_logging
-
-@setup_logging.connect
-def setup_loggers(*args, **kwargs):
-  print("SGR - celery logger")
 
 class TerraFilter(logging.Filter):
   def filter(self, record):
@@ -543,7 +547,7 @@ if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
   # Configure logging (pre configure)
   _logs = _SetupTerraLogger()
 
-  # register post_configure with settings
+  # Register post_configure with settings
   terra.core.signals.post_settings_configured.connect(_logs.configure_logger)
 
   # Handle a "with" settings context manager

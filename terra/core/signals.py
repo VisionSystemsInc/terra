@@ -343,7 +343,7 @@ def receiver(signal, **kwargs):
 
 
 __all__ = ['Signal', 'receiver', 'post_settings_configured',
-           'post_settings_context']
+           'post_settings_context', 'logger_configure']
 
 # a signal for settings done being loaded
 post_settings_configured = Signal()
@@ -355,6 +355,22 @@ manual call to :func:`terra.core.settings.LazySettings.configure`.
 '''
 
 post_settings_context = Signal()
+'''Signal:
+Sent after scope __exit__ from a settings context (i.e., with statement).
+'''
+
+# REVIEW should this be called post_logger_configure
+logger_configure = Signal()
+'''Signal:
+Sent to the executor after the logger has been configured. This will happen
+after the post_settings_configured signal.
+'''
+
+logger_reconfigure = Signal()
+'''Signal:
+Sent to the executor after the logger has been reconfigured. This will happen
+after the logger_configure signal.
+'''
 
 from terra.logger import getLogger  # noqa
 logger = getLogger(__name__)
