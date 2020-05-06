@@ -142,7 +142,6 @@ function terra_caseify()
 
       # We might be able to use CELERY_LOADER to avoid the -A argument
       TERRA_IS_CELERY_WORKER=1 Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" -n "${node_name}"
-      # REVIEW do you need extra args here
       ;;
 
     run_flower) # Start the flower server

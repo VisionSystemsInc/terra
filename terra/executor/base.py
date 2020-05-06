@@ -28,8 +28,6 @@ class BaseExecutor(Executor):
         sender._log_file.close()
         sender._log_file = open(log_file, 'a')
 
-    CeleryExecutor._reconfigure_logger(sender, **kwargs)
-
   @staticmethod
   def configure_logger(sender, **kwargs):
     # sender is logger in this case

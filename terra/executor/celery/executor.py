@@ -38,6 +38,7 @@ from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
+# stop celery from hijacking the logger
 @setup_logging.connect
 def setup_loggers(*args, **kwargs):
   print("SGR - celery logger")
