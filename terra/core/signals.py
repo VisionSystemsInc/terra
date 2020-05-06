@@ -343,7 +343,7 @@ def receiver(signal, **kwargs):
 
 
 __all__ = ['Signal', 'receiver', 'post_settings_configured',
-           'post_settings_context', 'logger_configure']
+           'post_settings_context', 'logger_configure', 'logger_reconfigure']
 
 # a signal for settings done being loaded
 post_settings_configured = Signal()

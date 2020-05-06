@@ -18,11 +18,14 @@ class ExecutorHandler(ClassHandler):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    # REVIEW could be moved out of the class and _configure_logger could be
-    # a staticmethod once we can remove the hasattr check
+    # This Executor type is setup automatically, via
+    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+    # when the signal is sent.
     terra.core.signals.logger_configure.connect(self._configure_logger)
     terra.core.signals.logger_reconfigure.connect(self._reconfigure_logger)
 
+  # These methods are necessary because the Executor actually behaves as a
+  # specific BaseExecutor type, so calls to methods must pass through this type
   def _configure_logger(self, sender, **kwargs):
     print('SGR - connect configure_logger signals')
 
@@ -84,9 +87,3 @@ Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.
 '''
-
-# This Executor type is setup automatically, via
-#   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
-# when the signal is sent.
-#terra.core.signals.logger_configure.connect(lambda _: Executor._configure_logger)
-#terra.core.signals.logger_reconfigure.connect(lambda _: Executor._reconfigure_logger)

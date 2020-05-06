@@ -292,6 +292,7 @@ class _SetupTerraLogger():
     # This sends a signal to the current Executor type, which has already been
     # imported at the end of LasySettings.configure. We don't import Executor
     # here to reduce the concerns of this module
+    # REVIEW can this be imported at the top?
     import terra.core.signals
     terra.core.signals.logger_configure.send(sender=self)
 
@@ -344,6 +345,7 @@ class _SetupTerraLogger():
 
     print('SGR - logging configured for zone ' + settings.terra.zone)
     #show_logs_and_handlers()
+    # REVIEW this is odd
     if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
       self.root_logger.removeHandler(self.stderr_handler)
 
