@@ -18,7 +18,8 @@
 
 import os
 from os import environ as env
-from concurrent.futures import Future, Executor, as_completed
+from terra.executor.base import BaseFuture, BaseExecutor
+from concurrent.futures import as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
                                       CANCELLED_AND_NOTIFIED)
 from threading import Lock, Thread
@@ -41,7 +42,7 @@ logger = getLogger(__name__)
 def setup_loggers(*args, **kwargs):
   print("SGR - celery logger")
 
-class CeleryExecutorFuture(Future):
+class CeleryExecutorFuture(BaseFuture):
   def __init__(self, asyncresult):
     self._ar = asyncresult
     super().__init__()
@@ -90,7 +91,7 @@ class CeleryExecutorFuture(Future):
       return result
 
 
-class CeleryExecutor(Executor):
+class CeleryExecutor(BaseExecutor):
   """
   Executor implementation using celery tasks.
 
@@ -251,60 +252,6 @@ class CeleryExecutor(Executor):
 
   @staticmethod
   def reconfigure_logger(sender, **kwargs):
-    # sender is logger in this case
-    #
-    # The default logging handler is a StreamHandler. This will reconfigure its
-    # output stream
-
-    print("SGR - reconfigure logging")
-
-    if settings.terra.zone == 'controller' or settings.terra.zone == 'task_controller':
-      log_file = os.path.join(settings.processing_dir,
-                              terra.logger._logs.default_log_prefix)
-
-      # if not os.path.samefile(log_file, sender._log_file.name):
-      if log_file != sender._log_file.name:
-        os.makedirs(settings.processing_dir, exist_ok=True)
-        sender._log_file.close()
-        sender._log_file = open(log_file, 'a')
-
-    CeleryExecutor._reconfigure_logger(sender, **kwargs)
-
-  # TODO move into a base executor class; mirror compute/base.py
-  @staticmethod
-  def configure_logger(sender, **kwargs):
-    # sender is logger in this case
-
-    # ThreadPoolExecutor will work just fine with a normal StreamHandler
-
-    print('SGR - configure logging ' + settings.terra.zone)
-
-    try:
-      handler = CeleryExecutor._configure_logger(sender, **kwargs)
-      # REVIEW this may not be needed anymore. it also is in the
-      # Justfile and docker-compose.yml
-      # In CeleryPoolExecutor, use the Celery logger.
-      # Use this to determine if main process or just a worker?
-      # https://stackoverflow.com/a/45022530/4166604
-      # Use TERRA_IS_CELERY_WORKER
-    except AttributeError:
-      # Setup log file for use in configure
-      sender._log_file = os.path.join(settings.processing_dir,
-                                    terra.logger._logs.default_log_prefix)
-      os.makedirs(settings.processing_dir, exist_ok=True)
-      sender._log_file = open(sender._log_file, 'a')
-
-      sender._logging_handler = logging.StreamHandler(stream=sender._log_file)
-      handler = sender._logging_handler
-
-    # TODO: ProcessPool - Log server
-
-    # FIXME this is hacky. it requires the executor know it is responsible for
-    # creating this variable on the logger
-    terra.logger._logs.main_log_handler = handler
-
-  @staticmethod
-  def _reconfigure_logger(sender, **kwargs):
     # FIXME no idea how to reset this
     # setup the logging when a task is reconfigured; e.g., changing logging
     # level or hostname
@@ -318,13 +265,15 @@ class CeleryExecutor(Executor):
         sender._socket_handler.close()
 
   @staticmethod
-  def _configure_logger(sender, **kwargs):
+  def configure_logger(sender, **kwargs):
     # FIXME don't hardcode hostname/port
     sender._hostname = 'kanade' # settings.terra.celery.hostname
     sender._port = logging.handlers.DEFAULT_TCP_LOGGING_PORT # settings.terra.celery.logging_port
 
     if settings.terra.zone == 'controller':
       print("SGR - setting up controller logging")
+
+      super(CeleryExecutor, CeleryExecutor).configure_logger(sender, **kwargs)
 
       # setup the listener
       sender.tcp_logging_server = LogRecordSocketReceiver(sender._hostname, sender._port)
@@ -336,8 +285,6 @@ class CeleryExecutor(Executor):
       lp.start()
       # TODO do we need to join
       #lp.join()
-
-      raise AttributeError
     elif settings.terra.zone == 'runner' or settings.terra.zone == 'task':
       print("SGR - setting up runner/task logging")
 
@@ -349,11 +296,13 @@ class CeleryExecutor(Executor):
       # TODO don't bother with a formatter, since a socket handler sends the event
       # as an unformatted pickle
 
-      return sender._socket_handler
+      # FIXME this is hacky. it requires the executor know it is responsible for
+      # creating this variable on the logger
+      terra.logger._logs.main_log_handler = sender._socket_handler
     elif settings.terra.zone == 'task_controller':
       print("SGR - setting up task_controller logging")
 
-      raise AttributeError
+      super(CeleryExecutor, CeleryExecutor).configure_logger(sender, **kwargs)
     else:
       assert False, 'unknown zone: ' + settings.terra.zone
 

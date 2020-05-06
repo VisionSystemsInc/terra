@@ -27,15 +27,13 @@ class ExecutorHandler(ClassHandler):
     print('SGR - connect configure_logger signals')
 
     # Register the Executor-specific configure_logger with the logger
-    if hasattr(self, 'configure_logger'):
-      self.configure_logger(sender, **kwargs)
+    self.configure_logger(sender, **kwargs)
 
   def _reconfigure_logger(self, sender, **kwargs):
     print('SGR - connect reconfigure_logger signals')
 
     # Register the Executor-specific configure_logger with the logger
-    if hasattr(self, 'reconfigure_logger'):
-      self.reconfigure_logger(sender, **kwargs)
+    self.reconfigure_logger(sender, **kwargs)
 
   def _connect_backend(self):
     '''
@@ -86,3 +84,9 @@ Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.
 '''
+
+# This Executor type is setup automatically, via
+#   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+# when the signal is sent.
+#terra.core.signals.logger_configure.connect(lambda _: Executor._configure_logger)
+#terra.core.signals.logger_reconfigure.connect(lambda _: Executor._reconfigure_logger)

@@ -248,13 +248,9 @@ class _SetupTerraLogger():
 
     self.set_level_and_formatter()
 
-    # This sends a signal to the current Executor type, a module level variable
-    # which has already been imported at the end of LasySettings.configure.
-    # Executor is setup automatically, via
-    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
-    # when the signal is sent to Executor._reconfigure_logger.
-    # We import Executor in LasySettings.configure instead of here to reduce
-    # the concerns of this module
+    # This sends a signal to the current Executor type, which has already been
+    # imported at the end of LasySettings.configure. We don't import Executor
+    # here to reduce the concerns of this module
     import terra.core.signals
     terra.core.signals.logger_reconfigure.send(sender=self)
 
@@ -293,13 +289,9 @@ class _SetupTerraLogger():
 
     print('SGR - sending logger_configure signal')
 
-    # This sends a signal to the current Executor type, a module level variable
-    # which has already been imported at the end of LasySettings.configure.
-    # Executor is setup automatically, via
-    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
-    # when the signal is sent to Executor._configure_logger.
-    # We import Executor in LasySettings.configure instead of here to reduce
-    # the concerns of this module
+    # This sends a signal to the current Executor type, which has already been
+    # imported at the end of LasySettings.configure. We don't import Executor
+    # here to reduce the concerns of this module
     import terra.core.signals
     terra.core.signals.logger_configure.send(sender=self)
 
