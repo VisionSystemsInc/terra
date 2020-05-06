@@ -147,9 +147,11 @@ framework instead of a larger application.
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
 from json import JSONEncoder
+import platform
 
 from terra.core.exceptions import ImproperlyConfigured
 # Do not import terra.logger or terra.signals here, or any module that
@@ -249,8 +251,12 @@ def unittest(self):
 
   return os.environ.get('TERRA_UNITTEST', None) == "1"
 
+@settings_property
+def need_to_set_virtualenv_dir(self):
+  raise ImproperlyConfigured("You are using the virtualenv compute, and did "
+                             "not set settings.compute.virtualenv_dir in your "
+                             "config file.")
 
-# TODO: come up with a way for apps to extend this themselves
 global_templates = [
   (
     # Global Defaults
@@ -260,7 +266,15 @@ global_templates = [
         "level": "ERROR",
         "format": f"%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s - %(filename)s - %(message)s",
         "date_format": None,
-        "style": "%"
+        "style": "%",
+        "server": {
+          # This is tricky use of a setting, because the master controller will
+          # be the first to set it, but the runner and task will inherit the
+          # master controller's values, not their node names, should they be
+          # different (such as celery and spark)
+          "hostname": platform.node(),
+          "port": DEFAULT_TCP_LOGGING_PORT
+        }
       },
       "executor": {
         "type": "ThreadPoolExecutor",
@@ -271,6 +285,8 @@ global_templates = [
         'volume_map': []
       },
       'terra': {
+        # unlike other settings, this should NOT be overwritten by a
+        # config.json file, there is currently nothing to prevent that
         'zone': 'controller'
       },
       'status_file': status_file,
@@ -281,11 +297,11 @@ global_templates = [
   ),
   (
     {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
-    {"compute": {"virtualenv_dir": None}}  # Defaults
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}  # Defaults
   ),
   (  # So much for DRY :(
     {"compute": {"arch": "virtualenv"}},
-    {"compute": {"virtualenv_dir": None}}
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}
   )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we

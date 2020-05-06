@@ -267,9 +267,8 @@ class CeleryExecutor(BaseExecutor):
 
   @staticmethod
   def configure_logger(sender, **kwargs):
-    # FIXME don't hardcode hostname/port
-    sender._hostname = 'kanade' # settings.terra.celery.hostname
-    sender._port = logging.handlers.DEFAULT_TCP_LOGGING_PORT # settings.terra.celery.logging_port
+    sender._hostname = settings.logging.server.hostname
+    sender._port = settings.logging.server.port
 
     if settings.terra.zone == 'controller':
       print("SGR - setting up controller logging")
@@ -278,7 +277,7 @@ class CeleryExecutor(BaseExecutor):
 
       # setup the listener
       sender.tcp_logging_server = LogRecordSocketReceiver(sender._hostname, sender._port)
-      print('About to start TCP server...')
+      print('SGR - About to start TCP server...')
 
       lp = threading.Thread(target=sender.tcp_logging_server.serve_until_stopped)
       lp.setDaemon(True)
@@ -291,8 +290,6 @@ class CeleryExecutor(BaseExecutor):
 
       sender._socket_handler = logging.handlers.SocketHandler(sender._hostname,
           sender._port)
-
-      # TODO would probably be good to also setup another handler to log to disk
 
       # TODO don't bother with a formatter, since a socket handler sends the event
       # as an unformatted pickle
