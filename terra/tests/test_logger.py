@@ -11,11 +11,7 @@ from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
 from .utils import TestCase, make_traceback, TestLoggerConfigureCase
 from terra import logger
-<<<<<<< HEAD
-=======
-from terra.core import signals
 from terra.executor.utils import Executor
->>>>>>> Fixing tests
 
 
 class TestHandlerLoggingContext(TestCase):
@@ -274,9 +270,13 @@ class TestUnitTests(TestCase):
         "have configured logging manually, and should make sure you "
         "restore it.")
 
+  @mock.patch.object(settings, '_wrapped', None)
+  @mock.patch.dict(Executor.__dict__)
   def last_test_executor_logfile(self):
     from terra.executor.utils import Executor
 
+    self.assertNotIn('_connection', Executor.__dict__)
+
+    settings.configure({})
     self.assertIsNone(getattr(Executor, '_log_file', None))
-    # self.assertIsNone(getattr(Executor, '_logging_handler', None))
-    # self.assertFalse(True)
+    self.assertIsNone(getattr(Executor, '_logging_handler', None))
