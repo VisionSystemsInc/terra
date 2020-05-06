@@ -148,8 +148,7 @@ class TerraTask(Task):
     self.settings = None
     return return_value
 
-class LogErrorsTask(TerraTask):
   # from https://stackoverflow.com/a/45333231/1771778
   def on_failure(self, exc, task_id, args, kwargs, einfo):
     logger.exception('Celery task failure!!!1', exc_info=exc)
-    super(LogErrorsTask, self).on_failure(exc, task_id, args, kwargs, einfo)
+    super(TerraTask, self).on_failure(exc, task_id, args, kwargs, einfo)
