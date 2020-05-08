@@ -121,10 +121,6 @@ function terra_caseify()
       extra_args=$#
       ;;
 
-    run_redis) # Run redis
-      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
-      extra_args=$#
-      ;;
     run_celery) # Starts a celery worker
       local node_name
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
