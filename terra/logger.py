@@ -252,20 +252,6 @@ class _SetupTerraLogger():
     except ImportError:  # pragma: no cover
       pass
 
-  def reconfigure_logger(self, sender=None, **kwargs):
-    if not self._configured:
-      self.root_logger.error("It is unexpected for reconfigure_logger to be "
-                             "called, without first calling configure_logger. "
-                             "This is not critical, but should not happen.")
-
-    self.set_level_and_formatter()
-
-    # This sends a signal to the current Executor type, which has already been
-    # imported at the end of LasySettings.configure. We don't import Executor
-    # here to reduce the concerns of this module
-    import terra.core.signals
-    terra.core.signals.logger_reconfigure.send(sender=self)
-
   def set_level_and_formatter(self):
     from terra import settings
     formatter = logging.Formatter(fmt=settings.logging.format,
@@ -306,10 +292,9 @@ class _SetupTerraLogger():
     # here to reduce the concerns of this module
     import terra.core.signals
     terra.core.signals.logger_configure.send(sender=self)
-
     self.set_level_and_formatter()
 
-    # Swap some handlers
+    # Now that the real logger has been set up, swap some handlers
     self.root_logger.removeHandler(self.preconfig_stderr_handler)
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
@@ -328,7 +313,7 @@ class _SetupTerraLogger():
     # level messages. This is probably not necessary because error/critical
     # messages before configure should be rare, and are probably worth
     # repeating. Repeating is the only way to get them formatted right the
-    # second time anyways. This applys to stderr only, not the log file
+    # second time anyways. This applies to stderr only, not the log file
     #                        if (x.levelno >= level)] and
     #                           (x.levelno < default_stderr_handler_level)]
 
@@ -354,12 +339,29 @@ class _SetupTerraLogger():
     self.tmp_file = None
 
     print('SGR - logging configured for zone ' + settings.terra.zone)
-    #show_logs_and_handlers()
-    # REVIEW this is odd
+
+    # Now in configure_logger, you are able to access settings and determine
+    # whether there should be a stderr handler or not. If you don't so this,
+    # both the master controller and service runner will output the same log
+    # messages, duplicating output on stderr.
     if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
       self.root_logger.removeHandler(self.stderr_handler)
 
     self._configured = True
+
+  def reconfigure_logger(self, sender=None, **kwargs):
+    if not self._configured:
+      self.root_logger.error("It is unexpected for reconfigure_logger to be "
+                             "called, without first calling configure_logger. "
+                             "This is not critical, but should not happen.")
+
+    # This sends a signal to the current Executor type, which has already been
+    # imported at the end of LazySettings.configure. We don't import Executor
+    # here to reduce the concerns of this module
+    import terra.core.signals
+    terra.core.signals.logger_reconfigure.send(sender=self)
+
+    self.set_level_and_formatter()
 
 class TerraFilter(logging.Filter):
   def filter(self, record):

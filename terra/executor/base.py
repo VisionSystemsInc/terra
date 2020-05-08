@@ -27,13 +27,11 @@ class BaseExecutor(Executor):
     os.makedirs(settings.processing_dir, exist_ok=True)
     sender._log_file = open(sender._log_file, 'a')
 
-    sender._logging_handler = logging.StreamHandler(stream=sender._log_file)
-    handler = sender._logging_handler
+    sender.main_log_handler = logging.StreamHandler(stream=sender._log_file)
 
     # TODO: ProcessPool - Log server
 
-    sender.root_logger.addHandler(handler)
-    sender.main_log_handler = handler
+    sender.root_logger.addHandler(sender.main_log_handler)
 
   @staticmethod
   def reconfigure_logger(sender, **kwargs):

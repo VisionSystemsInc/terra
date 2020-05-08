@@ -18,26 +18,6 @@ class ExecutorHandler(ClassHandler):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    # This Executor type is setup automatically, via
-    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
-    # when the signal is sent.
-    terra.core.signals.logger_configure.connect(self._configure_logger)
-    terra.core.signals.logger_reconfigure.connect(self._reconfigure_logger)
-
-  # These methods are necessary because the Executor actually behaves as a
-  # specific BaseExecutor type, so calls to methods must pass through this type
-  def _configure_logger(self, sender, **kwargs):
-    print('SGR - connect configure_logger signals')
-
-    # Register the Executor-specific configure_logger with the logger
-    self.configure_logger(sender, **kwargs)
-
-  def _reconfigure_logger(self, sender, **kwargs):
-    print('SGR - connect reconfigure_logger signals')
-
-    # Register the Executor-specific configure_logger with the logger
-    self.reconfigure_logger(sender, **kwargs)
-
   def _connect_backend(self):
     '''
     Loads the executor backend's base module, given either a fully qualified
@@ -87,3 +67,12 @@ Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.
 '''
+# This Executor type is setup automatically, via
+#   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+# when the signal is sent. So use a lambda to delay getattr
+terra.core.signals.logger_configure.connect(
+    lambda *args, **kwargs: Executor.configure_logger(*args, **kwargs),
+    weak=False)
+terra.core.signals.logger_reconfigure.connect(
+    lambda *args, **kwargs: Executor.reconfigure_logger(*args, **kwargs),
+    weak=False)

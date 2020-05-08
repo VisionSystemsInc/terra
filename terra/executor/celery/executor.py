@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import os
+import atexit
 from os import environ as env
 from terra.executor.base import BaseFuture, BaseExecutor
 from concurrent.futures import as_completed
@@ -252,20 +253,6 @@ class CeleryExecutor(BaseExecutor):
     return volume_map
 
   @staticmethod
-  def reconfigure_logger(sender, **kwargs):
-    # FIXME no idea how to reset this
-    # setup the logging when a task is reconfigured; e.g., changing logging
-    # level or hostname
-
-    if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
-      print("SGR - reconfigure runner/task logging")
-
-      # when the celery task is done, its logger is automatically reconfigured;
-      # use that opportunity to close the stream
-      if hasattr(sender, '_socket_handler'):
-        sender._socket_handler.close()
-
-  @staticmethod
   def configure_logger(sender, **kwargs):
     sender._hostname = settings.logging.server.hostname
     sender._port = settings.logging.server.port
@@ -283,10 +270,18 @@ class CeleryExecutor(BaseExecutor):
       lp.setDaemon(True)
       # FIXME can't actually handle a log message until logging is done configuring
       lp.start()
-      # TODO do we need to join
-      #lp.join()
+
+      @atexit.register
+      def cleanup_thread():
+        print("SGR - Sending cease and desist to LogRecordSocketReceiver")
+        sender.tcp_logging_server.abort = 1
+        lp.join(timeout=5)
+        if lp.is_alive():
+          print("SGR - LogRecordSocketReceiver thread did not die")
+        print("SGR - LogRecordSocketReceiver died!")
+
     elif settings.terra.zone == 'runner' or settings.terra.zone == 'task':
-      print("SGR - setting up runner/task logging")
+      print(f"SGR - setting up {settings.terra.zone} logging")
 
       sender._socket_handler = logging.handlers.SocketHandler(sender._hostname,
           sender._port)
@@ -301,6 +296,20 @@ class CeleryExecutor(BaseExecutor):
       super(CeleryExecutor, CeleryExecutor).configure_logger(sender, **kwargs)
     else:
       assert False, 'unknown zone: ' + settings.terra.zone
+
+  @staticmethod
+  def reconfigure_logger(sender, **kwargs):
+    # FIXME no idea how to reset this
+    # setup the logging when a task is reconfigured; e.g., changing logging
+    # level or hostname
+
+    if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
+      print("SGR - reconfigure runner/task logging")
+
+      # when the celery task is done, its logger is automatically reconfigured;
+      # use that opportunity to close the stream
+      if hasattr(sender, '_socket_handler'):
+        sender._socket_handler.close()
 
 # from https://docs.python.org/3/howto/logging-cookbook.html
 class LogRecordStreamHandler(socketserver.StreamRequestHandler):
