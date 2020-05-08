@@ -565,7 +565,7 @@ class LazySettings(LazyObject):
 
     # Incase the logger was messed with in the context, reset it.
     from terra.core.signals import post_settings_context
-    post_settings_context.send(sender=self)
+    post_settings_context.send(sender=self, post_settings_context=True)
 
     return return_value
 

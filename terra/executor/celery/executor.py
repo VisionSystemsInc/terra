@@ -294,9 +294,7 @@ class CeleryExecutor(BaseExecutor):
       # TODO don't bother with a formatter, since a socket handler sends the event
       # as an unformatted pickle
 
-      # FIXME this is hacky. it requires the executor know it is responsible for
-      # creating this variable on the logger
-      terra.logger._logs.main_log_handler = sender._socket_handler
+      sender.main_log_handler = sender._socket_handler
     elif settings.terra.zone == 'task_controller':
       print("SGR - setting up task_controller logging")
 

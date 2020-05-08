@@ -186,6 +186,18 @@ class _SetupTerraLogger():
         category=DeprecationWarning, module='osgeo',
         message="the imp module is deprecated")
 
+  @property
+  def main_log_handler(self):
+    try:
+      return self.__main_log_handler
+    except AttributeError:
+      raise AttributeError("'_logs' has no 'main_log_handler'. An executor "
+                           "class' 'configure_logger' method should setup a "
+                           "'main_log_handler'.")
+  @main_log_handler.setter
+  def main_log_handler(self, value):
+    self.__main_log_handler = value
+
   def setup_logging_exception_hook(self):
     '''
     Setup logging of uncaught exceptions
@@ -292,14 +304,12 @@ class _SetupTerraLogger():
     # This sends a signal to the current Executor type, which has already been
     # imported at the end of LasySettings.configure. We don't import Executor
     # here to reduce the concerns of this module
-    # REVIEW can this be imported at the top?
     import terra.core.signals
     terra.core.signals.logger_configure.send(sender=self)
 
     self.set_level_and_formatter()
 
     # Swap some handlers
-    self.root_logger.addHandler(self.main_log_handler)
     self.root_logger.removeHandler(self.preconfig_stderr_handler)
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)

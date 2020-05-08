@@ -128,10 +128,10 @@ class TerraTask(Task):
         kwargs = self.translate_paths(kwargs,
             reverse_compute_volume_map, executor_volume_map)
         # Set up logger to talk to master controller
-        terra.logger._logs.reconfigure_logger()
+        terra.logger._logs.reconfigure_logger(pre_run_task=True)
         return_value = self.run(*args_only, **kwargs)
-        # REVIEW the problem is the zone changes when this gets called on scope __exit__
-        terra.logger._logs.reconfigure_logger()
+        # # REVIEW the problem is the zone changes when this gets called on scope __exit__
+        # terra.logger._logs.reconfigure_logger()
 
         # Calculate the runner mapped version of the executor's return value
         return_value = self.translate_paths(return_value,

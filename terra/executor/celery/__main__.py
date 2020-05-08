@@ -14,10 +14,9 @@ def main():
     settings.configure(
       {
         'executor': {'type': 'CeleryExecutor'},
-        # FIXME
-        # 'terra': {'zone': 'task'},
         'terra': {'zone': 'task_controller'},
-        'logging': {'level': 'NOTSET'}
+        'logging': {'level': 'INFO'}
+        # 'logging': {'level': 'NOTSET'}
       }
     )
   print('SGR - celery.__main__.py')
