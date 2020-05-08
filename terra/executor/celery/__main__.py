@@ -15,8 +15,8 @@ def main():
       {
         'executor': {'type': 'CeleryExecutor'},
         # FIXME
-        'terra': {'zone': 'task'},
-        #'terra': {'zone': 'task_controller'},
+        # 'terra': {'zone': 'task'},
+        'terra': {'zone': 'task_controller'},
         'logging': {'level': 'NOTSET'}
       }
     )
