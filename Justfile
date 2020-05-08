@@ -145,7 +145,7 @@ function terra_caseify()
       ;;
 
     run_flower) # Start the flower server
-      Terra_Pipenv run celery -A terra.executor.celery.app flower
+      Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app flower
       ;;
     shutdown_celery) # Shuts down all celery works on all nodes
       Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"

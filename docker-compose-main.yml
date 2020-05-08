@@ -47,14 +47,14 @@ services:
       - source: redis_secret
         target: ${TERRA_REDIS_SECRET_DOCKER}
       - source: redis_commander_secret
-        target: ${TERRA_REDIS_COMMANDER_SECRET_FILE}
+        target: ${TERRA_REDIS_COMMANDER_SECRET}
     command: |
       sh -c '
         echo -n '"'"'{
           "connections":[
             {
               "password": "'"'"' > /redis-commander/config/local-production.json
-        cat /run/secrets/redis_password | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+        cat /run/secrets/${TERRA_REDIS_SECRET_DOCKER} | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
         echo -n '"'"'",
               "host": "${TERRA_REDIS_HOSTNAME_DOCKER}",
               "label": "terra",
@@ -69,7 +69,7 @@ services:
             "httpAuth": {
               "username": "admin",
               "passwordHash": "'"'"'>> /redis-commander/config/local-production.json
-          cat "/run/secrets/${TERRA_REDIS_COMMANDER_SECRET_FILE}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+          cat "/run/secrets/${TERRA_REDIS_COMMANDER_SECRET}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
           echo '"'"'"
             }
           }
