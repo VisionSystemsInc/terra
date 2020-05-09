@@ -350,7 +350,7 @@ class _SetupTerraLogger():
     self.main_log_handler.setFormatter(formatter)
     self.stderr_handler.setFormatter(formatter)
 
-  def configure_logger(self, sender, **kwargs):
+  def configure_logger(self, sender=None, signal=None, **kwargs):
     '''
     Call back function to configure the logger after settings have been
     configured
@@ -370,7 +370,7 @@ class _SetupTerraLogger():
     # imported at the end of LasySettings.configure. We don't import Executor
     # here to reduce the concerns of this module
     import terra.core.signals
-    terra.core.signals.logger_configure.send(sender=self)
+    terra.core.signals.logger_configure.send(sender=self, **kwargs)
     self.set_level_and_formatter()
 
     # Now that the real logger has been set up, swap some handlers
@@ -421,7 +421,7 @@ class _SetupTerraLogger():
 
     self._configured = True
 
-  def reconfigure_logger(self, sender=None, **kwargs):
+  def reconfigure_logger(self, sender=None, signal=None, **kwargs):
     if not self._configured:
       self.root_logger.error("It is unexpected for reconfigure_logger to be "
                              "called, without first calling configure_logger. "
@@ -431,7 +431,7 @@ class _SetupTerraLogger():
     # imported at the end of LazySettings.configure. We don't import Executor
     # here to reduce the concerns of this module
     import terra.core.signals
-    terra.core.signals.logger_reconfigure.send(sender=self)
+    terra.core.signals.logger_reconfigure.send(sender=self, **kwargs)
 
     self.set_level_and_formatter()
 

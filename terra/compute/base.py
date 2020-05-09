@@ -235,6 +235,7 @@ class BaseCompute:
 
       sender.main_log_handler = SocketHandler(
           settings.logging.server.hostname, settings.logging.server.port)
+      sender.root_logger.addHandler(sender.main_log_handler)
 
       # Now in configure_logger, you are able to access settings and determine
       # whether there should be a stderr handler or not. If you don't so this,
@@ -275,5 +276,6 @@ class BaseCompute:
 
         sender.main_log_handler = SocketHandler(
             settings.logging.server.hostname, settings.logging.server.port)
+        sender.root_logger.addHandler(sender.main_log_handler)
 
 services = {}

@@ -264,7 +264,7 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": f"%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s - %(filename)s - %(message)s",
+        "format": "%(asctime)s (%(hostname)s:%(zone)s): \x1b[31m%(levelname)s/%(processName)s\x1b[0m - %(filename)s - %(message)s",
         "date_format": None,
         "style": "%",
         "server": {

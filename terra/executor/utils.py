@@ -43,13 +43,17 @@ class ExecutorHandler(ClassHandler):
     elif backend_name == "SyncExecutor":
       from terra.executor.sync import SyncExecutor
       return SyncExecutor
-    elif backend_name == "ThreadPoolExecutor":
-      return concurrent.futures.ThreadPoolExecutor
-    elif backend_name == "ProcessPoolExecutor":
-      return concurrent.futures.ProcessPoolExecutor
+    elif backend_name == "ThreadPoolExecutor" or \
+         backend_name == "concurrent.futures.ThreadPoolExecutor":
+      from terra.executor.thread import ThreadPoolExecutor
+      return terra.executor.thread.ThreadPoolExecutor
+    elif backend_name == "ProcessPoolExecutor" or \
+         backend_name == "concurrent.futures.ProcessPoolExecutor":
+      from terra.executor.process import ProcessPoolExecutor
+      return terra.executor.process.ProcessPoolExecutor
     elif backend_name == "CeleryExecutor":
-      import terra.executor.celery
-      return terra.executor.celery.CeleryExecutor
+      from terra.executor.celery import CeleryExecutor
+      return CeleryExecutor
     else:
       module_name = backend_name.rsplit('.', 1)
       module = import_module(f'{module_name[0]}')

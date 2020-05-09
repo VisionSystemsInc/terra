@@ -100,6 +100,8 @@ class TerraTask(Task):
         settings._wrapped.clear()
         settings._wrapped.update(self.translate_paths(self.request.settings,
             reverse_compute_volume_map, executor_volume_map))
+        # This is needed here, because I just loaded settings from a runner!
+        settings.terra.zone = 'task'
 
         # Just in case processing dir doesn't exists
         if not os.path.exists(settings.processing_dir):
@@ -111,10 +113,6 @@ class TerraTask(Task):
                          f'"{settings.processing_dir}" for the processing dir')
 
         logger.error('SGR - TerraTask ZONE ' + str(settings.terra.zone))
-
-        # No longer needed here, all celery worker pool children are set to
-        # 'task' zone permanently, by worker_process_init
-        # settings.terra.zone = 'task' # was runner
 
         # Calculate the exector's mapped version of the arguments
         kwargs = args_to_kwargs(self.run, args, kwargs)

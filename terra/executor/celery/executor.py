@@ -271,14 +271,15 @@ class CeleryExecutor(BaseExecutor):
                          post_settings_context=False, **kwargs):
     # if settings.terra.zone == 'runner' or
     if settings.terra.zone == 'task':
-      print("SGR - reconfigure runner/task logging")
+      print("SGR - reconfigure task logging", kwargs)
 
       if pre_run_task:
         print(f"SGR - Actually setting up CeleryExecutor:task logging")
+        print(f"SGR - {settings.logging.server.hostname}:{settings.logging.server.port}")
         sender.main_log_handler = SocketHandler(
             settings.logging.server.hostname,
             settings.logging.server.port)
-
+        sender.root_logger.addHandler(sender.main_log_handler)
       if post_settings_context:
         print(f"SGR - Actually destroying CeleryExecutor:task logging")
         # when the celery task is done, its logger is automatically
@@ -291,6 +292,8 @@ class CeleryExecutor(BaseExecutor):
             print(f"This shouldn't be happening...")
             pass
           sender.main_log_handler = NullHandler()
+          sender.root_logger.addHandler(sender.main_log_handler)
+      print("SGR - reconfigured task logging")
     elif settings.terra.zone == 'task_controller':
       # TODO: Not dry with BaseComputer reconfigure(controller)
       log_file = os.path.join(settings.processing_dir,
