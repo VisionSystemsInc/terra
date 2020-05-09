@@ -17,7 +17,6 @@ services:
       - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
       - PYTHONPATH=${TERRA_PYTHONPATH-}
       - TZ
-      - TERRA_IS_CELERY_WORKER=${TERRA_IS_CELERY_WORKER-0}
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
