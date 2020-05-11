@@ -5,6 +5,7 @@ import atexit
 from logging import StreamHandler
 from logging.handlers import SocketHandler
 import threading
+import warnigns
 
 from terra import settings
 import terra.compute.utils
@@ -220,6 +221,10 @@ class BaseCompute:
         if sender.tcp_logging_server.ready:
           break
         time.sleep(0.001)
+      else: # pragma: no cover
+        warnigns.warn("TCP Logging server thread did not startup. "
+                      "This is probably not a problem, unless logging isn't "
+                      "working.", RuntimeWarning)
 
       # Auto cleanup
       @atexit.register
@@ -227,9 +232,10 @@ class BaseCompute:
         print("SGR - Sending cease and desist to LogRecordSocketReceiver")
         sender.tcp_logging_server.abort = 1
         listener_thread.join(timeout=5)
-        if listener_thread.is_alive():
-          print("SGR - LogRecordSocketReceiver thread did not die")
-        print("SGR - LogRecordSocketReceiver died!")
+        if listener_thread.is_alive(): # pragma: no cover
+          warnings.warn("TCP Logger Server Thread did not shut down "
+                        "gracefully. Attempting to exit anyways.",
+                        RuntimeWarning)
     elif settings.terra.zone == 'runner':
       print(f"SGR - setting up BaseCompute:runner logging")
 
@@ -240,7 +246,7 @@ class BaseCompute:
       # Now in configure_logger, you are able to access settings and determine
       # whether there should be a stderr handler or not. If you don't so this,
       # both the master controller and service runner will output the same log
-      # messages, duplicating output on stderr.
+      # messages, duplicating/interleaving output on stderr.
       sender.root_logger.removeHandler(sender.stderr_handler)
       # Some executors may need to do this too.
 
@@ -270,8 +276,7 @@ class BaseCompute:
         sender.main_log_handler.close()
         try:
           sender.root_logger.removeHandler(sender.main_log_handler)
-        except ValueError:
-          print(f"This shouldn't be happening...")
+        except ValueError: # pragma: no cover
           pass
 
         sender.main_log_handler = SocketHandler(

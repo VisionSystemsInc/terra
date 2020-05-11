@@ -18,9 +18,8 @@ logger = getLogger(__name__)
 __all__ = ['TerraTask', 'shared_task']
 
 
-# Take the shared task decorate, and add some defaults, so you don't need to
-# specify this EVERY task, and gives you a way to add to all tasks
-# automagically
+# Take the shared task decorator, and add some Terra defaults, so you don't
+# need to specify them EVERY task
 def shared_task(*args, **kwargs):
   kwargs['bind'] = kwargs.pop('bind', True)
   kwargs['base'] = kwargs.pop('base', TerraTask)
@@ -100,7 +99,7 @@ class TerraTask(Task):
         settings._wrapped.clear()
         settings._wrapped.update(self.translate_paths(self.request.settings,
             reverse_compute_volume_map, executor_volume_map))
-        # This is needed here, because I just loaded settings from a runner!
+        # This is needed here because I just loaded settings from a runner!
         settings.terra.zone = 'task'
 
         # Just in case processing dir doesn't exists

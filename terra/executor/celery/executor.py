@@ -252,12 +252,13 @@ class CeleryExecutor(BaseExecutor):
 
   @staticmethod
   def configure_logger(sender, **kwargs):
-    if settings.terra.zone == 'task':
+    if settings.terra.zone == 'task': # pragma: no cover
+      # This will never really be reached, because the task_controller will
+      # configure the logger, and than fork.
       print(f"SGR - Not setting up CeleryExecutor:task logging")
       sender.main_log_handler = NullHandler()
     elif settings.terra.zone == 'task_controller':
       print("SGR - setting up CeleryExecutor:task_controller logging")
-      # TODO: Not dry with BaseComputer configure(controller)
       # Setup log file for use in configure
       sender._log_file = os.path.join(settings.processing_dir,
                                       terra.logger._logs.default_log_prefix)
@@ -269,11 +270,16 @@ class CeleryExecutor(BaseExecutor):
   @staticmethod
   def reconfigure_logger(sender, pre_run_task=False,
                          post_settings_context=False, **kwargs):
-    # if settings.terra.zone == 'runner' or
     if settings.terra.zone == 'task':
       print("SGR - reconfigure task logging", kwargs)
 
       if pre_run_task:
+        if sender.main_log_handler:
+          sender.main_log_handler.close()
+          try:
+            sender.root_logger.removeHandler(sender.main_log_handler)
+          except ValueError:
+            pass
         print(f"SGR - Actually setting up CeleryExecutor:task logging")
         print(f"SGR - {settings.logging.server.hostname}:{settings.logging.server.port}")
         sender.main_log_handler = SocketHandler(
@@ -289,13 +295,11 @@ class CeleryExecutor(BaseExecutor):
           try:
             sender.root_logger.removeHandler(sender.main_log_handler)
           except ValueError:
-            print(f"This shouldn't be happening...")
             pass
           sender.main_log_handler = NullHandler()
           sender.root_logger.addHandler(sender.main_log_handler)
       print("SGR - reconfigured task logging")
     elif settings.terra.zone == 'task_controller':
-      # TODO: Not dry with BaseComputer reconfigure(controller)
       log_file = os.path.join(settings.processing_dir,
                               terra.logger._logs.default_log_prefix)
 
