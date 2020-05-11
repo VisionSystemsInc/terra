@@ -40,7 +40,7 @@ logger = getLogger(__name__)
 # stop celery from hijacking the logger
 @setup_logging.connect
 def setup_loggers(*args, **kwargs):
-  print("SGR - celery logger")
+  pass
 
 class CeleryExecutorFuture(BaseFuture):
   def __init__(self, asyncresult):
@@ -255,10 +255,8 @@ class CeleryExecutor(BaseExecutor):
     if settings.terra.zone == 'task': # pragma: no cover
       # This will never really be reached, because the task_controller will
       # configure the logger, and than fork.
-      print(f"SGR - Not setting up CeleryExecutor:task logging")
       sender.main_log_handler = NullHandler()
     elif settings.terra.zone == 'task_controller':
-      print("SGR - setting up CeleryExecutor:task_controller logging")
       # Setup log file for use in configure
       sender._log_file = os.path.join(settings.processing_dir,
                                       terra.logger._logs.default_log_prefix)
@@ -271,8 +269,6 @@ class CeleryExecutor(BaseExecutor):
   def reconfigure_logger(sender, pre_run_task=False,
                          post_settings_context=False, **kwargs):
     if settings.terra.zone == 'task':
-      print("SGR - reconfigure task logging", kwargs)
-
       if pre_run_task:
         if sender.main_log_handler:
           sender.main_log_handler.close()
@@ -280,14 +276,11 @@ class CeleryExecutor(BaseExecutor):
             sender.root_logger.removeHandler(sender.main_log_handler)
           except ValueError:
             pass
-        print(f"SGR - Actually setting up CeleryExecutor:task logging")
-        print(f"SGR - {settings.logging.server.hostname}:{settings.logging.server.port}")
         sender.main_log_handler = SocketHandler(
             settings.logging.server.hostname,
             settings.logging.server.port)
         sender.root_logger.addHandler(sender.main_log_handler)
       if post_settings_context:
-        print(f"SGR - Actually destroying CeleryExecutor:task logging")
         # when the celery task is done, its logger is automatically
         # reconfigured; use that opportunity to close the stream
         if sender.main_log_handler:
@@ -298,7 +291,6 @@ class CeleryExecutor(BaseExecutor):
             pass
           sender.main_log_handler = NullHandler()
           sender.root_logger.addHandler(sender.main_log_handler)
-      print("SGR - reconfigured task logging")
     elif settings.terra.zone == 'task_controller':
       log_file = os.path.join(settings.processing_dir,
                               terra.logger._logs.default_log_prefix)

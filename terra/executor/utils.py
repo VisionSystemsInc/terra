@@ -30,8 +30,6 @@ class ExecutorHandler(ClassHandler):
         If not ``None``, override the name of the backend to load.
     '''
 
-    print('SGR - _connect_backend')
-
     backend_name = self._override_type
 
     if backend_name is None:

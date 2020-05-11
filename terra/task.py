@@ -111,8 +111,6 @@ class TerraTask(Task):
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
 
-        logger.error('SGR - TerraTask ZONE ' + str(settings.terra.zone))
-
         # Calculate the exector's mapped version of the arguments
         kwargs = args_to_kwargs(self.run, args, kwargs)
         args_only = kwargs.pop(ARGS, ())

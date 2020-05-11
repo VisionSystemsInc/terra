@@ -188,13 +188,11 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
   def serve_until_stopped(self):
     abort = False
     ready = True
-    print('SGR - STARTING LISTENER')
     while not abort:
       rd, wr, ex = select.select([self.socket.fileno()],
                                   [], [],
                                   self.timeout)
       if rd:
-        print('SGR - RD')
         self.handle_request()
       abort = self.abort
     ready = False
@@ -342,7 +340,6 @@ class _SetupTerraLogger():
     if isinstance(level, str):
       # make level case insensitive
       level = level.upper()
-    print('SGR - log level ' + level)
     self.stderr_handler.setLevel(level)
     self.main_log_handler.setLevel(level)
 
@@ -363,8 +360,6 @@ class _SetupTerraLogger():
       self.root_logger.error("Configure logger called twice, this is "
                              "unexpected")
       raise ImproperlyConfigured()
-
-    print('SGR - sending logger_configure signal')
 
     # This sends a signal to the current Executor type, which has already been
     # imported at the end of LasySettings.configure. We don't import Executor
@@ -416,8 +411,6 @@ class _SetupTerraLogger():
     if os.path.exists(self.tmp_file.name):
       os.unlink(self.tmp_file.name)
     self.tmp_file = None
-
-    print('SGR - logging configured for zone ' + settings.terra.zone)
 
     self._configured = True
 

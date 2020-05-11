@@ -5,7 +5,7 @@ import atexit
 from logging import StreamHandler
 from logging.handlers import SocketHandler
 import threading
-import warnigns
+import warnings
 
 from terra import settings
 import terra.compute.utils
@@ -195,8 +195,6 @@ class BaseCompute:
   @staticmethod
   def configure_logger(sender, **kwargs):
     if settings.terra.zone == 'controller':
-      print("SGR - setting up controller logging")
-
       # Setup log file for use in configure
       sender._log_file = os.path.join(settings.processing_dir,
                                       terra.logger._logs.default_log_prefix)
@@ -209,8 +207,6 @@ class BaseCompute:
       # setup the TCP socket listener
       sender.tcp_logging_server = LogRecordSocketReceiver(
           settings.logging.server.hostname, settings.logging.server.port)
-      print('SGR - About to start TCP server...')
-
       listener_thread = threading.Thread(
           target=sender.tcp_logging_server.serve_until_stopped)
       listener_thread.setDaemon(True)
@@ -229,7 +225,6 @@ class BaseCompute:
       # Auto cleanup
       @atexit.register
       def cleanup_thread():
-        print("SGR - Sending cease and desist to LogRecordSocketReceiver")
         sender.tcp_logging_server.abort = 1
         listener_thread.join(timeout=5)
         if listener_thread.is_alive(): # pragma: no cover
@@ -237,8 +232,6 @@ class BaseCompute:
                         "gracefully. Attempting to exit anyways.",
                         RuntimeWarning)
     elif settings.terra.zone == 'runner':
-      print(f"SGR - setting up BaseCompute:runner logging")
-
       sender.main_log_handler = SocketHandler(
           settings.logging.server.hostname, settings.logging.server.port)
       sender.root_logger.addHandler(sender.main_log_handler)
@@ -258,7 +251,6 @@ class BaseCompute:
     # output stream
 
     if settings.terra.zone == 'controller':
-      print("SGR - BaseComputer:controller reconfigure logging")
       log_file = os.path.join(settings.processing_dir,
                               terra.logger._logs.default_log_prefix)
 
@@ -268,7 +260,6 @@ class BaseCompute:
         sender._log_file.close()
         sender._log_file = open(log_file, 'a')
     elif settings.terra.zone == 'runner':
-      print("SGR - BaseComputer:runner reconfigure logging")
       # Only if it's changed
       if settings.logging.server.hostname != sender.main_log_handler.host or \
          settings.logging.server.port != sender.main_log_handler.port:
