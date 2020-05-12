@@ -22,6 +22,20 @@ app = Celery(main_name)
 
 app.config_from_object(env['TERRA_CELERY_CONF'])
 
+from celery.signals import worker_process_init, worker_init
+@worker_process_init.connect
+def start_worker_child(*args, **kwargs):
+  from terra import settings
+  settings.terra.zone = 'task'
+#   print(args)
+#   print(kwargs)
+#   logger.info('hi')
+
+# @worker_init.connect
+# def start_worker(*args, **kwargs):
+#   logger.info('Hi')
+
+
 # app.running = False
 # from celery.signals import worker_process_init
 # @worker_process_init.connect

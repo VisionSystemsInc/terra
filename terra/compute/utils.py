@@ -40,6 +40,7 @@ from vsi.tools.diff import dict_diff
 from vsi.tools.python import nested_patch
 
 from terra.core.utils import Handler
+import terra.core.signals
 from terra import settings
 import terra.compute.base
 from terra.core.settings import filename_suffixes
@@ -92,7 +93,8 @@ compute = ComputeHandler()
 For the most part, workflows will be interacting with :data:`compute` to
 ``run`` services. Easier access via ``terra.compute.compute``
 '''
-
+terra.core.signals.logger_configure.connect(compute.configure_logger)
+terra.core.signals.logger_reconfigure.connect(compute.reconfigure_logger)
 
 def get_default_service_class(cls):
   '''

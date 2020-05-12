@@ -264,7 +264,7 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": f"%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s - %(filename)s - %(message)s",
+        "format": "%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s",
         "date_format": None,
         "style": "%",
         "server": {
@@ -565,7 +565,7 @@ class LazySettings(LazyObject):
 
     # Incase the logger was messed with in the context, reset it.
     from terra.core.signals import post_settings_context
-    post_settings_context.send(sender=self)
+    post_settings_context.send(sender=self, post_settings_context=True)
 
     return return_value
 

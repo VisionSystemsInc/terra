@@ -121,10 +121,6 @@ function terra_caseify()
       extra_args=$#
       ;;
 
-    run_redis) # Run redis
-      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
-      extra_args=$#
-      ;;
     run_celery) # Starts a celery worker
       local node_name
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
@@ -141,11 +137,11 @@ function terra_caseify()
       fi
 
       # We might be able to use CELERY_LOADER to avoid the -A argument
-      TERRA_IS_CELERY_WORKER=1 Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" -n "${node_name}"
+      Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" -n "${node_name}"
       ;;
 
     run_flower) # Start the flower server
-      Terra_Pipenv run celery -A terra.executor.celery.app flower
+      Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app flower
       ;;
     shutdown_celery) # Shuts down all celery works on all nodes
       Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"

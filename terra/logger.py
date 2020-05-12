@@ -67,6 +67,10 @@ import traceback
 import io
 import warnings
 from datetime import datetime, timezone
+import socketserver
+import struct
+import select
+import pickle
 
 from terra.core.exceptions import ImproperlyConfigured
 # Do not import terra.settings or terra.signals here, or any module that
@@ -119,6 +123,79 @@ class HandlerLoggingContext(object):
     finally:
       _releaseLock()
     # implicit return of None => don't swallow exceptions
+
+
+# from https://docs.python.org/3/howto/logging-cookbook.html
+class LogRecordStreamHandler(socketserver.StreamRequestHandler):
+  """Handler for a streaming logging request.
+
+  This basically logs the record using whatever logging policy is
+  configured locally.
+  """
+
+  def handle(self):
+    """
+    Handle multiple requests - each expected to be a 4-byte length,
+    followed by the LogRecord in pickle format. Logs the record
+    according to whatever policy is configured locally.
+    """
+    while True:
+      chunk = self.connection.recv(4)
+      if len(chunk) < 4:
+        break
+      slen = struct.unpack('>L', chunk)[0]
+      chunk = self.connection.recv(slen)
+      while len(chunk) < slen:
+        chunk = chunk + self.connection.recv(slen - len(chunk))
+      obj = self.unPickle(chunk)
+      record = logging.makeLogRecord(obj)
+      self.handleLogRecord(record)
+
+  def unPickle(self, data):
+    return pickle.loads(data)
+
+  def handleLogRecord(self, record):
+    # if a name is specified, we use the named logger rather than the one
+    # implied by the record.
+    if self.server.logname is not None:
+      name = self.server.logname
+    else:
+      name = record.name
+    logger = getLogger(name)
+    # N.B. EVERY record gets logged. This is because Logger.handle
+    # is normally called AFTER logger-level filtering. If you want
+    # to do filtering, do it at the client end to save wasting
+    # cycles and network bandwidth!
+    logger.handle(record)
+
+
+class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
+  """
+  Simple TCP socket-based logging receiver suitable for testing.
+  """
+
+  allow_reuse_address = True
+
+  def __init__(self, host='localhost',
+               port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+               handler=LogRecordStreamHandler):
+    socketserver.ThreadingTCPServer.__init__(self, (host, port), handler)
+    self.abort = False
+    self.ready = False
+    self.timeout = 1
+    self.logname = None
+
+  def serve_until_stopped(self):
+    abort = False
+    ready = True
+    while not abort:
+      rd, wr, ex = select.select([self.socket.fileno()],
+                                  [], [],
+                                  self.timeout)
+      if rd:
+        self.handle_request()
+      abort = self.abort
+    ready = False
 
 
 class _SetupTerraLogger():
@@ -186,6 +263,18 @@ class _SetupTerraLogger():
         category=DeprecationWarning, module='osgeo',
         message="the imp module is deprecated")
 
+  @property
+  def main_log_handler(self):
+    try:
+      return self.__main_log_handler
+    except AttributeError:
+      raise AttributeError("'_logs' has no 'main_log_handler'. An executor "
+                           "class' 'configure_logger' method should setup a "
+                           "'main_log_handler'.")
+  @main_log_handler.setter
+  def main_log_handler(self, value):
+    self.__main_log_handler = value
+
   def setup_logging_exception_hook(self):
     '''
     Setup logging of uncaught exceptions
@@ -240,20 +329,6 @@ class _SetupTerraLogger():
     except ImportError:  # pragma: no cover
       pass
 
-  def reconfigure_logger(self, sender=None, **kwargs):
-    if not self._configured:
-      self.root_logger.error("It is unexpected for reconfigure_logger to be "
-                             "called, without first calling configure_logger. "
-                             "This is not critical, but should not happen.")
-
-    self.set_level_and_formatter()
-
-    # This sends a signal to the current Executor type, which has already been
-    # imported at the end of LasySettings.configure. We don't import Executor
-    # here to reduce the concerns of this module
-    import terra.core.signals
-    terra.core.signals.logger_reconfigure.send(sender=self)
-
   def set_level_and_formatter(self):
     from terra import settings
     formatter = logging.Formatter(fmt=settings.logging.format,
@@ -265,7 +340,6 @@ class _SetupTerraLogger():
     if isinstance(level, str):
       # make level case insensitive
       level = level.upper()
-    print('SGR - log level ' + level)
     self.stderr_handler.setLevel(level)
     self.main_log_handler.setLevel(level)
 
@@ -273,7 +347,7 @@ class _SetupTerraLogger():
     self.main_log_handler.setFormatter(formatter)
     self.stderr_handler.setFormatter(formatter)
 
-  def configure_logger(self, sender, **kwargs):
+  def configure_logger(self, sender=None, signal=None, **kwargs):
     '''
     Call back function to configure the logger after settings have been
     configured
@@ -287,19 +361,14 @@ class _SetupTerraLogger():
                              "unexpected")
       raise ImproperlyConfigured()
 
-    print('SGR - sending logger_configure signal')
-
     # This sends a signal to the current Executor type, which has already been
     # imported at the end of LasySettings.configure. We don't import Executor
     # here to reduce the concerns of this module
-    # REVIEW can this be imported at the top?
     import terra.core.signals
-    terra.core.signals.logger_configure.send(sender=self)
-
+    terra.core.signals.logger_configure.send(sender=self, **kwargs)
     self.set_level_and_formatter()
 
-    # Swap some handlers
-    self.root_logger.addHandler(self.main_log_handler)
+    # Now that the real logger has been set up, swap some handlers
     self.root_logger.removeHandler(self.preconfig_stderr_handler)
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
@@ -318,7 +387,7 @@ class _SetupTerraLogger():
     # level messages. This is probably not necessary because error/critical
     # messages before configure should be rare, and are probably worth
     # repeating. Repeating is the only way to get them formatted right the
-    # second time anyways. This applys to stderr only, not the log file
+    # second time anyways. This applies to stderr only, not the log file
     #                        if (x.levelno >= level)] and
     #                           (x.levelno < default_stderr_handler_level)]
 
@@ -343,13 +412,21 @@ class _SetupTerraLogger():
       os.unlink(self.tmp_file.name)
     self.tmp_file = None
 
-    print('SGR - logging configured for zone ' + settings.terra.zone)
-    #show_logs_and_handlers()
-    # REVIEW this is odd
-    if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
-      self.root_logger.removeHandler(self.stderr_handler)
-
     self._configured = True
+
+  def reconfigure_logger(self, sender=None, signal=None, **kwargs):
+    if not self._configured:
+      self.root_logger.error("It is unexpected for reconfigure_logger to be "
+                             "called, without first calling configure_logger. "
+                             "This is not critical, but should not happen.")
+
+    # This sends a signal to the current Executor type, which has already been
+    # imported at the end of LazySettings.configure. We don't import Executor
+    # here to reduce the concerns of this module
+    import terra.core.signals
+    terra.core.signals.logger_reconfigure.send(sender=self, **kwargs)
+
+    self.set_level_and_formatter()
 
 class TerraFilter(logging.Filter):
   def filter(self, record):

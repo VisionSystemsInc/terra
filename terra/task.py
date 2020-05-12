@@ -18,6 +18,8 @@ logger = getLogger(__name__)
 __all__ = ['TerraTask', 'shared_task']
 
 
+# Take the shared task decorator, and add some Terra defaults, so you don't
+# need to specify them EVERY task
 def shared_task(*args, **kwargs):
   kwargs['bind'] = kwargs.pop('bind', True)
   kwargs['base'] = kwargs.pop('base', TerraTask)
@@ -25,19 +27,6 @@ def shared_task(*args, **kwargs):
 
 
 class TerraTask(Task):
-  settings = None
-  # @staticmethod
-  # def _patch_settings(args, kwargs):
-  #   if 'TERRA_EXECUTOR_SETTINGS_FILE' in env:
-  #     # TODO: Cache loads for efficiency?
-  #     settings = json.load(env['TERRA_EXECUTOR_SETTINGS_FILE'])
-
-  #     # If args is not empty, the first arg was settings
-  #     if args:
-  #       args[0] = settings
-  #     else:
-  #       kwargs['settings'] = settings
-
   def _get_volume_mappings(self):
     executor_volume_map = self.request.settings['executor']['volume_map']
 
@@ -80,17 +69,16 @@ class TerraTask(Task):
             payload, executor_volume_map)
     return payload
 
+  # Don't need to apply translations for apply, it runs locally
+  # def apply(self, *args, **kwargs):
+
+  # apply_async needs to smuggle a copy of the settings to the task
   def apply_async(self, args=None, kwargs=None, task_id=None,
                   *args2, **kwargs2):
     current_settings = TerraJSONEncoder.serializableSettings(settings)
     return super().apply_async(args=args, kwargs=kwargs,
                                headers={'settings': current_settings},
                                task_id=task_id, *args2, **kwargs2)
-
-  # Don't need to apply translations for apply, it runs locally
-  # def apply(self, *args, **kwargs):
-  #   # TerraTask._patch_settings(args, kwargs)
-  #   return super().apply(*args, settings={'X': 15}, **kwargs)
 
   def __call__(self, *args, **kwargs):
     # this is only set when apply_async was called.
@@ -99,6 +87,8 @@ class TerraTask(Task):
         # Cover a potential (unlikely) corner case where setting might not be
         # configured yet
         settings.configure({'processing_dir': gettempdir()})
+
+      # Create a settings context, so I can replace it with the task's settings
       with settings:
         # Calculate the exector's mapped version of the runner's settings
         compute_volume_map, reverse_compute_volume_map, \
@@ -109,6 +99,9 @@ class TerraTask(Task):
         settings._wrapped.clear()
         settings._wrapped.update(self.translate_paths(self.request.settings,
             reverse_compute_volume_map, executor_volume_map))
+        # This is needed here because I just loaded settings from a runner!
+        settings.terra.zone = 'task'
+
         # Just in case processing dir doesn't exists
         if not os.path.exists(settings.processing_dir):
           logger.critical(f'Dir "{settings.processing_dir}" is not accessible '
@@ -118,9 +111,6 @@ class TerraTask(Task):
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
 
-        logger.error('SGR - TerraTask ZONE ' + str(settings.terra.zone))
-
-        settings.terra.zone = 'task' # was runner
         # Calculate the exector's mapped version of the arguments
         kwargs = args_to_kwargs(self.run, args, kwargs)
         args_only = kwargs.pop(ARGS, ())
@@ -128,10 +118,8 @@ class TerraTask(Task):
         kwargs = self.translate_paths(kwargs,
             reverse_compute_volume_map, executor_volume_map)
         # Set up logger to talk to master controller
-        terra.logger._logs.reconfigure_logger()
+        terra.logger._logs.reconfigure_logger(pre_run_task=True)
         return_value = self.run(*args_only, **kwargs)
-        # REVIEW the problem is the zone changes when this gets called on scope __exit__
-        terra.logger._logs.reconfigure_logger()
 
         # Calculate the runner mapped version of the executor's return value
         return_value = self.translate_paths(return_value,
@@ -145,10 +133,9 @@ class TerraTask(Task):
         return_value = self.run(*args, **kwargs)
       finally:
         settings.terra.zone = original_zone
-    self.settings = None
     return return_value
 
-  # from https://stackoverflow.com/a/45333231/1771778
-  def on_failure(self, exc, task_id, args, kwargs, einfo):
-    logger.exception('Celery task failure!!!1', exc_info=exc)
-    super(TerraTask, self).on_failure(exc, task_id, args, kwargs, einfo)
+  # # from https://stackoverflow.com/a/45333231/1771778
+  # def on_failure(self, exc, task_id, args, kwargs, einfo):
+  #   logger.exception('Celery task failure!!!', exc_info=exc)
+  #   return super().on_failure(exc, task_id, args, kwargs, einfo)

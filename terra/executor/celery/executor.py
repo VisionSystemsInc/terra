@@ -17,21 +17,20 @@
 # limitations under the License.
 
 import os
+import atexit
 from os import environ as env
-from terra.executor.base import BaseFuture, BaseExecutor
 from concurrent.futures import as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
                                       CANCELLED_AND_NOTIFIED)
 from threading import Lock, Thread
 import time
-import logging.handlers
-import pickle
-import socketserver
-import struct
-import threading
+from logging import NullHandler, StreamHandler
+from logging.handlers import SocketHandler
 
 from celery.signals import setup_logging
 
+from terra.executor.base import BaseFuture, BaseExecutor
+from terra.core.exceptions import ImproperlyConfigured
 import terra
 from terra import settings
 from terra.logger import getLogger
@@ -41,7 +40,7 @@ logger = getLogger(__name__)
 # stop celery from hijacking the logger
 @setup_logging.connect
 def setup_loggers(*args, **kwargs):
-  print("SGR - celery logger")
+  pass
 
 class CeleryExecutorFuture(BaseFuture):
   def __init__(self, asyncresult):
@@ -252,125 +251,51 @@ class CeleryExecutor(BaseExecutor):
     return volume_map
 
   @staticmethod
-  def reconfigure_logger(sender, **kwargs):
-    # FIXME no idea how to reset this
-    # setup the logging when a task is reconfigured; e.g., changing logging
-    # level or hostname
-
-    if settings.terra.zone == 'runner' or settings.terra.zone == 'task':
-      print("SGR - reconfigure runner/task logging")
-
-      # when the celery task is done, its logger is automatically reconfigured;
-      # use that opportunity to close the stream
-      if hasattr(sender, '_socket_handler'):
-        sender._socket_handler.close()
+  def configure_logger(sender, **kwargs):
+    if settings.terra.zone == 'task': # pragma: no cover
+      # This will never really be reached, because the task_controller will
+      # configure the logger, and than fork.
+      sender.main_log_handler = NullHandler()
+    elif settings.terra.zone == 'task_controller':
+      # Setup log file for use in configure
+      sender._log_file = os.path.join(settings.processing_dir,
+                                      terra.logger._logs.default_log_prefix)
+      os.makedirs(settings.processing_dir, exist_ok=True)
+      sender._log_file = open(sender._log_file, 'a')
+      sender.main_log_handler = StreamHandler(stream=sender._log_file)
+      sender.root_logger.addHandler(sender.main_log_handler)
 
   @staticmethod
-  def configure_logger(sender, **kwargs):
-    sender._hostname = settings.logging.server.hostname
-    sender._port = settings.logging.server.port
-
-    if settings.terra.zone == 'controller':
-      print("SGR - setting up controller logging")
-
-      super(CeleryExecutor, CeleryExecutor).configure_logger(sender, **kwargs)
-
-      # setup the listener
-      sender.tcp_logging_server = LogRecordSocketReceiver(sender._hostname, sender._port)
-      print('SGR - About to start TCP server...')
-
-      lp = threading.Thread(target=sender.tcp_logging_server.serve_until_stopped)
-      lp.setDaemon(True)
-      # FIXME can't actually handle a log message until logging is done configuring
-      lp.start()
-      # TODO do we need to join
-      #lp.join()
-    elif settings.terra.zone == 'runner' or settings.terra.zone == 'task':
-      print("SGR - setting up runner/task logging")
-
-      sender._socket_handler = logging.handlers.SocketHandler(sender._hostname,
-          sender._port)
-
-      # TODO don't bother with a formatter, since a socket handler sends the event
-      # as an unformatted pickle
-
-      # FIXME this is hacky. it requires the executor know it is responsible for
-      # creating this variable on the logger
-      terra.logger._logs.main_log_handler = sender._socket_handler
+  def reconfigure_logger(sender, pre_run_task=False,
+                         post_settings_context=False, **kwargs):
+    if settings.terra.zone == 'task':
+      if pre_run_task:
+        if sender.main_log_handler:
+          sender.main_log_handler.close()
+          try:
+            sender.root_logger.removeHandler(sender.main_log_handler)
+          except ValueError:
+            pass
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.hostname,
+            settings.logging.server.port)
+        sender.root_logger.addHandler(sender.main_log_handler)
+      if post_settings_context:
+        # when the celery task is done, its logger is automatically
+        # reconfigured; use that opportunity to close the stream
+        if sender.main_log_handler:
+          sender.main_log_handler.close()
+          try:
+            sender.root_logger.removeHandler(sender.main_log_handler)
+          except ValueError:
+            pass
+          sender.main_log_handler = NullHandler()
+          sender.root_logger.addHandler(sender.main_log_handler)
     elif settings.terra.zone == 'task_controller':
-      print("SGR - setting up task_controller logging")
+      log_file = os.path.join(settings.processing_dir,
+                              terra.logger._logs.default_log_prefix)
 
-      super(CeleryExecutor, CeleryExecutor).configure_logger(sender, **kwargs)
-    else:
-      assert False, 'unknown zone: ' + settings.terra.zone
-
-# from https://docs.python.org/3/howto/logging-cookbook.html
-class LogRecordStreamHandler(socketserver.StreamRequestHandler):
-  """Handler for a streaming logging request.
-
-  This basically logs the record using whatever logging policy is
-  configured locally.
-  """
-
-  def handle(self):
-    """
-    Handle multiple requests - each expected to be a 4-byte length,
-    followed by the LogRecord in pickle format. Logs the record
-    according to whatever policy is configured locally.
-    """
-    while True:
-      chunk = self.connection.recv(4)
-      if len(chunk) < 4:
-        break
-      slen = struct.unpack('>L', chunk)[0]
-      chunk = self.connection.recv(slen)
-      while len(chunk) < slen:
-        chunk = chunk + self.connection.recv(slen - len(chunk))
-      obj = self.unPickle(chunk)
-      record = logging.makeLogRecord(obj)
-      self.handleLogRecord(record)
-
-  def unPickle(self, data):
-    return pickle.loads(data)
-
-  def handleLogRecord(self, record):
-    # if a name is specified, we use the named logger rather than the one
-    # implied by the record.
-    if self.server.logname is not None:
-      name = self.server.logname
-    else:
-      name = record.name
-    logger = terra.logger.getLogger(name)
-    # N.B. EVERY record gets logged. This is because Logger.handle
-    # is normally called AFTER logger-level filtering. If you want
-    # to do filtering, do it at the client end to save wasting
-    # cycles and network bandwidth!
-    logger.handle(record)
-
-class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
-  """
-  Simple TCP socket-based logging receiver suitable for testing.
-  """
-
-  allow_reuse_address = True
-
-  def __init__(self, host='localhost',
-               port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
-               handler=LogRecordStreamHandler):
-    socketserver.ThreadingTCPServer.__init__(self, (host, port), handler)
-    self.abort = 0
-    self.timeout = 1
-    self.logname = None
-
-  def serve_until_stopped(self):
-    import select
-    abort = 0
-    print('SGR - STARTING LISTNER')
-    while not abort:
-      rd, wr, ex = select.select([self.socket.fileno()],
-                                  [], [],
-                                  self.timeout)
-      if rd:
-        print('SGR - RD')
-        self.handle_request()
-      abort = self.abort
+      if log_file != sender._log_file.name:
+        os.makedirs(settings.processing_dir, exist_ok=True)
+        sender._log_file.close()
+        sender._log_file = open(log_file, 'a')

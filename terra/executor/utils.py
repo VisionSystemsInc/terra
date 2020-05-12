@@ -18,26 +18,6 @@ class ExecutorHandler(ClassHandler):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-    # This Executor type is setup automatically, via
-    #   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
-    # when the signal is sent.
-    terra.core.signals.logger_configure.connect(self._configure_logger)
-    terra.core.signals.logger_reconfigure.connect(self._reconfigure_logger)
-
-  # These methods are necessary because the Executor actually behaves as a
-  # specific BaseExecutor type, so calls to methods must pass through this type
-  def _configure_logger(self, sender, **kwargs):
-    print('SGR - connect configure_logger signals')
-
-    # Register the Executor-specific configure_logger with the logger
-    self.configure_logger(sender, **kwargs)
-
-  def _reconfigure_logger(self, sender, **kwargs):
-    print('SGR - connect reconfigure_logger signals')
-
-    # Register the Executor-specific configure_logger with the logger
-    self.reconfigure_logger(sender, **kwargs)
-
   def _connect_backend(self):
     '''
     Loads the executor backend's base module, given either a fully qualified
@@ -50,8 +30,6 @@ class ExecutorHandler(ClassHandler):
         If not ``None``, override the name of the backend to load.
     '''
 
-    print('SGR - _connect_backend')
-
     backend_name = self._override_type
 
     if backend_name is None:
@@ -63,13 +41,17 @@ class ExecutorHandler(ClassHandler):
     elif backend_name == "SyncExecutor":
       from terra.executor.sync import SyncExecutor
       return SyncExecutor
-    elif backend_name == "ThreadPoolExecutor":
-      return concurrent.futures.ThreadPoolExecutor
-    elif backend_name == "ProcessPoolExecutor":
-      return concurrent.futures.ProcessPoolExecutor
+    elif backend_name == "ThreadPoolExecutor" or \
+         backend_name == "concurrent.futures.ThreadPoolExecutor":
+      from terra.executor.thread import ThreadPoolExecutor
+      return terra.executor.thread.ThreadPoolExecutor
+    elif backend_name == "ProcessPoolExecutor" or \
+         backend_name == "concurrent.futures.ProcessPoolExecutor":
+      from terra.executor.process import ProcessPoolExecutor
+      return terra.executor.process.ProcessPoolExecutor
     elif backend_name == "CeleryExecutor":
-      import terra.executor.celery
-      return terra.executor.celery.CeleryExecutor
+      from terra.executor.celery import CeleryExecutor
+      return CeleryExecutor
     else:
       module_name = backend_name.rsplit('.', 1)
       module = import_module(f'{module_name[0]}')
@@ -87,3 +69,12 @@ Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.
 '''
+# This Executor type is setup automatically, via
+#   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+# when the signal is sent. So use a lambda to delay getattr
+terra.core.signals.logger_configure.connect(
+    lambda *args, **kwargs: Executor.configure_logger(*args, **kwargs),
+    weak=False)
+terra.core.signals.logger_reconfigure.connect(
+    lambda *args, **kwargs: Executor.reconfigure_logger(*args, **kwargs),
+    weak=False)

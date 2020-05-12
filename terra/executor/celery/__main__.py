@@ -9,19 +9,14 @@ from terra import settings
 
 def main():
   if env.get('TERRA_SETTINGS_FILE', '') == '':
-    print('SGR - default settings')
-
     settings.configure(
       {
         'executor': {'type': 'CeleryExecutor'},
-        # FIXME
-        'terra': {'zone': 'task'},
-        #'terra': {'zone': 'task_controller'},
-        'logging': {'level': 'NOTSET'}
+        'terra': {'zone': 'task_controller'},
+        'logging': {'level': 'INFO'}
+        # 'logging': {'level': 'NOTSET'}
       }
     )
-  print('SGR - celery.__main__.py')
-
   # REVIEW are settings setup at this point; they must be setup before the
   # celery tasks start
 
