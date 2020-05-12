@@ -13,12 +13,9 @@ def main():
       {
         'executor': {'type': 'CeleryExecutor'},
         'terra': {'zone': 'task_controller'},
-        'logging': {'level': 'INFO'}
-        # 'logging': {'level': 'NOTSET'}
+        'logging': {'level': 'NOTSET'}
       }
     )
-  # REVIEW are settings setup at this point; they must be setup before the
-  # celery tasks start
 
   app.start()
 
