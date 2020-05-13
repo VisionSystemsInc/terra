@@ -521,8 +521,8 @@ class LazySettings(LazyObject):
         lambda key, value: read_json(value))
 
     # Importing these here is intentional
-    from terra.executor import Executor
-    from terra.compute import compute
+    import terra.executor
+    import terra.compute
     # compute._connection # call a cached property
 
     post_settings_configured.send(sender=self)

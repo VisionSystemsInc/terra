@@ -218,7 +218,7 @@ class BaseCompute:
           break
         time.sleep(0.001)
       else: # pragma: no cover
-        warnigns.warn("TCP Logging server thread did not startup. "
+        warnings.warn("TCP Logging server thread did not startup. "
                       "This is probably not a problem, unless logging isn't "
                       "working.", RuntimeWarning)
 
@@ -236,10 +236,11 @@ class BaseCompute:
           settings.logging.server.hostname, settings.logging.server.port)
       sender.root_logger.addHandler(sender.main_log_handler)
 
-      # Now in configure_logger, you are able to access settings and determine
-      # whether there should be a stderr handler or not. If you don't so this,
-      # both the master controller and service runner will output the same log
-      # messages, duplicating/interleaving output on stderr.
+      # Now in configure_logger, settings are loaded and you are able to
+      # determine this is the runner and there should not be a stderr handler.
+      # If you don't do this, both the master controller and service runner
+      # will output the same log messages, duplicating/interleaving output on
+      # stderr.
       sender.root_logger.removeHandler(sender.stderr_handler)
       # Some executors may need to do this too.
 

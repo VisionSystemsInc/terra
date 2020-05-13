@@ -187,7 +187,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 
   def serve_until_stopped(self):
     abort = False
-    ready = True
+    self.ready = True
     while not abort:
       rd, wr, ex = select.select([self.socket.fileno()],
                                   [], [],
@@ -195,7 +195,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
       if rd:
         self.handle_request()
       abort = self.abort
-    ready = False
+    self.ready = False
 
 
 class _SetupTerraLogger():
