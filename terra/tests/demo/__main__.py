@@ -44,8 +44,8 @@ def main(processing_dir, args=None):
   # Configure settings
   settings.configure(settings_json)
 
-  import pprint
-  pprint.pprint(settings)
+  # import pprint
+  # pprint.pprint(settings)
 
   # Run workflow
   from .workflows import DemoWorkflow
