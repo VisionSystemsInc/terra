@@ -41,8 +41,8 @@ Usage
 To use the logger, in any module always:
 
 ```
-from terra.logging import get_logger
-logger = get_logger(__name__)
+from terra.logging import getLogger
+logger = getLogger(__name__)
 ```
 
 And then use the ``logger`` object anywhere in the module. This logger is a
@@ -179,6 +179,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
   def __init__(self, host='localhost',
                port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
                handler=LogRecordStreamHandler):
+    print('SGR - LRSR init')
     socketserver.ThreadingTCPServer.__init__(self, (host, port), handler)
     self.abort = False
     self.ready = False
@@ -219,6 +220,7 @@ class _SetupTerraLogger():
     self.stderr_handler = logging.StreamHandler(sys.stderr)
     self.stderr_handler.setLevel(self.default_stderr_handler_level)
     self.stderr_handler.setFormatter(self.default_formatter)
+    self.stderr_handler.addFilter(StdErrFilter())
     self.root_logger.addHandler(self.stderr_handler)
 
     # Set up temporary file logger
@@ -235,6 +237,7 @@ class _SetupTerraLogger():
         logging.handlers.MemoryHandler(capacity=1000)
     self.preconfig_stderr_handler.setLevel(0)
     self.preconfig_stderr_handler.setFormatter(self.default_formatter)
+    self.preconfig_stderr_handler.addFilter(StdErrFilter())
     self.root_logger.addHandler(self.preconfig_stderr_handler)
 
     self.preconfig_main_log_handler = \
@@ -258,10 +261,17 @@ class _SetupTerraLogger():
     warnings.simplefilter('default')
     warnings.filterwarnings("ignore",
         category=DeprecationWarning, module='yaml',
-        message="ABCs from 'collections' instead of from 'collections.abc'")
+        message="Using or importing the ABCs")
     warnings.filterwarnings("ignore",
         category=DeprecationWarning, module='osgeo',
         message="the imp module is deprecated")
+
+    # This disables a message that spams the screen:
+    # "pipbox received method enable_events() [reply_to:None ticket:None]"
+    # This is the only debug message in all of kombu.pidbox, so this is pretty
+    # safe to do
+    pidbox_logger = getLogger('kombu.pidbox')
+    pidbox_logger.setLevel(INFO)
 
   @property
   def main_log_handler(self):
@@ -290,11 +300,20 @@ class _SetupTerraLogger():
     def handle_exception(exc_type, exc_value, exc_traceback):
       # Try catch here because I want to make sure the original hook is called
       try:
-        logger.error("Uncaught exception",
-                     exc_info=(exc_type, exc_value, exc_traceback))
+        logger.critical("Uncaught exception", extra={'skip_stderr': True},
+                        exc_info=(exc_type, exc_value, exc_traceback))
       except Exception:  # pragma: no cover
-        print('There was an exception logging in the execpetion handler!')
+        print('There was an exception logging in the execpetion handler!',
+              file=sys.stderr)
         traceback.print_exc()
+
+      try:
+        from terra import settings
+        zone = settings.terra.zone
+      except:
+        zone = 'preconfig'
+      print(f'Exception in {zone} on {platform.node()}',
+            file=sys.stderr)
 
       return original_hook(exc_type, exc_value, exc_traceback)
 
@@ -320,8 +339,17 @@ class _SetupTerraLogger():
       original_exception = InteractiveShell.showtraceback
 
       def handle_traceback(*args, **kwargs):  # pragma: no cover
-        getLogger(__name__).error("Uncaught exception",
-                                  exc_info=sys.exc_info())
+        getLogger(__name__).critical("Uncaught exception",
+                                     exc_info=sys.exc_info())
+
+        try:
+          from terra import settings
+          zone = settings.terra.zone
+        except:
+          zone = 'preconfig'
+        print(f'Exception in {zone} on {platform.node()}',
+              file=sys.stderr)
+
         return original_exception(*args, **kwargs)
 
       InteractiveShell.showtraceback = handle_traceback
@@ -428,15 +456,31 @@ class _SetupTerraLogger():
 
     self.set_level_and_formatter()
 
-class TerraFilter(logging.Filter):
+
+class TerraAddFilter(logging.Filter):
   def filter(self, record):
     if not hasattr(record, 'hostname'):
       record.hostname = platform.node()
     if not hasattr(record, 'zone'):
-      if terra.settings.configured:
-        record.zone = terra.settings.terra.zone
-      else:
+      try:
+        from terra import settings
+        if terra.settings.configured:
+          record.zone = terra.settings.terra.zone
+        else:
+          record.zone = 'preconfig'
+      except:
         record.zone = 'preconfig'
+    return True
+
+
+class StdErrFilter(logging.Filter):
+  def filter(self, record):
+    return not getattr(record, 'skip_stderr', False)
+
+
+class SkipStdErrAddFilter(logging.Filter):
+  def filter(self, record):
+    record.skip_stderr = getattr(record, 'skip_stderr', True)
     return True
 
 
@@ -446,7 +490,7 @@ class TerraFilter(logging.Filter):
 #       print('%s%s=%s' %(prefix, fld,val) )
 
 #   if not isinstance(v, logging.PlaceHolder):
-#     print('+ [%s] {%s} (%s) ' % (str.ljust( k, 20), str(v.__class__)[8:-2], logging.getLevelName(v.level)) ) 
+#     print('+ [%s] {%s} (%s) ' % (str.ljust( k, 20), str(v.__class__)[8:-2], logging.getLevelName(v.level)) )
 #     print(str.ljust( '-------------------------',20) )
 #     show_dict_fields('   -', v.__dict__)
 
@@ -467,7 +511,7 @@ class Logger(Logger_original):
     # I like https://stackoverflow.com/a/17558764/4166604 better than
     # https://stackoverflow.com/a/28050837/4166604, it has the ability to add
     # logic/function calls, if I so desire
-    self.addFilter(TerraFilter())
+    self.addFilter(TerraAddFilter())
 
   def findCaller(self, stack_info=False, stacklevel=1):
     """
@@ -508,9 +552,8 @@ class Logger(Logger_original):
 
   # Define _log instead of logger adapter, this works better (setLoggerClass)
   # https://stackoverflow.com/a/28050837/4166604
-  def _log(self, *args, **kwargs):
-    # kwargs['extra'] = extra_logger_variables
-    return super()._log(*args, **kwargs)
+  # def _log(self,*args, **kwargs):
+  #   return super()._log(*args, **kwargs)
 
   def debug1(self, msg, *args, **kwargs):
     '''

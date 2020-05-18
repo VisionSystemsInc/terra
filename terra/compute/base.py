@@ -10,7 +10,7 @@ import warnings
 from terra import settings
 import terra.compute.utils
 from terra.executor import Executor
-from terra.logger import getLogger, LogRecordSocketReceiver
+from terra.logger import getLogger, LogRecordSocketReceiver, SkipStdErrAddFilter
 logger = getLogger(__name__)
 
 
@@ -234,15 +234,11 @@ class BaseCompute:
     elif settings.terra.zone == 'runner':
       sender.main_log_handler = SocketHandler(
           settings.logging.server.hostname, settings.logging.server.port)
+      # By default, all runners have access to the master controllers stderr,
+      # so there is no need for the master controller to echo out the log
+      # messages a second time.
+      sender.main_log_handler.addFilter(SkipStdErrAddFilter())
       sender.root_logger.addHandler(sender.main_log_handler)
-
-      # Now in configure_logger, settings are loaded and you are able to
-      # determine this is the runner and there should not be a stderr handler.
-      # If you don't do this, both the master controller and service runner
-      # will output the same log messages, duplicating/interleaving output on
-      # stderr.
-      sender.root_logger.removeHandler(sender.stderr_handler)
-      # Some executors may need to do this too.
 
   @staticmethod
   def reconfigure_logger(sender, **kwargs):

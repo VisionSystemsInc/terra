@@ -106,7 +106,7 @@ class Service(BaseService):
 
     # Create a temp directory, store it in this instance
     self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")
-    if env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
+    if self.env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
       self.temp_dir._finalizer.detach()
 
     # Use a config.json file to store settings within that temp directory
@@ -126,5 +126,5 @@ class Service(BaseService):
   def post_run(self):
     super().post_run()
     # Delete temp_dir
-    if env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
+    if self.env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
       self.temp_dir.cleanup()

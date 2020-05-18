@@ -8,15 +8,15 @@ services:
     image: ${TERRA_DOCKER_REPO}:terra_${TERRA_USERNAME}
     environment: &terra_environment
       # Variables for docker_entrypoint.bsh
-      - DOCKER_UID=${TERRA_UID}
-      - DOCKER_GIDS=${TERRA_GIDS}
-      - DOCKER_GROUP_NAMES=${TERRA_GROUP_NAMES}
-      - DOCKER_USERNAME=user
-      - DISPLAY
-      - JUSTFILE=${TERRA_TERRA_DIR_DOCKER}/docker/terra.Justfile
-      - JUST_SETTINGS=${TERRA_TERRA_DIR_DOCKER}/terra.env
-      - PYTHONPATH=${TERRA_PYTHONPATH-}
-      - TZ
+      DOCKER_UID: ${TERRA_UID}
+      DOCKER_GIDS: ${TERRA_GIDS}
+      DOCKER_GROUP_NAMES: ${TERRA_GROUP_NAMES}
+      DOCKER_USERNAME: user
+      JUSTFILE: ${TERRA_TERRA_DIR_DOCKER}/docker/terra.Justfile
+      JUST_SETTINGS: ${TERRA_TERRA_DIR_DOCKER}/terra.env
+      PYTHONPATH: ${TERRA_PYTHONPATH-}
+      DISPLAY:
+      TZ:
     cap_add:
       - SYS_PTRACE # Useful for gdb
     volumes:
@@ -37,6 +37,12 @@ services:
         type: volume
         source: terra-venv
         target: /venv
+
+  terra-demo:
+    <<: *terra
+    environment:
+      <<: *terra_environment
+      TERRA_SETTINGS_FILE:
 
   redis-commander:
     image: rediscommander/redis-commander

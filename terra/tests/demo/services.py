@@ -20,9 +20,17 @@ import posixpath
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+
 class Demo1(BaseService):
   ''' Simple Demo Service '''
   command = ['python', '-m', 'terra.tests.demo.runners.demo1']
+  CONTAINER_PROCESSING_DIR = "/processing"
+
+  def pre_run(self):
+    self.add_volume(settings.processing_dir,
+                    Demo1.CONTAINER_PROCESSING_DIR,
+                    'rw')
+    super().pre_run()
 
 
 @DockerCompute.register(Demo1)
@@ -31,7 +39,8 @@ class Demo1_docker(DockerService, Demo1):
     super().__init__()
     self.compose_files = [os.path.join(env['TERRA_TERRA_DIR'],
                                        'docker-compose-main.yml')]
-    self.compose_service_name = 'terra'
+    self.compose_service_name = 'terra-demo'
+
 
 @VirtualEnvCompute.register(Demo1)
 class Demo1_virtualenv(VirtualEnvService, Demo1):
