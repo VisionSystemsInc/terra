@@ -56,7 +56,7 @@ class CeleryExecutorFuture(BaseFuture):
     Returns True if the future was cancelled, False otherwise. A future
     cannot be cancelled if it is running or has already completed.
     """
-    logger.info(f'Canceling task {self._ar.id}')
+    logger.debug4(f'Canceling task {self._ar.id}')
     with self._condition:
       if self._state in [RUNNING, FINISHED, CANCELLED, CANCELLED_AND_NOTIFIED]:
         return super().cancel()
@@ -169,7 +169,7 @@ class CeleryExecutor(BaseExecutor):
           # Future is FINISHED
 
         elif ar.state == 'FAILURE':
-          logger.info('Celery task "%s" resolved with error.', ar.id)
+          logger.error('Celery task "%s" resolved with error.', ar.id)
           fut.set_exception(ar.result)
           # Future is FINISHED
 
@@ -205,7 +205,7 @@ class CeleryExecutor(BaseExecutor):
       return future
 
   def shutdown(self, wait=True):
-    logger.info('Shutting down celery tasks...')
+    logger.debug1('Shutting down celery tasks...')
     with self._shutdown_lock:
       self._shutdown = True
       for fut in tuple(self._futures):

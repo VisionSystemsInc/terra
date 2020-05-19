@@ -12,19 +12,12 @@ from terra.compute.virtualenv import (
   Compute as VirtualEnvCompute
 )
 from terra.compute.base import BaseService
-from terra.core.settings import TerraJSONEncoder
-from os import environ as env
-import json
-import os
-import posixpath
-from terra.logger import getLogger
-logger = getLogger(__name__)
 
 
 class Demo1(BaseService):
   ''' Simple Demo Service '''
   command = ['python', '-m', 'terra.tests.demo.runners.demo1']
-  CONTAINER_PROCESSING_DIR = "/processing"
+  CONTAINER_PROCESSING_DIR = "/opt/test"
 
   def pre_run(self):
     self.add_volume(settings.processing_dir,
@@ -37,11 +30,43 @@ class Demo1(BaseService):
 class Demo1_docker(DockerService, Demo1):
   def __init__(self):
     super().__init__()
-    self.compose_files = [os.path.join(env['TERRA_TERRA_DIR'],
-                                       'docker-compose-main.yml')]
-    self.compose_service_name = 'terra-demo'
+    self.compose_files = [settings.demo.compose]
+    self.compose_service_name = settings.demo.service
+
+
+@SingularityCompute.register(Demo1)
+class Demo1_singularity(SingularityService, Demo1):
+  def __init__(self):
+    super().__init__()
+    self.compose_files = [settings.demo.compose]
+    self.compose_service_name = settings.demo.service
 
 
 @VirtualEnvCompute.register(Demo1)
 class Demo1_virtualenv(VirtualEnvService, Demo1):
+  pass
+
+
+class Demo2(Demo1):
+  ''' Simple Demo Service '''
+  command = ['python', '-m', 'terra.tests.demo.runners.demo2']
+
+@DockerCompute.register(Demo2)
+class Demo2_docker(DockerService, Demo2):
+  def __init__(self):
+    super().__init__()
+    self.compose_files = [settings.demo.compose]
+    self.compose_service_name = settings.demo.service
+
+
+@SingularityCompute.register(Demo2)
+class Demo2_singularity(SingularityService, Demo2):
+  def __init__(self):
+    super().__init__()
+    self.compose_files = [settings.demo.compose]
+    self.compose_service_name = settings.demo.service
+
+
+@VirtualEnvCompute.register(Demo2)
+class Demo2_virtualenv(VirtualEnvService, Demo2):
   pass

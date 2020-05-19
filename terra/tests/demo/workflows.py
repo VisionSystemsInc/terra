@@ -8,6 +8,5 @@ class DemoWorkflow:
   def demonate(self):
     logger.critical('Starting demo workflow')
     compute.run('terra.tests.demo.services.Demo1')
-    # compute.run('terra.tests.demo.services.Demo2')
-    # compute.run('terra.tests.demo.services.Demo3')
+    compute.run('terra.tests.demo.services.Demo2')
     logger.critical('Ran demo workflow')

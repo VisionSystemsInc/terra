@@ -78,7 +78,7 @@ from terra.core.exceptions import ImproperlyConfigured
 
 from logging import (
   CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, Filter,
-  getLogger, _acquireLock, _releaseLock, currentframe,
+  getLogger, _acquireLock, _releaseLock, currentframe, Formatter,
   _srcfile as logging_srcfile, Logger as Logger_original
 )
 
@@ -259,9 +259,11 @@ class _SetupTerraLogger():
 
     # Enable warnings to default
     warnings.simplefilter('default')
-    warnings.filterwarnings("ignore",
-        category=DeprecationWarning, module='yaml',
-        message="Using or importing the ABCs")
+    # Disable known warnings that there's nothing to be done about.
+    for module in ('yaml', 'celery.app.amqp'):
+      warnings.filterwarnings("ignore",
+          category=DeprecationWarning, module=module,
+          message="Using or importing the ABCs")
     warnings.filterwarnings("ignore",
         category=DeprecationWarning, module='osgeo',
         message="the imp module is deprecated")
@@ -363,6 +365,10 @@ class _SetupTerraLogger():
                                   datefmt=settings.logging.date_format,
                                   style=settings.logging.style)
 
+    stderr_formatter = ColorFormatter(fmt=settings.logging.format,
+                                      datefmt=settings.logging.date_format,
+                                      style=settings.logging.style)
+
     # Configure log level
     level = settings.logging.level
     if isinstance(level, str):
@@ -373,7 +379,7 @@ class _SetupTerraLogger():
 
     # Configure format
     self.main_log_handler.setFormatter(formatter)
-    self.stderr_handler.setFormatter(formatter)
+    self.stderr_handler.setFormatter(stderr_formatter)
 
   def configure_logger(self, sender=None, signal=None, **kwargs):
     '''
@@ -482,6 +488,33 @@ class SkipStdErrAddFilter(logging.Filter):
   def filter(self, record):
     record.skip_stderr = getattr(record, 'skip_stderr', True)
     return True
+
+
+class ColorFormatter(Formatter):
+  use_color = True
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    # self.use_color = use_color
+
+  def format(self, record):
+    if self.use_color:
+      zone = record.__dict__['zone']
+      if zone == "preconfig":
+        record.__dict__['zone'] = '\033[33mpreconfig\033[0m'
+      elif zone == "controller":
+        record.__dict__['zone'] = '\033[32mcontroller\033[0m'
+      elif zone == "runner":
+        record.__dict__['zone'] = '\033[35mrunner\033[0m'
+      elif zone == "task":
+        record.__dict__['zone'] = '\033[34mtask\033[0m'
+      else:
+        record.__dict__['zone'] = f'\033[31m{record.__dict__["zone"]}\033[0m'
+
+      msg = super().format(record)
+      record.__dict__['zone'] = zone
+      return msg
+    else:
+      return super().format(record)
 
 
 # def show_log(k, v):

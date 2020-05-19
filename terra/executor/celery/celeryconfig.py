@@ -31,3 +31,4 @@ celery_include = env.get('TERRA_CELERY_INCLUDE', None)
 if celery_include:
   import ast
   include = ast.literal_eval(celery_include)
+  include += type(include)(['terra.tests.demo.tasks'])
