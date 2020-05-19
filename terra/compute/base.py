@@ -71,9 +71,6 @@ class BaseService:
     self._validate_volume(local, remote, local_must_exist=local_must_exist)
     self.volumes.append((local, remote))
 
-  def get_volume_map(self, config, service_info):
-    return []
-
   def pre_run(self):
     '''
     A function that runs before the run service
@@ -169,6 +166,9 @@ class BaseCompute:
 
     # bind function and return it
     return defaultCommand.__get__(self, type(self))
+
+  def get_volume_map(self, config, service_info):
+    return []
 
   def run_service(self, *args, **kwargs):
     '''

@@ -113,11 +113,12 @@ class Service(BaseService):
     temp_config_file = os.path.join(self.temp_dir.name, 'config.json')
 
     # Serialize config file
-    docker_config = TerraJSONEncoder.serializableSettings(settings)
+    venv_config = TerraJSONEncoder.serializableSettings(settings)
 
     # Dump the serialized config to the temp config file
+    venv_config['terra']['zone'] = 'runner'
     with open(temp_config_file, 'w') as fid:
-      json.dump(docker_config, fid)
+      json.dump(venv_config, fid)
 
     # Set the Terra settings file for this service runner to the temp config
     # file

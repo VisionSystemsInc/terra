@@ -1,9 +1,10 @@
-from concurrent.futures import Future, Executor
 from threading import Lock
+
+from terra.executor.base import BaseExecutor, BaseFuture
 
 
 # No need for a global shutdown lock here, not multi-threaded/process
-class SyncExecutor(Executor):
+class SyncExecutor(BaseExecutor):
   """
   Executor that does the job synchronously.
 
@@ -25,7 +26,7 @@ class SyncExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      f = Future()
+      f = BaseFuture()
       try:
         result = fn(*args, **kwargs)
       except BaseException as e:

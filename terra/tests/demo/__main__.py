@@ -92,10 +92,10 @@ if __name__ == '__main__':
   processing_dir = tempfile.TemporaryDirectory()
   try:
     main(processing_dir.name)
-    # with open(os.path.join(processing_dir.name, 'terra_log'), 'r') as fid:
-    #   print('-------------------')
-    #   print('Paging log messages')
-    #   print('-------------------')
-    #   pydoc.pager(fid.read())
+    with open(os.path.join(processing_dir.name, 'terra_log'), 'r') as fid:
+      print('-------------------')
+      print('Paging log messages')
+      print('-------------------')
+      pydoc.pager(fid.read())
   finally:
     processing_dir.cleanup()
