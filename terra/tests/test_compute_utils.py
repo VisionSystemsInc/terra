@@ -176,7 +176,7 @@ class TestBaseJust(TestComputeUtilsCase):
 
   def test_logging_code(self):
     # Test the debug1 diffdict log output
-    with self.assertLogs(utils.__name__, level="DEBUG1") as cm:
+    with self.assertLogs(utils.__name__, level="DEBUG4") as cm:
       env = os.environ.copy()
       env.pop('PATH')
       env['FOO'] = 'BAR'

@@ -154,7 +154,7 @@ from functools import wraps
 from json import JSONEncoder
 import platform
 
-from terra.core.exceptions import ImproperlyConfigured
+from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
 # Do not import terra.logger or terra.signals here, or any module that
 # imports them
 from vsi.tools.python import (
@@ -254,9 +254,10 @@ def unittest(self):
 
 @settings_property
 def need_to_set_virtualenv_dir(self):
-  raise ImproperlyConfigured("You are using the virtualenv compute, and did "
-                             "not set settings.compute.virtualenv_dir in your "
-                             "config file.")
+  warnings.warn("You are using the virtualenv compute, and did not set "
+                "settings.compute.virtualenv_dir in your config file. "
+                "Using system python.", ConfigurationWarning)
+  return None
 
 @settings_property
 def terra_uuid(self):

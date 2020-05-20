@@ -37,7 +37,8 @@ class TestVirtualEnv(TestCase):
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
     settings.configure({
-        'compute': {'arch': 'virtualenv'},
+        'compute': {'arch': 'virtualenv',
+                    'virtualenv_dir': None},
         'processing_dir': self.temp_dir.name,
         'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
@@ -98,7 +99,7 @@ class TestVirtualEnv(TestCase):
     service = MockVirtualEnvService()
 
     # Test logging code
-    with self.assertLogs(virtualenv.__name__, level="DEBUG1") as cm:
+    with self.assertLogs(virtualenv.__name__, level="DEBUG4") as cm:
       os.environ['BAR'] = 'FOO'
       env = os.environ.copy()
       env.pop('BAR')
