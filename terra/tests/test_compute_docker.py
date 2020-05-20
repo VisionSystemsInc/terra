@@ -102,7 +102,7 @@ class TestDockerRun(TestComputeDockerCase):
     compute.run(MockJustService())
     # Run a docker service
     self.assertEqual(('--wrap', 'Just-docker-compose',
-                      '-f', 'file1', 'run', 'launch', 'ls'),
+                      '-f', 'file1', 'run', '-T', 'launch', 'ls'),
                      self.just_args)
     self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
