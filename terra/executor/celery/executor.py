@@ -61,7 +61,7 @@ class CeleryExecutorFuture(BaseFuture):
       if self._state in [RUNNING, FINISHED, CANCELLED, CANCELLED_AND_NOTIFIED]:
         return super().cancel()
 
-      # Not running and not canceled. May be possible to cancel!
+      # Not running and not cancelled. May be possible to cancel!
       self._ar.ready()  # Triggers an update check
       if self._ar.state != 'REVOKED':
         self._ar.revoke()
@@ -150,7 +150,7 @@ class CeleryExecutor(BaseExecutor):
         ar.ready()  # Just trigger the AsyncResult state update check
 
         if ar.state == 'REVOKED':
-          logger.warning('Celery task "%s" canceled.', ar.id)
+          logger.warning('Celery task "%s" cancelled.', ar.id)
           if not fut.cancelled():
             if not fut.cancel():  # pragma: no cover
               logger.error('Future was not running but failed to be cancelled')
