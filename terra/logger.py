@@ -396,7 +396,7 @@ class _SetupTerraLogger():
       raise ImproperlyConfigured()
 
     # This sends a signal to the current Executor type, which has already been
-    # imported at the end of LasySettings.configure. We don't import Executor
+    # imported at the end of LazySettings.configure. We don't import Executor
     # here to reduce the concerns of this module
     import terra.core.signals
     terra.core.signals.logger_configure.send(sender=self, **kwargs)
@@ -408,8 +408,8 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.tmp_handler)
 
     settings_dump = os.path.join(settings.processing_dir,
-                                 datetime.now(timezone.utc).strftime(
-                                     'settings_%Y_%m_%d_%H_%M_%S_%f.json'))
+        datetime.now(timezone.utc).strftime(
+        f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
     with open(settings_dump, 'w') as fid:
       fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 

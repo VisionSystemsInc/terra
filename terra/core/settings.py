@@ -147,6 +147,7 @@ framework instead of a larger application.
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from uuid import uuid4
 from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
@@ -257,6 +258,10 @@ def need_to_set_virtualenv_dir(self):
                              "not set settings.compute.virtualenv_dir in your "
                              "config file.")
 
+@settings_property
+def terra_uuid(self):
+  return str(uuid4())
+
 global_templates = [
   (
     # Global Defaults
@@ -287,7 +292,8 @@ global_templates = [
       'terra': {
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
-        'zone': 'controller'
+        'zone': 'controller',
+        'uuid': terra_uuid
       },
       'status_file': status_file,
       'processing_dir': processing_dir,
