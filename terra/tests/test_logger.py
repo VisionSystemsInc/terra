@@ -47,6 +47,11 @@ class TestLoggerCase(TestCase):
     settings_filename = os.path.join(self.temp_dir.name, 'config.json')
     self.patches.append(mock.patch.dict(os.environ,
                                         TERRA_SETTINGS_FILE=settings_filename))
+    attrs = {'serve_until_stopped.return_value': True, 'ready': True}
+    MockLogRecordSocketReceiver = mock.Mock(**attrs)
+    self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',
+                                   MockLogRecordSocketReceiver))
+
     super().setUp()
 
     # Don't use settings.configure here, because I need to test out logging
@@ -64,7 +69,7 @@ class TestLoggerCase(TestCase):
     # Remove all the logger handlers
     sys.excepthook = self.original_system_hook
     try:
-      self._logs.log_file.close()
+      self._logs._log_file.close()
     except AttributeError:
       pass
     # Windows is pickier about deleting files
@@ -154,24 +159,30 @@ class TestLogger(TestLoggerCase):
     # This doesn't get formatted
     # with self.assertLogs(__name__, logger.ERROR) as cm:
     #   logger.getLogger(__name__).error('Hi')
+
+    test_logger = logger.getLogger(f'{__name__}.test_formatter')
     record = logging.LogRecord(__name__, logger.ERROR, __file__, 0, "Hiya", (),
                                None)
+    self.assertTrue(test_logger.filter(record))
+    self.assertTrue(self._logs.stderr_handler.filter(record))
     self.assertEqual(self._logs.stderr_handler.format(record), "foo bar Hiya")
 
   def test_hostname(self):
     test_logger = logger.getLogger(f'{__name__}.test_hostname')
 
     record = test_logger.makeRecord(__name__, logger.ERROR, __file__, 0,
-                                    "Hiya", (), None,
-                                    extra=logger.extra_logger_variables)
-    self.assertIn('(preconfig)', self._logs.stderr_handler.format(record))
+                                    "Hiya", (), None)
+    self.assertTrue(test_logger.filter(record))
+    self.assertTrue(self._logs.stderr_handler.filter(record))
+    self.assertIn(':preconfig)', self._logs.stderr_handler.format(record))
 
     settings._setup()
 
     record = test_logger.makeRecord(__name__, logger.ERROR, __file__, 0,
-                                    "Hiya", (), None,
-                                    extra=logger.extra_logger_variables)
-    self.assertIn(f'({platform.node()})',
+                                    "Hiya", (), None)
+    self.assertTrue(test_logger.filter(record))
+    self.assertTrue(self._logs.stderr_handler.filter(record))
+    self.assertIn(f'({platform.node()}:',
                   self._logs.stderr_handler.format(record))
 
   # Test https://stackoverflow.com/q/19615876/4166604

@@ -668,4 +668,4 @@ class TestCircularDependency(TestLoggerCase):
 
     # Picky windows
     import terra.logger
-    terra.logger._logs.log_file.close()
+    terra.logger._logs._log_file.close()

@@ -197,7 +197,7 @@ class BaseCompute:
     if settings.terra.zone == 'controller':
       # Setup log file for use in configure
       sender._log_file = os.path.join(settings.processing_dir,
-                                      terra.logger._logs.default_log_prefix)
+          terra.logger._SetupTerraLogger.default_log_prefix)
       os.makedirs(settings.processing_dir, exist_ok=True)
       sender._log_file = open(sender._log_file, 'a')
       sender.main_log_handler = StreamHandler(stream=sender._log_file)
@@ -249,7 +249,7 @@ class BaseCompute:
 
     if settings.terra.zone == 'controller':
       log_file = os.path.join(settings.processing_dir,
-                              terra.logger._logs.default_log_prefix)
+          terra.logger._SetupTerraLogger.default_log_prefix)
 
       # if not os.path.samefile(log_file, sender._log_file.name):
       if log_file != sender._log_file.name:
