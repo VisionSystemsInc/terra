@@ -496,8 +496,6 @@ class LazySettings(LazyObject):
     ImproperlyConfigured
         If settings is already configured, will throw this exception
     """
-    from terra.core.signals import post_settings_configured
-
     if self._wrapped is not None:
       raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
@@ -532,6 +530,7 @@ class LazySettings(LazyObject):
     import terra.compute
     # compute._connection # call a cached property
 
+    from terra.core.signals import post_settings_configured
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
 

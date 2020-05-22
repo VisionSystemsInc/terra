@@ -251,8 +251,12 @@ class BaseCompute:
       log_file = os.path.join(settings.processing_dir,
           terra.logger._SetupTerraLogger.default_log_prefix)
 
+      # Check to see if _log_file is unset. If it is, this is due to _log_file
+      # being called without configure being called. While it is not important
+      # this work, it's more likely for unit testsing
       # if not os.path.samefile(log_file, sender._log_file.name):
-      if log_file != sender._log_file.name:
+      if getattr(sender, '_log_file', None) is not None and \
+         log_file != sender._log_file.name:
         os.makedirs(settings.processing_dir, exist_ok=True)
         sender._log_file.close()
         sender._log_file = open(log_file, 'a')

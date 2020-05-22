@@ -1,14 +1,13 @@
 import os
 import ntpath
 import json
-import tempfile
 from unittest import mock, skipIf
 
 from terra import settings
 from terra.executor.utils import Executor
 from terra.compute import base
 import terra.compute.container
-from vsi.test.utils import TestCase, NamedTemporaryFileFactory
+from .utils import TestCase, TestNamedTemporaryFileCase
 
 
 class SomeService(terra.compute.container.ContainerService):
@@ -51,12 +50,11 @@ class TestComputeContainerCase(TestCase):
         'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
 
-class TestContainerService(TestComputeContainerCase):
+class TestContainerService(TestComputeContainerCase,
+                           TestNamedTemporaryFileCase):
   # Test the flushing configuration to json for a container mechanism
 
   def setUp(self):
-    self.patches.append(mock.patch.object(tempfile, 'NamedTemporaryFile',
-                                          NamedTemporaryFileFactory(self)))
     self.patches.append(mock.patch.object(json, 'dump', self.json_dump))
     # self.common calls service.pre_run which trigger Executor
     self.patches.append(mock.patch.dict(Executor.__dict__))

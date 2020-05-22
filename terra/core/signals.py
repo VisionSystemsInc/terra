@@ -37,6 +37,7 @@ See https://docs.djangoproject.com/en/2.2/topics/signals/ for more info
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import threading
 import weakref
 
@@ -197,9 +198,16 @@ class Signal:
     -------
     list
         Return a list of tuple pairs [(receiver, response), ... ].
+
+    Environment Variables
+    ---------------------
+    TERRA_UNITTEST
+        Setting this to ``1`` will disable send. This is used during
+        unittesting to prevent unexpected behavior
     """
     if not self.receivers or \
-       self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+       self.sender_receivers_cache.get(sender) is NO_RECEIVERS or \
+       os.environ.get('TERRA_UNITTEST') == "1":
       return []
 
     return [
@@ -228,9 +236,16 @@ class Signal:
         Return a list of tuple pairs [(receiver, response), ... ].
         If any receiver raises an error (specifically any subclass of
         Exception), return the error instance as the result for that receiver.
+
+    Environment Variables
+    ---------------------
+    TERRA_UNITTEST
+        Setting this to ``1`` will disable send. This is used during
+        unittesting to prevent unexpected behavior
     """
     if not self.receivers or \
-       self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
+       self.sender_receivers_cache.get(sender) is NO_RECEIVERS or \
+       os.environ.get('TERRA_UNITTEST') == "1":
       return []
 
     # Call each receiver with whatever arguments it can accept.
@@ -359,7 +374,6 @@ post_settings_context = Signal()
 Sent after scope __exit__ from a settings context (i.e., with statement).
 '''
 
-# REVIEW should this be called post_logger_configure
 logger_configure = Signal()
 '''Signal:
 Sent to the executor after the logger has been configured. This will happen

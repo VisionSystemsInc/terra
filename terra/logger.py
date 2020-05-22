@@ -374,12 +374,14 @@ class _SetupTerraLogger():
     if isinstance(level, str):
       # make level case insensitive
       level = level.upper()
-    self.stderr_handler.setLevel(level)
-    self.main_log_handler.setLevel(level)
 
-    # Configure format
-    self.main_log_handler.setFormatter(formatter)
-    self.stderr_handler.setFormatter(stderr_formatter)
+    if getattr(self, 'stderr_handler', None) is not None:
+      self.stderr_handler.setLevel(level)
+      self.stderr_handler.setFormatter(stderr_formatter)
+
+    if getattr(self, 'main_log_handler', None) is not None:
+      self.main_log_handler.setLevel(level)
+      self.main_log_handler.setFormatter(formatter)
 
   def configure_logger(self, sender=None, signal=None, **kwargs):
     '''
@@ -684,18 +686,23 @@ logging.setLoggerClass(Logger)
 # Get the logger here, AFTER all the changes to the logger class
 logger = getLogger(__name__)
 
-# Disable log setup for unittests. Can't use settings here ;)
-if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
+def _setup_terra_logger():
   # Must be import signal after getLogger is defined... Currently this is
   # imported from logger. But if a custom getLogger is defined eventually, it
   # will need to be defined before importing terra.core.signals.
   import terra.core.signals
 
   # Configure logging (pre configure)
-  _logs = _SetupTerraLogger()
+  logs = _SetupTerraLogger()
 
   # Register post_configure with settings
-  terra.core.signals.post_settings_configured.connect(_logs.configure_logger)
+  terra.core.signals.post_settings_configured.connect(logs.configure_logger)
 
   # Handle a "with" settings context manager
-  terra.core.signals.post_settings_context.connect(_logs.reconfigure_logger)
+  terra.core.signals.post_settings_context.connect(logs.reconfigure_logger)
+
+  return logs
+
+# Disable log setup for unittests. Can't use settings here ;)
+if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
+  _logs = _setup_terra_logger()

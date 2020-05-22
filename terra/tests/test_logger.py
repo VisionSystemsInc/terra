@@ -11,10 +11,14 @@ import warnings
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
-from vsi.test.utils import TestCase, make_traceback, NamedTemporaryFileFactory
+from .utils import (
+  TestCase, make_traceback, TestNamedTemporaryFileCase,
+  TestSettingsUnconfiguredCase, TestLoggerCase as TestLoggerCaseOrig
+)
 from terra import logger
 from terra.core import signals
 
+# import terra.compute.utils
 
 class TestHandlerLoggingContext(TestCase):
   def test_handler_logging_context(self):
@@ -38,21 +42,18 @@ class TestHandlerLoggingContext(TestCase):
     self.assertIn(message2, str(handler_swap.buffer))
 
 
-class TestLoggerCase(TestCase):
+class TestLoggerCase(TestLoggerCaseOrig, TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
   def setUp(self):
-    self.original_system_hook = sys.excepthook
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    self.patches.append(mock.patch.object(tempfile, 'NamedTemporaryFile',
-                                          NamedTemporaryFileFactory(self)))
-    settings_filename = os.path.join(self.temp_dir.name, 'config.json')
-    self.patches.append(mock.patch.dict(os.environ,
-                                        TERRA_SETTINGS_FILE=settings_filename))
-    attrs = {'serve_until_stopped.return_value': True, 'ready': True}
-    MockLogRecordSocketReceiver = mock.Mock(**attrs)
-    self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',
-                                   MockLogRecordSocketReceiver))
+    # self.original_system_hook = sys.excepthook
+    # attrs = {'serve_until_stopped.return_value': True, 'ready': True}
+    # MockLogRecordSocketReceiver = mock.Mock(**attrs)
+    # self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',
+    #                                MockLogRecordSocketReceiver))
 
     super().setUp()
+
+    settings_filename = os.path.join(self.temp_dir.name, 'config.json')
+    os.environ['TERRA_SETTINGS_FILE']=settings_filename
 
     # Don't use settings.configure here, because I need to test out logging
     # signals
@@ -60,10 +61,7 @@ class TestLoggerCase(TestCase):
     with open(settings_filename, 'w') as fid:
       json.dump(config, fid)
 
-    self._logs = logger._SetupTerraLogger()
-
-    # # register post_configure with settings
-    signals.post_settings_configured.connect(self._logs.configure_logger)
+    self._logs = logger._setup_terra_logger()
 
   def tearDown(self):
     # Remove all the logger handlers
@@ -80,6 +78,7 @@ class TestLoggerCase(TestCase):
       pass
     self._logs.root_logger.handlers = []
     signals.post_settings_configured.disconnect(self._logs.configure_logger)
+    signals.post_settings_context.disconnect(self._logs.reconfigure_logger)
     # Apparently this is unnecessary because signals use weak refs, that are
     # auto removed on free, but I think it's still better to put this here.
     super().tearDown()
@@ -118,11 +117,12 @@ class TestLogger(TestLoggerCase):
       self.tb = tb
     sys.excepthook = save_exec_info
     self._logs.setup_logging_exception_hook()
-    with self.assertLogs() as cm:
-      # with self.assertRaises(ZeroDivisionError):
-      tb = make_traceback()
-      sys.excepthook(ZeroDivisionError,
-                     ZeroDivisionError('division by almost zero'), tb)
+    with mock.patch('sys.stderr', new_callable=io.StringIO):
+      with self.assertLogs() as cm:
+        # with self.assertRaises(ZeroDivisionError):
+        tb = make_traceback()
+        sys.excepthook(ZeroDivisionError,
+                      ZeroDivisionError('division by almost zero'), tb)
 
     self.assertIn('division by almost zero', str(cm.output))
     # Test stack trace stuff in there
@@ -310,7 +310,7 @@ class TestUnitTests(TestCase):
 
     self.assertFalse(
         root_logger.handlers,
-        msg="If you are seting this, one of the other unit tests has "
+        msg="If you are seeing this, one of the other unit tests has "
         "initialized the logger. This side effect should be "
         "prevented for you automatically. If you are seeing this, you "
         "have configured logging manually, and should make sure you "
