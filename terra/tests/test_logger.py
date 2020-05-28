@@ -13,7 +13,8 @@ from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
 from .utils import (
   TestCase, make_traceback, TestNamedTemporaryFileCase,
-  TestSettingsUnconfiguredCase, TestLoggerCase as TestLoggerCaseOrig
+  TestSettingsUnconfiguredCase,
+  TestLoggerConfigureCase
 )
 from terra import logger
 from terra.core import signals
@@ -42,49 +43,7 @@ class TestHandlerLoggingContext(TestCase):
     self.assertIn(message2, str(handler_swap.buffer))
 
 
-class TestLoggerCase(TestLoggerCaseOrig, TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
-  def setUp(self):
-    # self.original_system_hook = sys.excepthook
-    # attrs = {'serve_until_stopped.return_value': True, 'ready': True}
-    # MockLogRecordSocketReceiver = mock.Mock(**attrs)
-    # self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',
-    #                                MockLogRecordSocketReceiver))
-
-    super().setUp()
-
-    settings_filename = os.path.join(self.temp_dir.name, 'config.json')
-    os.environ['TERRA_SETTINGS_FILE']=settings_filename
-
-    # Don't use settings.configure here, because I need to test out logging
-    # signals
-    config = {"processing_dir": self.temp_dir.name}
-    with open(settings_filename, 'w') as fid:
-      json.dump(config, fid)
-
-    self._logs = logger._setup_terra_logger()
-
-  def tearDown(self):
-    # Remove all the logger handlers
-    sys.excepthook = self.original_system_hook
-    try:
-      self._logs._log_file.close()
-    except AttributeError:
-      pass
-    # Windows is pickier about deleting files
-    try:
-      if self._logs.tmp_file:
-        self._logs.tmp_file.close()
-    except AttributeError:
-      pass
-    self._logs.root_logger.handlers = []
-    signals.post_settings_configured.disconnect(self._logs.configure_logger)
-    signals.post_settings_context.disconnect(self._logs.reconfigure_logger)
-    # Apparently this is unnecessary because signals use weak refs, that are
-    # auto removed on free, but I think it's still better to put this here.
-    super().tearDown()
-
-
-class TestLogger(TestLoggerCase):
+class TestLogger(TestLoggerConfigureCase):
   def test_setup_working(self):
     self.assertFalse(settings.configured)
     self.assertEqual(settings.processing_dir, self.temp_dir.name)
@@ -97,10 +56,11 @@ class TestLogger(TestLoggerCase):
         self._logs.configure_logger(None)
 
   def test_temp_file_cleanup(self):
-    self.assertExist(self.temp_log_file)
+    tmp_file = self._logs.tmp_file.name
+    self.assertExist(tmp_file)
     self.assertFalse(self._logs._configured)
     settings.processing_dir
-    self.assertNotExist(self.temp_log_file)
+    self.assertNotExist(tmp_file)
     self.assertTrue(self._logs._configured)
 
   def test_exception_hook_installed(self):
@@ -139,13 +99,13 @@ class TestLogger(TestLoggerCase):
   def test_logs_stderr(self):
     stderr_handler = [h for h in self._logs.root_logger.handlers
                       if hasattr(h, 'stream') and h.stream == sys.stderr][0]
-    self.assertIs(self._logs.stderr_handler, stderr_handler)
     self.assertEqual(stderr_handler.level, logging.WARNING)
+    self.assertIs(self._logs.stderr_handler, stderr_handler)
 
   def test_logs_temp_file(self):
     temp_handler = [
         h for h in self._logs.root_logger.handlers
-        if hasattr(h, 'stream') and h.stream.name == self.temp_log_file][0]
+        if hasattr(h, 'stream') and h.stream.name == self._logs.tmp_file.name][0]
     # Test that log everything is set
     self.assertEqual(temp_handler.level, logger.NOTSET)
     self.assertEqual(self._logs.root_logger.level, logger.NOTSET)

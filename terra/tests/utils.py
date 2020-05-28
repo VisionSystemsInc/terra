@@ -76,6 +76,14 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
     terra.core.signals.post_settings_context.disconnect(self._logs.reconfigure_logger)
     super().tearDown()
 
+class TestLoggerConfigureCase(TestLoggerCase):
+  def setUp(self):
+    # Enable signals. Most logging tests require configure logger to actually
+    # be called. LogRecordSocketReceiver is mocked out, so no lasting side
+    # effects should inccur.
+    self.patches.append(mock.patch.dict(os.environ, TERRA_UNITTEST='0'))
+    super().setUp()
+
 
 class TestSignalCase(TestCase):
   def setUp(self):

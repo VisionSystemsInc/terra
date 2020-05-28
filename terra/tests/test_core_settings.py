@@ -8,7 +8,10 @@ import tempfile
 
 from envcontext import EnvironmentContext
 
-from .utils import TestCase, TestLoggerCase, TestSettingsUnconfiguredCase
+from .utils import (
+  TestCase, TestLoggerCase, TestLoggerConfigureCase,
+  TestSettingsUnconfiguredCase
+)
 
 from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
@@ -643,13 +646,11 @@ class TestUnitTests(TestCase):
             "Otherwise unit tests can interfere with each other")
 
 
-class TestCircularDependency(TestLoggerCase):
+class TestCircularDependency(TestLoggerConfigureCase):
   # I don't want this unloading terra to interfere with other last_tests, as
   # this would reset modules to their initial state, giving false positives to
   # corruption checks. So mock it
   @mock.patch.dict(sys.modules)
-  # Needed to make circular imports
-  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')
   def last_test_import_settings(self):
     # Unload terra
     for module in list(sys.modules.keys()):
