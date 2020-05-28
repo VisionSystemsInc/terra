@@ -23,7 +23,8 @@ class TestSettingsUnconfiguredCase(TestCase):
 
   def setUp(self):
     # Useful for tests that set this
-    self.patches.append(mock.patch.dict(os.environ,
+    self.patches.append(mock.patch.dict(
+        os.environ,
         {'TERRA_SETTINGS_FILE': self.settings_filename}))
     # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))

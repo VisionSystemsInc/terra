@@ -72,6 +72,7 @@ import struct
 import select
 import pickle
 
+import terra
 from terra.core.exceptions import ImproperlyConfigured
 # Do not import terra.settings or terra.signals here, or any module that
 # imports them
@@ -191,8 +192,8 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
     self.ready = True
     while not abort:
       rd, wr, ex = select.select([self.socket.fileno()],
-                                  [], [],
-                                  self.timeout)
+                                 [], [],
+                                 self.timeout)
       if rd:
         self.handle_request()
       abort = self.abort
@@ -262,11 +263,11 @@ class _SetupTerraLogger():
     # Disable known warnings that there's nothing to be done about.
     for module in ('yaml', 'celery.app.amqp'):
       warnings.filterwarnings("ignore",
-          category=DeprecationWarning, module=module,
-          message="Using or importing the ABCs")
+                              category=DeprecationWarning, module=module,
+                              message="Using or importing the ABCs")
     warnings.filterwarnings("ignore",
-        category=DeprecationWarning, module='osgeo',
-        message="the imp module is deprecated")
+                            category=DeprecationWarning, module='osgeo',
+                            message="the imp module is deprecated")
 
     # This disables a message that spams the screen:
     # "pipbox received method enable_events() [reply_to:None ticket:None]"
@@ -283,6 +284,7 @@ class _SetupTerraLogger():
       raise AttributeError("'_logs' has no 'main_log_handler'. An executor "
                            "class' 'configure_logger' method should setup a "
                            "'main_log_handler'.")
+
   @main_log_handler.setter
   def main_log_handler(self, value):
     self.__main_log_handler = value
@@ -312,7 +314,7 @@ class _SetupTerraLogger():
       try:
         from terra import settings
         zone = settings.terra.zone
-      except:
+      except Exception:
         zone = 'preconfig'
       print(f'Exception in {zone} on {platform.node()}',
             file=sys.stderr)
@@ -347,7 +349,7 @@ class _SetupTerraLogger():
         try:
           from terra import settings
           zone = settings.terra.zone
-        except:
+        except Exception:
           zone = 'preconfig'
         print(f'Exception in {zone} on {platform.node()}',
               file=sys.stderr)
@@ -409,9 +411,10 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    settings_dump = os.path.join(settings.processing_dir,
+    settings_dump = os.path.join(
+        settings.processing_dir,
         datetime.now(timezone.utc).strftime(
-        f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
+            f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
     with open(settings_dump, 'w') as fid:
       fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 
@@ -465,28 +468,27 @@ class _SetupTerraLogger():
     self.set_level_and_formatter()
 
 
-class TerraAddFilter(logging.Filter):
+class TerraAddFilter(Filter):
   def filter(self, record):
     if not hasattr(record, 'hostname'):
       record.hostname = platform.node()
     if not hasattr(record, 'zone'):
       try:
-        from terra import settings
         if terra.settings.configured:
           record.zone = terra.settings.terra.zone
         else:
           record.zone = 'preconfig'
-      except:
+      except BaseException:
         record.zone = 'preconfig'
     return True
 
 
-class StdErrFilter(logging.Filter):
+class StdErrFilter(Filter):
   def filter(self, record):
     return not getattr(record, 'skip_stderr', False)
 
 
-class SkipStdErrAddFilter(logging.Filter):
+class SkipStdErrAddFilter(Filter):
   def filter(self, record):
     record.skip_stderr = getattr(record, 'skip_stderr', True)
     return True
@@ -494,6 +496,7 @@ class SkipStdErrAddFilter(logging.Filter):
 
 class ColorFormatter(Formatter):
   use_color = True
+
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     # self.use_color = use_color
@@ -517,27 +520,6 @@ class ColorFormatter(Formatter):
       return msg
     else:
       return super().format(record)
-
-
-# def show_log(k, v):
-#   def show_dict_fields(prefix, dict1):
-#     for fld,val in dict1.items():
-#       print('%s%s=%s' %(prefix, fld,val) )
-
-#   if not isinstance(v, logging.PlaceHolder):
-#     print('+ [%s] {%s} (%s) ' % (str.ljust( k, 20), str(v.__class__)[8:-2], logging.getLevelName(v.level)) )
-#     print(str.ljust( '-------------------------',20) )
-#     show_dict_fields('   -', v.__dict__)
-
-#     for h in v.handlers:
-#       print('     +++%s (%s)' %(str(h.__class__)[8:-2], logging.getLevelName(h.level) ))
-#       show_dict_fields('   -', h.__dict__)
-
-# # from https://github.com/mickeyperlstein/logging_debugger/blob/master/__init__.py
-# def show_logs_and_handlers():
-#   show_log('root', logging.getLogger(''))
-#   for k,v in logging.Logger.manager.loggerDict.items():
-#     show_log(k,v)
 
 
 class Logger(Logger_original):
@@ -686,6 +668,7 @@ logging.setLoggerClass(Logger)
 # Get the logger here, AFTER all the changes to the logger class
 logger = getLogger(__name__)
 
+
 def _setup_terra_logger():
   # Must be import signal after getLogger is defined... Currently this is
   # imported from logger. But if a custom getLogger is defined eventually, it
@@ -702,6 +685,7 @@ def _setup_terra_logger():
   terra.core.signals.post_settings_context.connect(logs.reconfigure_logger)
 
   return logs
+
 
 # Disable log setup for unittests. Can't use settings here ;)
 if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover

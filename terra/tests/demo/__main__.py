@@ -16,10 +16,12 @@ from terra.core.settings import ENVIRONMENT_VARIABLE, settings_property
 from terra.core.exceptions import ImproperlyConfigured
 from terra.utils.cli import FullPaths, ArgumentParser
 
+
 @settings_property
 def singularity_unset(self):
   raise ImproperlyConfigured('You must to set --compose and --service for '
                              'singularity')
+
 
 def demo_templates():
   docker = {

@@ -51,6 +51,7 @@ class Demo2(Demo1):
   ''' Simple Demo Service '''
   command = ['python', '-m', 'terra.tests.demo.runners.demo2']
 
+
 @DockerCompute.register(Demo2)
 class Demo2_docker(DockerService, Demo2):
   def __init__(self):

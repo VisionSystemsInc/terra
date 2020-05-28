@@ -17,7 +17,6 @@
 # limitations under the License.
 
 import os
-import atexit
 from os import environ as env
 from concurrent.futures import as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
@@ -30,7 +29,6 @@ from logging.handlers import SocketHandler
 from celery.signals import setup_logging
 
 from terra.executor.base import BaseFuture, BaseExecutor
-from terra.core.exceptions import ImproperlyConfigured
 import terra
 from terra import settings
 from terra.logger import getLogger
@@ -41,6 +39,7 @@ logger = getLogger(__name__)
 @setup_logging.connect
 def setup_loggers(*args, **kwargs):
   pass
+
 
 class CeleryExecutorFuture(BaseFuture):
   def __init__(self, asyncresult):
@@ -252,7 +251,7 @@ class CeleryExecutor(BaseExecutor):
 
   @staticmethod
   def configure_logger(sender, **kwargs):
-    if settings.terra.zone == 'task': # pragma: no cover
+    if settings.terra.zone == 'task':  # pragma: no cover
       # This will never really be reached, because the task_controller will
       # configure the logger, and than fork.
       sender.main_log_handler = NullHandler()

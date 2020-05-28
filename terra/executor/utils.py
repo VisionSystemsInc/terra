@@ -1,6 +1,3 @@
-import os
-import logging
-import concurrent.futures
 from importlib import import_module
 
 from terra import settings
@@ -42,13 +39,13 @@ class ExecutorHandler(ClassHandler):
       from terra.executor.sync import SyncExecutor
       return SyncExecutor
     elif backend_name == "ThreadPoolExecutor" or \
-         backend_name == "concurrent.futures.ThreadPoolExecutor":
+        backend_name == "concurrent.futures.ThreadPoolExecutor":
       from terra.executor.thread import ThreadPoolExecutor
-      return terra.executor.thread.ThreadPoolExecutor
+      return ThreadPoolExecutor
     elif backend_name == "ProcessPoolExecutor" or \
-         backend_name == "concurrent.futures.ProcessPoolExecutor":
+        backend_name == "concurrent.futures.ProcessPoolExecutor":
       from terra.executor.process import ProcessPoolExecutor
-      return terra.executor.process.ProcessPoolExecutor
+      return ProcessPoolExecutor
     elif backend_name == "CeleryExecutor":
       from terra.executor.celery import CeleryExecutor
       return CeleryExecutor

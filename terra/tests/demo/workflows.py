@@ -1,8 +1,8 @@
-from terra import settings
 from terra.compute import compute
 
 from terra.logger import getLogger
 logger = getLogger(__name__)
+
 
 class DemoWorkflow:
   def demonate(self):

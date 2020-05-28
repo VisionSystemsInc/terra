@@ -1,10 +1,5 @@
-import os
-import logging
-import logging.handlers
-from concurrent.futures import Future, Executor, as_completed
+from concurrent.futures import Future, Executor
 
-import terra
-from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -17,6 +12,7 @@ class BaseExecutor(Executor):
   @staticmethod
   def reconfigure_logger(sender, **kwargs):
     pass
+
 
 class BaseFuture(Future):
   pass

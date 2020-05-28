@@ -1,6 +1,6 @@
 from terra.core.signals import Signal, receiver
-import terra.core.signals as signals
-from .utils import TestCase, TestSignalCase
+from .utils import TestSignalCase
+
 
 class TestSignals(TestSignalCase):
   def signal_handle1(self, sender, **kwargs):
@@ -160,5 +160,5 @@ class TestSignals(TestSignalCase):
 #           signal.receivers,
 #           msg="If you are seeing this, one of the other unit tests has "
 #               "left a signal connected. This side effect should "
-#               "be prevented by disconnecting any functions you connected to a "
-#               "signal.")
+#               "be prevented by disconnecting any functions you connected to "
+#               "a signal.")

@@ -8,11 +8,7 @@ import tempfile
 
 from envcontext import EnvironmentContext
 
-from .utils import (
-  TestCase, TestLoggerCase, TestLoggerConfigureCase,
-  TestSettingsUnconfiguredCase
-)
-
+from .utils import TestCase, TestLoggerCase, TestLoggerConfigureCase
 from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
@@ -671,7 +667,8 @@ class TestCircularDependency(TestLoggerConfigureCase):
         break
       time.sleep(0.001)
     else:
-      self.assertFalse(terra.logger._logs.tcp_logging_server.ready, 'TCP Server did not shut down within a second')
+      self.assertFalse(terra.logger._logs.tcp_logging_server.ready,
+                       'TCP Server did not shut down within a second')
 
     # Picky windows
     import terra.logger

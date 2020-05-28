@@ -5,13 +5,6 @@ Demo app that tests if a terra config is working
 configured to do so. May result in a small amount of billing.
 '''
 
-import argparse
-from os import environ as env
-import tempfile
-import os
-import json
-import pydoc
-
 from terra.utils.cli import ArgumentParser
 from terra import settings
 from terra.logger import getLogger
@@ -21,6 +14,7 @@ logger = getLogger(__name__)
 def main(args=None):
   settings.terra.zone
   logger.critical('Demo 1')
+
 
 if __name__ == '__main__':
   ArgumentParser().parse_args()

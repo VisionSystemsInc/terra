@@ -45,7 +45,8 @@ class ContainerService(BaseService):
       env_volume_index += 1
 
     # Setup volumes for container
-    self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = \
+    self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+             f'VOLUME_{env_volume_index}'] = \
         f'{str(temp_dir)}:/tmp_settings:rw'
     env_volume_index += 1
 
@@ -55,7 +56,8 @@ class ContainerService(BaseService):
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
-      self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = \
+      self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+               f'VOLUME_{env_volume_index}'] = \
           volume_str
       env_volume_index += 1
 

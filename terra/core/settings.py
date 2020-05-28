@@ -153,6 +153,7 @@ from inspect import isfunction
 from functools import wraps
 from json import JSONEncoder
 import platform
+import warnings
 
 from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
 # Do not import terra.logger or terra.signals here, or any module that
@@ -252,6 +253,7 @@ def unittest(self):
 
   return os.environ.get('TERRA_UNITTEST', None) == "1"
 
+
 @settings_property
 def need_to_set_virtualenv_dir(self):
   warnings.warn("You are using the virtualenv compute, and did not set "
@@ -259,9 +261,11 @@ def need_to_set_virtualenv_dir(self):
                 "Using system python.", ConfigurationWarning)
   return None
 
+
 @settings_property
 def terra_uuid(self):
   return str(uuid4())
+
 
 global_templates = [
   (
@@ -270,7 +274,8 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": "%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s",
+        "format": "%(asctime)s (%(hostname)s:%(zone)s): "
+                  "%(levelname)s/%(processName)s - %(filename)s - %(message)s",
         "date_format": None,
         "style": "%",
         "server": {
@@ -526,8 +531,8 @@ class LazySettings(LazyObject):
         lambda key, value: read_json(value))
 
     # Importing these here is intentional
-    import terra.executor
-    import terra.compute
+    import terra.executor  # noqa
+    import terra.compute  # noqa
     # compute._connection # call a cached property
 
     from terra.core.signals import post_settings_configured
@@ -720,7 +725,9 @@ class TerraJSONEncoder(JSONEncoder):
 
     obj = nested_patch(
         obj,
-        lambda k, v: any(v is not None and isinstance(k, str) and k.endswith(pattern) for pattern in filename_suffixes),
+        lambda k, v: any(v is not None and isinstance(k, str)
+                         and k.endswith(pattern)
+                         for pattern in filename_suffixes),
         lambda k, v: os.path.expanduser(v))
 
     return obj

@@ -24,13 +24,12 @@ def main(args=None):
   with Executor(max_workers=4) as executor:
     for x in range(1, 3):
       for y in range(4, 6):
-        futures[executor.submit(demo2, x, y)] = (x,y)
+        futures[executor.submit(demo2, x, y)] = (x, y)
 
     for future in concurrent.futures.as_completed(futures):
       logger.info(f'Completed: {settings.terra.zone} {futures[future]}')
 
   logger.critical('Demo 2 Done')
-
 
 
 if __name__ == '__main__':

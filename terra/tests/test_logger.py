@@ -2,24 +2,16 @@ from unittest import mock
 import io
 import os
 import sys
-import json
 import logging
 import uuid
-import tempfile
 import platform
 import warnings
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
-from .utils import (
-  TestCase, make_traceback, TestNamedTemporaryFileCase,
-  TestSettingsUnconfiguredCase,
-  TestLoggerConfigureCase
-)
+from .utils import TestCase, make_traceback, TestLoggerConfigureCase
 from terra import logger
-from terra.core import signals
 
-# import terra.compute.utils
 
 class TestHandlerLoggingContext(TestCase):
   def test_handler_logging_context(self):
@@ -44,7 +36,6 @@ class TestHandlerLoggingContext(TestCase):
 
 
 class TestLogger(TestLoggerConfigureCase):
-  pass
   def test_setup_working(self):
     self.assertFalse(settings.configured)
     self.assertEqual(settings.processing_dir, self.temp_dir.name)
@@ -83,7 +74,7 @@ class TestLogger(TestLoggerConfigureCase):
         # with self.assertRaises(ZeroDivisionError):
         tb = make_traceback()
         sys.excepthook(ZeroDivisionError,
-                      ZeroDivisionError('division by almost zero'), tb)
+                       ZeroDivisionError('division by almost zero'), tb)
 
     self.assertIn('division by almost zero', str(cm.output))
     # Test stack trace stuff in there
@@ -106,7 +97,8 @@ class TestLogger(TestLoggerConfigureCase):
   def test_logs_temp_file(self):
     temp_handler = [
         h for h in self._logs.root_logger.handlers
-        if hasattr(h, 'stream') and h.stream.name == self._logs.tmp_file.name][0]
+        if hasattr(h, 'stream')
+        and h.stream.name == self._logs.tmp_file.name][0]
     # Test that log everything is set
     self.assertEqual(temp_handler.level, logger.NOTSET)
     self.assertEqual(self._logs.root_logger.level, logger.NOTSET)

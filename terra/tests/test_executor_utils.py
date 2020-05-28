@@ -1,4 +1,4 @@
-from unittest import mock, SkipTest
+from unittest import SkipTest
 import concurrent.futures
 
 from terra import settings

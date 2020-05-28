@@ -51,20 +51,19 @@ class TestServiceBase(TestSettingsConfiguredCase):
         class TestService(self.base.BaseService):
           pass
 
-
       class TestService_base(Foo.TestService, self.base.BaseService):
         pass
 
       # Register a class class, just for fun
       self.base.BaseCompute.register(Foo.TestService)(TestService_base)
 
-      self.assertIn(Foo.TestService.__module__ + '.' + \
-                    Foo.TestService.__qualname__,
+      self.assertIn(Foo.TestService.__module__ + '.'
+                    + Foo.TestService.__qualname__,
                     self.base.services)
 
       with self.assertRaises(self.base.AlreadyRegisteredException,
-                            msg='Compute command "car" does not have a service '
-                                'implementation "car_service"'):
+                             msg='Compute command "car" does not have a '
+                                 'service implementation "car_service"'):
         self.base.BaseCompute.register(Foo.TestService)(lambda x: 1)
 
   def test_getattr(self):

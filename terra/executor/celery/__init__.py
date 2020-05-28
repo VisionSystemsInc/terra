@@ -1,6 +1,7 @@
 import sys
 from os import environ as env
 
+from celery.signals import worker_process_init
 from celery import Celery
 
 from .executor import CeleryExecutor
@@ -16,34 +17,17 @@ if main_name is None:
     # FIXME __spec__ is None (__main__ is builtin)
     main_name = sys.modules['__main__'].__spec__.name
   # REVIEW can we catch a specific exception here, like AttributeError
-  except:
+  except Exception:
     main_name = "main_name_unset__set_TERRA_CELERY_MAIN_NAME"
 app = Celery(main_name)
 
 app.config_from_object(env['TERRA_CELERY_CONF'])
 
-from celery.signals import worker_process_init, worker_init
+
 @worker_process_init.connect
 def start_worker_child(*args, **kwargs):
   from terra import settings
   settings.terra.zone = 'task'
-#   print(args)
-#   print(kwargs)
-#   logger.info('hi')
-
-# @worker_init.connect
-# def start_worker(*args, **kwargs):
-#   logger.info('Hi')
-
-
-# app.running = False
-# from celery.signals import worker_process_init
-# @worker_process_init.connect
-# def set_running(*args, **kwargs):
-#     app.running = True
-
-# import traceback
-# traceback.print_stack()
 
 # Running on windows.
 # https://stackoverflow.com/questions/37255548/how-to-run-celery-on-windows

@@ -1,5 +1,3 @@
-import json
-from os import environ as env
 import os
 from tempfile import gettempdir
 
@@ -9,7 +7,6 @@ from vsi.tools.python import args_to_kwargs, ARGS, KWARGS
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
-from terra.executor import Executor
 import terra.logger
 import terra.compute.utils
 from terra.logger import getLogger
@@ -41,7 +38,7 @@ class TerraTask(Task):
       reverse_compute_volume_map.reverse()
 
       reverse_executor_volume_map = [[x[1], x[0]]
-                                    for x in executor_volume_map]
+                                     for x in executor_volume_map]
       reverse_executor_volume_map.reverse()
 
     else:
@@ -92,13 +89,15 @@ class TerraTask(Task):
       with settings:
         # Calculate the exector's mapped version of the runner's settings
         compute_volume_map, reverse_compute_volume_map, \
-        executor_volume_map, reverse_executor_volume_map = \
+            executor_volume_map, reverse_executor_volume_map = \
             self._get_volume_mappings()
 
         # Load the executor version of the runner's settings
         settings._wrapped.clear()
-        settings._wrapped.update(self.translate_paths(self.request.settings,
-            reverse_compute_volume_map, executor_volume_map))
+        settings._wrapped.update(self.translate_paths(
+            self.request.settings,
+            reverse_compute_volume_map,
+            executor_volume_map))
         # This is needed here because I just loaded settings from a runner!
         settings.terra.zone = 'task'
 
@@ -116,14 +115,16 @@ class TerraTask(Task):
         args_only = kwargs.pop(ARGS, ())
         kwargs.update(kwargs.pop(KWARGS, ()))
         kwargs = self.translate_paths(kwargs,
-            reverse_compute_volume_map, executor_volume_map)
+                                      reverse_compute_volume_map,
+                                      executor_volume_map)
         # Set up logger to talk to master controller
         terra.logger._logs.reconfigure_logger(pre_run_task=True)
         return_value = self.run(*args_only, **kwargs)
 
         # Calculate the runner mapped version of the executor's return value
         return_value = self.translate_paths(return_value,
-            reverse_executor_volume_map, compute_volume_map)
+                                            reverse_executor_volume_map,
+                                            compute_volume_map)
     else:
       # Must call (synchronous) apply or python __call__ with no volume
       # mappings

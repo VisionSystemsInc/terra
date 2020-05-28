@@ -1,6 +1,4 @@
-from unittest import mock
 import re
-import os
 import json
 
 from terra.utils.workflow import resumable, AlreadyRunException

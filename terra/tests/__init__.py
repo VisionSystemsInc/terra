@@ -1,21 +1,17 @@
 import os
 import warnings
 
-# from terra.core.signals import logger_configure, logger_reconfigure
-
-
-# # Disconnect signal receivers
-# logger_configure.receivers = []
-# logger_reconfigure.receivers = []
 
 original_environ = os.environ.copy()
+
 
 # Use this as a package level setup
 def load_tests(loader, standard_tests, pattern):
   if os.environ.get('TERRA_UNITTEST', None) != "1":
-    warnings.warn('WARNING: Running terra tests without setting TERRA_UNITTEST will '
-          'result in side effects such as extraneouse log files being '
-          'generated')
+    warnings.warn(
+        'WARNING: Running terra tests without setting TERRA_UNITTEST will '
+        'result in side effects such as extraneouse log files being '
+        'generated')
 
   this_dir = os.path.dirname(__file__)
   package_tests = loader.discover(start_dir=this_dir, pattern=pattern)

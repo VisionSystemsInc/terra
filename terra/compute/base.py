@@ -1,5 +1,4 @@
 import os
-import json
 import time
 import atexit
 from logging import StreamHandler
@@ -10,7 +9,9 @@ import warnings
 from terra import settings
 import terra.compute.utils
 from terra.executor import Executor
-from terra.logger import getLogger, LogRecordSocketReceiver, SkipStdErrAddFilter
+from terra.logger import (
+  getLogger, LogRecordSocketReceiver, SkipStdErrAddFilter
+)
 logger = getLogger(__name__)
 
 
@@ -196,13 +197,13 @@ class BaseCompute:
   def configure_logger(sender, **kwargs):
     if settings.terra.zone == 'controller':
       # Setup log file for use in configure
-      sender._log_file = os.path.join(settings.processing_dir,
+      sender._log_file = os.path.join(
+          settings.processing_dir,
           terra.logger._SetupTerraLogger.default_log_prefix)
       os.makedirs(settings.processing_dir, exist_ok=True)
       sender._log_file = open(sender._log_file, 'a')
       sender.main_log_handler = StreamHandler(stream=sender._log_file)
       sender.root_logger.addHandler(sender.main_log_handler)
-
 
       # setup the TCP socket listener
       sender.tcp_logging_server = LogRecordSocketReceiver(
@@ -217,7 +218,7 @@ class BaseCompute:
         if sender.tcp_logging_server.ready:
           break
         time.sleep(0.001)
-      else: # pragma: no cover
+      else:  # pragma: no cover
         warnings.warn("TCP Logging server thread did not startup. "
                       "This is probably not a problem, unless logging isn't "
                       "working.", RuntimeWarning)
@@ -227,7 +228,7 @@ class BaseCompute:
       def cleanup_thread():
         sender.tcp_logging_server.abort = 1
         listener_thread.join(timeout=5)
-        if listener_thread.is_alive(): # pragma: no cover
+        if listener_thread.is_alive():  # pragma: no cover
           warnings.warn("TCP Logger Server Thread did not shut down "
                         "gracefully. Attempting to exit anyways.",
                         RuntimeWarning)
@@ -248,7 +249,8 @@ class BaseCompute:
     # output stream
 
     if settings.terra.zone == 'controller':
-      log_file = os.path.join(settings.processing_dir,
+      log_file = os.path.join(
+          settings.processing_dir,
           terra.logger._SetupTerraLogger.default_log_prefix)
 
       # Check to see if _log_file is unset. If it is, this is due to _log_file
@@ -268,11 +270,12 @@ class BaseCompute:
         sender.main_log_handler.close()
         try:
           sender.root_logger.removeHandler(sender.main_log_handler)
-        except ValueError: # pragma: no cover
+        except ValueError:  # pragma: no cover
           pass
 
         sender.main_log_handler = SocketHandler(
             settings.logging.server.hostname, settings.logging.server.port)
         sender.root_logger.addHandler(sender.main_log_handler)
+
 
 services = {}

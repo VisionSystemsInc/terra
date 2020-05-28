@@ -100,6 +100,7 @@ terra.core.signals.logger_reconfigure.connect(
     lambda *args, **kwargs: compute.reconfigure_logger(*args, **kwargs),
     weak=False)
 
+
 def get_default_service_class(cls):
   '''
   Gets a compute class' default Service class from the class object.
