@@ -224,7 +224,10 @@ class TestObjectDict(TestCase):
     self.assertIn('c', dir(d.b[0][0]))
 
 
-class TestSettings(TestLoggerCase, TestSettingsUnconfiguredCase):
+class TestSettings(TestLoggerCase):
+  # TestLoggerCase sets TERRA_SETTINGS_FILE to a valid file, in order to get
+  # an ImproperlyConfigured Exception here, TERRA_SETTINGS_FILE must be set to
+  # not a file, such as the empty string.
   @mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='')
   def test_unconfigured(self):
     with self.assertRaises(ImproperlyConfigured):

@@ -7,7 +7,7 @@ from terra import settings
 from terra.executor.utils import Executor
 from terra.compute import base
 import terra.compute.container
-from .utils import TestCase, TestNamedTemporaryFileCase
+from .utils import TestNamedTemporaryFileCase, TestSettingsUnconfiguredCase
 
 
 class SomeService(terra.compute.container.ContainerService):
@@ -29,11 +29,9 @@ def mock_map_lcow(self, *args, **kwargs):
   return [('/c/foo', '/bar')]
 
 
-class TestComputeContainerCase(TestCase):
+class TestComputeContainerCase(TestSettingsUnconfiguredCase):
   def setUp(self):
     self.temp_dir
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # This will resets the _connection to an uninitialized state
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,

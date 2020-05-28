@@ -6,7 +6,7 @@ from terra.compute import base
 from terra.compute import dummy
 import terra.compute.utils
 
-from .utils import TestCase
+from .utils import TestSettingsUnconfiguredCase
 
 
 # Test Dummy Definition
@@ -31,10 +31,8 @@ class TestServiceManual_dummy(TestServiceManual, dummy.Service):
     self.d = 44
 
 
-class TestComputeDummyCase(TestCase):
+class TestComputeDummyCase(TestSettingsUnconfiguredCase):
   def setUp(self):
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # Use registry
     self.patches.append(mock.patch.dict(base.services, clear=True))
     # Use compute

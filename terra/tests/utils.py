@@ -4,18 +4,16 @@ import json
 from unittest import mock
 
 from vsi.test.utils import (
-  TestCase as TestCase_original, make_traceback, TestNamedTemporaryFileCase
+  TestCase, make_traceback, TestNamedTemporaryFileCase
 )
 
 from terra import settings
 
 
 __all__ = ["TestCase", "make_traceback", "TestNamedTemporaryFileCase",
-           "TestSettingsUnconfiguredCase", "TestSettingsConfiguredCase"]
-
-
-class TestCase(TestCase_original):
-  pass
+           "TestSettingsUnconfiguredCase", "TestSettingsConfiguredCase",
+           "TestComputeCase", "TestExecutorCase", "TestSignalCase",
+           "TestLoggerConfigureCase"]
 
 
 class TestSettingsUnconfiguredCase(TestCase):
@@ -45,8 +43,9 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
     MockLogRecordSocketReceiver = mock.Mock(**attrs)
     self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',
                                    MockLogRecordSocketReceiver))
-    self.patches.append(mock.patch('terra.compute.base.LogRecordSocketReceiver',
-                                   MockLogRecordSocketReceiver))
+    self.patches.append(mock.patch(
+        'terra.compute.base.LogRecordSocketReceiver',
+        MockLogRecordSocketReceiver))
     # Special customization of TestSettingsUnconfiguredCase
     self.settings_filename = os.path.join(self.temp_dir.name, 'config.json')
     config = {"processing_dir": self.temp_dir.name}
@@ -72,8 +71,10 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
       pass
     self._logs.root_logger.handlers = []
     import terra.core.signals
-    terra.core.signals.post_settings_configured.disconnect(self._logs.configure_logger)
-    terra.core.signals.post_settings_context.disconnect(self._logs.reconfigure_logger)
+    terra.core.signals.post_settings_configured.disconnect(
+        self._logs.configure_logger)
+    terra.core.signals.post_settings_context.disconnect(
+        self._logs.reconfigure_logger)
     super().tearDown()
 
 
@@ -87,7 +88,8 @@ class TestComputeCase(TestCase):
 class TestExecutorCase(TestCase):
   def setUp(self):
     import terra.executor.utils
-    self.patches.append(mock.patch.dict(terra.executor.utils.Executor.__dict__))
+    self.patches.append(mock.patch.dict(
+        terra.executor.utils.Executor.__dict__))
     super().setUp()
 
 

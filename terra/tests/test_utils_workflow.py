@@ -6,22 +6,15 @@ import json
 from terra.utils.workflow import resumable, AlreadyRunException
 from terra import settings
 from terra.logger import DEBUG1
-from .utils import TestCase
+from .utils import TestSettingsUnconfiguredCase
 
 
 class Klass:
   pass
 
 
-class TestResumable(TestCase):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.patches = []
-
+class TestResumable(TestSettingsUnconfiguredCase):
   def setUp(self):
-    self.patches.append(mock.patch.dict(os.environ,
-                                        {'TERRA_SETTINGS_FILE': ""}))
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
     super().setUp()
     settings.configure({'processing_dir': self.temp_dir.name})
 
