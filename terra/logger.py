@@ -183,7 +183,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
     socketserver.ThreadingTCPServer.__init__(self, (host, port), handler)
     self.abort = False
     self.ready = False
-    self.timeout = 1
+    self.timeout = 0.1
     self.logname = None
 
   def serve_until_stopped(self):

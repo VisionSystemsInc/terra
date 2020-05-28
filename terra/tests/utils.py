@@ -20,13 +20,13 @@ class TestCase(TestCase_original):
 
 class TestSettingsUnconfiguredCase(TestCase):
   def __init__(self, *args, **kwargs):
-    self.settings_file = ''
+    self.settings_filename = ''
     super().__init__(*args, **kwargs)
 
   def setUp(self):
     # Useful for tests that set this
     self.patches.append(mock.patch.dict(os.environ,
-        {'TERRA_SETTINGS_FILE': self.settings_file}))
+        {'TERRA_SETTINGS_FILE': self.settings_filename}))
     # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
     super().setUp()
@@ -44,6 +44,8 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
     attrs = {'serve_until_stopped.return_value': True, 'ready': True}
     MockLogRecordSocketReceiver = mock.Mock(**attrs)
     self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',
+                                   MockLogRecordSocketReceiver))
+    self.patches.append(mock.patch('terra.compute.base.LogRecordSocketReceiver',
                                    MockLogRecordSocketReceiver))
     # Special customization of TestSettingsUnconfiguredCase
     self.settings_filename = os.path.join(self.temp_dir.name, 'config.json')

@@ -8,6 +8,7 @@ import warnings
 # logger_configure.receivers = []
 # logger_reconfigure.receivers = []
 
+original_environ = os.environ.copy()
 
 # Use this as a package level setup
 def load_tests(loader, standard_tests, pattern):

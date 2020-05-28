@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import time
 from unittest import mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 import tempfile
@@ -221,6 +222,7 @@ class TestObjectDict(TestCase):
 
 
 class TestSettings(TestLoggerCase, TestSettingsUnconfiguredCase):
+  @mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='')
   def test_unconfigured(self):
     with self.assertRaises(ImproperlyConfigured):
       settings.foo
@@ -479,151 +481,151 @@ class TestSettings(TestLoggerCase, TestSettingsUnconfiguredCase):
     self.assertNotIn('b', settings)
     self.assertNotIn('c', settings)
 
-  # @mock.patch('terra.core.settings.global_templates', [])
-  # def test_json(self):
-  #   with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
-  #                           delete=False) as fid:
-  #     fid.write('{"a": 15, "b":"22", "c": true}')
+  @mock.patch('terra.core.settings.global_templates', [])
+  def test_json(self):
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 15, "b":"22", "c": true}')
 
-  #   @settings_property
-  #   def c(self):
-  #     return self['a']
+    @settings_property
+    def c(self):
+      return self['a']
 
-  #   settings.add_templates([({},
-  #                            {'a': fid.name,
-  #                             'b_json': fid.name,
-  #                             # Both json AND settings_property
-  #                             'c_json': c})])
+    settings.add_templates([({},
+                             {'a': fid.name,
+                              'b_json': fid.name,
+                              # Both json AND settings_property
+                              'c_json': c})])
 
-  #   settings.configure({})
+    settings.configure({})
 
-  #   self.assertEqual(settings.a, fid.name)
-  #   self.assertEqual(settings.b_json.a, 15)
-  #   self.assertEqual(settings.b_json.b, "22")
-  #   self.assertEqual(settings.b_json.c, True)
-  #   self.assertEqual(settings.c_json.a, 15)
-  #   self.assertEqual(settings.c_json.b, "22")
-  #   self.assertEqual(settings.c_json.c, True)
+    self.assertEqual(settings.a, fid.name)
+    self.assertEqual(settings.b_json.a, 15)
+    self.assertEqual(settings.b_json.b, "22")
+    self.assertEqual(settings.b_json.c, True)
+    self.assertEqual(settings.c_json.a, 15)
+    self.assertEqual(settings.c_json.b, "22")
+    self.assertEqual(settings.c_json.c, True)
 
-  # def test_json_serializer(self):
+  def test_json_serializer(self):
 
-  #   @settings_property
-  #   def c(self):
-  #     return self.a + self.b
+    @settings_property
+    def c(self):
+      return self.a + self.b
 
-  #   with self.assertRaises(ImproperlyConfigured):
-  #     TerraJSONEncoder.dumps(settings)
+    with self.assertRaises(ImproperlyConfigured):
+      TerraJSONEncoder.dumps(settings)
 
-  #   settings._wrapped = Settings({'a': 11, 'b': 22, 'c': c})
-  #   j = json.loads(TerraJSONEncoder.dumps(settings))
-  #   self.assertEqual(j['a'], 11)
-  #   self.assertEqual(j['b'], 22)
-  #   self.assertEqual(j['c'], 33)
+    settings._wrapped = Settings({'a': 11, 'b': 22, 'c': c})
+    j = json.loads(TerraJSONEncoder.dumps(settings))
+    self.assertEqual(j['a'], 11)
+    self.assertEqual(j['b'], 22)
+    self.assertEqual(j['c'], 33)
 
-  # def test_nested_json_serializer(self):
-  #   @settings_property
-  #   def c(self):
-  #     return self.a + self.b
+  def test_nested_json_serializer(self):
+    @settings_property
+    def c(self):
+      return self.a + self.b
 
-  #   settings._wrapped = Settings(
-  #               {'a': 11, 'b': 22, 'q': {'x': c, 'y': c, 'foo': {'t': [c]}}})
-  #   j = json.loads(TerraJSONEncoder.dumps(settings))
-  #   self.assertEqual(j['a'], 11)
-  #   self.assertEqual(j['b'], 22)
-  #   self.assertEqual(j['q']['x'], 33)
-  #   self.assertEqual(j['q']['y'], 33)
-  #   self.assertEqual(j['q']['foo']['t'][0], 33)
+    settings._wrapped = Settings(
+                {'a': 11, 'b': 22, 'q': {'x': c, 'y': c, 'foo': {'t': [c]}}})
+    j = json.loads(TerraJSONEncoder.dumps(settings))
+    self.assertEqual(j['a'], 11)
+    self.assertEqual(j['b'], 22)
+    self.assertEqual(j['q']['x'], 33)
+    self.assertEqual(j['q']['y'], 33)
+    self.assertEqual(j['q']['foo']['t'][0], 33)
 
-  # def test_properties_status_file(self):
-  #   settings.configure({})
-  #   with settings:
-  #     if os.name == "nt":
-  #       settings.processing_dir = 'C:\\foobar'
-  #       ans = 'C:\\foobar\\status.json'
-  #     else:
-  #       settings.processing_dir = '/foobar'
-  #       ans = '/foobar/status.json'
-  #     self.assertEqual(settings.status_file, ans)
+  def test_properties_status_file(self):
+    settings.configure({})
+    with settings:
+      if os.name == "nt":
+        settings.processing_dir = 'C:\\foobar'
+        ans = 'C:\\foobar\\status.json'
+      else:
+        settings.processing_dir = '/foobar'
+        ans = '/foobar/status.json'
+      self.assertEqual(settings.status_file, ans)
 
-  # def test_properties_processing_dir_default(self):
-  #   settings.configure({})
+  def test_properties_processing_dir_default(self):
+    settings.configure({})
 
-  #   with self.assertLogs(), settings:
-  #     self.assertEqual(settings.processing_dir, os.getcwd())
+    with self.assertLogs(), settings:
+      self.assertEqual(settings.processing_dir, os.getcwd())
 
-  # def test_properties_processing_dir_config_file(self):
-  #   settings.configure({})
+  def test_properties_processing_dir_config_file(self):
+    settings.configure({})
 
-  #   with settings, TemporaryDirectory() as temp_dir:
-  #     settings.config_file = os.path.join(temp_dir, 'foo.bar')
-  #     self.assertEqual(settings.processing_dir, temp_dir)
+    with settings, TemporaryDirectory() as temp_dir:
+      settings.config_file = os.path.join(temp_dir, 'foo.bar')
+      self.assertEqual(settings.processing_dir, temp_dir)
 
-  # def test_properties_processing_dir_nonexisting_config_file(self):
-  #   settings.configure({})
+  def test_properties_processing_dir_nonexisting_config_file(self):
+    settings.configure({})
 
-  #   def mock_mkdtemp(prefix):
-  #     return f'"{prefix}"'
+    def mock_mkdtemp(prefix):
+      return f'"{prefix}"'
 
-  #   with mock.patch.object(tempfile, 'mkdtemp', mock_mkdtemp), \
-  #       self.assertLogs(), settings:
-  #     settings.config_file = '/land/of/foo.bar'
-  #     self.assertEqual(settings.processing_dir, '"terra_"')
+    with mock.patch.object(tempfile, 'mkdtemp', mock_mkdtemp), \
+        self.assertLogs(), settings:
+      settings.config_file = '/land/of/foo.bar'
+      self.assertEqual(settings.processing_dir, '"terra_"')
 
-  # def test_properties_unittest(self):
-  #   settings.configure({})
+  def test_properties_unittest(self):
+    settings.configure({})
 
-  #   with settings, EnvironmentContext(TERRA_UNITTEST="1"):
-  #     self.assertTrue(settings.unittest)
+    with settings, EnvironmentContext(TERRA_UNITTEST="1"):
+      self.assertTrue(settings.unittest)
 
-  #   with settings, EnvironmentContext(TERRA_UNITTEST="0"):
-  #     self.assertFalse(settings.unittest)
+    with settings, EnvironmentContext(TERRA_UNITTEST="0"):
+      self.assertFalse(settings.unittest)
 
-  #   # Test when unset
-  #   with settings, EnvironmentContext(TERRA_UNITTEST='1'):
-  #     os.environ.pop('TERRA_UNITTEST')
-  #     self.assertFalse(settings.unittest)
+    # Test when unset
+    with settings, EnvironmentContext(TERRA_UNITTEST='1'):
+      os.environ.pop('TERRA_UNITTEST')
+      self.assertFalse(settings.unittest)
 
-  #   # Make sure I didn't break anything
-  #   self.assertEqual(os.environ['TERRA_UNITTEST'], '1')
+    # Make sure I didn't break anything
+    self.assertEqual(os.environ['TERRA_UNITTEST'], '1')
 
-  # def test_expanduser(self):
-  #   settings.configure({'test_dir': '~/foo',
-  #                       'test_that': '~/bar'})
+  def test_expanduser(self):
+    settings.configure({'test_dir': '~/foo',
+                        'test_that': '~/bar'})
 
-  #   self.assertEqual(settings.test_dir, os.path.expanduser('~/foo'))
-  #   self.assertNotEqual(settings.test_that, os.path.expanduser('~/bar'))
-  #   self.assertEqual(settings.test_that, '~/bar')
+    self.assertEqual(settings.test_dir, os.path.expanduser('~/foo'))
+    self.assertNotEqual(settings.test_that, os.path.expanduser('~/bar'))
+    self.assertEqual(settings.test_that, '~/bar')
 
-  # def test_expanduser_once(self):
-  #   settings.configure({'test_dir': ExpandedString('~/foo'),
-  #                       'test_file': '~/bar'})
+  def test_expanduser_once(self):
+    settings.configure({'test_dir': ExpandedString('~/foo'),
+                        'test_file': '~/bar'})
 
-  #   self.assertNotIsInstance(settings._wrapped['test_file'], ExpandedString)
-  #   self.assertEqual(settings.test_file, os.path.expanduser('~/bar'))
-  #   self.assertIsInstance(settings._wrapped['test_file'], ExpandedString)
+    self.assertNotIsInstance(settings._wrapped['test_file'], ExpandedString)
+    self.assertEqual(settings.test_file, os.path.expanduser('~/bar'))
+    self.assertIsInstance(settings._wrapped['test_file'], ExpandedString)
 
-  #   self.assertEqual(settings.test_dir, '~/foo')
+    self.assertEqual(settings.test_dir, '~/foo')
 
-  # def test_expandvars(self):
-  #   with EnvironmentContext(FOO="NOTBAR"):
-  #     settings.configure({'test1': 'this${FOO}that',
-  #                         'test2': 'a${GKLDGSJLGKJSGURNAONV}b'})
+  def test_expandvars(self):
+    with EnvironmentContext(FOO="NOTBAR"):
+      settings.configure({'test1': 'this${FOO}that',
+                          'test2': 'a${GKLDGSJLGKJSGURNAONV}b'})
 
-  #   with EnvironmentContext(FOO="BAR"):
-  #     self.assertEqual(settings.test1, 'thisBARthat')
-  #     self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
+    with EnvironmentContext(FOO="BAR"):
+      self.assertEqual(settings.test1, 'thisBARthat')
+      self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
 
-  # def test_expandvars_once(self):
-  #   settings.configure({'test2': 'a${GKLDGSJLGKJSGURNAONV}b'})
+  def test_expandvars_once(self):
+    settings.configure({'test2': 'a${GKLDGSJLGKJSGURNAONV}b'})
 
-  #   # Evaluate it here once
-  #   self.assertNotIsInstance(settings._wrapped['test2'], ExpandedString)
-  #   self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
-  #   self.assertIsInstance(settings._wrapped['test2'], ExpandedString)
+    # Evaluate it here once
+    self.assertNotIsInstance(settings._wrapped['test2'], ExpandedString)
+    self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
+    self.assertIsInstance(settings._wrapped['test2'], ExpandedString)
 
-  #   with EnvironmentContext(GKLDGSJLGKJSGURNAONV="FOO"):
-  #     # Show it is not evaluated again here
-  #     self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
+    with EnvironmentContext(GKLDGSJLGKJSGURNAONV="FOO"):
+      # Show it is not evaluated again here
+      self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
 
 
 class TestUnitTests(TestCase):
@@ -656,6 +658,16 @@ class TestCircularDependency(TestLoggerCase):
 
     import terra.core.settings
     terra.core.settings.settings._setup()
+
+    # Shut down TCP server
+    terra.logger._logs.tcp_logging_server.abort = True
+
+    for x in range(1000):
+      if not terra.logger._logs.tcp_logging_server.ready:
+        break
+      time.sleep(0.001)
+    else:
+      self.assertFalse(terra.logger._logs.tcp_logging_server.ready, 'TCP Server did not shut down within a second')
 
     # Picky windows
     import terra.logger
