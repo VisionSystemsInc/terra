@@ -76,12 +76,18 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
     terra.core.signals.post_settings_context.disconnect(self._logs.reconfigure_logger)
     super().tearDown()
 
-class TestLoggerConfigureCase(TestLoggerCase):
+
+class TestComputeCase(TestCase):
   def setUp(self):
-    # Enable signals. Most logging tests require configure logger to actually
-    # be called. LogRecordSocketReceiver is mocked out, so no lasting side
-    # effects should inccur.
-    self.patches.append(mock.patch.dict(os.environ, TERRA_UNITTEST='0'))
+    import terra.compute.utils
+    self.patches.append(mock.patch.dict(terra.compute.utils.compute.__dict__))
+    super().setUp()
+
+
+class TestExecutorCase(TestCase):
+  def setUp(self):
+    import terra.executor.utils
+    self.patches.append(mock.patch.dict(terra.executor.utils.Executor.__dict__))
     super().setUp()
 
 
@@ -89,3 +95,11 @@ class TestSignalCase(TestCase):
   def setUp(self):
     self.patches.append(mock.patch.dict(os.environ, TERRA_UNITTEST='0'))
     super().setUp()
+
+
+# Enable signals. Most logging tests require configure logger to actually
+# be called. LogRecordSocketReceiver is mocked out, so no lasting side
+# effects should inccur.
+class TestLoggerConfigureCase(TestLoggerCase, TestSignalCase,
+                              TestComputeCase, TestExecutorCase):
+  pass
