@@ -53,9 +53,13 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
     with open(self.settings_filename, 'w') as fid:
       json.dump(config, fid)
 
+    super().setUp()
+
+    # Run _setup_terra_logger AFTER the patches have been applied, or else the
+    # temp files will be in /tmp, not self.temp_dir, and the terra_initial_tmp_
+    # files won't get auto cleaned up
     import terra.logger
     self._logs = terra.logger._setup_terra_logger()
-    super().setUp()
 
   def tearDown(self):
     sys.excepthook = self.original_system_hook

@@ -1,7 +1,8 @@
 import os
 from tempfile import gettempdir
 
-from celery import Task, shared_task as original_shared_task
+from celery import shared_task as original_shared_task
+from celery.app.task import Task
 
 from vsi.tools.python import args_to_kwargs, ARGS, KWARGS
 

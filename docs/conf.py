@@ -51,6 +51,7 @@ extensions = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'vsi_common': ('https://visionsystemsinc.github.io/vsi_common/', None),
+    'celery': ('https://docs.celeryproject.org/en/stable/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -103,6 +104,8 @@ nitpick_ignore = [
     ('py:class', 'json.encoder.JSONEncoder'),
     ('py:class', 'concurrent.futures._base.Executor'),
     ('py:class', 'concurrent.futures._base.Future'),
+    ('py:class', 'concurrent.futures.process.ProcessPoolExecutor'),
+    ('py:class', 'concurrent.futures.thread.ThreadPoolExecutor'),
     ('py:class', 'argparse._AppendAction'),
     ('py:data',  'logging.DEBUG'),
     ('py:data',  'logging.WARNING'),
