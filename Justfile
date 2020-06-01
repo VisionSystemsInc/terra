@@ -220,7 +220,8 @@ function terra_caseify()
     terra_test-pep8) # Run pep8 test
       justify terra pep8
       echo "Running flake8..."
-      Terra_Pipenv run bash -c 'flake8 \
+      Terra_Pipenv run bash -c 'cd ${TERRA_TERRA_DIR};
+                                flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
 
