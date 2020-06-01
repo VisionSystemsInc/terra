@@ -180,7 +180,6 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
   def __init__(self, host='localhost',
                port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
                handler=LogRecordStreamHandler):
-    print('SGR - LRSR init')
     socketserver.ThreadingTCPServer.__init__(self, (host, port), handler)
     self.abort = False
     self.ready = False

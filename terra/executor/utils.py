@@ -12,9 +12,6 @@ class ExecutorHandler(ClassHandler):
   the ``concurrent.futures`` executor class.
   '''
 
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-
   def _connect_backend(self):
     '''
     Loads the executor backend's base module, given either a fully qualified
