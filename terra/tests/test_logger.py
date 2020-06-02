@@ -121,6 +121,7 @@ class TestLogger(TestLoggerConfigureCase):
     self.assertTrue(self._logs.stderr_handler.filter(record))
     self.assertEqual(self._logs.stderr_handler.format(record), "foo bar Hiya")
 
+  @mock.patch('terra.logger.ColorFormatter.use_color', False)
   def test_hostname(self):
     test_logger = logger.getLogger(f'{__name__}.test_hostname')
 
@@ -269,14 +270,3 @@ class TestUnitTests(TestCase):
         "prevented for you automatically. If you are seeing this, you "
         "have configured logging manually, and should make sure you "
         "restore it.")
-
-  @mock.patch.object(settings, '_wrapped', None)
-  @mock.patch.dict(Executor.__dict__)
-  def last_test_executor_logfile(self):
-    from terra.executor.utils import Executor
-
-    self.assertNotIn('_connection', Executor.__dict__)
-
-    settings.configure({})
-    self.assertIsNone(getattr(Executor, '_log_file', None))
-    self.assertIsNone(getattr(Executor, '_logging_handler', None))

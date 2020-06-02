@@ -213,10 +213,7 @@ class _SetupTerraLogger():
 
   def __init__(self):
     self._configured = False
-    self.root_logger = None
-    self.stderr_handler = None
 
-  def setup(self):
     # This must always use logging's getLogger. If a custom Terra getLogger is
     # ever defined, don't use it to get the root logger
     self.root_logger = logging.getLogger(None)
@@ -619,9 +616,6 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
   it will call warnings.formatwarning and will log the resulting string to a
   warnings logger named "py.warnings" with level logging.WARNING.
   """
-
-  # import traceback
-  # traceback.print_stack()
 
   if file is not None:  # I don't actually know how this can be not None
     if _warnings_showwarning is not None:  # pragma: no cover

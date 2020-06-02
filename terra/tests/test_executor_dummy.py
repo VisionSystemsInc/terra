@@ -1,6 +1,3 @@
-from unittest import mock
-
-from terra import settings
 from terra.executor import dummy
 from .utils import TestSettingsConfiguredCase
 
@@ -15,15 +12,8 @@ def test2(x):
 
 class TestExecutorDummy(TestSettingsConfiguredCase):
   def setUp(self):
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
-
     super().setUp()
     self.executor = dummy.DummyExecutor()
-
-    settings.configure({
-        'executor': {'type': 'dummy'},
-        'processing_dir': self.temp_dir.name})
 
   def test_simple(self):
     future = self.executor.submit(test1, 15)
