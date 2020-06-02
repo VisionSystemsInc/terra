@@ -1,6 +1,3 @@
-from uuid import uuid4
-from datetime import datetime
-
 from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -10,10 +7,6 @@ class BaseWorkflow:
   '''
   The base class for all Terra Workflows
   '''
-
-  def __init__(self):
-    self.uuid = uuid4()
-    self.start_time = datetime.now()
 
   def run(self):
     pass

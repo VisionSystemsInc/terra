@@ -148,6 +148,7 @@ framework instead of a larger application.
 
 import os
 from uuid import uuid4
+# from datetime import datetime
 from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
@@ -299,6 +300,7 @@ global_templates = [
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
         'zone': 'controller',
+        # 'start_time': datetime.now(), # Not json serializable yet
         'uuid': terra_uuid
       },
       'status_file': status_file,
@@ -530,10 +532,10 @@ class LazySettings(LazyObject):
                                     for pattern in json_include_suffixes)),
         lambda key, value: read_json(value))
 
-    # Importing these here is intentional
+    # Importing these here is intentional, it guarantees the signals are
+    # connected so that executor and computes can setup logging if need be
     import terra.executor  # noqa
     import terra.compute  # noqa
-    # compute._connection # call a cached property
 
     from terra.core.signals import post_settings_configured
     post_settings_configured.send(sender=self)
@@ -694,6 +696,8 @@ class TerraJSONEncoder(JSONEncoder):
       if obj._wrapped is None:
         raise ImproperlyConfigured('Settings not initialized')
       return TerraJSONEncoder.serializableSettings(obj._wrapped)
+    # elif isinstance(obj, datetime):
+    #   return str(obj)
     return JSONEncoder.default(self, obj)  # pragma: no cover
 
   @staticmethod

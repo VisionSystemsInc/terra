@@ -306,7 +306,7 @@ class _SetupTerraLogger():
         logger.critical("Uncaught exception", extra={'skip_stderr': True},
                         exc_info=(exc_type, exc_value, exc_traceback))
       except Exception:  # pragma: no cover
-        print('There was an exception logging in the execpetion handler!',
+        print('There was an exception logging in the exception handler!',
               file=sys.stderr)
         traceback.print_exc()
 

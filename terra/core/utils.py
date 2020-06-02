@@ -193,8 +193,3 @@ class ClassHandler(Handler):
 
   def __call__(self, *args, **kwargs):
     return self._connection(*args, **kwargs)
-
-
-class ThreadedHandler(Handler):
-  def _connection(self):
-    return self._connect_backend()
