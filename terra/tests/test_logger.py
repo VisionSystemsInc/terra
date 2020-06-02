@@ -11,7 +11,6 @@ from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
 from .utils import TestCase, make_traceback, TestLoggerConfigureCase
 from terra import logger
-from terra.executor.utils import Executor
 
 
 class TestHandlerLoggingContext(TestCase):
@@ -129,7 +128,8 @@ class TestLogger(TestLoggerConfigureCase):
                                     "Hiya", (), None)
     self.assertTrue(test_logger.filter(record))
     self.assertTrue(self._logs.stderr_handler.filter(record))
-    self.assertIn(f'({platform.node()}:preconfig)', self._logs.stderr_handler.format(record))
+    self.assertIn(f'({platform.node()}:preconfig)',
+                  self._logs.stderr_handler.format(record))
 
     settings._setup()
 
