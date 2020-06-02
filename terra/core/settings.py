@@ -147,11 +147,15 @@ framework instead of a larger application.
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from uuid import uuid4
+from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
 from json import JSONEncoder
+import platform
+import warnings
 
-from terra.core.exceptions import ImproperlyConfigured
+from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
 # Do not import terra.logger or terra.signals here, or any module that
 # imports them
 from vsi.tools.python import (
@@ -250,7 +254,19 @@ def unittest(self):
   return os.environ.get('TERRA_UNITTEST', None) == "1"
 
 
-# TODO: come up with a way for apps to extend this themselves
+@settings_property
+def need_to_set_virtualenv_dir(self):
+  warnings.warn("You are using the virtualenv compute, and did not set "
+                "settings.compute.virtualenv_dir in your config file. "
+                "Using system python.", ConfigurationWarning)
+  return None
+
+
+@settings_property
+def terra_uuid(self):
+  return str(uuid4())
+
+
 global_templates = [
   (
     # Global Defaults
@@ -258,9 +274,18 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": f"%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s - %(filename)s - %(message)s",
+        "format": "%(asctime)s (%(hostname)s:%(zone)s): "
+                  "%(levelname)s/%(processName)s - %(filename)s - %(message)s",
         "date_format": None,
-        "style": "%"
+        "style": "%",
+        "server": {
+          # This is tricky use of a setting, because the master controller will
+          # be the first to set it, but the runner and task will inherit the
+          # master controller's values, not their node names, should they be
+          # different (such as celery and spark)
+          "hostname": platform.node(),
+          "port": DEFAULT_TCP_LOGGING_PORT
+        }
       },
       "executor": {
         "type": "ThreadPoolExecutor",
@@ -271,7 +296,10 @@ global_templates = [
         'volume_map': []
       },
       'terra': {
-        'zone': 'controller'
+        # unlike other settings, this should NOT be overwritten by a
+        # config.json file, there is currently nothing to prevent that
+        'zone': 'controller',
+        'uuid': terra_uuid
       },
       'status_file': status_file,
       'processing_dir': processing_dir,
@@ -281,11 +309,11 @@ global_templates = [
   ),
   (
     {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
-    {"compute": {"virtualenv_dir": None}}  # Defaults
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}  # Defaults
   ),
   (  # So much for DRY :(
     {"compute": {"arch": "virtualenv"}},
-    {"compute": {"virtualenv_dir": None}}
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}
   )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we
@@ -473,8 +501,6 @@ class LazySettings(LazyObject):
     ImproperlyConfigured
         If settings is already configured, will throw this exception
     """
-    from terra.core.signals import post_settings_configured
-
     if self._wrapped is not None:
       raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
@@ -504,6 +530,12 @@ class LazySettings(LazyObject):
                                     for pattern in json_include_suffixes)),
         lambda key, value: read_json(value))
 
+    # Importing these here is intentional
+    import terra.executor  # noqa
+    import terra.compute  # noqa
+    # compute._connection # call a cached property
+
+    from terra.core.signals import post_settings_configured
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
 
@@ -544,7 +576,7 @@ class LazySettings(LazyObject):
 
     # Incase the logger was messed with in the context, reset it.
     from terra.core.signals import post_settings_context
-    post_settings_context.send(sender=self)
+    post_settings_context.send(sender=self, post_settings_context=True)
 
     return return_value
 
@@ -693,7 +725,9 @@ class TerraJSONEncoder(JSONEncoder):
 
     obj = nested_patch(
         obj,
-        lambda k, v: any(v is not None and isinstance(k, str) and k.endswith(pattern) for pattern in filename_suffixes),
+        lambda k, v: any(v is not None and isinstance(k, str)
+                         and k.endswith(pattern)
+                         for pattern in filename_suffixes),
         lambda k, v: os.path.expanduser(v))
 
     return obj

@@ -1,5 +1,5 @@
 from terra.executor import dummy
-from .utils import TestCase
+from .utils import TestSettingsConfiguredCase
 
 
 def test1(x):
@@ -10,7 +10,7 @@ def test2(x):
   return x + 13
 
 
-class TestExecutorDummy(TestCase):
+class TestExecutorDummy(TestSettingsConfiguredCase):
   def setUp(self):
     super().setUp()
     self.executor = dummy.DummyExecutor()

@@ -1,9 +1,7 @@
-import os
-import logging
-import concurrent.futures
 from importlib import import_module
 
 from terra import settings
+import terra.core.signals
 from terra.core.utils import ClassHandler
 import terra.logger
 
@@ -37,13 +35,17 @@ class ExecutorHandler(ClassHandler):
     elif backend_name == "SyncExecutor":
       from terra.executor.sync import SyncExecutor
       return SyncExecutor
-    elif backend_name == "ThreadPoolExecutor":
-      return concurrent.futures.ThreadPoolExecutor
-    elif backend_name == "ProcessPoolExecutor":
-      return concurrent.futures.ProcessPoolExecutor
+    elif backend_name == "ThreadPoolExecutor" or \
+        backend_name == "concurrent.futures.ThreadPoolExecutor":
+      from terra.executor.thread import ThreadPoolExecutor
+      return ThreadPoolExecutor
+    elif backend_name == "ProcessPoolExecutor" or \
+        backend_name == "concurrent.futures.ProcessPoolExecutor":
+      from terra.executor.process import ProcessPoolExecutor
+      return ProcessPoolExecutor
     elif backend_name == "CeleryExecutor":
-      import terra.executor.celery
-      return terra.executor.celery.CeleryExecutor
+      from terra.executor.celery import CeleryExecutor
+      return CeleryExecutor
     else:
       module_name = backend_name.rsplit('.', 1)
       module = import_module(f'{module_name[0]}')
@@ -51,44 +53,22 @@ class ExecutorHandler(ClassHandler):
 
   def configuration_map(self, service_info):
     if not hasattr(self._connection, 'configuration_map'):
-      return {}
+      # Default behavior
+      return []
+    # else call the class specific implementation
     return self._connection.configuration_map(service_info)
-
-  def reconfigure_logger(self, logging_handler):
-    # The default logging handler is a StreamHandler. This will reconfigure the
-    # Stream handler, should
-    log_file = os.path.join(settings.processing_dir,
-                            terra.logger._logs.default_log_prefix)
-
-    # if not os.path.samefile(log_file, self._log_file.name):
-    if log_file != self._log_file.name:
-      os.makedirs(settings.processing_dir, exist_ok=True)
-      self._log_file.close()
-      self._log_file = open(log_file, 'a')
-
-  def configure_logger(self):
-    # ThreadPoolExecutor will work just fine with a normal StreamHandler
-
-    try:
-      self._configure_logger()
-      # In CeleryPoolExecutor, use the Celery logger.
-      # Use this to determine if main process or just a worker?
-      # https://stackoverflow.com/a/45022530/4166604
-      # Use JUST_IS_CELERY_WORKER
-    except AttributeError:
-      # Setup log file for use in configure
-      self._log_file = os.path.join(settings.processing_dir,
-                                    terra.logger._logs.default_log_prefix)
-      os.makedirs(settings.processing_dir, exist_ok=True)
-      self._log_file = open(self._log_file, 'a')
-
-      self._logging_handler = logging.StreamHandler(stream=self._log_file)
-      return self._logging_handler
-
-      # TODO: ProcessPool - Log server
 
 
 Executor = ExecutorHandler()
 '''ExecutorHandler: The executor handler that all services will be interfacing
 with when running parallel computation tasks.
 '''
+# This Executor type is setup automatically, via
+#   Handler.__getattr__ => Handler._connection => Executor._connect_backend,
+# when the signal is sent. So use a lambda to delay getattr
+terra.core.signals.logger_configure.connect(
+    lambda *args, **kwargs: Executor.configure_logger(*args, **kwargs),
+    weak=False)
+terra.core.signals.logger_reconfigure.connect(
+    lambda *args, **kwargs: Executor.reconfigure_logger(*args, **kwargs),
+    weak=False)

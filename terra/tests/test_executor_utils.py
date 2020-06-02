@@ -1,19 +1,14 @@
-from unittest import mock, SkipTest
+from unittest import SkipTest
 import concurrent.futures
 
 from terra import settings
-from .utils import TestCase
+from .utils import TestCase, TestExecutorCase, TestSettingsUnconfiguredCase
 from terra.executor.utils import ExecutorHandler, Executor
 from terra.executor.dummy import DummyExecutor
 from terra.executor.sync import SyncExecutor
 
 
-class TestExecutorHandler(TestCase):
-  def setUp(self):
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    self.patches.append(mock.patch.dict(Executor.__dict__))
-    super().setUp()
-
+class TestExecutorHandler(TestExecutorCase, TestSettingsUnconfiguredCase):
   def test_executor_handler(self):
     settings.configure({'executor': {'type': 'DummyExecutor'}})
 

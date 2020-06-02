@@ -6,13 +6,11 @@ from terra.compute import base
 from terra.compute import singularity
 import terra.compute.utils
 
-from .utils import TestCase
+from .utils import TestSettingsUnconfiguredCase
 
 
-class TestComputeSingularityCase(TestCase):
+class TestComputeSingularityCase(TestSettingsUnconfiguredCase):
   def setUp(self):
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # This will resets the _connection to an uninitialized state
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,

@@ -106,18 +106,19 @@ class Service(BaseService):
 
     # Create a temp directory, store it in this instance
     self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")
-    if env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
+    if self.env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
       self.temp_dir._finalizer.detach()
 
     # Use a config.json file to store settings within that temp directory
     temp_config_file = os.path.join(self.temp_dir.name, 'config.json')
 
     # Serialize config file
-    docker_config = TerraJSONEncoder.serializableSettings(settings)
+    venv_config = TerraJSONEncoder.serializableSettings(settings)
 
     # Dump the serialized config to the temp config file
+    venv_config['terra']['zone'] = 'runner'
     with open(temp_config_file, 'w') as fid:
-      json.dump(docker_config, fid)
+      json.dump(venv_config, fid)
 
     # Set the Terra settings file for this service runner to the temp config
     # file
@@ -126,5 +127,5 @@ class Service(BaseService):
   def post_run(self):
     super().post_run()
     # Delete temp_dir
-    if env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
+    if self.env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
       self.temp_dir.cleanup()

@@ -42,7 +42,7 @@ class Compute(BaseCompute):
 
         just --wrap Just-docker-compose \\
             -f {service_info.compose_files} ... \\
-            run {service_info.compose_service_name} \\
+            run -T {service_info.compose_service_name} \\
             {service_info.command}
     '''
     optional_args = {}
@@ -50,7 +50,7 @@ class Compute(BaseCompute):
 
     pid = just("--wrap", "Just-docker-compose",
                *sum([['-f', cf] for cf in service_info.compose_files], []),
-               'run', service_info.compose_service_name,
+               'run', '-T', service_info.compose_service_name,
                *service_info.command + extra_arguments,
                **optional_args,
                env=service_info.env)

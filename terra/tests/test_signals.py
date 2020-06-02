@@ -1,8 +1,8 @@
-from terra.core.signals import Signal, receiver, post_settings_configured
-from .utils import TestCase
+from terra.core.signals import Signal, receiver
+from .utils import TestSignalCase
 
 
-class TestSignals(TestCase):
+class TestSignals(TestSignalCase):
   def signal_handle1(self, sender, **kwargs):
     self.assertEqual(sender, self.sender)
     self.kwargs = kwargs
@@ -149,12 +149,16 @@ class TestSignals(TestCase):
     self.assertEqual(self.count, 1.1)
 
 
-class TestUnitTests(TestCase):
-  def last_test_signals(self):
-    for signal in [post_settings_configured]:
-      self.assertFalse(
-          signal.receivers,
-          msg="If you are seting this, one of the other unit tests has "
-          "left a signal connected. This side effect should be "
-          "prevented by disconnecting any functions you connected to a "
-          "signal.")
+# This no longer matters, as signals are disabled in unitted tests now?
+# class TestUnitTests(TestCase):
+#   def last_test_signals(self):
+#     for signal in [signals.post_settings_configured,
+#                    signals.post_settings_context,
+#                    signals.logger_configure,
+#                    signals.logger_reconfigure]:
+#       self.assertFalse(
+#           signal.receivers,
+#           msg="If you are seeing this, one of the other unit tests has "
+#               "left a signal connected. This side effect should "
+#               "be prevented by disconnecting any functions you connected to "
+#               "a signal.")

@@ -40,7 +40,7 @@ class TestCeleryConfig(TestCase):
   @mock.patch.dict(os.environ, TERRA_CELERY_INCLUDE='["foo", "bar"]')
   def test_include(self):
     import terra.executor.celery.celeryconfig as cc
-    self.assertEqual(cc.include, ['foo', 'bar'])
+    self.assertEqual(cc.include, ['foo', 'bar', 'terra.tests.demo.tasks'])
 
 
 class MockAsyncResult:
@@ -92,9 +92,9 @@ class TestCeleryExecutor(TestCase):
       time.sleep(0.001)
       if future._state == state:
         break
-      if x == 99:
-        raise TimeoutError(f'Took longer than 100us for a 1us update for '
-                           f'{future._state} to become {state}')
+    else:
+      raise TimeoutError(f'Took longer than 100ms for a 1ms update for '
+                         f'{future._state} to become {state}')
 
   def test_simple(self):
     test = test_factory()
@@ -158,16 +158,18 @@ class TestCeleryExecutor(TestCase):
       time.sleep(0.001)
       if not len(self.executor._futures):
         break
-      if x == 99:
-        raise TimeoutError('Took longer than 100us for a 1us update')
+    else:
+      raise TimeoutError('Took longer than 100ms for a 1ms update')
 
   def test_update_futures_revoked(self):
     test = test_factory()
     future = self.executor.submit(test)
 
     self.assertFalse(future.cancelled())
-    future._ar.state = 'REVOKED'
-    self.wait_for_state(future, 'CANCELLED_AND_NOTIFIED')
+    with self.assertLogs() as cm:
+      future._ar.state = 'REVOKED'
+      self.wait_for_state(future, 'CANCELLED_AND_NOTIFIED')
+    self.assertRegex(str(cm.output), 'WARNING.*Celery task.*cancelled')
     self.assertTrue(future.cancelled())
 
   def test_update_futures_success(self):
@@ -184,9 +186,11 @@ class TestCeleryExecutor(TestCase):
     future = self.executor.submit(test)
 
     self.assertIsNone(future._result)
-    future._ar.state = 'FAILURE'
-    future._ar.result = TypeError('On no')
-    self.wait_for_state(future, 'FINISHED')
+    with self.assertLogs() as cm:
+      future._ar.state = 'FAILURE'
+      future._ar.result = TypeError('On no')
+      self.wait_for_state(future, 'FINISHED')
+    self.assertRegex(str(cm.output), 'ERROR.*Celery task.*resolved with error')
 
   def test_shutdown(self):
     test = test_factory()

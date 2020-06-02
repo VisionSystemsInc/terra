@@ -1,12 +1,12 @@
-from concurrent.futures import Future, Executor
 from threading import Lock
 
+from terra.executor.base import BaseFuture, BaseExecutor
 from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
-class DummyExecutor(Executor):
+class DummyExecutor(BaseExecutor):
   """
   Executor that does nothing, just logs what would happen.
 
@@ -27,7 +27,7 @@ class DummyExecutor(Executor):
       original_zone = settings.terra.zone
       # Fake the zone for the log messages
       settings.terra.zone = 'task'
-      f = Future()
+      f = BaseFuture()
       logger.info(f'Run function: {fn}')
       logger.info(f'With args: {args}')
       logger.info(f'With kwargs: {kwargs}')

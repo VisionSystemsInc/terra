@@ -16,18 +16,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from os import environ as env
-from concurrent.futures import Future, Executor, as_completed
+from concurrent.futures import as_completed
 from concurrent.futures._base import (RUNNING, FINISHED, CANCELLED,
                                       CANCELLED_AND_NOTIFIED)
 from threading import Lock, Thread
 import time
+from logging import NullHandler, StreamHandler
+from logging.handlers import SocketHandler
 
+from celery.signals import setup_logging
+
+from terra.executor.base import BaseFuture, BaseExecutor
+import terra
+from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
-class CeleryExecutorFuture(Future):
+# stop celery from hijacking the logger
+@setup_logging.connect
+def setup_loggers(*args, **kwargs):
+  pass
+
+
+class CeleryExecutorFuture(BaseFuture):
   def __init__(self, asyncresult):
     self._ar = asyncresult
     super().__init__()
@@ -41,12 +55,12 @@ class CeleryExecutorFuture(Future):
     Returns True if the future was cancelled, False otherwise. A future
     cannot be cancelled if it is running or has already completed.
     """
-    logger.info(f'Canceling task {self._ar.id}')
+    logger.debug4(f'Canceling task {self._ar.id}')
     with self._condition:
       if self._state in [RUNNING, FINISHED, CANCELLED, CANCELLED_AND_NOTIFIED]:
         return super().cancel()
 
-      # Not running and not canceled. May be possible to cancel!
+      # Not running and not cancelled. May be possible to cancel!
       self._ar.ready()  # Triggers an update check
       if self._ar.state != 'REVOKED':
         self._ar.revoke()
@@ -76,7 +90,7 @@ class CeleryExecutorFuture(Future):
       return result
 
 
-class CeleryExecutor(Executor):
+class CeleryExecutor(BaseExecutor):
   """
   Executor implementation using celery tasks.
 
@@ -135,7 +149,7 @@ class CeleryExecutor(Executor):
         ar.ready()  # Just trigger the AsyncResult state update check
 
         if ar.state == 'REVOKED':
-          logger.warning('Celery task "%s" canceled.', ar.id)
+          logger.warning('Celery task "%s" cancelled.', ar.id)
           if not fut.cancelled():
             if not fut.cancel():  # pragma: no cover
               logger.error('Future was not running but failed to be cancelled')
@@ -154,7 +168,7 @@ class CeleryExecutor(Executor):
           # Future is FINISHED
 
         elif ar.state == 'FAILURE':
-          logger.info('Celery task "%s" resolved with error.', ar.id)
+          logger.error('Celery task "%s" resolved with error.', ar.id)
           fut.set_exception(ar.result)
           # Future is FINISHED
 
@@ -190,7 +204,7 @@ class CeleryExecutor(Executor):
       return future
 
   def shutdown(self, wait=True):
-    logger.info('Shutting down celery tasks...')
+    logger.debug1('Shutting down celery tasks...')
     with self._shutdown_lock:
       self._shutdown = True
       for fut in tuple(self._futures):
@@ -234,3 +248,53 @@ class CeleryExecutor(Executor):
     volume_map = compute.get_volume_map(config, service_clone)
 
     return volume_map
+
+  @staticmethod
+  def configure_logger(sender, **kwargs):
+    if settings.terra.zone == 'task':  # pragma: no cover
+      # This will never really be reached, because the task_controller will
+      # configure the logger, and than fork.
+      sender.main_log_handler = NullHandler()
+    elif settings.terra.zone == 'task_controller':
+      # Setup log file for use in configure
+      sender._log_file = os.path.join(settings.processing_dir,
+                                      terra.logger._logs.default_log_prefix)
+      os.makedirs(settings.processing_dir, exist_ok=True)
+      sender._log_file = open(sender._log_file, 'a')
+      sender.main_log_handler = StreamHandler(stream=sender._log_file)
+      sender.root_logger.addHandler(sender.main_log_handler)
+
+  @staticmethod
+  def reconfigure_logger(sender, pre_run_task=False,
+                         post_settings_context=False, **kwargs):
+    if settings.terra.zone == 'task':
+      if pre_run_task:
+        if sender.main_log_handler:
+          sender.main_log_handler.close()
+          try:
+            sender.root_logger.removeHandler(sender.main_log_handler)
+          except ValueError:
+            pass
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.hostname,
+            settings.logging.server.port)
+        sender.root_logger.addHandler(sender.main_log_handler)
+      if post_settings_context:
+        # when the celery task is done, its logger is automatically
+        # reconfigured; use that opportunity to close the stream
+        if sender.main_log_handler:
+          sender.main_log_handler.close()
+          try:
+            sender.root_logger.removeHandler(sender.main_log_handler)
+          except ValueError:
+            pass
+          sender.main_log_handler = NullHandler()
+          sender.root_logger.addHandler(sender.main_log_handler)
+    elif settings.terra.zone == 'task_controller':
+      log_file = os.path.join(settings.processing_dir,
+                              terra.logger._logs.default_log_prefix)
+
+      if log_file != sender._log_file.name:
+        os.makedirs(settings.processing_dir, exist_ok=True)
+        sender._log_file.close()
+        sender._log_file = open(log_file, 'a')

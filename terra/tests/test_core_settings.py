@@ -1,15 +1,14 @@
 import os
 import sys
 import json
+import time
 from unittest import mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 import tempfile
 
 from envcontext import EnvironmentContext
 
-from .utils import TestCase
-from .test_logger import TestLoggerCase
-
+from .utils import TestCase, TestLoggerCase, TestLoggerConfigureCase
 from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
@@ -221,15 +220,11 @@ class TestObjectDict(TestCase):
     self.assertIn('c', dir(d.b[0][0]))
 
 
-class TestSettings(TestCase):
-  def setUp(self):
-    # Useful for tests that set this
-    self.patches.append(mock.patch.dict(os.environ,
-                                        {'TERRA_SETTINGS_FILE': ""}))
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    super().setUp()
-
+class TestSettings(TestLoggerCase):
+  # TestLoggerCase sets TERRA_SETTINGS_FILE to a valid file, in order to get
+  # an ImproperlyConfigured Exception here, TERRA_SETTINGS_FILE must be set to
+  # not a file, such as the empty string.
+  @mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='')
   def test_unconfigured(self):
     with self.assertRaises(ImproperlyConfigured):
       settings.foo
@@ -650,13 +645,11 @@ class TestUnitTests(TestCase):
             "Otherwise unit tests can interfere with each other")
 
 
-class TestCircularDependency(TestLoggerCase):
+class TestCircularDependency(TestLoggerConfigureCase):
   # I don't want this unloading terra to interfere with other last_tests, as
   # this would reset modules to their initial state, giving false positives to
   # corruption checks. So mock it
   @mock.patch.dict(sys.modules)
-  # Needed to make circular imports
-  @mock.patch.dict(os.environ, TERRA_UNITTEST='0')
   def last_test_import_settings(self):
     # Unload terra
     for module in list(sys.modules.keys()):
@@ -666,6 +659,17 @@ class TestCircularDependency(TestLoggerCase):
     import terra.core.settings
     terra.core.settings.settings._setup()
 
+    # Shut down TCP server
+    terra.logger._logs.tcp_logging_server.abort = True
+
+    for x in range(1000):
+      if not terra.logger._logs.tcp_logging_server.ready:
+        break
+      time.sleep(0.001)
+    else:
+      self.assertFalse(terra.logger._logs.tcp_logging_server.ready,
+                       'TCP Server did not shut down within a second')
+
     # Picky windows
     import terra.logger
-    terra.logger._logs.log_file.close()
+    terra.logger._logs._log_file.close()

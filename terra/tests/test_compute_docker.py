@@ -10,13 +10,11 @@ from terra.compute import base
 from terra.compute import docker
 import terra.compute.utils
 
-from .utils import TestCase
+from .utils import TestSettingsUnconfiguredCase
 
 
-class TestComputeDockerCase(TestCase):
+class TestComputeDockerCase(TestSettingsUnconfiguredCase):
   def setUp(self):
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # This will resets the _connection to an uninitialized state
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,
@@ -102,7 +100,7 @@ class TestDockerRun(TestComputeDockerCase):
     compute.run(MockJustService())
     # Run a docker service
     self.assertEqual(('--wrap', 'Just-docker-compose',
-                      '-f', 'file1', 'run', 'launch', 'ls'),
+                      '-f', 'file1', 'run', '-T', 'launch', 'ls'),
                      self.just_args)
     self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO'}},
                      self.just_kwargs)

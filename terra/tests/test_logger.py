@@ -2,18 +2,15 @@ from unittest import mock
 import io
 import os
 import sys
-import json
 import logging
 import uuid
-import tempfile
 import platform
 import warnings
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
-from vsi.test.utils import TestCase, make_traceback, NamedTemporaryFileFactory
+from .utils import TestCase, make_traceback, TestLoggerConfigureCase
 from terra import logger
-from terra.core import signals
 
 
 class TestHandlerLoggingContext(TestCase):
@@ -38,49 +35,7 @@ class TestHandlerLoggingContext(TestCase):
     self.assertIn(message2, str(handler_swap.buffer))
 
 
-class TestLoggerCase(TestCase):
-  def setUp(self):
-    self.original_system_hook = sys.excepthook
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    self.patches.append(mock.patch.object(tempfile, 'NamedTemporaryFile',
-                                          NamedTemporaryFileFactory(self)))
-    settings_filename = os.path.join(self.temp_dir.name, 'config.json')
-    self.patches.append(mock.patch.dict(os.environ,
-                                        TERRA_SETTINGS_FILE=settings_filename))
-    super().setUp()
-
-    # Don't use settings.configure here, because I need to test out logging
-    # signals
-    config = {"processing_dir": self.temp_dir.name}
-    with open(settings_filename, 'w') as fid:
-      json.dump(config, fid)
-
-    self._logs = logger._SetupTerraLogger()
-
-    # # register post_configure with settings
-    signals.post_settings_configured.connect(self._logs.configure_logger)
-
-  def tearDown(self):
-    # Remove all the logger handlers
-    sys.excepthook = self.original_system_hook
-    try:
-      self._logs.log_file.close()
-    except AttributeError:
-      pass
-    # Windows is pickier about deleting files
-    try:
-      if self._logs.tmp_file:
-        self._logs.tmp_file.close()
-    except AttributeError:
-      pass
-    self._logs.root_logger.handlers = []
-    signals.post_settings_configured.disconnect(self._logs.configure_logger)
-    # Apparently this is unnecessary because signals use weak refs, that are
-    # auto removed on free, but I think it's still better to put this here.
-    super().tearDown()
-
-
-class TestLogger(TestLoggerCase):
+class TestLogger(TestLoggerConfigureCase):
   def test_setup_working(self):
     self.assertFalse(settings.configured)
     self.assertEqual(settings.processing_dir, self.temp_dir.name)
@@ -93,10 +48,11 @@ class TestLogger(TestLoggerCase):
         self._logs.configure_logger(None)
 
   def test_temp_file_cleanup(self):
-    self.assertExist(self.temp_log_file)
+    tmp_file = self._logs.tmp_file.name
+    self.assertExist(tmp_file)
     self.assertFalse(self._logs._configured)
     settings.processing_dir
-    self.assertNotExist(self.temp_log_file)
+    self.assertNotExist(tmp_file)
     self.assertTrue(self._logs._configured)
 
   def test_exception_hook_installed(self):
@@ -113,11 +69,12 @@ class TestLogger(TestLoggerCase):
       self.tb = tb
     sys.excepthook = save_exec_info
     self._logs.setup_logging_exception_hook()
-    with self.assertLogs() as cm:
-      # with self.assertRaises(ZeroDivisionError):
-      tb = make_traceback()
-      sys.excepthook(ZeroDivisionError,
-                     ZeroDivisionError('division by almost zero'), tb)
+    with mock.patch('sys.stderr', new_callable=io.StringIO):
+      with self.assertLogs() as cm:
+        # with self.assertRaises(ZeroDivisionError):
+        tb = make_traceback()
+        sys.excepthook(ZeroDivisionError,
+                       ZeroDivisionError('division by almost zero'), tb)
 
     self.assertIn('division by almost zero', str(cm.output))
     # Test stack trace stuff in there
@@ -134,13 +91,14 @@ class TestLogger(TestLoggerCase):
   def test_logs_stderr(self):
     stderr_handler = [h for h in self._logs.root_logger.handlers
                       if hasattr(h, 'stream') and h.stream == sys.stderr][0]
-    self.assertIs(self._logs.stderr_handler, stderr_handler)
     self.assertEqual(stderr_handler.level, logging.WARNING)
+    self.assertIs(self._logs.stderr_handler, stderr_handler)
 
   def test_logs_temp_file(self):
     temp_handler = [
         h for h in self._logs.root_logger.handlers
-        if hasattr(h, 'stream') and h.stream.name == self.temp_log_file][0]
+        if hasattr(h, 'stream')
+        and h.stream.name == self._logs.tmp_file.name][0]
     # Test that log everything is set
     self.assertEqual(temp_handler.level, logger.NOTSET)
     self.assertEqual(self._logs.root_logger.level, logger.NOTSET)
@@ -154,24 +112,30 @@ class TestLogger(TestLoggerCase):
     # This doesn't get formatted
     # with self.assertLogs(__name__, logger.ERROR) as cm:
     #   logger.getLogger(__name__).error('Hi')
+
+    test_logger = logger.getLogger(f'{__name__}.test_formatter')
     record = logging.LogRecord(__name__, logger.ERROR, __file__, 0, "Hiya", (),
                                None)
+    self.assertTrue(test_logger.filter(record))
+    self.assertTrue(self._logs.stderr_handler.filter(record))
     self.assertEqual(self._logs.stderr_handler.format(record), "foo bar Hiya")
 
   def test_hostname(self):
     test_logger = logger.getLogger(f'{__name__}.test_hostname')
 
     record = test_logger.makeRecord(__name__, logger.ERROR, __file__, 0,
-                                    "Hiya", (), None,
-                                    extra=logger.extra_logger_variables)
-    self.assertIn('(preconfig)', self._logs.stderr_handler.format(record))
+                                    "Hiya", (), None)
+    self.assertTrue(test_logger.filter(record))
+    self.assertTrue(self._logs.stderr_handler.filter(record))
+    self.assertIn(':preconfig)', self._logs.stderr_handler.format(record))
 
     settings._setup()
 
     record = test_logger.makeRecord(__name__, logger.ERROR, __file__, 0,
-                                    "Hiya", (), None,
-                                    extra=logger.extra_logger_variables)
-    self.assertIn(f'({platform.node()})',
+                                    "Hiya", (), None)
+    self.assertTrue(test_logger.filter(record))
+    self.assertTrue(self._logs.stderr_handler.filter(record))
+    self.assertIn(f'({platform.node()}:',
                   self._logs.stderr_handler.format(record))
 
   # Test https://stackoverflow.com/q/19615876/4166604
@@ -299,7 +263,7 @@ class TestUnitTests(TestCase):
 
     self.assertFalse(
         root_logger.handlers,
-        msg="If you are seting this, one of the other unit tests has "
+        msg="If you are seeing this, one of the other unit tests has "
         "initialized the logger. This side effect should be "
         "prevented for you automatically. If you are seeing this, you "
         "have configured logging manually, and should make sure you "

@@ -1,10 +1,17 @@
 import os
-import json
+import time
+import atexit
+from logging import StreamHandler
+from logging.handlers import SocketHandler
+import threading
+import warnings
 
 from terra import settings
 import terra.compute.utils
 from terra.executor import Executor
-from terra.logger import getLogger
+from terra.logger import (
+  getLogger, LogRecordSocketReceiver, SkipStdErrAddFilter
+)
 logger = getLogger(__name__)
 
 
@@ -64,9 +71,6 @@ class BaseService:
 
     self._validate_volume(local, remote, local_must_exist=local_must_exist)
     self.volumes.append((local, remote))
-
-  def get_volume_map(self, config, service_info):
-    return []
 
   def pre_run(self):
     '''
@@ -164,6 +168,9 @@ class BaseCompute:
     # bind function and return it
     return defaultCommand.__get__(self, type(self))
 
+  def get_volume_map(self, config, service_info):
+    return []
+
   def run_service(self, *args, **kwargs):
     '''
     Place holder for code to run an instance in the compute. Runs
@@ -185,6 +192,90 @@ class BaseCompute:
     '''
 
     return service_info.volumes
+
+  @staticmethod
+  def configure_logger(sender, **kwargs):
+    if settings.terra.zone == 'controller':
+      # Setup log file for use in configure
+      sender._log_file = os.path.join(
+          settings.processing_dir,
+          terra.logger._SetupTerraLogger.default_log_prefix)
+      os.makedirs(settings.processing_dir, exist_ok=True)
+      sender._log_file = open(sender._log_file, 'a')
+      sender.main_log_handler = StreamHandler(stream=sender._log_file)
+      sender.root_logger.addHandler(sender.main_log_handler)
+
+      # setup the TCP socket listener
+      sender.tcp_logging_server = LogRecordSocketReceiver(
+          settings.logging.server.hostname, settings.logging.server.port)
+      listener_thread = threading.Thread(
+          target=sender.tcp_logging_server.serve_until_stopped)
+      listener_thread.setDaemon(True)
+      listener_thread.start()
+
+      # Wait up to a second, to make sure the thread started
+      for _ in range(1000):
+        if sender.tcp_logging_server.ready:
+          break
+        time.sleep(0.001)
+      else:  # pragma: no cover
+        warnings.warn("TCP Logging server thread did not startup. "
+                      "This is probably not a problem, unless logging isn't "
+                      "working.", RuntimeWarning)
+
+      # Auto cleanup
+      @atexit.register
+      def cleanup_thread():
+        sender.tcp_logging_server.abort = 1
+        listener_thread.join(timeout=5)
+        if listener_thread.is_alive():  # pragma: no cover
+          warnings.warn("TCP Logger Server Thread did not shut down "
+                        "gracefully. Attempting to exit anyways.",
+                        RuntimeWarning)
+    elif settings.terra.zone == 'runner':
+      sender.main_log_handler = SocketHandler(
+          settings.logging.server.hostname, settings.logging.server.port)
+      # By default, all runners have access to the master controllers stderr,
+      # so there is no need for the master controller to echo out the log
+      # messages a second time.
+      sender.main_log_handler.addFilter(SkipStdErrAddFilter())
+      sender.root_logger.addHandler(sender.main_log_handler)
+
+  @staticmethod
+  def reconfigure_logger(sender, **kwargs):
+    # sender is logger in this case
+    #
+    # The default logging handler is a StreamHandler. This will reconfigure its
+    # output stream
+
+    if settings.terra.zone == 'controller':
+      log_file = os.path.join(
+          settings.processing_dir,
+          terra.logger._SetupTerraLogger.default_log_prefix)
+
+      # Check to see if _log_file is unset. If it is, this is due to _log_file
+      # being called without configure being called. While it is not important
+      # this work, it's more likely for unit testsing
+      # if not os.path.samefile(log_file, sender._log_file.name):
+      if getattr(sender, '_log_file', None) is not None and \
+         log_file != sender._log_file.name:
+        os.makedirs(settings.processing_dir, exist_ok=True)
+        sender._log_file.close()
+        sender._log_file = open(log_file, 'a')
+    elif settings.terra.zone == 'runner':
+      # Only if it's changed
+      if settings.logging.server.hostname != sender.main_log_handler.host or \
+         settings.logging.server.port != sender.main_log_handler.port:
+        # Reconnect Socket Handler
+        sender.main_log_handler.close()
+        try:
+          sender.root_logger.removeHandler(sender.main_log_handler)
+        except ValueError:  # pragma: no cover
+          pass
+
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.hostname, settings.logging.server.port)
+        sender.root_logger.addHandler(sender.main_log_handler)
 
 
 services = {}
