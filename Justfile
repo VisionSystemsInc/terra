@@ -34,7 +34,7 @@ function Terra_Pipenv()
       ask_question "Continue?" answer_continue n
       [ "$answer_continue" == "0" ] && return 1
     fi
-    PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
+    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
@@ -141,7 +141,8 @@ function terra_caseify()
       ;;
 
     run_flower) # Start the flower server
-      Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app flower
+      # Flower doesn't actually need the tasks an app, so clear it
+      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app flower
       ;;
     shutdown_celery) # Shuts down all celery works on all nodes
       Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"

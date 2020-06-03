@@ -499,10 +499,6 @@ class SkipStdErrAddFilter(Filter):
 class ColorFormatter(Formatter):
   use_color = True
 
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    # self.use_color = use_color
-
   def format(self, record):
     if self.use_color:
       zone = record.__dict__['zone']
@@ -569,10 +565,8 @@ class Logger(Logger_original):
       break
     return rv
 
-  # Define _log instead of logger adapter, this works better (setLoggerClass)
-  # https://stackoverflow.com/a/28050837/4166604
-  # def _log(self,*args, **kwargs):
-  #   return super()._log(*args, **kwargs)
+  # Define _log instead of logger adapter if needed, this works better
+  # (setLoggerClass) https://stackoverflow.com/a/28050837/4166604
 
   def debug1(self, msg, *args, **kwargs):
     '''
