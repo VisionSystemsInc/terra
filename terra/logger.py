@@ -425,12 +425,13 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    settings_dump = os.path.join(
-        settings.processing_dir,
-        datetime.now(timezone.utc).strftime(
-            f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
-    with open(settings_dump, 'w') as fid:
-      fid.write(TerraJSONEncoder.dumps(settings, indent=2))
+    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+      settings_dump = os.path.join(
+          settings.processing_dir,
+          datetime.now(timezone.utc).strftime(
+              f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
+      with open(settings_dump, 'w') as fid:
+        fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 
     # filter the stderr buffer
     self.preconfig_stderr_handler.buffer = \
