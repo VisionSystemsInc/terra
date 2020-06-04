@@ -227,9 +227,11 @@ class _SetupTerraLogger():
     self.root_logger.addHandler(self.stderr_handler)
 
     # Set up temporary file logger
-    self.tmp_file = tempfile.NamedTemporaryFile(mode="w+",
-                                                prefix=self.default_tmp_prefix,
-                                                delete=False)
+    if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
+      self.tmp_file = tempfile.NamedTemporaryFile(
+          mode="w+", prefix=self.default_tmp_prefix, delete=False)
+    else:
+      self.tmp_file = open(os.devnull, mode='w+')
     self.tmp_handler = logging.StreamHandler(stream=self.tmp_file)
     self.tmp_handler.setLevel(0)
     self.tmp_handler.setFormatter(self.default_formatter)
@@ -462,7 +464,7 @@ class _SetupTerraLogger():
 
     # Remove the temporary file now that you are done with it
     self.tmp_file.close()
-    if os.path.exists(self.tmp_file.name):
+    if os.path.exists(self.tmp_file.name) and self.tmp_file.name != os.devnull:
       os.unlink(self.tmp_file.name)
     self.tmp_file = None
 

@@ -257,8 +257,11 @@ class CeleryExecutor(BaseExecutor):
       sender.main_log_handler = NullHandler()
     elif settings.terra.zone == 'task_controller':
       # Setup log file for use in configure
-      sender._log_file = os.path.join(settings.processing_dir,
-                                      terra.logger._logs.default_log_prefix)
+      if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
+        sender._log_file = os.path.join(settings.processing_dir,
+                                        terra.logger._logs.default_log_prefix)
+      else:
+        sender._log_file = os.devnull
       os.makedirs(settings.processing_dir, exist_ok=True)
       sender._log_file = open(sender._log_file, 'a')
       sender.main_log_handler = StreamHandler(stream=sender._log_file)
@@ -291,8 +294,11 @@ class CeleryExecutor(BaseExecutor):
           sender.main_log_handler = NullHandler()
           sender.root_logger.addHandler(sender.main_log_handler)
     elif settings.terra.zone == 'task_controller':
-      log_file = os.path.join(settings.processing_dir,
-                              terra.logger._logs.default_log_prefix)
+      if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
+        log_file = os.path.join(settings.processing_dir,
+                                terra.logger._logs.default_log_prefix)
+      else:
+        log_file = os.devnull
 
       if log_file != sender._log_file.name:
         os.makedirs(settings.processing_dir, exist_ok=True)
