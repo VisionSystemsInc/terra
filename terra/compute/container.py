@@ -28,8 +28,8 @@ class ContainerService(BaseService):
     self.extra_compose_files = []
 
   def pre_run(self):
-    # Need to run Base's pre_run first, so it has a change to update settings
-    # for special exectutors, etc...
+    # Need to run Base's pre_run first, so it has a chance to update settings
+    # for special executors, etc...
     super().pre_run()
 
     self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")

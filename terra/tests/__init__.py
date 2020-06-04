@@ -10,7 +10,7 @@ def load_tests(loader, standard_tests, pattern):
   if os.environ.get('TERRA_UNITTEST', None) != "1":
     warnings.warn(
         'WARNING: Running terra tests without setting TERRA_UNITTEST will '
-        'result in side effects such as extraneouse log files being '
+        'result in side effects such as extraneous log files being '
         'generated')
 
   this_dir = os.path.dirname(__file__)

@@ -106,7 +106,7 @@ class TestSignalCase(TestCase):
 
 # Enable signals. Most logging tests require configure logger to actually
 # be called. LogRecordSocketReceiver is mocked out, so no lasting side
-# effects should inccur.
+# effects should occur.
 class TestLoggerConfigureCase(TestLoggerCase, TestSignalCase,
                               TestComputeCase, TestExecutorCase):
   pass

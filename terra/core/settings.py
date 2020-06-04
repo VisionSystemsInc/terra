@@ -473,8 +473,8 @@ class LazySettings(LazyObject):
   def __setstate__(self, state):
     self._wrapped = state['_wrapped']
 
-    # This should NOT be done on a pre instance basis, this if only for
-    # the global terra.settings. So maybe this should be done in context
+    # This should NOT be done on a per instance basis, this is only for
+    # the global terra.settings. So maybe this should be done in a context
     # manager??
     # from terra.core.signals import post_settings_configured
     # post_settings_configured.send(sender=self)

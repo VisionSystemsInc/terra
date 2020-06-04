@@ -6,5 +6,5 @@ class ImproperlyConfigured(Exception):
 
 class ConfigurationWarning(Warning):
   """
-  Warning for Terra may somehow be improperly configured
+  Warning that Terra may be improperly configured
   """

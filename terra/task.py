@@ -34,7 +34,7 @@ class TerraTask(Task):
       # Flip each mount point, so it goes from runner to controller
       reverse_compute_volume_map = [[x[1], x[0]]
                                     for x in compute_volume_map]
-      # Revere order. This will be important in case one mount point mounts
+      # Reverse order. This will be important in case one mount point mounts
       # inside another
       reverse_compute_volume_map.reverse()
 
@@ -54,14 +54,14 @@ class TerraTask(Task):
                       executor_volume_map):
     if reverse_compute_volume_map or executor_volume_map:
       # If either translation is needed, start by applying the ~ home dir
-      # expansion and settings_property(which wouldn't have made it through
-      # pure json conversion, but the ~ will
+      # expansion and settings_property (which wouldn't have made it through
+      # pure json conversion, but the ~ will)
       payload = TerraJSONEncoder.serializableSettings(payload)
       # Go from compute runner to master controller
       if reverse_compute_volume_map:
         payload = terra.compute.utils.translate_settings_paths(
             payload, reverse_compute_volume_map)
-      # Go from master controller to exector
+      # Go from master controller to executor
       if executor_volume_map:
         payload = terra.compute.utils.translate_settings_paths(
             payload, executor_volume_map)
@@ -102,7 +102,7 @@ class TerraTask(Task):
         # This is needed here because I just loaded settings from a runner!
         settings.terra.zone = 'task'
 
-        # Just in case processing dir doesn't exists
+        # Just in case processing dir doesn't exist
         if not os.path.exists(settings.processing_dir):
           logger.critical(f'Dir "{settings.processing_dir}" is not accessible '
                           'by the executor, please make sure the worker has '
@@ -111,7 +111,7 @@ class TerraTask(Task):
           logger.warning('Using temporary directory: '
                          f'"{settings.processing_dir}" for the processing dir')
 
-        # Calculate the exector's mapped version of the arguments
+        # Calculate the executor's mapped version of the arguments
         kwargs = args_to_kwargs(self.run, args, kwargs)
         args_only = kwargs.pop(ARGS, ())
         kwargs.update(kwargs.pop(KWARGS, ()))

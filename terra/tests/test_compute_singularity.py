@@ -11,7 +11,7 @@ from .utils import TestSettingsUnconfiguredCase
 
 class TestComputeSingularityCase(TestSettingsUnconfiguredCase):
   def setUp(self):
-    # This will resets the _connection to an uninitialized state
+    # This will reset the _connection to an uninitialized state
     self.patches.append(
         mock.patch.object(terra.compute.utils.ComputeHandler,
                           '_connection',

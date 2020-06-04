@@ -253,7 +253,7 @@ class CeleryExecutor(BaseExecutor):
   def configure_logger(sender, **kwargs):
     if settings.terra.zone == 'task':  # pragma: no cover
       # This will never really be reached, because the task_controller will
-      # configure the logger, and than fork.
+      # configure the logger, and then fork.
       sender.main_log_handler = NullHandler()
     elif settings.terra.zone == 'task_controller':
       # Setup log file for use in configure

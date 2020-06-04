@@ -19,7 +19,7 @@ from terra.utils.cli import FullPaths, ArgumentParser
 
 @settings_property
 def singularity_unset(self):
-  raise ImproperlyConfigured('You must to set --compose and --service for '
+  raise ImproperlyConfigured('You must set --compose and --service for '
                              'singularity')
 
 
