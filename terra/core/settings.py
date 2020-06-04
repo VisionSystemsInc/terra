@@ -289,7 +289,7 @@ global_templates = [
         }
       },
       "executor": {
-        "type": "ThreadPoolExecutor",
+        "type": "ProcessPoolExecutor",
         'volume_map': []
       },
       "compute": {
