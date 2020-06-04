@@ -306,8 +306,14 @@ class _SetupTerraLogger():
     def handle_exception(exc_type, exc_value, exc_traceback):
       # Try catch here because I want to make sure the original hook is called
       try:
-        logger.critical("Uncaught exception", extra={'skip_stderr': True},
-                        exc_info=(exc_type, exc_value, exc_traceback))
+        # Use getLogger instead of logger (defined below) incase there is an
+        # exception on import, this will make it easier to get a normal error
+        # message
+        getLogger(__name__).critical("Uncaught exception",
+                                     extra={'skip_stderr': True},
+                                     exc_info=(exc_type,
+                                               exc_value,
+                                               exc_traceback))
       except Exception:  # pragma: no cover
         print('There was an exception logging in the exception handler!',
               file=sys.stderr)
@@ -345,8 +351,14 @@ class _SetupTerraLogger():
       original_exception = InteractiveShell.showtraceback
 
       def handle_traceback(*args, **kwargs):  # pragma: no cover
-        getLogger(__name__).critical("Uncaught exception",
-                                     exc_info=sys.exc_info())
+        try:
+          getLogger(__name__).critical("Uncaught exception",
+                                       extra={'skip_stderr': True},
+                                       exc_info=sys.exc_info())
+        except Exception:
+          print('There was an exception logging in the exception handler!',
+                file=sys.stderr)
+          traceback.print_exc()
 
         try:
           from terra import settings
