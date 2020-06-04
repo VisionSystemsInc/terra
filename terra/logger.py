@@ -218,6 +218,9 @@ class _SetupTerraLogger():
     # ever defined, don't use it to get the root logger
     self.root_logger = logging.getLogger(None)
     self.root_logger.setLevel(0)
+    # Add the Terra filter to the rootlogger, so that it gets the same extra
+    # args any other terra.logger.Logger would get
+    self.root_logger.addFilter(TerraAddFilter())
 
     # stream -> stderr
     self.stderr_handler = logging.StreamHandler(sys.stderr)
@@ -516,7 +519,7 @@ class ColorFormatter(Formatter):
 
   def format(self, record):
     if self.use_color:
-      zone = record.__dict__['zone']
+      zone = record.__dict__.get('zone', 'preconfig')
       if zone == "preconfig":
         record.__dict__['zone'] = '\033[33mpreconfig\033[0m'
       elif zone == "controller":
