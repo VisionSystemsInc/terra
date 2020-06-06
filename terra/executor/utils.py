@@ -39,12 +39,6 @@ class ExecutorHandler(ClassHandler):
     elif backend_name == "ThreadPoolExecutor" or \
         backend_name == "concurrent.futures.ThreadPoolExecutor":
       from terra.executor.thread import ThreadPoolExecutor
-      # An example of unexpected behavior is the zone being set incorrectly in
-      # logging messages. But this is just one such example!
-      # You have been warned
-      warnings.warn("ThreadPoolExecutor is for testing purposes only. "
-                    "settings.terra.zone is not threadsafe and can create "
-                    "unexpected behavior", RuntimeWarning)
       return ThreadPoolExecutor
     elif backend_name == "ProcessPoolExecutor" or \
         backend_name == "concurrent.futures.ProcessPoolExecutor":

@@ -363,7 +363,6 @@ class LazyObject:
 
   def __getattr__(self, name, *args, **kwargs):
     '''Supported'''
-    print('getattr:', name)
     if self._wrapped is None:
       self._setup()
     return getattr(self._wrapped, name, *args, **kwargs)
@@ -592,9 +591,8 @@ class LazySettings(LazyObject):
 class LazySettingsThreaded(LazySettings):
   @classmethod
   def downcast(cls, obj):
-    assert(type(obj) == LazySettings,
-           "This downcast function was intended for LazySettings instances "
-           "only")
+    # This downcast function was intended for LazySettings instances only
+    assert type(obj) == LazySettings
     # Put settings in __wrapped where property below expects it.
     settings = obj._wrapped
     # Use object setattr, or else this will be treated as a normal key in the
@@ -614,7 +612,6 @@ class LazySettingsThreaded(LazySettings):
         self.__tls.settings = copy.deepcopy(self.__wrapped)
       return self.__tls.settings
     else:
-      print(self.__dict__.keys())
       return self.__wrapped
 
   def __setattr__(self, name, value):
