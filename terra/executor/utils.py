@@ -1,5 +1,4 @@
 from importlib import import_module
-import warnings
 
 from terra import settings
 import terra.core.signals

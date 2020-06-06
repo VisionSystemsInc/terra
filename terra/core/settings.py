@@ -157,7 +157,6 @@ import platform
 import warnings
 import threading
 import concurrent.futures
-import weakref
 import copy
 
 from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
@@ -599,7 +598,7 @@ class LazySettingsThreaded(LazySettings):
     # settings._wrapped ObjectDict, which is not what we want
     object.__setattr__(obj, '__class__', cls)
     obj.__wrapped = settings
-    obj.__tls  = threading.local()
+    obj.__tls = threading.local()
 
   @property
   def _wrapped(self):
