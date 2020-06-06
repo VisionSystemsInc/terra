@@ -592,41 +592,40 @@ class LazySettings(LazyObject):
 class LazySettingsThreaded(LazySettings):
   @classmethod
   def downcast(cls, obj):
-    assert(type(obj) == LazySettings)
-    settings = obj._wrapped
+    assert(type(obj) == LazySettings,
+           "This downcast function was intended for LazySettings instances "
+           "only")
     # Put settings in __wrapped where property below expects it.
-    obj.__wrapped = settings
+    settings = obj._wrapped
+    # Use object setattr, or else this will be treated as a normal key in the
+    # settings._wrapped ObjectDict, which is not what we want
     object.__setattr__(obj, '__class__', cls)
-    object.__setattr__(obj, '_LazySettingsThreaded__wrapped', settings)
-    # obj.__threaded_wrapped = weakref.WeakKeyDictionary()
-    object.__setattr__(obj, '_LazySettingsThreaded__threaded_wrapped', weakref.WeakKeyDictionary())
-
+    obj.__wrapped = settings
+    obj.__tls  = threading.local()
 
   @property
   def _wrapped(self):
+    '''
+    Thread safe version of _wrapped getter
+    '''
     thread = threading.current_thread()
     if thread._target == concurrent.futures.thread._worker:
-      print('thread pool thread')
-      if thread not in self.__threaded_wrapped:
-        self.__threaded_wrapped[thread] = copy.deepcopy(self.__wrapped)
-      return self.__threaded_wrapped[thread]
+      if not hasattr(self.__tls, 'settings'):
+        self.__tls.settings = copy.deepcopy(self.__wrapped)
+      return self.__tls.settings
     else:
-      print('main threads')
       print(self.__dict__.keys())
       return self.__wrapped
 
   def __setattr__(self, name, value):
     '''Supported'''
-    print('name:', name)
-    if name in ("_wrapped",
-                "_LazySettingsThreaded__wrapped",
-                "_LazySettingsThreaded__threaded_wrapped"):
-      # Call super to avoid infinite __setattr__ loops.
-      object.__setattr__(name, value)
+    if name in ("_LazySettingsThreaded__wrapped",
+                "_LazySettingsThreaded__tls"):
+      # Call original __setattr__ to avoid infinite __setattr__ loops.
+      object.__setattr__(self, name, value)
     else:
-      if self._wrapped is None:
-        self._setup()
-      setattr(self._wrapped, name, value)
+      # Normal LazyObject setter
+      super().__setattr__(name, value)
 
 
 class ObjectDict(dict):
