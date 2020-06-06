@@ -155,6 +155,10 @@ from functools import wraps
 from json import JSONEncoder
 import platform
 import warnings
+import threading
+import concurrent.futures
+import weakref
+import copy
 
 from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
 # Do not import terra.logger or terra.signals here, or any module that
@@ -337,7 +341,6 @@ class LazyObject:
   Based off of Django's LazyObject
   '''
 
-  _wrapped = None
   '''
   The internal object being wrapped
   '''
@@ -360,6 +363,7 @@ class LazyObject:
 
   def __getattr__(self, name, *args, **kwargs):
     '''Supported'''
+    print('getattr:', name)
     if self._wrapped is None:
       self._setup()
     return getattr(self._wrapped, name, *args, **kwargs)
@@ -367,8 +371,8 @@ class LazyObject:
   def __setattr__(self, name, value):
     '''Supported'''
     if name == "_wrapped":
-      # Assign to __dict__ to avoid infinite __setattr__ loops.
-      self.__dict__["_wrapped"] = value
+      # Call super to avoid infinite __setattr__ loops.
+      super().__setattr__(name, value)
     else:
       if self._wrapped is None:
         self._setup()
@@ -583,6 +587,46 @@ class LazySettings(LazyObject):
     post_settings_context.send(sender=self, post_settings_context=True)
 
     return return_value
+
+
+class LazySettingsThreaded(LazySettings):
+  @classmethod
+  def downcast(cls, obj):
+    assert(type(obj) == LazySettings)
+    settings = obj._wrapped
+    # Put settings in __wrapped where property below expects it.
+    obj.__wrapped = settings
+    object.__setattr__(obj, '__class__', cls)
+    object.__setattr__(obj, '_LazySettingsThreaded__wrapped', settings)
+    # obj.__threaded_wrapped = weakref.WeakKeyDictionary()
+    object.__setattr__(obj, '_LazySettingsThreaded__threaded_wrapped', weakref.WeakKeyDictionary())
+
+
+  @property
+  def _wrapped(self):
+    thread = threading.current_thread()
+    if thread._target == concurrent.futures.thread._worker:
+      print('thread pool thread')
+      if thread not in self.__threaded_wrapped:
+        self.__threaded_wrapped[thread] = copy.deepcopy(self.__wrapped)
+      return self.__threaded_wrapped[thread]
+    else:
+      print('main threads')
+      print(self.__dict__.keys())
+      return self.__wrapped
+
+  def __setattr__(self, name, value):
+    '''Supported'''
+    print('name:', name)
+    if name in ("_wrapped",
+                "_LazySettingsThreaded__wrapped",
+                "_LazySettingsThreaded__threaded_wrapped"):
+      # Call super to avoid infinite __setattr__ loops.
+      object.__setattr__(name, value)
+    else:
+      if self._wrapped is None:
+        self._setup()
+      setattr(self._wrapped, name, value)
 
 
 class ObjectDict(dict):
