@@ -98,6 +98,31 @@ class TestExecutorCase(TestCase):
     super().setUp()
 
 
+class TestThreadPoolExecutorCase(TestExecutorCase):
+  '''
+  Special care is needed for ThreadPoolExecutor because it downcasts settings
+  '''
+
+  def setUp(self):
+    self.settings_class_patch = mock.patch.object(
+        settings, '__class__', type(settings), create=False)
+    super().setUp()
+    self.settings_class_patch.start()
+    # This mock behavior needs to be modified, because setting __class__ is
+    # unlike normal attributes, it doesn't get overwritten in __dict__, so
+    # setting is_local prevents delattr being called on __class__, which would
+    # be the wrong thing to do.
+    self.settings_class_patch.is_local = True
+
+    # This class does not mock or clean up __wrapped or __tls, but they do not
+    # introduce sideeffects.
+
+  def tearDown(self):
+    # This has to be stopped before the rest, or else a setattr error occurs.
+    self.settings_class_patch.stop()
+    super().tearDown()
+
+
 class TestSignalCase(TestCase):
   def setUp(self):
     self.patches.append(mock.patch.dict(os.environ, TERRA_UNITTEST='0'))

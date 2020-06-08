@@ -368,7 +368,7 @@ class LazyObject:
 
   def __setattr__(self, name, value):
     '''Supported'''
-    if name == "_wrapped":
+    if name in ("_wrapped", "__class__"):
       # Call super to avoid infinite __setattr__ loops.
       super().__setattr__(name, value)
     else:
@@ -594,9 +594,8 @@ class LazySettingsThreaded(LazySettings):
     assert type(obj) == LazySettings
     # Put settings in __wrapped where property below expects it.
     settings = obj._wrapped
-    # Use object setattr, or else this will be treated as a normal key in the
-    # settings._wrapped ObjectDict, which is not what we want
-    object.__setattr__(obj, '__class__', cls)
+    # Downcast
+    obj.__class__ = cls
     obj.__wrapped = settings
     obj.__tls = threading.local()
 

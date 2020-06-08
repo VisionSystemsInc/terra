@@ -13,7 +13,7 @@ from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
   ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder,
-  ExpandedString
+  ExpandedString, LazySettings
 )
 
 
@@ -643,6 +643,11 @@ class TestUnitTests(TestCase):
             "initialized the settings. This side effect should be "
             "prevented by mocking out the settings._wrapped attribute. "
             "Otherwise unit tests can interfere with each other")
+
+
+class TestSettingsClass(TestCase):
+  def last_test_settings_class(self):
+    self.assertEqual(type(settings), LazySettings)
 
 
 class TestCircularDependency(TestLoggerConfigureCase):

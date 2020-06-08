@@ -2,7 +2,10 @@ from unittest import SkipTest
 import concurrent.futures
 
 from terra import settings
-from .utils import TestCase, TestExecutorCase, TestSettingsUnconfiguredCase
+from .utils import (
+  TestCase, TestExecutorCase, TestThreadPoolExecutorCase,
+  TestSettingsUnconfiguredCase
+)
 from terra.executor.utils import ExecutorHandler, Executor
 from terra.executor.dummy import DummyExecutor
 from terra.executor.sync import SyncExecutor
@@ -59,6 +62,14 @@ class TestExecutorHandler(TestExecutorCase, TestSettingsUnconfiguredCase):
         {'executor': {'type': 'concurrent.futures.ProcessPoolExecutor'}})
     self.assertIsInstance(Executor._connection(),
                           concurrent.futures.ProcessPoolExecutor)
+
+
+class TestThreadExecutorHandler(TestThreadPoolExecutorCase,
+                                TestSettingsUnconfiguredCase):
+  def test_executor_name_thread(self):
+    settings.configure({'executor': {'type': 'ThreadPoolExecutor'}})
+    self.assertIsInstance(Executor._connection(),
+                          concurrent.futures.ThreadPoolExecutor)
 
 
 class TestUnitTests(TestCase):
