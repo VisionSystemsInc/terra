@@ -218,6 +218,9 @@ class _SetupTerraLogger():
     # ever defined, don't use it to get the root logger
     self.root_logger = logging.getLogger(None)
     self.root_logger.setLevel(0)
+    # Add the Terra filter to the rootlogger, so that it gets the same extra
+    # args any other terra.logger.Logger would get
+    self.root_logger.addFilter(TerraAddFilter())
 
     # stream -> stderr
     self.stderr_handler = logging.StreamHandler(sys.stderr)
@@ -227,9 +230,11 @@ class _SetupTerraLogger():
     self.root_logger.addHandler(self.stderr_handler)
 
     # Set up temporary file logger
-    self.tmp_file = tempfile.NamedTemporaryFile(mode="w+",
-                                                prefix=self.default_tmp_prefix,
-                                                delete=False)
+    if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
+      self.tmp_file = tempfile.NamedTemporaryFile(
+          mode="w+", prefix=self.default_tmp_prefix, delete=False)
+    else:
+      self.tmp_file = open(os.devnull, mode='w+')
     self.tmp_handler = logging.StreamHandler(stream=self.tmp_file)
     self.tmp_handler.setLevel(0)
     self.tmp_handler.setFormatter(self.default_formatter)
@@ -425,12 +430,13 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    settings_dump = os.path.join(
-        settings.processing_dir,
-        datetime.now(timezone.utc).strftime(
-            f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
-    with open(settings_dump, 'w') as fid:
-      fid.write(TerraJSONEncoder.dumps(settings, indent=2))
+    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+      settings_dump = os.path.join(
+          settings.processing_dir,
+          datetime.now(timezone.utc).strftime(
+              f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
+      with open(settings_dump, 'w') as fid:
+        fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 
     # filter the stderr buffer
     self.preconfig_stderr_handler.buffer = \
@@ -461,7 +467,7 @@ class _SetupTerraLogger():
 
     # Remove the temporary file now that you are done with it
     self.tmp_file.close()
-    if os.path.exists(self.tmp_file.name):
+    if os.path.exists(self.tmp_file.name) and self.tmp_file.name != os.devnull:
       os.unlink(self.tmp_file.name)
     self.tmp_file = None
 
@@ -513,7 +519,7 @@ class ColorFormatter(Formatter):
 
   def format(self, record):
     if self.use_color:
-      zone = record.__dict__['zone']
+      zone = record.__dict__.get('zone', 'preconfig')
       if zone == "preconfig":
         record.__dict__['zone'] = '\033[33mpreconfig\033[0m'
       elif zone == "controller":

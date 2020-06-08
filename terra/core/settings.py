@@ -155,6 +155,9 @@ from functools import wraps
 from json import JSONEncoder
 import platform
 import warnings
+import threading
+import concurrent.futures
+import copy
 
 from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
 # Do not import terra.logger or terra.signals here, or any module that
@@ -337,7 +340,6 @@ class LazyObject:
   Based off of Django's LazyObject
   '''
 
-  _wrapped = None
   '''
   The internal object being wrapped
   '''
@@ -367,8 +369,8 @@ class LazyObject:
   def __setattr__(self, name, value):
     '''Supported'''
     if name == "_wrapped":
-      # Assign to __dict__ to avoid infinite __setattr__ loops.
-      self.__dict__["_wrapped"] = value
+      # Call super to avoid infinite __setattr__ loops.
+      super().__setattr__(name, value)
     else:
       if self._wrapped is None:
         self._setup()
@@ -583,6 +585,43 @@ class LazySettings(LazyObject):
     post_settings_context.send(sender=self, post_settings_context=True)
 
     return return_value
+
+
+class LazySettingsThreaded(LazySettings):
+  @classmethod
+  def downcast(cls, obj):
+    # This downcast function was intended for LazySettings instances only
+    assert type(obj) == LazySettings
+    # Put settings in __wrapped where property below expects it.
+    settings = obj._wrapped
+    # Use object setattr, or else this will be treated as a normal key in the
+    # settings._wrapped ObjectDict, which is not what we want
+    object.__setattr__(obj, '__class__', cls)
+    obj.__wrapped = settings
+    obj.__tls = threading.local()
+
+  @property
+  def _wrapped(self):
+    '''
+    Thread safe version of _wrapped getter
+    '''
+    thread = threading.current_thread()
+    if thread._target == concurrent.futures.thread._worker:
+      if not hasattr(self.__tls, 'settings'):
+        self.__tls.settings = copy.deepcopy(self.__wrapped)
+      return self.__tls.settings
+    else:
+      return self.__wrapped
+
+  def __setattr__(self, name, value):
+    '''Supported'''
+    if name in ("_LazySettingsThreaded__wrapped",
+                "_LazySettingsThreaded__tls"):
+      # Call original __setattr__ to avoid infinite __setattr__ loops.
+      object.__setattr__(self, name, value)
+    else:
+      # Normal LazyObject setter
+      super().__setattr__(name, value)
 
 
 class ObjectDict(dict):
