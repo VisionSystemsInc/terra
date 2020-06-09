@@ -3,6 +3,8 @@
 source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
 
 # Plugins
+source "${VSI_COMMON_DIR}/linux/ask_question"
+source "${VSI_COMMON_DIR}/linux/command_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
@@ -257,6 +259,94 @@ function terra_caseify()
                        # don't call this directly
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
       extra_args=$#
+      ;;
+
+    terra_setup) # Setup pipenv using system python and/or conda
+      local output_dir
+      local CONDA
+      local PYTHON
+
+      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: -- ${@+"${@}"}
+
+      if [ -z "${output_dir:+set}" ]; then
+        echo "--dir must be specified" >& 2
+        exit 2
+      fi
+
+      mkdir -p "${output_dir}"
+      # relative to absolute
+      output_dir="$(cd "${output_dir}"; pwd)"
+
+      local use_conda
+      local platform_bin
+      if [ "${OS-}" = "Windows_NT" ]; then
+        platform_bin=Scripts
+      else
+        platform_bin=bin
+      fi
+
+      if [ -n "${PYTHON:+set}" ]; then
+        use_conda=0
+      elif [ -n "${CONDA:+set}" ]; then
+        use_conda=1
+      else
+        if command -v Xpython3 &> /dev/null; then
+          PYTHON=python3
+          use_conda=0
+        elif command -v Xpython &> /dev/null; then
+          PYTHON=python
+          use_conda=0
+        elif command -v Xconda3 &> /dev/null; then
+          CONDA=conda3
+          use_conda=1
+        elif command -v Xconda2 &> /dev/null; then
+          CONDA=conda2
+          use_conda=1
+        else
+          source "${VSI_COMMON_DIR}/linux/web_tools.bsh"
+          source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
+          make_temp_path temp_dir -d
+          if [ "${OS-}" = "Windows_NT" ]; then
+            download_to_stdout "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" > "${temp_dir}/install_conda.exe"
+            MSYS2_ARG_CONV_EXCL="*" "${temp_dir}/install_conda.exe" /NoRegistry=1 /InstallationType=JustMe /S "/D=$(cygpath -aw "${temp_dir}/conda")"
+            CONDA="${temp_dir}/conda/Scripts/conda"
+          else
+            if [[ ${OSTYPE-} = darwin* ]]; then
+              URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
+            else
+              URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+            fi
+            download_to_stdout "${URL}" > "${temp_dir}/install_conda.sh"
+            bash "${temp_dir}/install_conda.sh" -b -p "${temp_dir}/conda" -s
+            CONDA="${temp_dir}/conda/bin/conda"
+          fi
+          use_conda=1
+        fi
+      fi
+
+      if [ "${use_conda}" = "1" ]; then
+        "${CONDA}" create -y -p "${output_dir}/.python" 'python<=3.8'
+        PYTHON="${output_dir}/.python/${platform_bin}/python"
+      fi
+
+      # Make sure python is 3.6 or newer
+      local python_version="$("${PYTHON}" --version | awk '{print $2}')"
+      source "${VSI_COMMON_DIR}/linux/requirements.bsh"
+      if ! meet_requirements "${python_version}" '>=3.6' '<3.9'; then
+        echo "Python version ${python_version} does not meet the expected requirements" >&2
+        read -srn1 -d '' -p "Press any key to continue"
+        echo
+      fi
+
+      source "${VSI_COMMON_DIR}/docker/recipes/get-pipenv"
+      PIPENV_VIRTUALENV="${output_dir}" install_pipenv
+
+      local add_to_local
+      echo "" >&2
+      ask_question "Do you want to add \"${output_dir}/${platform_bin}\" to your local.env automatically?" add_to_local y
+      if [ "${add_to_local}" == "1" ]; then
+        echo $'\n'"PATH=\"${output_dir}/${platform_bin}:\${PATH}\"" >> "${TERRA_CWD}/local.env"
+      fi
       ;;
 
     terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
