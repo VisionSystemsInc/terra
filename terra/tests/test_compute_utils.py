@@ -3,7 +3,7 @@ from unittest import mock
 import warnings
 
 from terra import settings
-from .utils import TestCase
+from .utils import TestSettingsUnconfiguredCase
 import terra.compute.utils as utils
 import terra.compute.dummy
 import terra.compute.docker
@@ -34,7 +34,7 @@ class Service2_test:
 
 # I am purposefully showing multiple ways to mock _wrapped for demonstration
 # purposes
-class TestComputeUtilsCase(TestCase):
+class TestComputeUtilsCase(TestSettingsUnconfiguredCase):
   def setUp(self):
     # Use setting
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
@@ -129,11 +129,11 @@ def mock_popen(*args, **kwargs):
 
 class TestBaseJust(TestComputeUtilsCase):
   def setUp(self):
-    self.patches.append(mock.patch.object(utils, 'Popen', mock_popen))
-    super().setUp()
-
     # Make a copy
     self.original_env = os.environ.copy()
+
+    self.patches.append(mock.patch.object(utils, 'Popen', mock_popen))
+    super().setUp()
 
   def tearDown(self):
     super().tearDown()
@@ -176,7 +176,7 @@ class TestBaseJust(TestComputeUtilsCase):
 
   def test_logging_code(self):
     # Test the debug1 diffdict log output
-    with self.assertLogs(utils.__name__, level="DEBUG1") as cm:
+    with self.assertLogs(utils.__name__, level="DEBUG4") as cm:
       env = os.environ.copy()
       env.pop('PATH')
       env['FOO'] = 'BAR'

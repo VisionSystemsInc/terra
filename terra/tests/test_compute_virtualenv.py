@@ -7,7 +7,7 @@ from terra.compute import base
 from terra.compute import virtualenv
 import terra.compute.utils
 
-from .utils import TestCase
+from .utils import TestSettingsUnconfiguredCase
 
 
 class MockVirtualEnvService(virtualenv.Service):
@@ -17,10 +17,8 @@ class MockVirtualEnvService(virtualenv.Service):
     self.env["BAR"] = "FOO"
 
 
-class TestVirtualEnv(TestCase):
+class TestVirtualEnv(TestSettingsUnconfiguredCase):
   def setUp(self):
-    # Use settings
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # self.run trigger Executor
     self.patches.append(mock.patch.dict(Executor.__dict__))
     # This will resets the _connection to an uninitialized state
@@ -37,7 +35,8 @@ class TestVirtualEnv(TestCase):
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
     settings.configure({
-        'compute': {'arch': 'virtualenv'},
+        'compute': {'arch': 'virtualenv',
+                    'virtualenv_dir': None},
         'processing_dir': self.temp_dir.name,
         'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
@@ -98,7 +97,7 @@ class TestVirtualEnv(TestCase):
     service = MockVirtualEnvService()
 
     # Test logging code
-    with self.assertLogs(virtualenv.__name__, level="DEBUG1") as cm:
+    with self.assertLogs(virtualenv.__name__, level="DEBUG4") as cm:
       os.environ['BAR'] = 'FOO'
       env = os.environ.copy()
       env.pop('BAR')
@@ -110,10 +109,13 @@ class TestVirtualEnv(TestCase):
 
     env_lines = [x for x in cm.output if "Environment Modification:" in x][0]
     env_lines = env_lines.split('\n')
-    self.assertEqual(len(env_lines), 4)
+    self.assertEqual(len(env_lines), 5)
 
     self.assertTrue(any(o.startswith('- BAR:') for o in env_lines))
     self.assertTrue(any(o.startswith('+ FOO:') for o in env_lines))
     # Added by Terra
     self.assertTrue(any(o.startswith('+ TERRA_SETTINGS_FILE:')
+                        for o in env_lines))
+    # Added by TestSettingsUnconfiguredCase
+    self.assertTrue(any(o.startswith('- TERRA_SETTINGS_FILE:')
                         for o in env_lines))

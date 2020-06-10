@@ -3,6 +3,8 @@
 source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
 
 # Plugins
+source "${VSI_COMMON_DIR}/linux/ask_question"
+source "${VSI_COMMON_DIR}/linux/command_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
@@ -28,7 +30,13 @@ JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 function Terra_Pipenv()
 {
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
-    PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
+    if [ -n "${VIRTUAL_ENV+set}" ]; then
+      echo "Warning: You appear to be in a virtual env" >&2
+      echo "Deactivate external virtual envs before running just" >&2
+      ask_question "Continue?" answer_continue n
+      [ "$answer_continue" == "0" ] && return 1
+    fi
+    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
@@ -115,10 +123,6 @@ function terra_caseify()
       extra_args=$#
       ;;
 
-    run_redis) # Run redis
-      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" run redis ${@+"${@}"}
-      extra_args=$#
-      ;;
     run_celery) # Starts a celery worker
       local node_name
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
@@ -127,7 +131,23 @@ function terra_caseify()
         node_name="docker@%h"
       fi
 
-      Terra_Pipenv run celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELLER_LOG_LEVEL-INFO}" -n "${node_name}"
+      # Untested
+      if [ "${OS-}" = "Windows_NT" ]; then
+        # https://www.distributedpython.com/2018/08/21/celery-4-windows/
+        local FORKED_BY_MULTIPROCESSING
+        export FORKED_BY_MULTIPROCESSING=1
+      fi
+
+      # We might be able to use CELERY_LOADER to avoid the -A argument
+      Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" -n "${node_name}"
+      ;;
+
+    run_flower) # Start the flower server
+      # Flower doesn't actually need the tasks loaded in the app, so clear it
+      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app flower
+      ;;
+    shutdown_celery) # Shuts down all celery workers on all nodes
+      Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"
       ;;
 
     ### Run Debugging containers ###
@@ -203,7 +223,8 @@ function terra_caseify()
     terra_test-pep8) # Run pep8 test
       justify terra pep8
       echo "Running flake8..."
-      Terra_Pipenv run bash -c 'flake8 \
+      Terra_Pipenv run bash -c 'cd ${TERRA_TERRA_DIR};
+                                flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
 
@@ -238,6 +259,98 @@ function terra_caseify()
                        # don't call this directly
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
       extra_args=$#
+      ;;
+
+    terra_setup) # Setup pipenv using system python and/or conda
+      local output_dir
+      local CONDA
+      local PYTHON
+      local download_conda=0
+
+      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: --download download_conda -- ${@+"${@}"}
+
+      if [ -z "${output_dir:+set}" ]; then
+        echo "--dir must be specified" >& 2
+        exit 2
+      fi
+
+      mkdir -p "${output_dir}"
+      # relative to absolute
+      output_dir="$(cd "${output_dir}"; pwd)"
+
+      local use_conda
+      local platform_bin
+      if [ "${OS-}" = "Windows_NT" ]; then
+        platform_bin=Scripts
+      else
+        platform_bin=bin
+      fi
+
+      if [ -n "${PYTHON:+set}" ]; then
+        use_conda=0
+      elif [ -n "${CONDA:+set}" ]; then
+        use_conda=1
+      else
+        if [ "${download_conda}" == "0" ] && command -v python3 &> /dev/null; then
+          PYTHON=python3
+          use_conda=0
+        elif [ "${download_conda}" == "0" ] && command -v python &> /dev/null; then
+          PYTHON=python
+          use_conda=0
+        elif [ "${download_conda}" == "0" ] && command -v conda3 &> /dev/null; then
+          CONDA=conda3
+          use_conda=1
+        elif [ "${download_conda}" == "0" ] && command -v conda &> /dev/null; then
+          CONDA=conda
+          use_conda=1
+        elif [ "${download_conda}" == "0" ] && command -v conda2 &> /dev/null; then
+          CONDA=conda2
+          use_conda=1
+        else
+          source "${VSI_COMMON_DIR}/linux/web_tools.bsh"
+          source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
+          make_temp_path temp_dir -d
+          if [ "${OS-}" = "Windows_NT" ]; then
+            download_to_stdout "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" > "${temp_dir}/install_conda.exe"
+            MSYS2_ARG_CONV_EXCL="*" "${temp_dir}/install_conda.exe" /NoRegistry=1 /InstallationType=JustMe /S "/D=$(cygpath -aw "${temp_dir}/conda")"
+            CONDA="${temp_dir}/conda/Scripts/conda"
+          else
+            if [[ ${OSTYPE-} = darwin* ]]; then
+              URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
+            else
+              URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+            fi
+            download_to_stdout "${URL}" > "${temp_dir}/install_conda.sh"
+            bash "${temp_dir}/install_conda.sh" -b -p "${temp_dir}/conda" -s
+            CONDA="${temp_dir}/conda/bin/conda"
+          fi
+          use_conda=1
+        fi
+      fi
+
+      if [ "${use_conda}" = "1" ]; then
+        "${CONDA}" create -y -p "${output_dir}/.python" 'python<=3.8'
+        PYTHON="${output_dir}/.python/${platform_bin}/python"
+      fi
+
+      # Make sure python is 3.6 or newer
+      local python_version="$("${PYTHON}" --version | awk '{print $2}')"
+      source "${VSI_COMMON_DIR}/linux/requirements.bsh"
+      if ! meet_requirements "${python_version}" '>=3.6' '<3.9'; then
+        echo "Python version ${python_version} does not meet the expected requirements" >&2
+        read -srn1 -d '' -p "Press any key to continue"
+        echo
+      fi
+
+      source "${VSI_COMMON_DIR}/docker/recipes/get-pipenv"
+      PIPENV_VIRTUALENV="${output_dir}" install_pipenv
+
+      local add_to_local
+      echo "" >&2
+      ask_question "Do you want to add \"${output_dir}/${platform_bin}\" to your local.env automatically?" add_to_local y
+      if [ "${add_to_local}" == "1" ]; then
+        echo $'\n'"PATH=\"${output_dir}/${platform_bin}:\${PATH}\"" >> "${TERRA_CWD}/local.env"
+      fi
       ;;
 
     terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \

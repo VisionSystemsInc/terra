@@ -1,13 +1,16 @@
-from concurrent.futures import Future, Executor
 from threading import Lock
 
+from terra.executor.base import BaseFuture, BaseExecutor
+from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
-class DummyExecutor(Executor):
+class DummyExecutor(BaseExecutor):
   """
-  Executor that does the nothin, just logs what would happen.
+  Executor that does nothing, just logs what would happen.
+
+  Note: Don't base new executors off of this example
   """
 
   def __init__(self, *arg, **kwargs):
@@ -21,11 +24,15 @@ class DummyExecutor(Executor):
       if self._shutdown:
         raise RuntimeError('cannot schedule new futures after shutdown')
 
-      f = Future()
+      original_zone = settings.terra.zone
+      # Fake the zone for the log messages
+      settings.terra.zone = 'task'
+      f = BaseFuture()
       logger.info(f'Run function: {fn}')
       logger.info(f'With args: {args}')
       logger.info(f'With kwargs: {kwargs}')
       f.set_result(None)
+      settings.terra.zone = original_zone
       return f
 
   def shutdown(self, wait=True):

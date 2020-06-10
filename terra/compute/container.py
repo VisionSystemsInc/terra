@@ -1,7 +1,6 @@
 import os
 import posixpath
 import ntpath
-from os import environ as env
 import re
 import pathlib
 from tempfile import TemporaryDirectory
@@ -29,18 +28,25 @@ class ContainerService(BaseService):
     self.extra_compose_files = []
 
   def pre_run(self):
-    self.temp_dir = TemporaryDirectory()
+    # Need to run Base's pre_run first, so it has a chance to update settings
+    # for special executors, etc...
+    super().pre_run()
+
+    self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")
+    if self.env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
+      self.temp_dir._finalizer.detach()
     temp_dir = pathlib.Path(self.temp_dir.name)
 
     # Check to see if and are already defined, this will play nicely with
     # external influences
     env_volume_index = 1
-    while f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}' in \
+    while f'{self.env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}' in \
         self.env:
       env_volume_index += 1
 
     # Setup volumes for container
-    self.env[f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = \
+    self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+             f'VOLUME_{env_volume_index}'] = \
         f'{str(temp_dir)}:/tmp_settings:rw'
     env_volume_index += 1
 
@@ -50,13 +56,13 @@ class ContainerService(BaseService):
       volume_str = f'{volume_host}:{volume_container}'
       if volume_flags:
         volume_str += f':{volume_flags}'
-      self.env[f'{env["JUST_PROJECT_PREFIX"]}_VOLUME_{env_volume_index}'] = \
+      self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+               f'VOLUME_{env_volume_index}'] = \
           volume_str
       env_volume_index += 1
 
-    volume_map = compute.configuration_map(self)
-
-    logger.debug3("Compute Volume map: %s", volume_map)
+    settings.compute.volume_map = compute.configuration_map(self)
+    logger.debug4("Compute Volume map: %s", settings.compute.volume_map)
 
     # Setup config file for container
 
@@ -64,7 +70,7 @@ class ContainerService(BaseService):
 
     container_config = translate_settings_paths(
         TerraJSONEncoder.serializableSettings(settings),
-        volume_map,
+        settings.compute.volume_map,
         self.container_platform)
 
     if os.name == "nt":  # pragma: no linux cover
@@ -75,15 +81,15 @@ class ContainerService(BaseService):
           + '|TERRA_SETTINGS_FILE'
 
     # Dump the settings
+    container_config['terra']['zone'] = 'runner'
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
-
-    super().pre_run()
 
   def post_run(self):
     super().post_run()
     # Delete temp_dir
-    self.temp_dir.cleanup()
+    if self.env.get('TERRA_KEEP_TEMP_DIR', None) != "1":
+      self.temp_dir.cleanup()
     # self.temp_dir = None # Causes a warning, hopefully there wasn't a reason
     # I did it this way.
 

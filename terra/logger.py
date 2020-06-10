@@ -41,8 +41,8 @@ Usage
 To use the logger, in any module always:
 
 ```
-from terra.logging import get_logger
-logger = get_logger(__name__)
+from terra.logging import getLogger
+logger = getLogger(__name__)
 ```
 
 And then use the ``logger`` object anywhere in the module. This logger is a
@@ -67,18 +67,26 @@ import traceback
 import io
 import warnings
 from datetime import datetime, timezone
+import socketserver
+import struct
+import select
+import pickle
 
+import terra
 from terra.core.exceptions import ImproperlyConfigured
+# Do not import terra.settings or terra.signals here, or any module that
+# imports them
 
 from logging import (
-  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET,
-  getLogger, _acquireLock, _releaseLock, currentframe,
+  CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, Filter,
+  getLogger, _acquireLock, _releaseLock, currentframe, Formatter,
   _srcfile as logging_srcfile, Logger as Logger_original
 )
 
 
 __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
-           'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3', 'Logger']
+           'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3', 'DEBUG4',
+           'Logger']
 
 
 class HandlerLoggingContext(object):
@@ -118,32 +126,115 @@ class HandlerLoggingContext(object):
     # implicit return of None => don't swallow exceptions
 
 
+# from https://docs.python.org/3/howto/logging-cookbook.html
+class LogRecordStreamHandler(socketserver.StreamRequestHandler):
+  """Handler for a streaming logging request.
+
+  This basically logs the record using whatever logging policy is
+  configured locally.
+  """
+
+  def handle(self):
+    """
+    Handle multiple requests - each expected to be a 4-byte length,
+    followed by the LogRecord in pickle format. Logs the record
+    according to whatever policy is configured locally.
+    """
+    while True:
+      chunk = self.connection.recv(4)
+      if len(chunk) < 4:
+        break
+      slen = struct.unpack('>L', chunk)[0]
+      chunk = self.connection.recv(slen)
+      while len(chunk) < slen:
+        chunk = chunk + self.connection.recv(slen - len(chunk))
+      obj = self.unPickle(chunk)
+      record = logging.makeLogRecord(obj)
+      self.handleLogRecord(record)
+
+  def unPickle(self, data):
+    return pickle.loads(data)
+
+  def handleLogRecord(self, record):
+    # if a name is specified, we use the named logger rather than the one
+    # implied by the record.
+    if self.server.logname is not None:
+      name = self.server.logname
+    else:
+      name = record.name
+    logger = getLogger(name)
+    # N.B. EVERY record gets logged. This is because Logger.handle
+    # is normally called AFTER logger-level filtering. If you want
+    # to do filtering, do it at the client end to save wasting
+    # cycles and network bandwidth!
+    logger.handle(record)
+
+
+class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
+  """
+  Simple TCP socket-based logging receiver suitable for testing.
+  """
+
+  allow_reuse_address = True
+
+  def __init__(self, host='localhost',
+               port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+               handler=LogRecordStreamHandler):
+    socketserver.ThreadingTCPServer.__init__(self, (host, port), handler)
+    self.abort = False
+    self.ready = False
+    self.timeout = 0.1
+    self.logname = None
+
+  def serve_until_stopped(self):
+    abort = False
+    self.ready = True
+    while not abort:
+      rd, wr, ex = select.select([self.socket.fileno()],
+                                 [], [],
+                                 self.timeout)
+      if rd:
+        self.handle_request()
+      abort = self.abort
+    self.ready = False
+
+
 class _SetupTerraLogger():
   '''
   A simple logger class used internally to configure the logger before and
   after :data:`terra.settings` is configured
   '''
-  default_formatter = logging.Formatter('%(asctime)s (preconfig) : '
-                                        '%(levelname)s - %(message)s')
+  default_formatter = logging.Formatter('%(asctime)s (%(hostname)s:%(zone)s) :'
+                                        ' %(levelname)s - %(filename)s -'
+                                        ' %(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
   default_log_prefix = "terra_log"
 
   def __init__(self):
     self._configured = False
+
+    # This must always use logging's getLogger. If a custom Terra getLogger is
+    # ever defined, don't use it to get the root logger
     self.root_logger = logging.getLogger(None)
     self.root_logger.setLevel(0)
+    # Add the Terra filter to the rootlogger, so that it gets the same extra
+    # args any other terra.logger.Logger would get
+    self.root_logger.addFilter(TerraAddFilter())
 
     # stream -> stderr
     self.stderr_handler = logging.StreamHandler(sys.stderr)
     self.stderr_handler.setLevel(self.default_stderr_handler_level)
     self.stderr_handler.setFormatter(self.default_formatter)
+    self.stderr_handler.addFilter(StdErrFilter())
     self.root_logger.addHandler(self.stderr_handler)
 
     # Set up temporary file logger
-    self.tmp_file = tempfile.NamedTemporaryFile(mode="w+",
-                                                prefix=self.default_tmp_prefix,
-                                                delete=False)
+    if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
+      self.tmp_file = tempfile.NamedTemporaryFile(
+          mode="w+", prefix=self.default_tmp_prefix, delete=False)
+    else:
+      self.tmp_file = open(os.devnull, mode='w+')
     self.tmp_handler = logging.StreamHandler(stream=self.tmp_file)
     self.tmp_handler.setLevel(0)
     self.tmp_handler.setFormatter(self.default_formatter)
@@ -154,13 +245,14 @@ class _SetupTerraLogger():
         logging.handlers.MemoryHandler(capacity=1000)
     self.preconfig_stderr_handler.setLevel(0)
     self.preconfig_stderr_handler.setFormatter(self.default_formatter)
+    self.preconfig_stderr_handler.addFilter(StdErrFilter())
     self.root_logger.addHandler(self.preconfig_stderr_handler)
 
-    self.preconfig_file_handler = \
+    self.preconfig_main_log_handler = \
         logging.handlers.MemoryHandler(capacity=1000)
-    self.preconfig_file_handler.setLevel(0)
-    self.preconfig_file_handler.setFormatter(self.default_formatter)
-    self.root_logger.addHandler(self.preconfig_file_handler)
+    self.preconfig_main_log_handler.setLevel(0)
+    self.preconfig_main_log_handler.setFormatter(self.default_formatter)
+    self.root_logger.addHandler(self.preconfig_main_log_handler)
 
     # Replace the exception hook with our exception handler
     self.setup_logging_exception_hook()
@@ -175,6 +267,34 @@ class _SetupTerraLogger():
 
     # Enable warnings to default
     warnings.simplefilter('default')
+    # Disable known warnings that there's nothing to be done about.
+    for module in ('yaml', 'celery.app.amqp'):
+      warnings.filterwarnings("ignore",
+                              category=DeprecationWarning, module=module,
+                              message="Using or importing the ABCs")
+    warnings.filterwarnings("ignore",
+                            category=DeprecationWarning, module='osgeo',
+                            message="the imp module is deprecated")
+
+    # This disables a message that spams the screen:
+    # "pipbox received method enable_events() [reply_to:None ticket:None]"
+    # This is the only debug message in all of kombu.pidbox, so this is pretty
+    # safe to do
+    pidbox_logger = getLogger('kombu.pidbox')
+    pidbox_logger.setLevel(INFO)
+
+  @property
+  def main_log_handler(self):
+    try:
+      return self.__main_log_handler
+    except AttributeError:
+      raise AttributeError("'_logs' has no 'main_log_handler'. An executor "
+                           "class' 'configure_logger' method should setup a "
+                           "'main_log_handler'.")
+
+  @main_log_handler.setter
+  def main_log_handler(self, value):
+    self.__main_log_handler = value
 
   def setup_logging_exception_hook(self):
     '''
@@ -191,11 +311,26 @@ class _SetupTerraLogger():
     def handle_exception(exc_type, exc_value, exc_traceback):
       # Try catch here because I want to make sure the original hook is called
       try:
-        logger.error("Uncaught exception",
-                     exc_info=(exc_type, exc_value, exc_traceback))
+        # Use getLogger instead of logger (defined below) incase there is an
+        # exception on import, this will make it easier to get a normal error
+        # message
+        getLogger(__name__).critical("Uncaught exception",
+                                     extra={'skip_stderr': True},
+                                     exc_info=(exc_type,
+                                               exc_value,
+                                               exc_traceback))
       except Exception:  # pragma: no cover
-        print('There was an exception logging in the execpetion handler!')
+        print('There was an exception logging in the exception handler!',
+              file=sys.stderr)
         traceback.print_exc()
+
+      try:
+        from terra import settings
+        zone = settings.terra.zone
+      except Exception:
+        zone = 'preconfig'
+      print(f'Exception in {zone} on {platform.node()}',
+            file=sys.stderr)
 
       return original_hook(exc_type, exc_value, exc_traceback)
 
@@ -221,8 +356,23 @@ class _SetupTerraLogger():
       original_exception = InteractiveShell.showtraceback
 
       def handle_traceback(*args, **kwargs):  # pragma: no cover
-        getLogger(__name__).error("Uncaught exception",
-                                  exc_info=sys.exc_info())
+        try:
+          getLogger(__name__).critical("Uncaught exception",
+                                       extra={'skip_stderr': True},
+                                       exc_info=sys.exc_info())
+        except Exception:
+          print('There was an exception logging in the exception handler!',
+                file=sys.stderr)
+          traceback.print_exc()
+
+        try:
+          from terra import settings
+          zone = settings.terra.zone
+        except Exception:
+          zone = 'preconfig'
+        print(f'Exception in {zone} on {platform.node()}',
+              file=sys.stderr)
+
         return original_exception(*args, **kwargs)
 
       InteractiveShell.showtraceback = handle_traceback
@@ -230,7 +380,31 @@ class _SetupTerraLogger():
     except ImportError:  # pragma: no cover
       pass
 
-  def configure_logger(self, sender, **kwargs):
+  def set_level_and_formatter(self):
+    from terra import settings
+    formatter = logging.Formatter(fmt=settings.logging.format,
+                                  datefmt=settings.logging.date_format,
+                                  style=settings.logging.style)
+
+    stderr_formatter = ColorFormatter(fmt=settings.logging.format,
+                                      datefmt=settings.logging.date_format,
+                                      style=settings.logging.style)
+
+    # Configure log level
+    level = settings.logging.level
+    if isinstance(level, str):
+      # make level case insensitive
+      level = level.upper()
+
+    if getattr(self, 'stderr_handler', None) is not None:
+      self.stderr_handler.setLevel(level)
+      self.stderr_handler.setFormatter(stderr_formatter)
+
+    if getattr(self, 'main_log_handler', None) is not None:
+      self.main_log_handler.setLevel(level)
+      self.main_log_handler.setFormatter(formatter)
+
+  def configure_logger(self, sender=None, signal=None, **kwargs):
     '''
     Call back function to configure the logger after settings have been
     configured
@@ -244,41 +418,25 @@ class _SetupTerraLogger():
                              "unexpected")
       raise ImproperlyConfigured()
 
-    formatter = logging.Formatter(fmt=settings.logging.format,
-                                  datefmt=settings.logging.date_format,
-                                  style=settings.logging.style)
+    # This sends a signal to the current Executor type, which has already been
+    # imported at the end of LazySettings.configure. We don't import Executor
+    # here to reduce the concerns of this module
+    import terra.core.signals
+    terra.core.signals.logger_configure.send(sender=self, **kwargs)
+    self.set_level_and_formatter()
 
-    # Setup log file for use in configure
-    self.log_file = os.path.join(settings.processing_dir,
-                                 self.default_log_prefix)
-    os.makedirs(settings.processing_dir, exist_ok=True)
-    self.log_file = open(self.log_file, 'a')
-
-    self.file_handler = logging.StreamHandler(stream=self.log_file)
-
-    # Configure log level
-    level = settings.logging.level
-    if isinstance(level, str):
-      # make level case insensitive
-      level = level.upper()
-    self.stderr_handler.setLevel(level)
-    self.file_handler.setLevel(level)
-
-    # Configure format
-    self.file_handler.setFormatter(formatter)
-    self.stderr_handler.setFormatter(formatter)
-
-    # Swap some handlers
-    self.root_logger.addHandler(self.file_handler)
+    # Now that the real logger has been set up, swap some handlers
     self.root_logger.removeHandler(self.preconfig_stderr_handler)
-    self.root_logger.removeHandler(self.preconfig_file_handler)
+    self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    settings_dump = os.path.join(settings.processing_dir,
-                                 datetime.now(timezone.utc).strftime(
-                                     'settings_%Y_%m_%d_%H_%M_%S_%f.json'))
-    with open(settings_dump, 'w') as fid:
-      fid.write(TerraJSONEncoder.dumps(settings, indent=2))
+    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+      settings_dump = os.path.join(
+          settings.processing_dir,
+          datetime.now(timezone.utc).strftime(
+              f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
+      with open(settings_dump, 'w') as fid:
+        fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 
     # filter the stderr buffer
     self.preconfig_stderr_handler.buffer = \
@@ -288,38 +446,106 @@ class _SetupTerraLogger():
     # level messages. This is probably not necessary because error/critical
     # messages before configure should be rare, and are probably worth
     # repeating. Repeating is the only way to get them formatted right the
-    # second time anyways. This applys to stderr only, not the log file
+    # second time anyways. This applies to stderr only, not the log file
     #                        if (x.levelno >= level)] and
     #                           (x.levelno < default_stderr_handler_level)]
 
     # Filter file buffer. Never remove default_stderr_handler_level message,
     # they won't be in the new output file
-    self.preconfig_file_handler.buffer = \
-        [x for x in self.preconfig_file_handler.buffer
-         if (x.levelno >= self.file_handler.level)]
+    self.preconfig_main_log_handler.buffer = \
+        [x for x in self.preconfig_main_log_handler.buffer
+         if (x.levelno >= self.main_log_handler.level)]
 
     # Flush the buffers
     self.preconfig_stderr_handler.setTarget(self.stderr_handler)
     self.preconfig_stderr_handler.flush()
     self.preconfig_stderr_handler = None
-    self.preconfig_file_handler.setTarget(self.file_handler)
-    self.preconfig_file_handler.flush()
-    self.preconfig_file_handler = None
+    self.preconfig_main_log_handler.setTarget(self.main_log_handler)
+    self.preconfig_main_log_handler.flush()
+    self.preconfig_main_log_handler = None
     self.tmp_handler = None
 
     # Remove the temporary file now that you are done with it
     self.tmp_file.close()
-    os.unlink(self.tmp_file.name)
+    if os.path.exists(self.tmp_file.name) and self.tmp_file.name != os.devnull:
+      os.unlink(self.tmp_file.name)
     self.tmp_file = None
 
     self._configured = True
 
+  def reconfigure_logger(self, sender=None, signal=None, **kwargs):
+    if not self._configured:
+      self.root_logger.error("It is unexpected for reconfigure_logger to be "
+                             "called, without first calling configure_logger. "
+                             "This is not critical, but should not happen.")
 
-extra_logger_variables = {'hostname': platform.node()}
-'''dict: Extra logger variables that can be reference in log messages'''
+    # This sends a signal to the current Executor type, which has already been
+    # imported at the end of LazySettings.configure. We don't import Executor
+    # here to reduce the concerns of this module
+    import terra.core.signals
+    terra.core.signals.logger_reconfigure.send(sender=self, **kwargs)
+
+    self.set_level_and_formatter()
+
+
+class TerraAddFilter(Filter):
+  def filter(self, record):
+    if not hasattr(record, 'hostname'):
+      record.hostname = platform.node()
+    if not hasattr(record, 'zone'):
+      try:
+        if terra.settings.configured:
+          record.zone = terra.settings.terra.zone
+        else:
+          record.zone = 'preconfig'
+      except BaseException:
+        record.zone = 'preconfig'
+    return True
+
+
+class StdErrFilter(Filter):
+  def filter(self, record):
+    return not getattr(record, 'skip_stderr', False)
+
+
+class SkipStdErrAddFilter(Filter):
+  def filter(self, record):
+    record.skip_stderr = getattr(record, 'skip_stderr', True)
+    return True
+
+
+class ColorFormatter(Formatter):
+  use_color = True
+
+  def format(self, record):
+    if self.use_color:
+      zone = record.__dict__.get('zone', 'preconfig')
+      if zone == "preconfig":
+        record.__dict__['zone'] = '\033[33mpreconfig\033[0m'
+      elif zone == "controller":
+        record.__dict__['zone'] = '\033[32mcontroller\033[0m'
+      elif zone == "runner":
+        record.__dict__['zone'] = '\033[35mrunner\033[0m'
+      elif zone == "task":
+        record.__dict__['zone'] = '\033[34mtask\033[0m'
+      else:
+        record.__dict__['zone'] = f'\033[31m{record.__dict__["zone"]}\033[0m'
+
+      msg = super().format(record)
+      record.__dict__['zone'] = zone
+      return msg
+    else:
+      return super().format(record)
 
 
 class Logger(Logger_original):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    # I like https://stackoverflow.com/a/17558764/4166604 better than
+    # https://stackoverflow.com/a/28050837/4166604, it has the ability to add
+    # logic/function calls, if I so desire
+    self.addFilter(TerraAddFilter())
+
   def findCaller(self, stack_info=False, stacklevel=1):
     """
     Find the stack frame of the caller so that we can note the source
@@ -357,11 +583,8 @@ class Logger(Logger_original):
       break
     return rv
 
-  # Define _log instead of logger adapter, this works better (setLoggerClass)
-  # https://stackoverflow.com/a/28050837/4166604
-  def _log(self, *args, **kwargs):
-    kwargs['extra'] = extra_logger_variables
-    return super()._log(*args, **kwargs)
+  # Define _log instead of logger adapter if needed, this works better
+  # (setLoggerClass) https://stackoverflow.com/a/28050837/4166604
 
   def debug1(self, msg, *args, **kwargs):
     '''
@@ -384,6 +607,13 @@ class Logger(Logger_original):
     '''
     self.log(DEBUG3, msg, *args, **kwargs)
 
+  def debug4(self, msg, *args, **kwargs):
+    '''
+    Logs a message with level :data:`DEBUG4` on this logger. The arguments are
+    interpreted as for :func:`logging.debug`
+    '''
+    self.log(DEBUG4, msg, *args, **kwargs)
+
   fatal = logging.LoggerAdapter.critical
 
 
@@ -398,6 +628,7 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
   it will call warnings.formatwarning and will log the resulting string to a
   warnings logger named "py.warnings" with level logging.WARNING.
   """
+
   if file is not None:  # I don't actually know how this can be not None
     if _warnings_showwarning is not None:  # pragma: no cover
       _warnings_showwarning(message, category, filename, lineno, file, line)
@@ -407,8 +638,13 @@ def handle_warning(message, category, filename, lineno, file=None, line=None):
     logger.warning("%s", s)
 
 
+# Ordinarily we would use __file__ for this, but frozen modules don't always
+# have __file__ set, for some reason (see Issue CPython#21736). Thus, we get
+# the filename from a handy code object from a function defined in this
+# module. (There's no particular reason for picking debug1.)
 _srcfiles = (logging_srcfile,
-             os.path.normcase(Logger.debug1.__code__.co_filename))
+             os.path.normcase(Logger.debug1.__code__.co_filename),
+             warnings.showwarning.__code__.co_filename)
 
 
 DEBUG1 = 10
@@ -434,24 +670,43 @@ Should be used for more specific development debug messages, such as math
 output used to debug algorithms
 '''
 
+DEBUG4 = 7
+'''
+Debug level four, even more verbose.
+
+Should be used for spamming the screen
+'''
+
+
 logging.addLevelName(DEBUG1, "DEBUG1")
 logging.addLevelName(DEBUG2, "DEBUG2")
 logging.addLevelName(DEBUG3, "DEBUG3")
+logging.addLevelName(DEBUG4, "DEBUG4")
 
 logging.setLoggerClass(Logger)
 
 # Get the logger here, AFTER all the changes to the logger class
 logger = getLogger(__name__)
 
-# Disable log setup for unittests. Can't use settings here ;)
-if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
+
+def _setup_terra_logger():
   # Must be import signal after getLogger is defined... Currently this is
   # imported from logger. But if a custom getLogger is defined eventually, it
   # will need to be defined before importing terra.core.signals.
   import terra.core.signals
 
   # Configure logging (pre configure)
-  _logs = _SetupTerraLogger()
+  logs = _SetupTerraLogger()
 
-  # register post_configure with settings
-  terra.core.signals.post_settings_configured.connect(_logs.configure_logger)
+  # Register post_configure with settings
+  terra.core.signals.post_settings_configured.connect(logs.configure_logger)
+
+  # Handle a "with" settings context manager
+  terra.core.signals.post_settings_context.connect(logs.reconfigure_logger)
+
+  return logs
+
+
+# Disable log setup for unittests. Can't use settings here ;)
+if os.environ.get('TERRA_UNITTEST', None) != "1":  # pragma: no cover
+  _logs = _setup_terra_logger()

@@ -21,7 +21,9 @@ broker_url = f'redis://:{password}@{env["TERRA_REDIS_HOSTNAME"]}:' \
 result_backend = broker_url
 
 task_serializer = 'pickle'
+result_serializer = 'pickle'
 accept_content = ['json', 'pickle']
+result_accept_content = ['json', 'pickle']
 result_expires = 3600
 
 # App needs to define include
@@ -29,3 +31,4 @@ celery_include = env.get('TERRA_CELERY_INCLUDE', None)
 if celery_include:
   import ast
   include = ast.literal_eval(celery_include)
+  include += type(include)(['terra.tests.demo.tasks'])

@@ -11,6 +11,8 @@ setup(name="terra",
       extra_requires=extra_requires,
       install_requires=[
         "jstyleson",
-        "envcontext"
+        "envcontext",
+        # I use signal and task from celery, no matter what
+        "celery"
       ]
 )

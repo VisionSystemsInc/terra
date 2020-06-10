@@ -42,7 +42,7 @@ class Compute(BaseCompute):
 
         just --wrap Just-docker-compose \\
             -f {service_info.compose_files} ... \\
-            run {service_info.compose_service_name} \\
+            run -T {service_info.compose_service_name} \\
             {service_info.command}
     '''
     optional_args = {}
@@ -50,7 +50,7 @@ class Compute(BaseCompute):
 
     pid = just("--wrap", "Just-docker-compose",
                *sum([['-f', cf] for cf in service_info.compose_files], []),
-               'run', service_info.compose_service_name,
+               'run', '-T', service_info.compose_service_name,
                *service_info.command + extra_arguments,
                **optional_args,
                env=service_info.env)
@@ -96,7 +96,9 @@ class Compute(BaseCompute):
           ans = re.match(docker_volume_re, volume).groups()
           volume_map.append((ans[0], ans[2]))
 
-    volume_map = volume_map + service_info.volumes
+    # This is not needed, because service_info.volumes are already in
+    # service_info.env, added by terra.compute.base.BaseService.pre_run
+    # volume_map = volume_map + service_info.volumes
 
     slashes = '/'
     if os.name == 'nt':

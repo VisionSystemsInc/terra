@@ -21,6 +21,7 @@ class PipelineWorkflow:
 
   def __init__(self):
     self.pipeline = list()
+    super().__init__()
 
   # locate index of service name in workflow pipeline
   def service_index(self, service_name=None, default_index=0):

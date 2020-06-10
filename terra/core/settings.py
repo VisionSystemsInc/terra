@@ -147,14 +147,24 @@ framework instead of a larger application.
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from uuid import uuid4
+# from datetime import datetime
+from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
+from json import JSONEncoder
+import platform
+import warnings
+import threading
+import concurrent.futures
+import copy
 
-from terra.core.exceptions import ImproperlyConfigured
+from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
+# Do not import terra.logger or terra.signals here, or any module that
+# imports them
 from vsi.tools.python import (
     nested_patch_inplace, nested_patch, nested_update, nested_in_dict
 )
-from json import JSONEncoder
 
 try:
   import jstyleson as json
@@ -248,7 +258,19 @@ def unittest(self):
   return os.environ.get('TERRA_UNITTEST', None) == "1"
 
 
-# TODO: come up with a way for apps to extend this themselves
+@settings_property
+def need_to_set_virtualenv_dir(self):
+  warnings.warn("You are using the virtualenv compute, and did not set "
+                "settings.compute.virtualenv_dir in your config file. "
+                "Using system python.", ConfigurationWarning)
+  return None
+
+
+@settings_property
+def terra_uuid(self):
+  return str(uuid4())
+
+
 global_templates = [
   (
     # Global Defaults
@@ -256,15 +278,33 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
-        "format": f"%(asctime)s (%(hostname)s): %(levelname)s - %(message)s",
+        "format": "%(asctime)s (%(hostname)s:%(zone)s): "
+                  "%(levelname)s/%(processName)s - %(filename)s - %(message)s",
         "date_format": None,
-        "style": "%"
+        "style": "%",
+        "server": {
+          # This is tricky use of a setting, because the master controller will
+          # be the first to set it, but the runner and task will inherit the
+          # master controller's values, not their node names, should they be
+          # different (such as celery and spark)
+          "hostname": platform.node(),
+          "port": DEFAULT_TCP_LOGGING_PORT
+        }
       },
       "executor": {
-        "type": "ThreadPoolExecutor"
+        "type": "ProcessPoolExecutor",
+        'volume_map': []
       },
       "compute": {
-        "arch": "terra.compute.dummy"
+        "arch": "terra.compute.dummy",
+        'volume_map': []
+      },
+      'terra': {
+        # unlike other settings, this should NOT be overwritten by a
+        # config.json file, there is currently nothing to prevent that
+        'zone': 'controller',
+        # 'start_time': datetime.now(), # Not json serializable yet
+        'uuid': terra_uuid
       },
       'status_file': status_file,
       'processing_dir': processing_dir,
@@ -274,11 +314,11 @@ global_templates = [
   ),
   (
     {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
-    {"compute": {"virtualenv_dir": None}}  # Defaults
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}  # Defaults
   ),
   (  # So much for DRY :(
     {"compute": {"arch": "virtualenv"}},
-    {"compute": {"virtualenv_dir": None}}
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}
   )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we
@@ -300,7 +340,6 @@ class LazyObject:
   Based off of Django's LazyObject
   '''
 
-  _wrapped = None
   '''
   The internal object being wrapped
   '''
@@ -329,9 +368,9 @@ class LazyObject:
 
   def __setattr__(self, name, value):
     '''Supported'''
-    if name == "_wrapped":
-      # Assign to __dict__ to avoid infinite __setattr__ loops.
-      self.__dict__["_wrapped"] = value
+    if name in ("_wrapped", "__class__"):
+      # Call super to avoid infinite __setattr__ loops.
+      super().__setattr__(name, value)
     else:
       if self._wrapped is None:
         self._setup()
@@ -428,6 +467,20 @@ class LazySettings(LazyObject):
       self.configure(json.load(fid))
     self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
 
+  def __getstate__(self):
+    if self._wrapped is None:
+      self._setup()
+    return {'_wrapped': self._wrapped}
+
+  def __setstate__(self, state):
+    self._wrapped = state['_wrapped']
+
+    # This should NOT be done on a per instance basis, this is only for
+    # the global terra.settings. So maybe this should be done in a context
+    # manager??
+    # from terra.core.signals import post_settings_configured
+    # post_settings_configured.send(sender=self)
+
   def __repr__(self):
     # Hardcode the class name as otherwise it yields 'Settings'.
     if self._wrapped is None:
@@ -452,8 +505,6 @@ class LazySettings(LazyObject):
     ImproperlyConfigured
         If settings is already configured, will throw this exception
     """
-    from terra.core.signals import post_settings_configured
-
     if self._wrapped is not None:
       raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
@@ -479,10 +530,18 @@ class LazySettings(LazyObject):
     nested_patch_inplace(
         self._wrapped,
         lambda key, value: (isinstance(key, str)
+                            and (isinstance(value, str)
+                                 or getattr(value, 'settings_property', False))
                             and any(key.endswith(pattern)
                                     for pattern in json_include_suffixes)),
         lambda key, value: read_json(value))
 
+    # Importing these here is intentional, it guarantees the signals are
+    # connected so that executor and computes can setup logging if need be
+    import terra.executor  # noqa
+    import terra.compute  # noqa
+
+    from terra.core.signals import post_settings_configured
     post_settings_configured.send(sender=self)
     logger.debug2('Post settings configure')
 
@@ -519,7 +578,49 @@ class LazySettings(LazyObject):
     return self._wrapped.__enter__()
 
   def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-    return self._wrapped.__exit__(exc_type, exc_value, traceback)
+    return_value = self._wrapped.__exit__(exc_type, exc_value, traceback)
+
+    # Incase the logger was messed with in the context, reset it.
+    from terra.core.signals import post_settings_context
+    post_settings_context.send(sender=self, post_settings_context=True)
+
+    return return_value
+
+
+class LazySettingsThreaded(LazySettings):
+  @classmethod
+  def downcast(cls, obj):
+    # This downcast function was intended for LazySettings instances only
+    assert type(obj) == LazySettings
+    # Put settings in __wrapped where property below expects it.
+    settings = obj._wrapped
+    # Downcast
+    obj.__class__ = cls
+    obj.__wrapped = settings
+    obj.__tls = threading.local()
+
+  @property
+  def _wrapped(self):
+    '''
+    Thread safe version of _wrapped getter
+    '''
+    thread = threading.current_thread()
+    if thread._target == concurrent.futures.thread._worker:
+      if not hasattr(self.__tls, 'settings'):
+        self.__tls.settings = copy.deepcopy(self.__wrapped)
+      return self.__tls.settings
+    else:
+      return self.__wrapped
+
+  def __setattr__(self, name, value):
+    '''Supported'''
+    if name in ("_LazySettingsThreaded__wrapped",
+                "_LazySettingsThreaded__tls"):
+      # Call original __setattr__ to avoid infinite __setattr__ loops.
+      object.__setattr__(self, name, value)
+    else:
+      # Normal LazyObject setter
+      super().__setattr__(name, value)
 
 
 class ObjectDict(dict):
@@ -635,6 +736,8 @@ class TerraJSONEncoder(JSONEncoder):
       if obj._wrapped is None:
         raise ImproperlyConfigured('Settings not initialized')
       return TerraJSONEncoder.serializableSettings(obj._wrapped)
+    # elif isinstance(obj, datetime):
+    #   return str(obj)
     return JSONEncoder.default(self, obj)  # pragma: no cover
 
   @staticmethod
@@ -655,10 +758,23 @@ class TerraJSONEncoder(JSONEncoder):
     if isinstance(obj, LazySettings):
       obj = obj._wrapped
 
-    return nested_patch(
+    # I do not os.path.expandvars(val) here, because the Just-docker-compose
+    # takes care of that for me, so I can still use the envvar names in the
+    # containers
+
+    obj = nested_patch(
         obj,
         lambda k, v: isfunction(v) and hasattr(v, 'settings_property'),
         lambda k, v: v(obj))
+
+    obj = nested_patch(
+        obj,
+        lambda k, v: any(v is not None and isinstance(k, str)
+                         and k.endswith(pattern)
+                         for pattern in filename_suffixes),
+        lambda k, v: os.path.expanduser(v))
+
+    return obj
 
   @staticmethod
   def dumps(obj, **kwargs):

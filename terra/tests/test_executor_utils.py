@@ -1,19 +1,17 @@
-from unittest import mock, SkipTest
+from unittest import SkipTest
 import concurrent.futures
 
 from terra import settings
-from .utils import TestCase
+from .utils import (
+  TestCase, TestExecutorCase, TestThreadPoolExecutorCase,
+  TestSettingsUnconfiguredCase
+)
 from terra.executor.utils import ExecutorHandler, Executor
 from terra.executor.dummy import DummyExecutor
 from terra.executor.sync import SyncExecutor
 
 
-class TestExecutorHandler(TestCase):
-  def setUp(self):
-    self.patches.append(mock.patch.object(settings, '_wrapped', None))
-    self.patches.append(mock.patch.dict(Executor.__dict__))
-    super().setUp()
-
+class TestExecutorHandler(TestExecutorCase, TestSettingsUnconfiguredCase):
   def test_executor_handler(self):
     settings.configure({'executor': {'type': 'DummyExecutor'}})
 
@@ -38,10 +36,11 @@ class TestExecutorHandler(TestCase):
     settings.configure({'executor': {'type': 'SyncExecutor'}})
     self.assertIsInstance(Executor._connection(), SyncExecutor)
 
-  def test_executor_name_thread(self):
-    settings.configure({'executor': {'type': 'ThreadPoolExecutor'}})
-    self.assertIsInstance(Executor._connection(),
-                          concurrent.futures.ThreadPoolExecutor)
+  # TODO: It takes more mocking to make this test pass now
+  # def test_executor_name_thread(self):
+  #   settings.configure({'executor': {'type': 'ThreadPoolExecutor'}})
+  #   self.assertIsInstance(Executor._connection(),
+  #                         concurrent.futures.ThreadPoolExecutor)
 
   def test_executor_name_process(self):
     settings.configure({'executor': {'type': 'ProcessPoolExecutor'}})
@@ -60,7 +59,15 @@ class TestExecutorHandler(TestCase):
 
   def test_executor_name_by_name(self):
     settings.configure(
-        {'executor': {'type': 'concurrent.futures.ThreadPoolExecutor'}})
+        {'executor': {'type': 'concurrent.futures.ProcessPoolExecutor'}})
+    self.assertIsInstance(Executor._connection(),
+                          concurrent.futures.ProcessPoolExecutor)
+
+
+class TestThreadExecutorHandler(TestThreadPoolExecutorCase,
+                                TestSettingsUnconfiguredCase):
+  def test_executor_name_thread(self):
+    settings.configure({'executor': {'type': 'ThreadPoolExecutor'}})
     self.assertIsInstance(Executor._connection(),
                           concurrent.futures.ThreadPoolExecutor)
 
