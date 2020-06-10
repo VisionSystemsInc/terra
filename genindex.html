@@ -82,7 +82,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="terra/getting_started.html">What is Terra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Adding Apps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="python/modules.html">terra</a></li>
@@ -204,13 +205,15 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.LazyObject.__iter__">__iter__() (terra.core.settings.LazyObject method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.LazyObject.__len__">__len__() (terra.core.settings.LazyObject method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.LazyObject.__setattr__">__setattr__() (terra.core.settings.LazyObject method)</a>
 
       <ul>
+        <li><a href="python/terra.core.html#terra.core.settings.LazySettingsThreaded.__setattr__">(terra.core.settings.LazySettingsThreaded method)</a>
+</li>
         <li><a href="python/terra.core.html#terra.core.settings.ObjectDict.__setattr__">(terra.core.settings.ObjectDict method)</a>
 </li>
       </ul></li>
@@ -258,6 +261,8 @@
 </li>
       <li><a href="python/terra.utils.html#terra.utils.workflow.AlreadyRunException">AlreadyRunException</a>
 </li>
+      <li><a href="python/terra.html#terra.task.TerraTask.apply_async">apply_async() (terra.task.TerraTask method)</a>
+</li>
       <li><a href="python/terra.utils.html#terra.utils.cli.ArgumentParser">ArgumentParser (class in terra.utils.cli)</a>
 </li>
   </ul></td>
@@ -268,8 +273,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute">BaseCompute (class in terra.compute.base)</a>
 </li>
+      <li><a href="python/terra.executor.html#terra.executor.base.BaseExecutor">BaseExecutor (class in terra.executor.base)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.executor.html#terra.executor.base.BaseFuture">BaseFuture (class in terra.executor.base)</a>
+</li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseService">BaseService (class in terra.compute.base)</a>
 </li>
       <li><a href="python/terra.html#terra.workflow.BaseWorkflow">BaseWorkflow (class in terra.workflow)</a>
@@ -314,6 +323,8 @@
 </li>
         <li><a href="terra/settings.html#cmdoption-arg-service-start">service_start</a>
 </li>
+        <li><a href="terra/settings.html#cmdoption-arg-terra-zone">terra.zone</a>
+</li>
       </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.docker.Compute">Compute (class in terra.compute.docker)</a>
 
@@ -353,8 +364,20 @@
         <li><a href="python/terra.compute.html#terra.compute.singularity.Compute.configuration_map_service">(terra.compute.singularity.Compute method)</a>
 </li>
       </ul></li>
+      <li><a href="python/terra.core.html#terra.core.exceptions.ConfigurationWarning">ConfigurationWarning</a>
+</li>
       <li><a href="python/terra.core.html#terra.core.settings.LazySettings.configure">configure() (terra.core.settings.LazySettings method)</a>
 </li>
+      <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.configure_logger">configure_logger() (terra.compute.base.BaseCompute static method)</a>
+
+      <ul>
+        <li><a href="python/terra.executor.html#terra.executor.base.BaseExecutor.configure_logger">(terra.executor.base.BaseExecutor static method)</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#terra.executor.celery.CeleryExecutor.configure_logger">(terra.executor.celery.CeleryExecutor static method)</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor.configure_logger">(terra.executor.celery.executor.CeleryExecutor static method)</a>
+</li>
+      </ul></li>
       <li><a href="python/terra.core.html#terra.core.settings.LazySettings.configured">configured() (terra.core.settings.LazySettings property)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal.connect">connect() (terra.core.signals.Signal method)</a>
@@ -381,15 +404,21 @@
 </li>
       <li><a href="python/terra.html#terra.logger.DEBUG3">DEBUG3 (in module terra.logger)</a>
 </li>
+      <li><a href="python/terra.html#terra.logger.Logger.debug3">debug3() (terra.logger.Logger method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.html#terra.logger.Logger.debug3">debug3() (terra.logger.Logger method)</a>
+      <li><a href="python/terra.html#terra.logger.DEBUG4">DEBUG4 (in module terra.logger)</a>
+</li>
+      <li><a href="python/terra.html#terra.logger.Logger.debug4">debug4() (terra.logger.Logger method)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.TerraJSONEncoder.default">default() (terra.core.settings.TerraJSONEncoder method)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal.disconnect">disconnect() (terra.core.signals.Signal method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.docker.docker_volume_re">docker_volume_re (in module terra.compute.docker)</a>
+</li>
+      <li><a href="python/terra.core.html#terra.core.settings.LazySettingsThreaded.downcast">downcast() (terra.core.settings.LazySettingsThreaded class method)</a>
 </li>
       <li><a href="python/terra.executor.html#terra.executor.dummy.DummyExecutor">DummyExecutor (class in terra.executor.dummy)</a>
 </li>
@@ -448,7 +477,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.utils.get_default_service_class">get_default_service_class() (in module terra.compute.utils)</a>
 </li>
-      <li><a href="python/terra.compute.html#terra.compute.base.BaseService.get_volume_map">get_volume_map() (terra.compute.base.BaseService method)</a>
+      <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.get_volume_map">get_volume_map() (terra.compute.base.BaseCompute method)</a>
 
       <ul>
         <li><a href="python/terra.compute.html#terra.compute.docker.Compute.get_volume_map">(terra.compute.docker.Compute method)</a>
@@ -504,10 +533,18 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.LazySettings">LazySettings (class in terra.core.settings)</a>
 </li>
+      <li><a href="python/terra.core.html#terra.core.settings.LazySettingsThreaded">LazySettingsThreaded (class in terra.core.settings)</a>
+</li>
       <li><a href="python/terra.compute.html#terra.compute.utils.load_service">load_service() (in module terra.compute.utils)</a>
 </li>
       <li><a href="python/terra.html#terra.logger.Logger">Logger (class in terra.logger)</a>
 </li>
+      <li><a href="python/terra.core.html#terra.core.signals.logger_configure">logger_configure (in module terra.core.signals)</a>
+</li>
+      <li><a href="python/terra.core.html#terra.core.signals.logger_reconfigure">logger_reconfigure (in module terra.core.signals)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     logging.date_format
 
@@ -515,8 +552,6 @@
         <li><a href="terra/settings.html#cmdoption-arg-logging-date-format">command line option</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     logging.format
 
@@ -547,6 +582,10 @@
       <li><a href="python/terra.core.html#terra.core.utils.cached_property.name">name (terra.core.utils.cached_property attribute)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.core.html#terra.core.settings.need_to_set_virtualenv_dir">need_to_set_virtualenv_dir() (in module terra.core.settings)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
@@ -572,9 +611,11 @@
         <li><a href="python/terra.compute.html#terra.compute.virtualenv.Service.post_run">(terra.compute.virtualenv.Service method)</a>
 </li>
       </ul></li>
+      <li><a href="python/terra.core.html#terra.core.signals.post_settings_configured">post_settings_configured (in module terra.core.signals)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.core.html#terra.core.signals.post_settings_configured">post_settings_configured (in module terra.core.signals)</a>
+      <li><a href="python/terra.core.html#terra.core.signals.post_settings_context">post_settings_context (in module terra.core.signals)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseService.pre_run">pre_run() (terra.compute.base.BaseService method)</a>
 
@@ -588,6 +629,8 @@
       </ul></li>
       <li><a href="python/terra.core.html#terra.core.settings.processing_dir">processing_dir() (in module terra.core.settings)</a>
 </li>
+      <li><a href="python/terra.executor.html#terra.executor.process.ProcessPoolExecutor">ProcessPoolExecutor (class in terra.executor.process)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -598,10 +641,22 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal.receivers">receivers (terra.core.signals.Signal attribute)</a>
 </li>
+      <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.reconfigure_logger">reconfigure_logger() (terra.compute.base.BaseCompute static method)</a>
+
+      <ul>
+        <li><a href="python/terra.executor.html#terra.executor.base.BaseExecutor.reconfigure_logger">(terra.executor.base.BaseExecutor static method)</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#terra.executor.celery.CeleryExecutor.reconfigure_logger">(terra.executor.celery.CeleryExecutor static method)</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor.reconfigure_logger">(terra.executor.celery.executor.CeleryExecutor static method)</a>
+</li>
+      </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.register">register() (terra.compute.base.BaseCompute class method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.dummy.Compute.remove_service">remove_service() (terra.compute.dummy.Compute method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.utils.html#terra.utils.workflow.resumable">resumable (class in terra.utils.workflow)</a>
 </li>
       <li><a href="python/terra.html#terra.workflow.BaseWorkflow.run">run() (terra.workflow.BaseWorkflow method)</a>
@@ -610,8 +665,6 @@
         <li><a href="python/terra.html#terra.workflow.PipelineWorkflow.run">(terra.workflow.PipelineWorkflow method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.run_service">run_service() (terra.compute.base.BaseCompute method)</a>
 
       <ul>
@@ -670,15 +723,19 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.Settings">Settings (class in terra.core.settings)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.html#terra.settings">settings (in module terra)</a>
 
       <ul>
         <li><a href="python/terra.core.html#terra.core.settings.settings">(in module terra.core.settings)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.settings_property">settings_property() (in module terra.core.settings)</a>
+</li>
+      <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.setup_loggers">setup_loggers() (in module terra.executor.celery.executor)</a>
+</li>
+      <li><a href="python/terra.html#terra.task.shared_task">shared_task() (in module terra.task)</a>
 </li>
       <li><a href="python/terra.executor.celery.html#terra.executor.celery.CeleryExecutor.shutdown">shutdown() (terra.executor.celery.CeleryExecutor method)</a>
 
@@ -746,8 +803,8 @@
 </li>
       <li><a href="python/terra.executor.html#module-terra.executor">terra.executor (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.executor.html#module-terra.executor.base">terra.executor.base (module)</a>
+</li>
       <li><a href="python/terra.executor.celery.html#module-terra.executor.celery">terra.executor.celery (module)</a>
 </li>
       <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.celeryconfig">terra.executor.celery.celeryconfig (module)</a>
@@ -756,11 +813,19 @@
 </li>
       <li><a href="python/terra.executor.html#module-terra.executor.dummy">terra.executor.dummy (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.executor.html#module-terra.executor.process">terra.executor.process (module)</a>
+</li>
       <li><a href="python/terra.executor.html#module-terra.executor.sync">terra.executor.sync (module)</a>
+</li>
+      <li><a href="python/terra.executor.html#module-terra.executor.thread">terra.executor.thread (module)</a>
 </li>
       <li><a href="python/terra.executor.html#module-terra.executor.utils">terra.executor.utils (module)</a>
 </li>
       <li><a href="python/terra.html#module-terra.logger">terra.logger (module)</a>
+</li>
+      <li><a href="python/terra.html#module-terra.task">terra.task (module)</a>
 </li>
       <li><a href="python/terra.utils.html#module-terra.utils">terra.utils (module)</a>
 </li>
@@ -770,11 +835,26 @@
 </li>
       <li><a href="python/terra.html#module-terra.workflow">terra.workflow (module)</a>
 </li>
+      <li>
+    terra.zone
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-terra-zone">command line option</a>
+</li>
+      </ul></li>
       <li><a href="python/terra.core.html#index-0">TERRA_SETTINGS_FILE</a>, <a href="python/terra.core.html#index-1">[1]</a>, <a href="python/terra.core.html#index-2">[2]</a>, <a href="terra/getting_started.html#index-0">[3]</a>
 </li>
       <li><a href="python/terra.core.html#index-3">TERRA_UNITTEST</a>
 </li>
+      <li><a href="python/terra.core.html#terra.core.settings.terra_uuid">terra_uuid() (in module terra.core.settings)</a>
+</li>
       <li><a href="python/terra.core.html#terra.core.settings.TerraJSONEncoder">TerraJSONEncoder (class in terra.core.settings)</a>
+</li>
+      <li><a href="python/terra.html#terra.task.TerraTask">TerraTask (class in terra.task)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.thread.ThreadPoolExecutor">ThreadPoolExecutor (class in terra.executor.thread)</a>
+</li>
+      <li><a href="python/terra.html#terra.task.TerraTask.translate_paths">translate_paths() (terra.task.TerraTask method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.utils.translate_settings_paths">translate_settings_paths() (in module terra.compute.utils)</a>
 </li>

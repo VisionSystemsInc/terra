@@ -83,7 +83,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/apps.html">Adding Apps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">terra</a><ul class="current">
@@ -97,6 +98,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.logger">terra.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.task">terra.task module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.workflow">terra.workflow module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra">Module contents</a></li>
 </ul>
@@ -191,13 +193,39 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-terra.executor.base">
+<span id="terra-executor-base-module"></span><h2>terra.executor.base module<a class="headerlink" href="#module-terra.executor.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.executor.base.BaseExecutor">
+<em class="property">class </em><code class="sig-prename descclassname">terra.executor.base.</code><code class="sig-name descname">BaseExecutor</code><a class="headerlink" href="#terra.executor.base.BaseExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
+<dl class="method">
+<dt id="terra.executor.base.BaseExecutor.configure_logger">
+<em class="property">static </em><code class="sig-name descname">configure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.base.BaseExecutor.configure_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.executor.base.BaseExecutor.reconfigure_logger">
+<em class="property">static </em><code class="sig-name descname">reconfigure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.base.BaseExecutor.reconfigure_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="terra.executor.base.BaseFuture">
+<em class="property">class </em><code class="sig-prename descclassname">terra.executor.base.</code><code class="sig-name descname">BaseFuture</code><a class="headerlink" href="#terra.executor.base.BaseFuture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Future</span></code></p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-terra.executor.dummy">
 <span id="terra-executor-dummy-module"></span><h2>terra.executor.dummy module<a class="headerlink" href="#module-terra.executor.dummy" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="terra.executor.dummy.DummyExecutor">
 <em class="property">class </em><code class="sig-prename descclassname">terra.executor.dummy.</code><code class="sig-name descname">DummyExecutor</code><span class="sig-paren">(</span><em class="sig-param">*arg</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.dummy.DummyExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
-<p>Executor that does the nothin, just logs what would happen.</p>
+<dd><p>Bases: <a class="reference internal" href="#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
+<p>Executor that does nothing, just logs what would happen.</p>
+<p>Note: Don’t base new executors off of this example</p>
 <dl class="method">
 <dt id="terra.executor.dummy.DummyExecutor.shutdown">
 <code class="sig-name descname">shutdown</code><span class="sig-paren">(</span><em class="sig-param">wait=True</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.dummy.DummyExecutor.shutdown" title="Permalink to this definition">¶</a></dt>
@@ -222,12 +250,21 @@ executor have been reclaimed.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-terra.executor.process">
+<span id="terra-executor-process-module"></span><h2>terra.executor.process module<a class="headerlink" href="#module-terra.executor.process" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.executor.process.ProcessPoolExecutor">
+<em class="property">class </em><code class="sig-prename descclassname">terra.executor.process.</code><code class="sig-name descname">ProcessPoolExecutor</code><span class="sig-paren">(</span><em class="sig-param">max_workers=None</em>, <em class="sig-param">mp_context=None</em>, <em class="sig-param">initializer=None</em>, <em class="sig-param">initargs=()</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.process.ProcessPoolExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.process.ProcessPoolExecutor</span></code>, <a class="reference internal" href="#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-terra.executor.sync">
 <span id="terra-executor-sync-module"></span><h2>terra.executor.sync module<a class="headerlink" href="#module-terra.executor.sync" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="terra.executor.sync.SyncExecutor">
 <em class="property">class </em><code class="sig-prename descclassname">terra.executor.sync.</code><code class="sig-name descname">SyncExecutor</code><span class="sig-paren">(</span><em class="sig-param">*arg</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.sync.SyncExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
 <p>Executor that does the job synchronously.</p>
 <p>All the returned Futures will be already resolved. This executor is intended
 to be mainly used on tests or to keep internal API conformance with the
@@ -254,6 +291,32 @@ executor have been reclaimed.</p>
 <code class="sig-name descname">submit</code><span class="sig-paren">(</span><em class="sig-param">fn</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.sync.SyncExecutor.submit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="module-terra.executor.thread">
+<span id="terra-executor-thread-module"></span><h2>terra.executor.thread module<a class="headerlink" href="#module-terra.executor.thread" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="terra.executor.thread.ThreadPoolExecutor">
+<em class="property">class </em><code class="sig-prename descclassname">terra.executor.thread.</code><code class="sig-name descname">ThreadPoolExecutor</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.thread.ThreadPoolExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.thread.ThreadPoolExecutor</span></code>, <a class="reference internal" href="#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
+<p>Terra version of <a class="reference external" href="https://docs.python.org/3.6/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code></a></p>
+<p>Unlike other executors, <a class="reference internal" href="#terra.executor.thread.ThreadPoolExecutor" title="terra.executor.thread.ThreadPoolExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></a> has no process isolation.
+This results in a scenario where multiple threads could use terra settings to
+influence each other, which is not typical behavior, given that all other
+executors have process isolation and do not allow this.</p>
+<p><a class="reference internal" href="#terra.executor.thread.ThreadPoolExecutor" title="terra.executor.thread.ThreadPoolExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></a> will downcast <a class="reference internal" href="terra.core.html#module-terra.core.settings" title="terra.core.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">terra.core.settings</span></code></a> to a
+thread-safe <a class="reference internal" href="terra.core.html#terra.core.settings.LazySettingsThreaded" title="terra.core.settings.LazySettingsThreaded"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.settings.LazySettingsThreaded</span></code></a> where each
+Executor thread has it’s own thread local storage version of the settings
+structure.</p>
+<p>This behavior is limited to threads started by <a class="reference internal" href="#terra.executor.thread.ThreadPoolExecutor" title="terra.executor.thread.ThreadPoolExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></a>
+only. All other threads will have normal thread behavior with the runner
+threads, and use a single version of the settings. The only side effect is if
+a task starts its own thread, it will be treated as one of the runner
+threads, not a task thread. The currently known downside to this is log
+messages will be reported as coming from the runner rather than task zone.
+However, any attempts to edit settings from this rogue thread could
+potentially have other unintended consequences.</p>
 </dd></dl>
 
 </div>

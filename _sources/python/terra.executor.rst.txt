@@ -11,6 +11,14 @@ Subpackages
 Submodules
 ----------
 
+terra.executor.base module
+--------------------------
+
+.. automodule:: terra.executor.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.executor.dummy module
 ---------------------------
 
@@ -19,10 +27,26 @@ terra.executor.dummy module
    :undoc-members:
    :show-inheritance:
 
+terra.executor.process module
+-----------------------------
+
+.. automodule:: terra.executor.process
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.executor.sync module
 --------------------------
 
 .. automodule:: terra.executor.sync
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+terra.executor.thread module
+----------------------------
+
+.. automodule:: terra.executor.thread
    :members:
    :undoc-members:
    :show-inheritance:

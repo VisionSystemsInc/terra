@@ -22,6 +22,14 @@ terra.logger module
    :undoc-members:
    :show-inheritance:
 
+terra.task module
+-----------------
+
+.. automodule:: terra.task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.workflow module
 ---------------------
 

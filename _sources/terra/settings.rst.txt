@@ -1,6 +1,19 @@
 
 .. _settings:
 
+Terra Settings
+--------------
+
+.. option:: terra.zone
+
+    Terra can be running in one of three areas of execution, or "zones": the master controller (``controller``), a service runner (``runner``), or a task (``task``). The different zones could all be running on the main host, or other containers or computers, depending on the compute and executor.
+
+    The master controller includes: the CLI, workflow, stage and service definitions layers.
+
+    This variable is automatically updated, and should only be read.
+
+    Default: ``controller``
+
 Workflow Settings
 -----------------
 

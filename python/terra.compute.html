@@ -83,7 +83,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/apps.html">Adding Apps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">terra</a><ul class="current">
@@ -97,6 +98,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.logger">terra.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.task">terra.task module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.workflow">terra.workflow module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra">Module contents</a></li>
 </ul>
@@ -207,6 +209,21 @@ mounted from the host to remote</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="terra.compute.base.BaseCompute.configure_logger">
+<em class="property">static </em><code class="sig-name descname">configure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.configure_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.base.BaseCompute.get_volume_map">
+<code class="sig-name descname">get_volume_map</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.get_volume_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.compute.base.BaseCompute.reconfigure_logger">
+<em class="property">static </em><code class="sig-name descname">reconfigure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.reconfigure_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="terra.compute.base.BaseCompute.register">
 <em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">service</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseCompute.register" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used to register a function for a particular service using a specific
@@ -254,11 +271,6 @@ following conditions:</p>
 <code class="sig-name descname">add_volume</code><span class="sig-paren">(</span><em class="sig-param">local</em>, <em class="sig-param">remote</em>, <em class="sig-param">flags=None</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">local_must_exist=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.add_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a volume to the service</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="terra.compute.base.BaseService.get_volume_map">
-<code class="sig-name descname">get_volume_map</code><span class="sig-paren">(</span><em class="sig-param">config</em>, <em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.get_volume_map" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="terra.compute.base.BaseService.post_run">
@@ -364,7 +376,7 @@ configuration adaptations down the line.</p></li>
 using</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just --wrap Just-docker-compose <span class="se">\</span>
     -f <span class="o">{</span>service_info.compose_files<span class="o">}</span> ... <span class="se">\</span>
-    run <span class="o">{</span>service_info.compose_service_name<span class="o">}</span> <span class="se">\</span>
+    run -T <span class="o">{</span>service_info.compose_service_name<span class="o">}</span> <span class="se">\</span>
     <span class="o">{</span>service_info.command<span class="o">}</span>
 </pre></div>
 </div>
@@ -664,7 +676,12 @@ way than chaning the <code class="docutils literal notranslate"><span class="pre
 <dl class="method">
 <dt id="terra.compute.virtualenv.Service.pre_run">
 <code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.virtualenv.Service.pre_run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A function that runs before the run service</p>
+<p>All service classes should implement at least <code class="docutils literal notranslate"><span class="pre">run_service</span></code>, as this is
+the quintessential call in running a service. <code class="docutils literal notranslate"><span class="pre">pre_run</span></code> in
+<a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.base.BaseService</span></code></a> is mainly responsible for handling
+Executors that need a separate volume translation</p>
+</dd></dl>
 
 </dd></dl>
 

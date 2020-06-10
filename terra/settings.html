@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Workflow Settings &mdash; Terra 0.0.1 documentation</title>
+  <title>Terra Settings &mdash; Terra 0.0.1 documentation</title>
   
 
   
@@ -83,7 +83,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">What is Terra</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Workflow Settings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="apps.html">Adding Apps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../python/modules.html">terra</a></li>
@@ -133,7 +134,7 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Workflow Settings</li>
+      <li>Terra Settings</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -152,8 +153,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="workflow-settings">
-<span id="settings"></span><h1>Workflow Settings<a class="headerlink" href="#workflow-settings" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="terra-settings">
+<span id="settings"></span><h1>Terra Settings<a class="headerlink" href="#terra-settings" title="Permalink to this headline">¶</a></h1>
+<dl class="option">
+<dt id="cmdoption-arg-terra-zone">
+<code class="sig-name descname">terra.zone</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-terra-zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terra can be running in one of three areas of execution, or “zones”: the master controller (<code class="docutils literal notranslate"><span class="pre">controller</span></code>), a service runner (<code class="docutils literal notranslate"><span class="pre">runner</span></code>), or a task (<code class="docutils literal notranslate"><span class="pre">task</span></code>). The different zones could all be running on the main host, or other containers or computers, depending on the compute and executor.</p>
+<p>The master controller includes: the CLI, workflow, stage and service definitions layers.</p>
+<p>This variable is automatically updated, and should only be read.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">controller</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="workflow-settings">
+<h1>Workflow Settings<a class="headerlink" href="#workflow-settings" title="Permalink to this headline">¶</a></h1>
 <dl class="option">
 <dt id="cmdoption-arg-service-start">
 <code class="sig-name descname">service_start</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service-start" title="Permalink to this definition">¶</a></dt>

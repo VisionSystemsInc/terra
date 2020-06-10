@@ -83,7 +83,8 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/settings.html#logging-settings">Logging Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/apps.html">Adding Apps</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">terra</a><ul class="current">
@@ -97,6 +98,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.logger">terra.logger module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.task">terra.task module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra.workflow">terra.workflow module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.html#module-terra">Module contents</a></li>
 </ul>
@@ -187,7 +189,7 @@
 <dl class="class">
 <dt id="terra.executor.celery.executor.CeleryExecutor">
 <em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.executor.</code><code class="sig-name descname">CeleryExecutor</code><span class="sig-paren">(</span><em class="sig-param">predelay=None</em>, <em class="sig-param">postdelay=None</em>, <em class="sig-param">applyasync_kwargs=None</em>, <em class="sig-param">retry_kwargs=None</em>, <em class="sig-param">retry_queue=''</em>, <em class="sig-param">update_delay=0.1</em>, <em class="sig-param">max_workers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="terra.executor.html#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
 <p>Executor implementation using celery tasks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -204,6 +206,16 @@
 <dl class="method">
 <dt id="terra.executor.celery.executor.CeleryExecutor.configuration_map">
 <em class="property">static </em><code class="sig-name descname">configuration_map</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor.configuration_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.executor.celery.executor.CeleryExecutor.configure_logger">
+<em class="property">static </em><code class="sig-name descname">configure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor.configure_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.executor.celery.executor.CeleryExecutor.reconfigure_logger">
+<em class="property">static </em><code class="sig-name descname">reconfigure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">pre_run_task=False</em>, <em class="sig-param">post_settings_context=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutor.reconfigure_logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -232,7 +244,7 @@ executor have been reclaimed.</p>
 <dl class="class">
 <dt id="terra.executor.celery.executor.CeleryExecutorFuture">
 <em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.executor.</code><code class="sig-name descname">CeleryExecutorFuture</code><span class="sig-paren">(</span><em class="sig-param">asyncresult</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutorFuture" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Future</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="terra.executor.html#terra.executor.base.BaseFuture" title="terra.executor.base.BaseFuture"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseFuture</span></code></a></p>
 <dl class="method">
 <dt id="terra.executor.celery.executor.CeleryExecutorFuture.cancel">
 <code class="sig-name descname">cancel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.CeleryExecutorFuture.cancel" title="Permalink to this definition">¶</a></dt>
@@ -243,13 +255,18 @@ cannot be cancelled if it is running or has already completed.</p>
 
 </dd></dl>
 
+<dl class="function">
+<dt id="terra.executor.celery.executor.setup_loggers">
+<code class="sig-prename descclassname">terra.executor.celery.executor.</code><code class="sig-name descname">setup_loggers</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.executor.setup_loggers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-terra.executor.celery">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra.executor.celery" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="terra.executor.celery.CeleryExecutor">
 <em class="property">class </em><code class="sig-prename descclassname">terra.executor.celery.</code><code class="sig-name descname">CeleryExecutor</code><span class="sig-paren">(</span><em class="sig-param">predelay=None</em>, <em class="sig-param">postdelay=None</em>, <em class="sig-param">applyasync_kwargs=None</em>, <em class="sig-param">retry_kwargs=None</em>, <em class="sig-param">retry_queue=''</em>, <em class="sig-param">update_delay=0.1</em>, <em class="sig-param">max_workers=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures._base.Executor</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="terra.executor.html#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
 <p>Executor implementation using celery tasks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -266,6 +283,16 @@ cannot be cancelled if it is running or has already completed.</p>
 <dl class="method">
 <dt id="terra.executor.celery.CeleryExecutor.configuration_map">
 <em class="property">static </em><code class="sig-name descname">configuration_map</code><span class="sig-paren">(</span><em class="sig-param">service_info</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor.configuration_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.executor.celery.CeleryExecutor.configure_logger">
+<em class="property">static </em><code class="sig-name descname">configure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor.configure_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="terra.executor.celery.CeleryExecutor.reconfigure_logger">
+<em class="property">static </em><code class="sig-name descname">reconfigure_logger</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">pre_run_task=False</em>, <em class="sig-param">post_settings_context=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.celery.CeleryExecutor.reconfigure_logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
