@@ -168,7 +168,8 @@ function terra_caseify()
       if [ ! -s "${TERRA_REDIS_COMMANDER_SECRET_FILE}" ]; then
         justify generate-redis-commander-hash
       fi
-      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run --service-ports redis-commander
+      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" up -d redis-commander
+      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" logs -f redis-commander
       ;;
 
     ### Deploy command ###
