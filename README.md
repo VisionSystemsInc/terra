@@ -18,6 +18,20 @@ just terra sync
 just terra run
 ```
 
+## Setting up pipenv
+
+There are a number of reasons `pipenv` running python 3.6 or newer may not be available, especially on older operating systems. To automatically setup `pipenv` in a directory for you, run `just terra setup --dir {directory to install pipenv in}`. This does not require elevated permissions.
+
+`just terra setup` will attempt to setup pipenv using a series of different strategies:
+
+1. It will look for the Python 3 executable (`python3` or `python`). If this is found, it will be used to setup `pipenv`
+  - A specific python executable can be specified using the `--python` flag
+2. If `python` cannot be found, it will look for the `conda3`/`conda`/`conda2` executable and use that to first setup Python 3.7, and then setup `pipenv`
+  - A specific executable of conda can be specified using the `--conda` flag
+3. If all else fails, MiniConda will be downloaded from the internet, installed, and used to first setup Python 3.7, and then setup `pipenv`
+4. If an invalid version of python or conda is detected, the download approach can be forced using the `--download` flag.
+5. Once `pipenv` is setup, it should be added to your `PATH` using the `local.env` file. This will be done for you if you answer yes to the final question at the end.
+
 ## Running an app in celery
 
 1. `just terra up` - To start redis queue (only once)

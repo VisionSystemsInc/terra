@@ -265,8 +265,9 @@ function terra_caseify()
       local output_dir
       local CONDA
       local PYTHON
+      local download_conda=0
 
-      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: -- ${@+"${@}"}
+      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: --download download_conda -- ${@+"${@}"}
 
       if [ -z "${output_dir:+set}" ]; then
         echo "--dir must be specified" >& 2
@@ -290,16 +291,19 @@ function terra_caseify()
       elif [ -n "${CONDA:+set}" ]; then
         use_conda=1
       else
-        if command -v python3 &> /dev/null; then
+        if [ "${download_conda}" == "0" ] && command -v python3 &> /dev/null; then
           PYTHON=python3
           use_conda=0
-        elif command -v python &> /dev/null; then
+        elif [ "${download_conda}" == "0" ] && command -v python &> /dev/null; then
           PYTHON=python
           use_conda=0
-        elif command -v conda3 &> /dev/null; then
+        elif [ "${download_conda}" == "0" ] && command -v conda3 &> /dev/null; then
           CONDA=conda3
           use_conda=1
-        elif command -v conda2 &> /dev/null; then
+        elif [ "${download_conda}" == "0" ] && command -v conda &> /dev/null; then
+          CONDA=conda
+          use_conda=1
+        elif [ "${download_conda}" == "0" ] && command -v conda2 &> /dev/null; then
           CONDA=conda2
           use_conda=1
         else
