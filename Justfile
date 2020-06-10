@@ -290,16 +290,16 @@ function terra_caseify()
       elif [ -n "${CONDA:+set}" ]; then
         use_conda=1
       else
-        if command -v Xpython3 &> /dev/null; then
+        if command -v python3 &> /dev/null; then
           PYTHON=python3
           use_conda=0
-        elif command -v Xpython &> /dev/null; then
+        elif command -v python &> /dev/null; then
           PYTHON=python
           use_conda=0
-        elif command -v Xconda3 &> /dev/null; then
+        elif command -v conda3 &> /dev/null; then
           CONDA=conda3
           use_conda=1
-        elif command -v Xconda2 &> /dev/null; then
+        elif command -v conda2 &> /dev/null; then
           CONDA=conda2
           use_conda=1
         else
