@@ -30,7 +30,8 @@ There are a number of reasons `pipenv` running python 3.6 or newer may not be av
   - A specific executable of conda can be specified using the `--conda` flag
 3. If all else fails, MiniConda will be downloaded from the internet, installed, and used to first setup Python 3.7, and then setup `pipenv`
 4. If an invalid version of python or conda is detected, the download approach can be forced using the `--download` flag.
-5. Once `pipenv` is setup, it should be added to your `PATH` using the `local.env` file. This will be done for you if you answer yes to the final question at the end.
+5. If for some reason, `curl`/`wget`/`perl`/`python`/`ruby` have an https error downloading miniconda when using the `--download` flag, then the `--conda-install` flag can be used to point to a pre-downloaded version of the anaconda or miniconda installer.
+6. Once `pipenv` is setup, it should be added to your `PATH` using the `local.env` file. This will be done for you if you answer yes to the final question at the end.
 
 ## Running an app in celery
 

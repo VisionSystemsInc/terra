@@ -267,12 +267,17 @@ function terra_caseify()
       local CONDA
       local PYTHON
       local download_conda=0
+      local conda_install
 
-      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: --download download_conda -- ${@+"${@}"}
+      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
       if [ -z "${output_dir:+set}" ]; then
         echo "--dir must be specified" >& 2
         exit 2
+      fi
+
+      if [ -n "${conda_install:+set}" ]; then
+        download_conda=1
       fi
 
       mkdir -p "${output_dir}"
@@ -311,9 +316,15 @@ function terra_caseify()
           source "${VSI_COMMON_DIR}/linux/web_tools.bsh"
           source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
           make_temp_path temp_dir -d
+          local URL
           if [ "${OS-}" = "Windows_NT" ]; then
-            download_to_stdout "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" > "${temp_dir}/install_conda.exe"
-            MSYS2_ARG_CONV_EXCL="*" "${temp_dir}/install_conda.exe" /NoRegistry=1 /InstallationType=JustMe /S "/D=$(cygpath -aw "${temp_dir}/conda")"
+            URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
+            if [ -z "${conda_install:+set}" ]; then
+              echo "Downloading miniconda..."
+              download_to_stdout "${URL}" > "${temp_dir}/install_conda.exe"
+              conda_install="${temp_dir}/install_conda.exe"
+            fi
+            MSYS2_ARG_CONV_EXCL="*" "${conda_install}" /NoRegistry=1 /InstallationType=JustMe /S "/D=$(cygpath -aw "${temp_dir}/conda")"
             CONDA="${temp_dir}/conda/Scripts/conda"
           else
             if [[ ${OSTYPE-} = darwin* ]]; then
@@ -321,8 +332,12 @@ function terra_caseify()
             else
               URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
             fi
-            download_to_stdout "${URL}" > "${temp_dir}/install_conda.sh"
-            bash "${temp_dir}/install_conda.sh" -b -p "${temp_dir}/conda" -s
+            if [ -z "${conda_install:+set}" ]; then
+              echo "Downloading miniconda..."
+              download_to_stdout "${URL}" > "${temp_dir}/install_conda.sh"
+              conda_install="${temp_dir}/install_conda.sh"
+            fi
+            bash "${conda_install}" -b -p "${temp_dir}/conda" -s
             CONDA="${temp_dir}/conda/bin/conda"
           fi
           use_conda=1
@@ -339,7 +354,8 @@ function terra_caseify()
       source "${VSI_COMMON_DIR}/linux/requirements.bsh"
       if ! meet_requirements "${python_version}" '>=3.6' '<3.9'; then
         echo "Python version ${python_version} does not meet the expected requirements" >&2
-        read -srn1 -d '' -p "Press any key to continue"
+        echo "Consider adding the --download flag" >&2
+        read -srn1 -d '' -p "Press any key to continue, or Ctrl+C to stop"
         echo
       fi
 
