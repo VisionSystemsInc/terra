@@ -229,8 +229,8 @@ def processing_dir(self):
   If the directory is not writeable, a temporary directory will be used instead
   '''
 
-  if hasattr(self, 'config_file'):
-    processing_dir = os.path.dirname(self.config_file)
+  if hasattr(self.terra, 'config_file'):
+    processing_dir = os.path.dirname(self.terra.config_file)
   else:
     processing_dir = os.getcwd()
     logger.warning('No config file found, and processing dir unset. '
@@ -465,6 +465,7 @@ class LazySettings(LazyObject):
           (desc, ENVIRONMENT_VARIABLE))
     with open(settings_file) as fid:
       self.configure(json.load(fid))
+    self.terra.config_file = settings_file
     self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
 
   def __getstate__(self):

@@ -179,11 +179,11 @@ function terra_caseify()
     terra_down) # Stop redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" down
       ;;
-    terra_deploy) # Deploy services on a swarm
-      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" \
-                     -f "${TERRA_CWD}/docker-compose-swarm.yml" config | \
-          Docker stack deploy -c - terra
-      ;;
+    # terra_deploy) # Deploy services on a swarm
+    #   Docker-compose -f "${TERRA_CWD}/docker-compose.yml" \
+    #                  -f "${TERRA_CWD}/docker-compose-swarm.yml" config | \
+    #       Docker stack deploy -c - terra
+    #   ;;
 
 
     ### Testing ###
@@ -384,6 +384,11 @@ function terra_caseify()
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
         Terra_Pipenv --rm
       fi
+      ;;
+
+    terra_deploy) # Deploy terra using pyinstaller
+      # Terra_Pipenv sync --dev
+      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/deploy/terra.spec"
       ;;
 
     ### Other ###

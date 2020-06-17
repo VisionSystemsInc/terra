@@ -37,7 +37,7 @@ There are a number of reasons `pipenv` running python 3.6 or newer may not be av
 
 1. `just terra up` - To start redis queue (only once)
 2. `just run celery` - To start a celery worker (run on each worker node)
-3. `just run dsm ...` - To start processing job
+3. `just run {app} ...` - To start processing job
 
 When done
 4. `just shutdown celery` - To shutdown _all_ celery workers on _all_ nodes
