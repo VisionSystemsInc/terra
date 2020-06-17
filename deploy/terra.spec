@@ -66,7 +66,7 @@ hidden_imports = [x for x in iter_modules([env['TERRA_CWD']],
 
 for app in apps:
   hidden_imports += [x for x in iter_modules(
-      # This is a hack \|/
+      # TODO: Fix this hack \|/
       [os.path.dirname(os.path.dirname(app))],
       exclude=['test_', '^setup'])]
 

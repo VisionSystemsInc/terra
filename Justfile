@@ -100,8 +100,15 @@ function terra_caseify()
 
     ### Running containers ###
     run) # Run python module/cli in terra
-      Terra_Pipenv run python -m ${@+"${@}"}
-      extra_args=$#
+      if [[ ${JUST_RODEO-} == 1 ]]; then
+        extra_args=$#
+        local app_name="${1}"
+        shift 1
+        ${DRYRUN} "${TERRA_APP_DIR}/${app_name}" ${@+"${@}"}
+      else
+        Terra_Pipenv run python -m ${@+"${@}"}
+        extra_args=$#
+      fi
       ;;
     run_pdb) # Run pdb module/cli in terra
       Terra_Pipenv run python -m pdb -m ${@+"${@}"}
@@ -389,6 +396,26 @@ function terra_caseify()
     terra_deploy) # Deploy terra using pyinstaller
       # Terra_Pipenv sync --dev
       Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/deploy/terra.spec"
+      ;;
+
+    build_local) # Build local environment
+      # Must be version after 2.4.2, I need a working ARCHIVE_DIR.
+      # https://github.com/megastep/makeself/issues/213
+      JUST_MAKESELF_VERSION=master
+      mkdir -p "${TERRA_CWD}/deploy/makeself"
+      pushd "${TERRA_CWD}/deploy/makeself"
+        curl -LO "https://github.com/megastep/makeself/archive/${JUST_MAKESELF_VERSION}/makeself.tar.gz"
+        tar xf makeself.tar.gz --strip-components=1
+        rm makeself.tar.gz
+
+        sed '1,/^while true/s|^while true|while false|; 1,/^quiet="n"/s|^quiet="n"|quiet="y"|' "${TERRA_CWD}/deploy/makeself/makeself-header.sh" > "${TERRA_CWD}/deploy/makeself/makeself-header_just.sh"
+      popd &> /dev/null
+      ;;
+
+    compile_local) # Compile the binary locally
+      mkdir -p "./dist"
+      # ${DRYRUN} "${TERRA_CWD}/deploy/makeself/makeself.sh" --tar-extra "--exclude=.git --exclude=docs ../.juste_wrapper" --noprogress --nomd5 --nocrc --nox11 --keep-umask --header "${TERRA_CWD}/deploy/makeself/makeself-header_just.sh" vsi_common/ "./dist/juste" juste_label ./.juste_wrapper
+      ./external/terra/deploy/makeself/makeself.sh --tar-extra "--exclude=.git --exclude=docs --exclude=vxl --exclude=pyvxl --exclude=pybind11 --exclude=singular --exclude=dist --exclude=build --exclude=foo" --noprogress --nomd5 --nocrc --nox11 --keep-umask --header /opt/projects/terra/terra_dsm/external/terra/deploy/makeself/makeself-header_just.sh . ./dist/juste juste_label ./external/terra/deploy/just_wrapper
       ;;
 
     ### Other ###
