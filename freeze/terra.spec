@@ -14,37 +14,34 @@ block_cipher = None
 import sys
 sys.path.insert(0, '')
 
-# just_files=[(os.path.join(env['VSI_COMMON_DIR'], 'linux'), 'linux'),
-#             (os.path.join(env['VSI_COMMON_DIR'], 'env.bsh'), '.'),
-#             (os.path.join(env['VSI_COMMON_DIR'], 'Justfile'), '.')]
-# # Add for recipes
-# just_files.append((os.path.join(env['VSI_COMMON_DIR'], 'docker'), 'docker'))
-# # Add tests to test just executable
-# # just_files.append(('./vsi_common/tests', 'tests'))
+app_names = ast.literal_eval(env['TERRA_APPS'])
 
-importlib.util.find_spec('dsm')
+# For each app (python import string, like "app.foo.bar"), determine the
+# filename of import (prefer __main__ of __init__)
 
-apps = ast.literal_eval(env['TERRA_APPS'])
-def get_app_paths(apps):
-  for app in apps:
-    app = importlib.util.find_spec(app+'.__main__')
-    if app:
-      yield app.origin
-    else:
-      yield importlib.util.find_spec(app).origin
-apps = list(get_app_paths(apps))
+def get_app_paths(app_names):
+  for name in app_names:
+    # # Determine base_dir, the directory responsible for the import
+    # base_dir = importlib.util.find_spec(name.split('.')[0]).origin
+    # base_name = os.path.split(base_dir)[-1]
+    # if base_name.startswith('__init__') or base_name.startswith('__main__'):
+    #   # It was a module in a package
+    #   base_dir = os.path.dirname(os.path.dirname(base_dir))
+    # else:
+    #   # Else it must be module without a package
+    #   base_dir = os.path.dirname(base_dir)
 
+    # app_name = name
 
-if platform.system() == 'Windows':
-  console=False
-  # console=True
-else:
-  console=True
+    # Determine the app file full path
+    app = importlib.util.find_spec(name+'.__main__')
+    if app is None:
+      app = importlib.util.find_spec(name)
 
-# if env.get('VSI_MUSL', None)=='1':
-#   name='juste-'+platform.system()+'-musl-x86_64'
-# else:
-#   name='juste-'+platform.system()+'-x86_64'
+    # yield (app.origin, base_dir, app_name)
+    yield app.origin
+
+app_paths = get_app_paths(app_names)
 
 # Discover all modules in a package, to help hidden imports
 def iter_modules(path=None, prefix='', exclude=[]):
@@ -59,84 +56,53 @@ def iter_modules(path=None, prefix='', exclude=[]):
                                             pkg.name.split('.')[-1])],
                               pkg.name+'.', exclude)
 
+# Include all of terra, many parts of terra use hidden imports
 hidden_imports = [x for x in iter_modules([env['TERRA_CWD']],
                                           exclude=['test_', '^setup'])]
 
+try:
+  hooks_dir = [env['TERRA_PYINSTALLER_HOOKS_DIR']]
+except KeyError:
+  hooks_dir=[]
 
+apps_a = []
+for app_path in app_paths:
+  apps_a.append(Analysis([app_path],
+                         pathex=[env['TERRA_CWD']],
+                         binaries=[],
+                         datas=[],
+                         hiddenimports=['pkg_resources.py2_warn'] + hidden_imports,
+                         hookspath=hooks_dir,
+                         runtime_hooks=[],
+                         excludes=[],
+                         win_no_prefer_redirects=False,
+                         win_private_assemblies=False,
+                         cipher=block_cipher,
+                         noarchive=False))
 
-for app in apps:
-  hidden_imports += [x for x in iter_modules(
-      # TODO: Fix this hack \|/
-      [os.path.dirname(os.path.dirname(app))],
-      exclude=['test_', '^setup'])]
+merge_args = []
+for a, name in zip(apps_a, app_names):
+  merge_args.append((a, name, name))
+MERGE(*merge_args)
 
-# apps.append(os.path.join(env['TERRA_CWD'], 'deploy', 'just.py'))
-# apps = [os.path.join(env['TERRA_CWD'], 'deploy', 'just.py')] + apps
-
-app_a = Analysis(apps,
-                 pathex=[env['TERRA_CWD']],
-                 binaries=[],
-                 datas=[],
-                 hiddenimports=['pkg_resources.py2_warn'] + hidden_imports,
-                 hookspath=[],
-                 runtime_hooks=[],
-                 excludes=[],
-                 win_no_prefer_redirects=False,
-                 win_private_assemblies=False,
-                 cipher=block_cipher,
-                 noarchive=False)
-
-pyz = PYZ(app_a.pure, app_a.zipped_data,
-          cipher=block_cipher)
-exe = EXE(pyz,
-          app_a.scripts,
-          [],
-          exclude_binaries=True,
-          name='dsm',
-          debug=False,
-          bootloader_ignore_signals=False,
-          strip=False,
-          upx=True,
-          console=console)
-coll = COLLECT(exe,
-               app_a.binaries,
-               app_a.zipfiles,
-               app_a.datas,
-               strip=False,
-               upx=True,
-               upx_exclude=[],
-               name='terra')
-
-# just_a = Analysis([os.path.join(env['TERRA_CWD'], 'deploy', 'just.py')],
-#                   pathex=[],
-#                   binaries=[],
-#                   datas=just_files,
-#                   hookspath=[],
-#                   runtime_hooks=[],
-#                   excludes=[],
-#                   win_no_prefer_redirects=False,
-#                   win_private_assemblies=False,
-#                   cipher=block_cipher,
-#                   noarchive=False)
-# just_pyz = PYZ(just_a.pure, just_a.zipped_data,
-#                cipher=block_cipher)
-# just_exe = EXE(just_pyz,
-#                just_a.scripts,
-#                [],
-#                exclude_binaries=True,
-#                name='just',
-#                debug=False,
-#                bootloader_ignore_signals=False,
-#                strip=False,
-#                upx=True,
-#                console=console)
-# just_coll = COLLECT(just_exe,
-#                     just_a.binaries,
-#                     just_a.zipfiles,
-#                     just_a.datas,
-#                     strip=False,
-#                     upx=True,
-#                     upx_exclude=[],
-#                     name='just')
-
-# MERGE((app_a, 'dsm', 'dsm'), (just_a, 'just', 'just'))
+for a, name in zip(apps_a, app_names):
+  pyz = PYZ(a.pure, a.zipped_data,
+            cipher=block_cipher)
+  exe = EXE(pyz,
+            a.scripts,
+            [],
+            exclude_binaries=True,
+            name=name,
+            debug=False,
+            bootloader_ignore_signals=False,
+            strip=False,
+            upx=True,
+            console=True)
+  coll = COLLECT(exe,
+                 a.binaries,
+                 a.zipfiles,
+                 a.datas,
+                 strip=False,
+                 upx=True,
+                 upx_exclude=[],
+                 name=name)

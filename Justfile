@@ -395,7 +395,7 @@ function terra_caseify()
       ;;
 
     terra_pyinstaller) # Deploy terra using pyinstaller
-      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/terra.spec"
+      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
       ;;
 
     terra_makeself) # Create terra makeself, then append to it
