@@ -10,7 +10,8 @@ source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
-
+source "${VSI_COMMON_DIR}/linux/just_makeself_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
@@ -393,29 +394,16 @@ function terra_caseify()
       fi
       ;;
 
-    terra_deploy) # Deploy terra using pyinstaller
-      # Terra_Pipenv sync --dev
-      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/deploy/terra.spec"
+    terra_pyinstaller) # Deploy terra using pyinstaller
+      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/terra.spec"
       ;;
 
-    build_local) # Build local environment
-      # Must be version after 2.4.2, I need a working ARCHIVE_DIR.
-      # https://github.com/megastep/makeself/issues/213
-      JUST_MAKESELF_VERSION=master
-      mkdir -p "${TERRA_CWD}/deploy/makeself"
-      pushd "${TERRA_CWD}/deploy/makeself"
-        curl -LO "https://github.com/megastep/makeself/archive/${JUST_MAKESELF_VERSION}/makeself.tar.gz"
-        tar xf makeself.tar.gz --strip-components=1
-        rm makeself.tar.gz
+    terra_makeself) # Create terra makeself, then append to it
+      justify makeself just-project-locally
+      local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
 
-        sed '1,/^while true/s|^while true|while false|; 1,/^quiet="n"/s|^quiet="n"|quiet="y"|' "${TERRA_CWD}/deploy/makeself/makeself-header.sh" > "${TERRA_CWD}/deploy/makeself/makeself-header_just.sh"
-      popd &> /dev/null
-      ;;
-
-    compile_local) # Compile the binary locally
-      mkdir -p "./dist"
-      # ${DRYRUN} "${TERRA_CWD}/deploy/makeself/makeself.sh" --tar-extra "--exclude=.git --exclude=docs ../.juste_wrapper" --noprogress --nomd5 --nocrc --nox11 --keep-umask --header "${TERRA_CWD}/deploy/makeself/makeself-header_just.sh" vsi_common/ "./dist/juste" juste_label ./.juste_wrapper
-      ./external/terra/deploy/makeself/makeself.sh --tar-extra "--exclude=.git --exclude=docs --exclude=vxl --exclude=pyvxl --exclude=pybind11 --exclude=singular --exclude=dist --exclude=build --exclude=foo" --noprogress --nomd5 --nocrc --nox11 --keep-umask --header /opt/projects/terra/terra_dsm/external/terra/deploy/makeself/makeself-header_just.sh . ./dist/juste juste_label ./external/terra/deploy/just_wrapper
+      justify makeself add-files-locally "${TERRA_CWD}" \
+        "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
       ;;
 
     ### Other ###
