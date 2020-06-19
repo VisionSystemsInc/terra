@@ -73,5 +73,5 @@ Environment variables can be set in the `local.env`
     - Example: `TMPDIR=~/ ./just ...`
 - `sed: invalid option -- 'E'`
     - On ancient versions of sed, only the `-r` option is accepted, and does not accept the BSD compatible `-E` version of the same flag
-    - Solution: Ser `VSI_SED_COMPAT` to `gnu` to disable BSD compatibility mode.
+    - Solution: Set `VSI_SED_COMPAT` to `gnu` to disable BSD compatibility mode.
     - Example: `VSI_SED_COMPAT=gnu ./just ...`
