@@ -18,21 +18,8 @@ app_names = ast.literal_eval(env['TERRA_APPS'])
 
 # For each app (python import string, like "app.foo.bar"), determine the
 # filename of import (prefer __main__ of __init__)
-
 def get_app_paths(app_names):
   for name in app_names:
-    # # Determine base_dir, the directory responsible for the import
-    # base_dir = importlib.util.find_spec(name.split('.')[0]).origin
-    # base_name = os.path.split(base_dir)[-1]
-    # if base_name.startswith('__init__') or base_name.startswith('__main__'):
-    #   # It was a module in a package
-    #   base_dir = os.path.dirname(os.path.dirname(base_dir))
-    # else:
-    #   # Else it must be module without a package
-    #   base_dir = os.path.dirname(base_dir)
-
-    # app_name = name
-
     # Determine the app file full path
     app = importlib.util.find_spec(name+'.__main__')
     if app is None:
@@ -90,19 +77,13 @@ for a, name in zip(apps_a, app_names):
             cipher=block_cipher)
   exe = EXE(pyz,
             a.scripts,
-            [],
-            exclude_binaries=True,
+            a.binaries,
+            a.zipfiles,
+            a.datas,
+            a.dependencies,
             name=name,
             debug=False,
             bootloader_ignore_signals=False,
             strip=False,
-            upx=True,
+            upx=False,
             console=True)
-  coll = COLLECT(exe,
-                 a.binaries,
-                 a.zipfiles,
-                 a.datas,
-                 strip=False,
-                 upx=True,
-                 upx_exclude=[],
-                 name=name)

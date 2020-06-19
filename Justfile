@@ -395,6 +395,9 @@ function terra_caseify()
       ;;
 
     terra_pyinstaller) # Deploy terra using pyinstaller
+      if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
+        justify terra pipenv sync --dev
+      fi
       Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
       ;;
 

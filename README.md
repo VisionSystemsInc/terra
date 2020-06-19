@@ -42,3 +42,36 @@ There are a number of reasons `pipenv` running python 3.6 or newer may not be av
 When done
 4. `just shutdown celery` - To shutdown _all_ celery workers on _all_ nodes
 5. `just terra down` - To shutdown redis.
+
+## Deploying a Terra App
+
+It is probably best to not use the system's python, if you want a portable deploying:
+
+- `just terra setup --download --dir {some dir}` # to setup a conda python
+- `just --wrap Terra_Pipenv --rm` # to remove the old pipenv
+- `just sync` # Sync your app and terra
+- `just makeself` # To create a makeself. This should call `justify terra makeself` internally
+- `just pyinstaller`
+- `just deploy` # to build docker images
+- `just deploy singular` # If your app has this, and you want to use singularity
+
+### How to use
+
+After `makeself` and `pyinstaller` are run, you will have a `./just` project executable to run all just related tasks, and `{app name}` executables too. By default, the app executables should be in the same directory as the `./just` executable, but may be moved by setting the `TERRA_APP_DIR` environment variable.
+
+#### local.env
+
+Since there is no project directory, a `local.env` is first searched for in the directory of the `./just` executable, and loaded. After that, the current working directory is searched for a `local.env` file too, and loaded. This means it is possible for up to two `local.env` files to be loaded. In a multi-user environemnt, the `local.env` file in the `./just` directory should be used for containing values to make your app run for everyone, and the other `local.env` for any customizations a user needs for each themselves or even multiple project (in multiple directories).
+
+### Common deployment issues:
+
+Environment variables can be set in the `local.env`
+
+- `./just: line 662: ./external/terra/external/vsi_common/freeze/just_wrapper: Permission denied`
+    - This happen in the very uncommon case when the `/tmp` folder has `noexec` on it. This is a form of fake security that can only lead to things breaking.
+    - Solution: Set TMPDIR to a folder you do have exec permissions on, such as your home
+    - Example: `TMPDIR=~/ ./just ...`
+- `sed: invalid option -- 'E'`
+    - On ancient versions of sed, only the `-r` option is accepted, and does not accept the BSD compatible `-E` version of the same flag
+    - Solution: Ser `VSI_SED_COMPAT` to `gnu` to disable BSD compatibility mode.
+    - Example: `VSI_SED_COMPAT=gnu ./just ...`
