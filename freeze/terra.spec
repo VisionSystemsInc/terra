@@ -1,10 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 import ast
-import platform
 import os
-import pkgutil
-import re
 import importlib
 from os import environ as env
 
@@ -30,27 +27,12 @@ def get_app_paths(app_names):
 
 app_paths = get_app_paths(app_names)
 
-# Discover all modules in a package, to help hidden imports
-def iter_modules(path=None, prefix='', exclude=[]):
-  exclude = [ex if isinstance(ex, re.Pattern) else re.compile(ex)
-             for ex in exclude]
-  for pkg in pkgutil.iter_modules(path, prefix):
-    if any((ex.search(pkg.name) for ex in exclude)):
-      continue
-    yield pkg.name
-    if pkg.ispkg:
-      yield from iter_modules([os.path.join(pkg.module_finder.path,
-                                            pkg.name.split('.')[-1])],
-                              pkg.name+'.', exclude)
-
-# Include all of terra, many parts of terra use hidden imports
-hidden_imports = [x for x in iter_modules([env['TERRA_CWD']],
-                                          exclude=['test_', '^setup'])]
+hooks_dirs = [os.path.join(env['TERRA_CWD'], 'freeze')]
 
 try:
-  hooks_dir = [env['TERRA_PYINSTALLER_HOOKS_DIR']]
+  hooks_dirs.append(env['TERRA_PYINSTALLER_HOOKS_DIR'])
 except KeyError:
-  hooks_dir=[]
+  pass
 
 apps_a = []
 for app_path in app_paths:
@@ -58,8 +40,8 @@ for app_path in app_paths:
                          pathex=[env['TERRA_CWD']],
                          binaries=[],
                          datas=[],
-                         hiddenimports=['pkg_resources.py2_warn'] + hidden_imports,
-                         hookspath=hooks_dir,
+                         hiddenimports=['pkg_resources.py2_warn'],
+                         hookspath=hooks_dirs,
                          runtime_hooks=[],
                          excludes=[],
                          win_no_prefer_redirects=False,
