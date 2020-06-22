@@ -58,6 +58,17 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
 def clean_path(path):
+  # Support Just's changing of CWD, to keep relative paths for the user.
+  if os.getenv('JUST_USER_CWD') is not None:
+    # os.path.abspath, with a tweak
+    path = os.fspath(path)
+    if not os.path.isabs(path):
+      if isinstance(path, bytes):
+        cwd = os.getenvb('JUST_USER_CWD')
+      else:
+        cwd = os.getenv('JUST_USER_CWD')
+      path = os.path.join(cwd, path)
+    return os.path.normpath(path)
   return os.path.abspath(os.path.expanduser(path))
 
 
