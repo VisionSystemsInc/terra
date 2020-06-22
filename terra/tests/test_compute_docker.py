@@ -385,7 +385,7 @@ volumes:
 
 
 def mock_config(*args, **kwargs):
-  return yaml.load(mock_yaml)
+  return yaml.load(mock_yaml, Loader=yaml.Loader)
 
 
 class TestDockerMap(TestComputeDockerCase):

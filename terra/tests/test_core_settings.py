@@ -559,7 +559,7 @@ class TestSettings(TestLoggerCase):
     settings.configure({})
 
     with settings, TemporaryDirectory() as temp_dir:
-      settings.config_file = os.path.join(temp_dir, 'foo.bar')
+      settings.terra.config_file = os.path.join(temp_dir, 'foo.bar')
       self.assertEqual(settings.processing_dir, temp_dir)
 
   def test_properties_processing_dir_nonexisting_config_file(self):
@@ -570,7 +570,7 @@ class TestSettings(TestLoggerCase):
 
     with mock.patch.object(tempfile, 'mkdtemp', mock_mkdtemp), \
         self.assertLogs(), settings:
-      settings.config_file = '/land/of/foo.bar'
+      settings.terra.config_file = '/land/of/foo.bar'
       self.assertEqual(settings.processing_dir, '"terra_"')
 
   def test_properties_unittest(self):

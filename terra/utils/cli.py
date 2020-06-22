@@ -58,6 +58,9 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
 def clean_path(path):
+  # This must be done before isabs test, or else you will get a false negative
+  path = os.path.expanduser(path)
+
   # Support Just's changing of CWD, to keep relative paths for the user.
   if os.getenv('JUST_USER_CWD') is not None:
     # os.path.abspath, with a tweak
@@ -69,7 +72,7 @@ def clean_path(path):
         cwd = os.getenv('JUST_USER_CWD')
       path = os.path.join(cwd, path)
     return os.path.normpath(path)
-  return os.path.abspath(os.path.expanduser(path))
+  return os.path.abspath(path)
 
 
 # https://gist.github.com/brantfaircloth/1252339

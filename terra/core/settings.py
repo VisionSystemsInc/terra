@@ -465,8 +465,10 @@ class LazySettings(LazyObject):
           (desc, ENVIRONMENT_VARIABLE))
     with open(settings_file) as fid:
       self.configure(json.load(fid))
+    # Cover corner case that can only really happens in testing
+    if not hasattr(self, 'terra'):
+      settings.terra = {}
     self.terra.config_file = settings_file
-    self._wrapped.config_file = os.environ.get(ENVIRONMENT_VARIABLE)
 
   def __getstate__(self):
     if self._wrapped is None:
