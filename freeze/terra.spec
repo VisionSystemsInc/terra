@@ -52,7 +52,9 @@ for app_path in app_paths:
 merge_args = []
 for a, name in zip(apps_a, app_names):
   merge_args.append((a, name, name))
-MERGE(*merge_args)
+# This is broken until pyinstaller 4.0 is released
+# https://github.com/pyinstaller/pyinstaller/pull/4303
+# MERGE(*merge_args)
 
 for a, name in zip(apps_a, app_names):
   pyz = PYZ(a.pure, a.zipped_data,
