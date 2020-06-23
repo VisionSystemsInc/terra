@@ -10,7 +10,8 @@ source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
-
+source "${VSI_COMMON_DIR}/linux/just_makeself_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
@@ -100,8 +101,15 @@ function terra_caseify()
 
     ### Running containers ###
     run) # Run python module/cli in terra
-      Terra_Pipenv run python -m ${@+"${@}"}
-      extra_args=$#
+      if [[ ${JUST_RODEO-} == 1 ]]; then
+        extra_args=$#
+        local app_name="${1}"
+        shift 1
+        ${DRYRUN} "${TERRA_APP_DIR}/${app_name}" ${@+"${@}"}
+      else
+        Terra_Pipenv run python -m ${@+"${@}"}
+        extra_args=$#
+      fi
       ;;
     run_pdb) # Run pdb module/cli in terra
       Terra_Pipenv run python -m pdb -m ${@+"${@}"}
@@ -384,6 +392,21 @@ function terra_caseify()
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
         Terra_Pipenv --rm
       fi
+      ;;
+
+    terra_pyinstaller) # Deploy terra using pyinstaller
+      if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
+        justify terra pipenv sync --dev
+      fi
+      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
+      ;;
+
+    terra_makeself) # Create terra makeself, then append to it
+      justify makeself just-project-locally
+      local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
+
+      justify makeself add-files-locally "${TERRA_CWD}" \
+        "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
       ;;
 
     ### Other ###

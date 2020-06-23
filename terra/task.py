@@ -80,6 +80,7 @@ class TerraTask(Task):
 
   def __call__(self, *args, **kwargs):
     # this is only set when apply_async was called.
+    logger.debug4(f"Running task: {self} with args {args} and kwargs {kwargs}")
     if getattr(self.request, 'settings', None):
       if not settings.configured:
         # Cover a potential (unlikely) corner case where setting might not be
