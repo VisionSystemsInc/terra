@@ -14,15 +14,13 @@ sys.path.insert(0, '')
 app_names = ast.literal_eval(env['TERRA_APPS'])
 
 # For each app (python import string, like "app.foo.bar"), determine the
-# filename of import (prefer __main__ of __init__)
+# filename of import (prefer __main__ over __init__)
 def get_app_paths(app_names):
   for name in app_names:
     # Determine the app file full path
     app = importlib.util.find_spec(name+'.__main__')
     if app is None:
       app = importlib.util.find_spec(name)
-
-    # yield (app.origin, base_dir, app_name)
     yield app.origin
 
 app_paths = get_app_paths(app_names)
