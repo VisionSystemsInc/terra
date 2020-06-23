@@ -467,7 +467,7 @@ class LazySettings(LazyObject):
       self.configure(json.load(fid))
     # Cover corner case that can only really happens in testing
     if not hasattr(self, 'terra'):
-      settings.terra = {}
+      self.terra = {}
     self.terra.config_file = settings_file
 
   def __getstate__(self):
