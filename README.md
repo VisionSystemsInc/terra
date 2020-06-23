@@ -45,10 +45,11 @@ When done
 
 ## Deploying a Terra App
 
-It is probably best to not use the system's python, if you want a portable deploying:
+These commands should be run from the app's just project directory, not Terra's or VSI Common's. Running these commands from the wrong project result in the wrong directory path transformations, and the resulting `just` executable will probably not work.
 
-- `just terra setup --download --dir {some dir}` # to setup a conda python
-- `just --wrap Terra_Pipenv --rm` # to remove the old pipenv
+- It is probably best to not use the system's python, if you want a portable deployment:
+    - `just terra setup --download --dir {some dir}` # to setup a conda python
+    - `just --wrap Terra_Pipenv --rm` # to remove the old pipenv
 - `just sync` # Sync your app and terra
 - `just makeself` # To create a makeself. This should call `justify terra makeself` internally
 - `just pyinstaller`
@@ -57,15 +58,13 @@ It is probably best to not use the system's python, if you want a portable deplo
 
 ### How to use
 
-After `makeself` and `pyinstaller` are run, you will have a `./just` project executable to run all just related tasks, and `{app name}` executables too. By default, the app executables should be in the same directory as the `./just` executable, but may be moved by setting the `TERRA_APP_DIR` environment variable.
+After `makeself` and `pyinstaller` are run, you will have a `./just` project executable to run all just related tasks, and `{app name}` executables too. By default, the app executables should be in the same directory as the `./just` executable, but may be moved by setting the `TERRA_APP_DIR` environment variable in `local.env` (see below).
 
 #### local.env
 
-Since there is no project directory, a `local.env` is first searched for in the directory of the `./just` executable, and loaded. After that, the current working directory is searched for a `local.env` file too, and loaded. This means it is possible for up to two `local.env` files to be loaded. In a multi-user environemnt, the `local.env` file in the `./just` directory should be used for containing values to make your app run for everyone, and the other `local.env` for any customizations a user needs for each themselves or even multiple project (in multiple directories).
+Since there is no project directory, a `local.env` is first searched for in the directory of the `./just` executable, and loaded. After that, the current working directory is searched for a `local.env` file too, and loaded. This means it is possible for up to two `local.env` files to be loaded. In a multi-user environment, the `local.env` file in the `./just` directory should be used for containing values to make your app run for everyone, and the other `local.env` for any customizations a user needs for themselves or even multiple project (in multiple directories).
 
 ### Common deployment issues:
-
-Environment variables can be set in the `local.env`
 
 - `./just: line 662: ./external/terra/external/vsi_common/freeze/just_wrapper: Permission denied`
     - This happen in the very uncommon case when the `/tmp` folder has `noexec` on it. This is a form of fake security that can only lead to things breaking.
