@@ -253,22 +253,19 @@ def config_file(self):
   '''
   A :func:`settings_property` for passing the filename of the config_file to
   settings
-
-  There was a chicken-egg problem with determing settings.processing_dir
-
-  Call _setup
-  - Calls configure
-    Send signal
-      - Logger receives signal, and start setting up logger
-      - Needs to know where to put log files, so check
-        settings.processing_dir
-      - settings.processing_dir looks for setttings.terra.config_file,
-        doesn't see it yet
-  - Returns to _setup
-  - Then set settings.terra.config_file.
-
-  This is used to get around the problem
   '''
+  # There was a chicken-egg problem with determing settings.processing_dir:
+  # #. Call ``_setup``
+  #   #. Calls ``configure``
+  #   #. Send signal
+  #     #. Logger receives signal, and start setting up logger
+  #     #. Needs to know where to put log files, so check
+  #        ``settings.processing_dir``
+  #     #. settings.processing_dir looks for `setttings.terra.config_file``,
+  #        doesn't see it yet
+  # 2. Returns to ``_setup``
+  # #. Then set ``settings.terra.config_file``, but it's too late
+  # This will around the problem
   return config_file.filename
 
 
