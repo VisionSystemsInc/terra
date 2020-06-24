@@ -798,10 +798,11 @@ def json_load(filename):
     with open(filename, 'r') as fid:
       return json.load(fid)
   except JSONDecodeError as e:
-    logger.error(f'Error parsing the JSON config file {filename}: ' + str(e))
+    logger.critical(
+        f'Error parsing the JSON config file {filename}: ' + str(e))
     raise SystemExit(handledExitCode)
   except FileNotFoundError as e:
-    logger.error('Cannot find JSON config file: ' + str(e))
+    logger.critical('Cannot find JSON config file: ' + str(e))
     raise SystemExit(handledExitCode)
 
 
