@@ -33,12 +33,18 @@ except KeyError:
   pass
 
 apps_a = []
-for app_path in app_paths:
+for app_path, app_name in zip(app_paths, app_names):
+  extra_hidden_imports = env.get(
+      f'TERRA_PYINSTALLER_{app_name.upper()}_HIDDEN_IMPORTS', [])
+  if extra_hidden_imports:
+    extra_hidden_imports = ast.literal_eval(extra_hidden_imports)
+
   apps_a.append(Analysis([app_path],
                          pathex=[env['TERRA_CWD']],
                          binaries=[],
                          datas=[],
-                         hiddenimports=['pkg_resources.py2_warn'],
+                         hiddenimports=['pkg_resources.py2_warn'] \
+                                       + extra_hidden_imports,
                          hookspath=hooks_dirs,
                          runtime_hooks=[],
                          excludes=[],
