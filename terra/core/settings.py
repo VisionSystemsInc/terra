@@ -231,10 +231,9 @@ def processing_dir(self):
 
   If the directory is not writeable, a temporary directory will be used instead
   '''
-
-  if hasattr(self.terra, 'config_file'):
+  try:
     processing_dir = os.path.dirname(self.terra.config_file)
-  else:
+  except Exception:
     processing_dir = os.getcwd()
     logger.warning('No config file found, and processing dir unset. '
                    f'Using cwd: {processing_dir}')
@@ -247,6 +246,30 @@ def processing_dir(self):
                  f'Using "{processing_dir}" instead')
 
   return processing_dir
+
+
+@settings_property
+def config_file(self):
+  '''
+  A :func:`settings_property` for passing the filename of the config_file to
+  settings
+  '''
+  # There was a chicken-egg problem with determing settings.processing_dir:
+  # #. Call ``_setup``
+  #   #. Calls ``configure``
+  #   #. Send signal
+  #     #. Logger receives signal, and start setting up logger
+  #     #. Needs to know where to put log files, so check
+  #        ``settings.processing_dir``
+  #     #. settings.processing_dir looks for `setttings.terra.config_file``,
+  #        doesn't see it yet
+  # 2. Returns to ``_setup``
+  # #. Then set ``settings.terra.config_file``, but it's too late
+  # This will around the problem
+  return config_file.filename
+
+
+config_file.filename = None
 
 
 @settings_property
@@ -303,6 +326,7 @@ global_templates = [
         'volume_map': []
       },
       'terra': {
+        'config_file': config_file,
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
         'zone': 'controller',
@@ -466,11 +490,9 @@ class LazySettings(LazyObject):
           "You must either define the environment variable %s "
           "or call settings.configure() before accessing settings." %
           (desc, ENVIRONMENT_VARIABLE))
+    # Store in global variable :-\
+    config_file.filename = settings_file
     self.configure(json_load(settings_file))
-    # Cover corner case that can only really happens in testing
-    if not hasattr(self, 'terra'):
-      self.terra = {}
-    self.terra.config_file = settings_file
 
   def __getstate__(self):
     if self._wrapped is None:
