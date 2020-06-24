@@ -158,8 +158,11 @@ import warnings
 import threading
 import concurrent.futures
 import copy
+from json.decoder import JSONDecodeError
 
-from terra.core.exceptions import ImproperlyConfigured, ConfigurationWarning
+from terra.core.exceptions import (
+  ImproperlyConfigured, ConfigurationWarning, JsonError, handledExitCode
+)
 # Do not import terra.logger or terra.signals here, or any module that
 # imports them
 from vsi.tools.python import (
@@ -463,8 +466,7 @@ class LazySettings(LazyObject):
           "You must either define the environment variable %s "
           "or call settings.configure() before accessing settings." %
           (desc, ENVIRONMENT_VARIABLE))
-    with open(settings_file) as fid:
-      self.configure(json.load(fid))
+    self.configure(json_load(settings_file))
     # Cover corner case that can only really happens in testing
     if not hasattr(self, 'terra'):
       self.terra = {}
@@ -527,8 +529,7 @@ class LazySettings(LazyObject):
       if getattr(json_file, 'settings_property', None):
         json_file = json_file(settings)
 
-      with open(json_file, 'r') as fid:
-        return Settings(json.load(fid))
+      return Settings(json_load(settings_file))
 
     nested_patch_inplace(
         self._wrapped,
@@ -790,6 +791,18 @@ class TerraJSONEncoder(JSONEncoder):
         Object to be converted to json friendly :class:`dict`
     '''
     return json.dumps(obj, cls=TerraJSONEncoder, **kwargs)
+
+def json_load(filename):
+  # Helper function to load from json
+  try:
+    with open(filename, 'r') as fid:
+      return json.load(fid)
+  except JSONDecodeError as e:
+    logger.error(f'Error parsing the JSON config file {filename}: ' + str(e))
+    raise SystemExit(handledExitCode)
+  except FileNotFoundError as e:
+    logger.error('Cannot find JSON config file: ' + str(e))
+    raise SystemExit(handledExitCode)
 
 
 import terra.logger  # noqa
