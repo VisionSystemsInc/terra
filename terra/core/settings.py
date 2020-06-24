@@ -529,7 +529,7 @@ class LazySettings(LazyObject):
       if getattr(json_file, 'settings_property', None):
         json_file = json_file(settings)
 
-      return Settings(json_load(settings_file))
+      return Settings(json_load(json_file))
 
     nested_patch_inplace(
         self._wrapped,
