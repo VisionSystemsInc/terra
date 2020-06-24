@@ -28,6 +28,9 @@ class TestSettingsUnconfiguredCase(TestCase):
         {'TERRA_SETTINGS_FILE': self.settings_filename}))
     # Use settings
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
+    import terra.core.settings
+    self.patches.append(mock.patch.object(terra.core.settings.config_file,
+                                          'filename', None))
     super().setUp()
 
 
