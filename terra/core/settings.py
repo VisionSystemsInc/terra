@@ -161,7 +161,7 @@ import copy
 from json.decoder import JSONDecodeError
 
 from terra.core.exceptions import (
-  ImproperlyConfigured, ConfigurationWarning, JsonError, handledExitCode
+  ImproperlyConfigured, ConfigurationWarning, handledExitCode
 )
 # Do not import terra.logger or terra.signals here, or any module that
 # imports them
@@ -791,6 +791,7 @@ class TerraJSONEncoder(JSONEncoder):
         Object to be converted to json friendly :class:`dict`
     '''
     return json.dumps(obj, cls=TerraJSONEncoder, **kwargs)
+
 
 def json_load(filename):
   # Helper function to load from json
