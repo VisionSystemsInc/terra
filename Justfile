@@ -101,6 +101,7 @@ function terra_caseify()
 
     ### Running containers ###
     run) # Run python module/cli in terra
+      local JUST_IGNORE_EXIT_CODES=62
       if [[ ${JUST_RODEO-} == 1 ]]; then
         extra_args=$#
         local app_name="${1}"
