@@ -92,9 +92,9 @@ class Compute(BaseCompute):
         if volume['type'] == 'bind':
           volume_map.append((volume['source'], volume['target']))
       else:
-        if volume.startswith('/'):
-          ans = re.match(docker_volume_re, volume).groups()
-          volume_map.append((ans[0], ans[2]))
+        ans = re.fullmatch(docker_volume_re, volume)
+        if ans is not None:
+          volume_map.append((ans.group(1), ans.group(3)))
 
     # This is not needed, because service_info.volumes are already in
     # service_info.env, added by terra.compute.base.BaseService.pre_run
