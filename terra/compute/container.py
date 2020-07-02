@@ -54,7 +54,7 @@ class ContainerService(BaseService):
       os.makedirs(settings.settings_dir, exist_ok=True)
       self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
                f'VOLUME_{env_volume_index}'] = \
-          f'{settings.settings_dir}:/settingsrw'
+          f'{settings.settings_dir}:/settings:rw'
       env_volume_index += 1
 
     # Copy self.volumes to the environment variables
