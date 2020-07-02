@@ -12,9 +12,29 @@ from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
-docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):(([a-zA-Z]:[/\\])?[^:]*)' \
-                   r'((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|' \
-                   r':delegated|:cached|:consistent|:nocopy)*)$'
+_docker_volume_flags_re = r'((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|' \
+                          r':delegated|:cached|:consistent|:nocopy)*)'
+'''str: Common regex for docker flags
+'''
+
+docker_internal_volume_re = r'^([a-zA-Z0-9][a-zA-Z0-9_\.\-]+):' \
+                            r'(([a-zA-Z]:[/\\])?[^:]*)' \
+                            + _docker_volume_flags_re
+'''str: A regular expression to parse old style docker volume strings for
+internal docker volumes only
+
+RE Groups
+
+* 0: Source
+* 1: Target
+* 2: Junk - target drive (windows)
+* 3: Flags
+* 4: Junk - last flag
+'''
+
+docker_volume_re = r'^(([a-zA-Z]:[/\\])?[^:]*):' \
+                   r'(([a-zA-Z]:[/\\])?[^:]*)' \
+                   + _docker_volume_flags_re
 '''str: A regular expression to parse old style docker volume strings
 
 RE Groups
@@ -87,14 +107,16 @@ class Compute(BaseCompute):
     else:
       volumes = []
 
+    # volume_map for bind mounts only
     for volume in volumes:
       if isinstance(volume, dict):
         if volume['type'] == 'bind':
           volume_map.append((volume['source'], volume['target']))
       else:
-        ans = re.fullmatch(docker_volume_re, volume)
-        if ans is not None:
-          volume_map.append((ans.group(1), ans.group(3)))
+        if re.fullmatch(docker_internal_volume_re, volume) is None:
+          ans = re.fullmatch(docker_volume_re, volume)
+          if ans is not None:
+            volume_map.append((ans.group(1), ans.group(3)))
 
     # This is not needed, because service_info.volumes are already in
     # service_info.env, added by terra.compute.base.BaseService.pre_run
