@@ -225,7 +225,7 @@ def status_file(self):
 def settings_dump_dir(self):
   '''
   The default :func:`settings_property` for settings dumps as JSON files.
-  The default location is :func:`processing_dir/settings_dump`.
+  The default is :func:`processing_dir/settings_dump<processing_dir>`.
   This directory is not used if ``TERRA_DISABLE_SETTINGS_DUMP`` is true.
   '''
   return os.path.join(self.processing_dir, 'settings_dump')
