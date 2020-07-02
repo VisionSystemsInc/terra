@@ -222,6 +222,16 @@ def status_file(self):
 
 
 @settings_property
+def settings_dir(self):
+  '''
+  The default :func:`settings_property` for settings dumps as JSON files.
+  The default is :func:`processing_dir/settings<processing_dir>`.
+  This directory is not used if ``TERRA_DISABLE_SETTINGS_DUMP`` is true.
+  '''
+  return os.path.join(self.processing_dir, 'settings')
+
+
+@settings_property
 def processing_dir(self):
   '''
   The default :func:`settings_property` for the processing directory. If not
@@ -333,6 +343,7 @@ global_templates = [
         # 'start_time': datetime.now(), # Not json serializable yet
         'uuid': terra_uuid
       },
+      'settings_dir': settings_dir,
       'status_file': status_file,
       'processing_dir': processing_dir,
       'unittest': unittest,

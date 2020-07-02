@@ -431,8 +431,9 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.tmp_handler)
 
     if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+      os.makedirs(settings.settings_dir, exist_ok=True)
       settings_dump = os.path.join(
-          settings.processing_dir,
+          settings.settings_dir,
           datetime.now(timezone.utc).strftime(
               f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
       with open(settings_dump, 'w') as fid:
