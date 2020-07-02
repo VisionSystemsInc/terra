@@ -392,8 +392,39 @@ using</p>
 </dd></dl>
 
 <dl class="data">
+<dt id="terra.compute.docker._docker_volume_flags_re">
+<code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">_docker_volume_flags_re</code><em class="property"> = '((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)'</em><a class="headerlink" href="#terra.compute.docker._docker_volume_flags_re" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common regex for docker flags</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="data">
+<dt id="terra.compute.docker.docker_internal_volume_re">
+<code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">docker_internal_volume_re</code><em class="property"> = '^([a-zA-Z0-9][a-zA-Z0-9_\\.\\-]+):(([a-zA-Z]:[/\\\\])?[^:]*)((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)'</em><a class="headerlink" href="#terra.compute.docker.docker_internal_volume_re" title="Permalink to this definition">¶</a></dt>
+<dd><p>A regular expression to parse old style docker volume strings for
+internal docker volumes only</p>
+<p>RE Groups</p>
+<ul class="simple">
+<li><p>0: Source</p></li>
+<li><p>1: Target</p></li>
+<li><p>2: Junk - target drive (windows)</p></li>
+<li><p>3: Flags</p></li>
+<li><p>4: Junk - last flag</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="data">
 <dt id="terra.compute.docker.docker_volume_re">
-<code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">docker_volume_re</code><em class="property"> = '^(([a-zA-Z]:[/\\\\])?[^:]*):(([a-zA-Z]:[/\\\\])?[^:]*)((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)$'</em><a class="headerlink" href="#terra.compute.docker.docker_volume_re" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.compute.docker.</code><code class="sig-name descname">docker_volume_re</code><em class="property"> = '^(([a-zA-Z]:[/\\\\])?[^:]*):(([a-zA-Z]:[/\\\\])?[^:]*)((:ro|:rw|:z|:Z|:r?shared|:r?slave|:r?private|:delegated|:cached|:consistent|:nocopy)*)'</em><a class="headerlink" href="#terra.compute.docker.docker_volume_re" title="Permalink to this definition">¶</a></dt>
 <dd><p>A regular expression to parse old style docker volume strings</p>
 <p>RE Groups</p>
 <ul class="simple">
