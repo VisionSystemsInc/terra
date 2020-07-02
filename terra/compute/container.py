@@ -51,10 +51,10 @@ class ContainerService(BaseService):
     env_volume_index += 1
 
     if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
-      os.makedirs(settings.settings_dump_dir, exist_ok=True)
+      os.makedirs(settings.settings_dir, exist_ok=True)
       self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
                f'VOLUME_{env_volume_index}'] = \
-          f'{settings.settings_dump_dir}:/settings_dump:rw'
+          f'{settings.settings_dir}:/settingsrw'
       env_volume_index += 1
 
     # Copy self.volumes to the environment variables
