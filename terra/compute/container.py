@@ -50,6 +50,13 @@ class ContainerService(BaseService):
         f'{str(temp_dir)}:/tmp_settings:rw'
     env_volume_index += 1
 
+    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+      os.makedirs(settings.settings_dump_dir, exist_ok=True)
+      self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+               f'VOLUME_{env_volume_index}'] = \
+          f'{settings.settings_dump_dir}:/settings_dump:rw'
+      env_volume_index += 1
+
     # Copy self.volumes to the environment variables
     for _, ((volume_host, volume_container), volume_flags) in \
         enumerate(zip(self.volumes, self.volumes_flags)):
