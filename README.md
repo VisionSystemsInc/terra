@@ -52,7 +52,7 @@ These commands should be run from the app's just project directory, not Terra's 
     - `just --wrap Terra_Pipenv --rm` # to remove the old pipenv
 - `just sync` # Sync your app and terra
 - `just makeself` # To create a makeself. This should call `justify terra makeself` internally
-- `just pyinstaller`
+- `just terra pyinstaller`
 - `just deploy` # to build docker images
 - `just deploy singular` # If your app has this, and you want to use singularity
 
@@ -72,5 +72,5 @@ Since there is no project directory, a `local.env` is first searched for in the 
     - Example: `TMPDIR=~/ ./just ...`
 - `sed: invalid option -- 'E'`
     - On ancient versions of sed, only the `-r` option is accepted, and does not accept the BSD compatible `-E` version of the same flag
-    - Solution: Set `VSI_SED_COMPAT` to `gnu` to disable BSD compatibility mode.
-    - Example: `VSI_SED_COMPAT=gnu ./just ...`
+    - Solution: You should no longer need to do this, it is auto detected, but setting `VSI_SED_COMPAT` to `gnu` disables BSD compatibility mode.
+    - Example: `VSI_SED_COMPAT=gnu ./just ...` or use `local.env`

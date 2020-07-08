@@ -403,10 +403,12 @@ function terra_caseify()
       ;;
 
     terra_makeself) # Create terra makeself, then append to it
-      justify makeself just-project-locally
+      justify makeself just-project
       local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
 
-      justify makeself add-files-locally "${TERRA_CWD}" \
+      local VSI_COMMON_JUST_SETTINGS=/src/terra.env
+
+      justify makeself add-files "${TERRA_CWD}" \
         "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
       ;;
 
