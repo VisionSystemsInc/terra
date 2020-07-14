@@ -34,7 +34,6 @@ from shlex import quote
 from subprocess import Popen
 import distutils.spawn
 import pathlib
-import ntpath
 
 from vsi.tools.diff import dict_diff
 from vsi.tools.python import nested_patch
