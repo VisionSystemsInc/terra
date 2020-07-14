@@ -211,44 +211,80 @@ def just(*args, **kwargs):
   return pid
 
 
+def pathlib_map(volume_map, container_platform='linux'):
+  '''
+  Translate volume mapping from strings to pathlib objects. Source paths on
+  the host system are instantiated as :ref:`concrete-paths` allowing use of
+  the :meth:`pathlib.Path.resolve` function.  Paths in the container are
+  instantiated as :ref:`pure-paths` of the appropriate type.
+
+  Parameters
+  ----------
+  volume_map : :obj:`list` of :obj:`tuple` of :obj:`str`
+    List of tuples. Each tuple contains two strings of the form
+    ``(host_str, container_str)``.
+  container_platform : :obj:`str`, optional
+    String specifying container platform, ``linux`` or ``windows``.
+    Defaults to ``linux``
+
+  Returns
+  ----------
+  :obj:`list` of :obj:`tuple` of :obj:`pathlib` objects
+    List of tuples. Each tuple contains two pathlib objects of the form
+    ``(host_pathlib, container_pathlib)``. ``host_pathlib`` objects are
+    :ref:`concrete-paths` suitable for the current host OS.
+    ``container_pathlib`` objects are :ref:`pure-paths` suitable
+    for the specified ``container_platform``.
+
+  '''
+  pure_path = (pathlib.PureWindowsPath if container_platform == 'windows'
+               else pathlib.PurePosixPath)
+
+  return [(pathlib.Path(host_str).resolve(), pure_path(container_str))
+          for host_str, container_str in volume_map]
+
+
+def patch_volume(value, volume_map, container_platform='linux'):
+  '''
+  Translate path value according to volume_map.
+
+  Parameters
+  ----------
+  value : :obj:`str`
+    Path value on the host
+  volume_map : :obj:`list` of :obj:`tuple` of :obj:`str`
+    List of tuples. Each tuple contains two strings of the form
+    ``(host_str, container_str)``.
+  container_platform : :obj:`str`, optional
+    String specifying container platform, ``linux`` or ``windows``.
+    Defaults to ``linux``.
+
+  Returns
+  ----------
+  :obj:`str`
+    Translated path value in the container. If translation is not possible,
+    function returns the original value.
+
+  '''
+  if isinstance(value, str):
+    value_pathlib = pathlib.Path(value).resolve()
+    volume_map_pathlib = pathlib_map(volume_map, container_platform)
+
+    for host_pathlib, container_pathlib in volume_map_pathlib:
+      try:
+        remainder = value_pathlib.relative_to(host_pathlib)
+      except ValueError:
+        continue
+      return str(container_pathlib / remainder)
+
+  return value
+
+
 def translate_settings_paths(container_config, volume_map,
                              container_platform='linux'):
 
   if os.name == "nt":  # pragma: no linux cover
     logger.warning("Windows volume mapping is experimental.")
-
-    def patch_volume(value, volume_map):
-      if isinstance(value, str):
-        value_path = pathlib.PureWindowsPath(ntpath.normpath(value))
-        for vol_from, vol_to in volume_map:
-          # pattern = re.compile(re.escape(vol_from), re.IGNORECASE)
-
-          # if isinstance(value, str) and pattern.match(value):
-          #   value = pattern.sub(vol_to, value)
-          #   value = value.replace('\\', '/')
-          #   break
-
-          vol_from = pathlib.PureWindowsPath(ntpath.normpath(vol_from))
-
-          try:
-            remainder = value_path.relative_to(vol_from)
-          except ValueError:
-            continue
-          if container_platform == "windows":
-            value = pathlib.PureWindowsPath(vol_to)
-          else:
-            value = pathlib.PurePosixPath(vol_to)
-
-          value /= remainder
-          return str(value)
-      return value
-  else:  # pragma: no nt cover
-    def patch_volume(value, volume_map):
-      if isinstance(value, str):
-        for vol_from, vol_to in volume_map:
-          if value.startswith(vol_from):
-            return value.replace(vol_from, vol_to, 1)
-      return value
 
   # Apply map translation to settings configuration
   return nested_patch(
