@@ -11,7 +11,9 @@ source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_makeself_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_pyinstaller_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
+source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
@@ -396,17 +398,38 @@ function terra_caseify()
       ;;
 
     terra_pyinstaller) # Deploy terra using pyinstaller
-      if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
-        justify terra pipenv sync --dev
-      fi
-      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
+      local app_prefix
+      local terra_rel
+      local indirect
+      local indirect2
+      local terra_apps
+      for app_prefix in ${TERRA_APP_PREFIXES[@]+"${TERRA_APP_PREFIXES[@]}"}; do
+        indirect="${app_prefix}_CWD"
+
+        local TERRA_PYINSTALLER_SRC_DIR="${TERRA_PYINSTALLER_SRC_DIR-${!indirect}}"
+        local TERRA_PYINSTALLER_DIST_DIR="${TERRA_PYINSTALLER_DIST_DIR-${TERRA_PYINSTALLER_SRC_DIR}/dist}"
+
+        indirect2="${app_prefix}_JUST_SETTINGS"
+        indirect2="${!indirect2-${JUST_SETTINGS}}"
+        terra_rel="$(relative_path "${!indirect}" "$(dirname "${indirect2}")")"
+        local VSI_COMMON_JUST_SETTINGS="${VSI_COMMON_JUST_SETTINGS-/src/${terra_rel}/$(basename "${indirect2}")}"
+
+        terra_rel="$(relative_path "${TERRA_CWD}" "${!indirect}")"
+
+        indirect="${app_prefix}_APPS[@]"
+        terra_apps=(${!indirect+"${!indirect}"})
+        array_to_python_ast_list_of_strings terra_apps ${terra_apps[@]+"${terra_apps[@]}"}
+        local DOCKER_COMPOSE_EXTRA_RUN_ARGS=(-e TERRA_APPS="${terra_apps}")
+
+        justify pyinstaller run pyinstaller /src/${terra_rel}/freeze/terra.spec
+      done
       ;;
 
     terra_makeself) # Create terra makeself, then append to it
       justify makeself just-project
       local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
 
-      local VSI_COMMON_JUST_SETTINGS=/src/terra.env
+      local VSI_COMMON_JUST_SETTINGS="${JUST_PATH_ESC}/src/terra.env"
 
       justify makeself add-files "${TERRA_CWD}" \
         "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
