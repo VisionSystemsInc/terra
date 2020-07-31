@@ -153,6 +153,7 @@ from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
 from json import JSONEncoder
+import socket
 import platform
 import warnings
 import threading
@@ -307,6 +308,30 @@ def terra_uuid(self):
   return str(uuid4())
 
 
+@settings_property
+def logging_hostname(self):
+  '''
+  A :func:`settings_property` for getting the hostname for logging.
+  Should the env. variable ``TERRA_RESOLVE_HOSTNAME = 1``, this function
+  will attempt to resolve the IP address of the default host route as per
+  https://stackoverflow.com/a/28950776.
+  '''
+  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1":
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+      # doesn't even have to be reachable
+      s.connect(('10.255.255.255', 1))
+      ip_addr = s.getsockname()[0]
+      return ip_addr
+    except OSError:
+      pass
+    finally:
+      s.close()
+
+  # default return
+  return platform.node()
+
+
 global_templates = [
   (
     # Global Defaults
@@ -323,7 +348,7 @@ global_templates = [
           # be the first to set it, but the runner and task will inherit the
           # master controller's values, not their node names, should they be
           # different (such as celery and spark)
-          "hostname": platform.node(),
+          "hostname": logging_hostname,
           "port": DEFAULT_TCP_LOGGING_PORT
         }
       },
