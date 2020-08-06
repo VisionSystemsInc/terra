@@ -368,7 +368,7 @@ function terra_caseify()
         echo
       fi
 
-      source "${VSI_COMMON_DIR}/docker/recipes/get-pipenv"
+      source "${VSI_COMMON_DIR}/docker/recipes/30_get-pipenv"
       PIPENV_PYTHON="${PYTHON}" PIPENV_VIRTUALENV="${output_dir}" install_pipenv
 
       local add_to_local
