@@ -332,6 +332,18 @@ def logging_hostname(self):
   return platform.node()
 
 
+@settings_property
+def logging_listen_address(self):
+  '''
+  A :func:`settings_property` defining the address on which the main
+  logger will listen. In some environments this may need to be overridden
+  (e.g., ``0.0.0.0``) to ensure appropriate capture of service & task logs.
+  '''
+
+  # is 0.0.0.0 as default better?
+  return self.logging.server.hostname
+
+
 global_templates = [
   (
     # Global Defaults
@@ -349,7 +361,8 @@ global_templates = [
           # master controller's values, not their node names, should they be
           # different (such as celery and spark)
           "hostname": logging_hostname,
-          "port": DEFAULT_TCP_LOGGING_PORT
+          "port": DEFAULT_TCP_LOGGING_PORT,
+          "listen_address": logging_listen_address,
         }
       },
       "executor": {

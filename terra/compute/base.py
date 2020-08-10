@@ -210,7 +210,8 @@ class BaseCompute:
 
       # setup the TCP socket listener
       sender.tcp_logging_server = LogRecordSocketReceiver(
-          settings.logging.server.hostname, settings.logging.server.port)
+          settings.logging.server.listen_address,
+          settings.logging.server.port)
       listener_thread = threading.Thread(
           target=sender.tcp_logging_server.serve_until_stopped)
       listener_thread.setDaemon(True)
