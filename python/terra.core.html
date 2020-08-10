@@ -604,7 +604,7 @@ settings</p>
 
 <dl class="data">
 <dt id="terra.core.settings.global_templates">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">global_templates</code><em class="property"> = [({}, {'logging': {'level': 'ERROR', 'format': '%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s', 'date_format': None, 'style': '%', 'server': {'hostname': &lt;function logging_hostname&gt;, 'port': 9020}}, 'executor': {'type': 'ProcessPoolExecutor', 'volume_map': []}, 'compute': {'arch': 'terra.compute.dummy', 'volume_map': []}, 'terra': {'config_file': &lt;function config_file&gt;, 'zone': 'controller', 'uuid': &lt;function terra_uuid&gt;}, 'settings_dir': &lt;function settings_dir&gt;, 'status_file': &lt;function status_file&gt;, 'processing_dir': &lt;function processing_dir&gt;, 'unittest': &lt;function unittest&gt;, 'resume': False}), ({'compute': {'arch': 'terra.compute.virtualenv'}}, {'compute': {'virtualenv_dir': &lt;function need_to_set_virtualenv_dir&gt;}}), ({'compute': {'arch': 'virtualenv'}}, {'compute': {'virtualenv_dir': &lt;function need_to_set_virtualenv_dir&gt;}})]</em><a class="headerlink" href="#terra.core.settings.global_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">global_templates</code><em class="property"> = [({}, {'logging': {'level': 'ERROR', 'format': '%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s', 'date_format': None, 'style': '%', 'server': {'hostname': &lt;function logging_hostname&gt;, 'port': 9020, 'listen_address': &lt;function logging_listen_address&gt;}}, 'executor': {'type': 'ProcessPoolExecutor', 'volume_map': []}, 'compute': {'arch': 'terra.compute.dummy', 'volume_map': []}, 'terra': {'config_file': &lt;function config_file&gt;, 'zone': 'controller', 'uuid': &lt;function terra_uuid&gt;}, 'settings_dir': &lt;function settings_dir&gt;, 'status_file': &lt;function status_file&gt;, 'processing_dir': &lt;function processing_dir&gt;, 'unittest': &lt;function unittest&gt;, 'resume': False}), ({'compute': {'arch': 'terra.compute.virtualenv'}}, {'compute': {'virtualenv_dir': &lt;function need_to_set_virtualenv_dir&gt;}}), ({'compute': {'arch': 'virtualenv'}}, {'compute': {'virtualenv_dir': &lt;function need_to_set_virtualenv_dir&gt;}})]</em><a class="headerlink" href="#terra.core.settings.global_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Templates are how we
 conditionally assign default values. It is a list of pair tuples, where the
 first in the tuple is a “pattern” and the second is the default values. If the
@@ -642,6 +642,14 @@ include replacement at load time.</p>
 Should the env. variable <code class="docutils literal notranslate"><span class="pre">TERRA_RESOLVE_HOSTNAME</span> <span class="pre">=</span> <span class="pre">1</span></code>, this function
 will attempt to resolve the IP address of the default host route as per
 <a class="reference external" href="https://stackoverflow.com/a/28950776">https://stackoverflow.com/a/28950776</a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="terra.core.settings.logging_listen_address">
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">logging_listen_address</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.logging_listen_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> defining the address on which the main
+logger will listen. In some environments this may need to be overridden
+(e.g., <code class="docutils literal notranslate"><span class="pre">0.0.0.0</span></code>) to ensure appropriate capture of service &amp; task logs.</p>
 </dd></dl>
 
 <dl class="function">
