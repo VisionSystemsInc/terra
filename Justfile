@@ -35,10 +35,12 @@ function Terra_Pipenv()
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
     if [ -n "${VIRTUAL_ENV+set}" ] || [ -n "${CONDA_DEFAULT_ENV+set}" ]; then
       echo "Warning: You appear to be in a virtual/conda env" >&2
+      echo "This can interfere with terra and cause unexpected consequences" >&2
       echo "Deactivate external virtual/conda envs before running just" >&2
-      ask_question "Continue?" answer_continue n
+      ask_question "Continue anyways?" answer_continue n
       if [ "$answer_continue" == "0" ]; then
         JUST_IGNORE_EXIT_CODES=1
+        echo "Exiting..." >&2
         return 1
       fi
     fi
