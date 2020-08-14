@@ -2,10 +2,11 @@ import re
 import pkgutil
 import os
 from os import environ as env
+from typing import Pattern
 
 # Discover all modules in a package, to help hidden imports
 def iter_modules(path=None, prefix='', exclude=[]):
-  exclude = [ex if isinstance(ex, re.Pattern) else re.compile(ex)
+  exclude = [ex if isinstance(ex, Pattern) else re.compile(ex)
              for ex in exclude]
   for pkg in pkgutil.iter_modules(path, prefix):
     if any((ex.search(pkg.name) for ex in exclude)):

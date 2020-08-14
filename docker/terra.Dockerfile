@@ -47,7 +47,7 @@ FROM pipenv_cache as pipenv_run
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 COPY --from=vsi /vsi /vsi
 
-ENTRYPOINT ["/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/env", "bash", "/vsi/linux/just_files/just_entrypoint.sh"]
 
 CMD ["bash"]
 
@@ -67,6 +67,6 @@ COPY --from=vsi /vsi /vsi
 COPY terra.env /terra/
 COPY docker/terra.Justfile /terra/docker/
 
-ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_files/just_entrypoint.sh"]
 
 CMD ["bash"]

@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 
-source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
+source "${VSI_COMMON_DIR}/linux/just_files/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
 
 # Plugins
 source "${VSI_COMMON_DIR}/linux/ask_question"
 source "${VSI_COMMON_DIR}/linux/command_tools.bsh"
-source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_makeself_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/docker_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_docker_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_singularity_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_git_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_sphinx_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_makeself_functions.bsh"
+# source "${VSI_COMMON_DIR}/linux/just_files/just_pyinstaller_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
+source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
@@ -31,11 +33,16 @@ JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 function Terra_Pipenv()
 {
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
-    if [ -n "${VIRTUAL_ENV+set}" ]; then
-      echo "Warning: You appear to be in a virtual env" >&2
-      echo "Deactivate external virtual envs before running just" >&2
-      ask_question "Continue?" answer_continue n
-      [ "$answer_continue" == "0" ] && return 1
+    if [ -n "${VIRTUAL_ENV+set}" ] || [ -n "${CONDA_DEFAULT_ENV+set}" ]; then
+      echo "Warning: You appear to be in a virtual/conda env" >&2
+      echo "This can interfere with terra and cause unexpected consequences" >&2
+      echo "Deactivate external virtual/conda envs before running just" >&2
+      ask_question "Continue anyways?" answer_continue n
+      if [ "$answer_continue" == "0" ]; then
+        JUST_IGNORE_EXIT_CODES=1
+        echo "Exiting..." >&2
+        return 1
+      fi
     fi
     ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
@@ -397,16 +404,75 @@ function terra_caseify()
 
     terra_pyinstaller) # Deploy terra using pyinstaller
       if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
-        justify terra pipenv sync --dev
+        justify terra pipenv run pip install pyinstaller
       fi
-      Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
+      local indirect
+      local app_prefix
+      local terra_apps
+      for app_prefix in TERRA_DSM; do #${TERRA_APP_PREFIXES[@]+"${TERRA_APP_PREFIXES[@]}"}; do
+        indirect="${app_prefix}_APPS[@]"
+        terra_apps=(${!indirect+"${!indirect}"})
+        array_to_python_ast_list_of_strings terra_apps ${terra_apps[@]+"${terra_apps[@]}"}
+        declare -x TERRA_APPS="${terra_apps}"
+
+        Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
+      done
       ;;
+    #   local app_prefix
+    #   local terra_rel
+    #   local indirect
+    #   local indirect2
+    #   local terra_apps
+
+    #   declare -x PYINSTALLER_PYTHON_VERSION=3.6.9
+    #   declare -x PYINSTALLER_VERSION=3.6
+    #   declare -x PYINSTALLER_IMAGE="vsiri/pyinstaller:${PYINSTALLER_PYTHON_VERSION}-${PYINSTALLER_VERSION}"
+
+    #   justify pyinstaller build
+
+    #   for app_prefix in ${TERRA_APP_PREFIXES[@]+"${TERRA_APP_PREFIXES[@]}"}; do
+    #     indirect="${app_prefix}_CWD"
+
+    #     local TERRA_PYINSTALLER_SRC_DIR="${TERRA_PYINSTALLER_SRC_DIR-${!indirect}}"
+    #     local TERRA_PYINSTALLER_DIST_DIR="${TERRA_PYINSTALLER_DIST_DIR-${TERRA_PYINSTALLER_SRC_DIR}/dist}"
+
+    #     indirect2="${app_prefix}_JUST_SETTINGS"
+    #     indirect2="${!indirect2-${JUST_SETTINGS}}"
+    #     terra_rel="$(relative_path "${!indirect}" "$(dirname "${indirect2}")")"
+    #     local VSI_COMMON_JUST_SETTINGS="${VSI_COMMON_JUST_SETTINGS-/src/${terra_rel}/$(basename "${indirect2}")}"
+
+
+    #     terra_rel="$(relative_path "${TERRA_CWD}" "${!indirect}")"
+
+    #     indirect="${app_prefix}_APPS[@]"
+    #     terra_apps=(${!indirect+"${!indirect}"})
+    #     array_to_python_ast_list_of_strings terra_apps ${terra_apps[@]+"${terra_apps[@]}"}
+    #     local DOCKER_COMPOSE_EXTRA_RUN_ARGS=(-e TERRA_APPS="${terra_apps}")
+
+    #     local terra_venv_volume="${COMPOSE_PROJECT_NAME}_terra-venv"
+    #     if ! docker inspect "${terra_venv_volume}" &> /dev/null; then
+    #       echo "Volume ${terra_venv_volume} does not exist. Needs to be initialized by running a terra command :TODO" >&2
+    #       JUST_IGNORE_EXIT_CODES=1
+    #       return 1
+    #     fi
+
+    #     indirect2="${app_prefix}_VENV_DIR"
+    #     local TERRA_PYINSTALLER_VENV_DIR="${!indirect2-}"
+    #     if [ -n "${TERRA_PYINSTALLER_VENV_DIR}" ]; then
+    #       TERRA_PYINSTALLER_VOLUMES=("${TERRA_PYINSTALLER_VENV_DIR}:/venv")
+    #     fi
+
+    #     justify pyinstaller run bash # pyinstaller /src/${terra_rel}/freeze/terra.spec
+    #   done
+    #   ;;
 
     terra_makeself) # Create terra makeself, then append to it
-      justify makeself just-project-locally
+      justify makeself just-project
       local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
 
-      justify makeself add-files-locally "${TERRA_CWD}" \
+      local VSI_COMMON_JUST_SETTINGS="${JUST_PATH_ESC}/src/terra.env"
+
+      justify makeself add-files "${TERRA_CWD}" \
         "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
       ;;
 

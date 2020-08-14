@@ -14,8 +14,22 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('/src'))
+import tempfile
 
+sys.path.insert(0, os.path.abspath(os.environ['TERRA_CWD']))
+sys.path.insert(0, os.path.abspath(os.path.join(os.environ['VSI_COMMON_DIR'],
+                                                'python')))
+# Disable logging from fully initializing. It's just a mess we don't need
+os.environ['TERRA_UNITTEST']='1'
+
+temp = tempfile.NamedTemporaryFile(mode='w')
+temp.write('{}')
+temp.flush()
+
+# Don't load terra here, it'll mess up the monkey patching sphinx does
+os.environ['TERRA_SETTINGS_FILE']=temp.name
+# import terra
+# terra.settings.configure({})
 
 # -- Project information -----------------------------------------------------
 
@@ -91,7 +105,6 @@ napoleon_include_special_with_doc = True
 # Autodoc parameters
 
 autodoc_mock_imports = [
-    "vsi",
     "terra._terra",
     "yaml",
     "celery",
