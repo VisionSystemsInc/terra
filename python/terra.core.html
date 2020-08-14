@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,27 +11,29 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="terra.executor package" href="terra.executor.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Terra
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +113,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -149,7 +152,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">terra</a> &raquo;</li>
         
@@ -181,14 +184,14 @@
 </div>
 <div class="section" id="module-terra.core.exceptions">
 <span id="terra-core-exceptions-module"></span><h2>terra.core.exceptions module<a class="headerlink" href="#module-terra.core.exceptions" title="Permalink to this headline">¶</a></h2>
-<dl class="exception">
+<dl class="py exception">
 <dt id="terra.core.exceptions.ConfigurationWarning">
 <em class="property">exception </em><code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">ConfigurationWarning</code><a class="headerlink" href="#terra.core.exceptions.ConfigurationWarning" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Warning" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
 <p>Warning that Terra may be improperly configured</p>
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="terra.core.exceptions.ImproperlyConfigured">
 <em class="property">exception </em><code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">ImproperlyConfigured</code><a class="headerlink" href="#terra.core.exceptions.ImproperlyConfigured" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
@@ -217,7 +220,7 @@ document explains how settings work.</p>
 </div>
 <div class="section" id="designating-the-settings">
 <h3>Designating the settings<a class="headerlink" href="#designating-the-settings" title="Permalink to this headline">¶</a></h3>
-<dl class="envvar">
+<dl class="std envvar">
 <dt id="envvar-TERRA_SETTINGS_FILE">
 <code class="sig-name descname">TERRA_SETTINGS_FILE</code><a class="headerlink" href="#envvar-TERRA_SETTINGS_FILE" title="Permalink to this definition">¶</a></dt>
 <dd><p>When you run a Terra App, you have to tell it which settings you’re using.
@@ -257,7 +260,7 @@ individual settings is not possible:</p>
 don’t do this in an app:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
 
-<span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>   <span class="c1"># Don&#39;t do this!</span>
+<span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="kc">True</span>   <span class="c1"># Don&#39;t do this!</span>
 </pre></div>
 </div>
 </div>
@@ -291,7 +294,7 @@ later point, Terra will use the default setting value.</p>
 <p>Configuring Terra in this fashion is mostly necessary - and, indeed,
 recommended - when you’re using are running a trivial transient app in the
 framework instead of a larger application.</p>
-<dl class="data">
+<dl class="py data">
 <dt id="terra.core.settings.ENVIRONMENT_VARIABLE">
 <code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">ENVIRONMENT_VARIABLE</code><em class="property"> = 'TERRA_SETTINGS_FILE'</em><a class="headerlink" href="#terra.core.settings.ENVIRONMENT_VARIABLE" title="Permalink to this definition">¶</a></dt>
 <dd><p>The environment variable that store the file name of the configuration
@@ -303,13 +306,13 @@ file</p>
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.ExpandedString">
 <em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">ExpandedString</code><a class="headerlink" href="#terra.core.settings.ExpandedString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.LazyObject">
 <em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">LazyObject</code><a class="headerlink" href="#terra.core.settings.LazyObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -317,67 +320,67 @@ file</p>
 <p><a class="reference internal" href="#terra.core.settings.LazyObject" title="terra.core.settings.LazyObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazyObject</span></code></a> remains unevaluated until one of the supported magic
 functions are called.</p>
 <p>Based off of Django’s LazyObject</p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__contains__">
-<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__contains__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__contains__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__delattr__">
-<code class="sig-name descname">__delattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__delattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__delattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__delattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__delitem__">
-<code class="sig-name descname">__delitem__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__delitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__delitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__delitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__dir__">
 <code class="sig-name descname">__dir__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__dir__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__getattr__">
-<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__getattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__getattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__iter__">
 <code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__len__">
 <code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__setattr__">
-<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__setattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__setattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject.__setitem__">
-<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__setitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject.__setitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazyObject._setup">
 <code class="sig-name descname">_setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazyObject._setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract. Must be implemented by subclasses to initialize the wrapped
@@ -391,7 +394,7 @@ object.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.LazySettings">
 <em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">LazySettings</code><a class="headerlink" href="#terra.core.settings.LazySettings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terra.core.settings.LazyObject" title="terra.core.settings.LazyObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.settings.LazyObject</span></code></a></p>
@@ -400,9 +403,9 @@ settings object. The user can manually configure settings prior to using
 them. Otherwise, Terra uses the config file pointed to by
 <span class="target" id="index-2"></span><a class="reference internal" href="#envvar-TERRA_SETTINGS_FILE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_SETTINGS_FILE</span></code></a></p>
 <p>Based off of <code class="xref py py-mod docutils literal notranslate"><span class="pre">django.conf</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazySettings._setup">
-<code class="sig-name descname">_setup</code><span class="sig-paren">(</span><em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings._setup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_setup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings._setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the config json file pointed to by the environment variable. This is
 used the first time settings are needed, if the user hasn’t configured
 settings manually.</p>
@@ -417,9 +420,9 @@ settings manually.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazySettings.add_templates">
-<code class="sig-name descname">add_templates</code><span class="sig-paren">(</span><em class="sig-param">templates</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.add_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_templates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">templates</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.add_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to easily expose adding more defaults templates to
 <a class="reference internal" href="#terra.core.settings.global_templates" title="terra.core.settings.global_templates"><code class="xref py py-data docutils literal notranslate"><span class="pre">global_templates</span></code></a> specific for an application</p>
 <dl class="field-list simple">
@@ -429,9 +432,9 @@ settings manually.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazySettings.configure">
-<code class="sig-name descname">configure</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.configure" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">configure</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.configure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called to manually configure the settings. The ‘default_settings’
 parameter sets where to retrieve any unspecified values from (its
 argument should be a <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>).</p>
@@ -448,7 +451,7 @@ argument should be a <a class="reference external" href="https://docs.python.org
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazySettings.configured">
 <em class="property">property </em><code class="sig-name descname">configured</code><a class="headerlink" href="#terra.core.settings.LazySettings.configured" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the settings have already been configured</p>
@@ -464,71 +467,71 @@ argument should be a <a class="reference external" href="https://docs.python.org
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.LazySettingsThreaded">
 <em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">LazySettingsThreaded</code><a class="headerlink" href="#terra.core.settings.LazySettingsThreaded" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terra.core.settings.LazySettings" title="terra.core.settings.LazySettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.settings.LazySettings</span></code></a></p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazySettingsThreaded.__setattr__">
-<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettingsThreaded.__setattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettingsThreaded.__setattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.LazySettingsThreaded.downcast">
-<em class="property">classmethod </em><code class="sig-name descname">downcast</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettingsThreaded.downcast" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">downcast</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettingsThreaded.downcast" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.ObjectDict">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">ObjectDict</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">ObjectDict</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
 <p>An object dictionary, that accesses dictionary keys using attributes (<code class="docutils literal notranslate"><span class="pre">.</span></code>)
 rather than items (<code class="docutils literal notranslate"><span class="pre">[]</span></code>).</p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.ObjectDict.__dir__">
 <code class="sig-name descname">__dir__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.__dir__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.ObjectDict.__getattr__">
-<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.__getattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.__getattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.ObjectDict.__setattr__">
-<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.__setattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__setattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.__setattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.ObjectDict.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supported</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.Settings">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">Settings</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.Settings" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">Settings</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.Settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terra.core.settings.ObjectDict" title="terra.core.settings.ObjectDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.settings.ObjectDict</span></code></a></p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.Settings.__getattr__">
-<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.Settings.__getattr__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.Settings.__getattr__" title="Permalink to this definition">¶</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> that will evaluate &#64;settings_property functions, and cache
 the values</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.settings.TerraJSONEncoder">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">TerraJSONEncoder</code><span class="sig-paren">(</span><em class="sig-param">*</em>, <em class="sig-param">skipkeys=False</em>, <em class="sig-param">ensure_ascii=True</em>, <em class="sig-param">check_circular=True</em>, <em class="sig-param">allow_nan=True</em>, <em class="sig-param">sort_keys=False</em>, <em class="sig-param">indent=None</em>, <em class="sig-param">separators=None</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">TerraJSONEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">skipkeys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ensure_ascii</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">check_circular</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">allow_nan</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sort_keys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">separators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
 <p>Json serializer for <a class="reference internal" href="#terra.core.settings.LazySettings" title="terra.core.settings.LazySettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazySettings</span></code></a>.</p>
 <div class="admonition note">
@@ -536,9 +539,9 @@ the values</p>
 <p>Does not work on <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> since it would be handled
 automatically as a <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
 </div>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.TerraJSONEncoder.default">
-<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.default" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement this method in a subclass such that it returns
 a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
 (to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
@@ -557,9 +560,9 @@ implement default like this:</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.TerraJSONEncoder.dumps">
-<em class="property">static </em><code class="sig-name descname">dumps</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.dumps" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">dumps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.dumps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience function for running <cite>dumps</cite> using this encoder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -568,9 +571,9 @@ implement default like this:</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.settings.TerraJSONEncoder.serializableSettings">
-<em class="property">static </em><code class="sig-name descname">serializableSettings</code><span class="sig-paren">(</span><em class="sig-param">obj</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.serializableSettings" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">serializableSettings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.serializableSettings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> object into a json serializable <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
 <p>Since <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> can contain <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a>, this
 prevents json serialization. This function will evaluate all
@@ -584,14 +587,14 @@ prevents json serialization. This function will evaluate all
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.config_file">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">config_file</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.config_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">config_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.config_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for passing the filename of the config_file to
 settings</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.core.settings.filename_suffixes">
 <code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">filename_suffixes</code><em class="property"> = ['_file', '_files', '_dir', '_dirs', '_path', '_paths']</em><a class="headerlink" href="#terra.core.settings.filename_suffixes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The list key suffixes that are to be considered for volume translation</p>
@@ -602,7 +605,7 @@ settings</p>
 </dl>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.core.settings.global_templates">
 <code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">global_templates</code><em class="property"> = [({}, {'logging': {'level': 'ERROR', 'format': '%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s', 'date_format': None, 'style': '%', 'server': {'hostname': &lt;function logging_hostname&gt;, 'port': 9020, 'listen_address': &lt;function logging_listen_address&gt;}}, 'executor': {'type': 'ProcessPoolExecutor', 'volume_map': []}, 'compute': {'arch': 'terra.compute.dummy', 'volume_map': []}, 'terra': {'config_file': &lt;function config_file&gt;, 'zone': 'controller', 'uuid': &lt;function terra_uuid&gt;}, 'settings_dir': &lt;function settings_dir&gt;, 'status_file': &lt;function status_file&gt;, 'processing_dir': &lt;function processing_dir&gt;, 'unittest': &lt;function unittest&gt;, 'resume': False}), ({'compute': {'arch': 'terra.compute.virtualenv'}}, {'compute': {'virtualenv_dir': &lt;function need_to_set_virtualenv_dir&gt;}}), ({'compute': {'arch': 'virtualenv'}}, {'compute': {'virtualenv_dir': &lt;function need_to_set_virtualenv_dir&gt;}})]</em><a class="headerlink" href="#terra.core.settings.global_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Templates are how we
@@ -618,7 +621,7 @@ values.</p>
 </dl>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.core.settings.json_include_suffixes">
 <code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">json_include_suffixes</code><em class="property"> = ['_json']</em><a class="headerlink" href="#terra.core.settings.json_include_suffixes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The list key suffixes that are to be considered executing json
@@ -630,36 +633,36 @@ include replacement at load time.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.json_load">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">json_load</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.json_load" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">json_load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.json_load" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.logging_hostname">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">logging_hostname</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.logging_hostname" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">logging_hostname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.logging_hostname" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for getting the hostname for logging.
 Should the env. variable <code class="docutils literal notranslate"><span class="pre">TERRA_RESOLVE_HOSTNAME</span> <span class="pre">=</span> <span class="pre">1</span></code>, this function
 will attempt to resolve the IP address of the default host route as per
 <a class="reference external" href="https://stackoverflow.com/a/28950776">https://stackoverflow.com/a/28950776</a>.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.logging_listen_address">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">logging_listen_address</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.logging_listen_address" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">logging_listen_address</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.logging_listen_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> defining the address on which the main
 logger will listen. In some environments this may need to be overridden
 (e.g., <code class="docutils literal notranslate"><span class="pre">0.0.0.0</span></code>) to ensure appropriate capture of service &amp; task logs.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.need_to_set_virtualenv_dir">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">need_to_set_virtualenv_dir</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.need_to_set_virtualenv_dir" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">need_to_set_virtualenv_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.need_to_set_virtualenv_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.processing_dir">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">processing_dir</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.processing_dir" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">processing_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.processing_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for the processing directory. If not
 set in your configuration, it will default to the directory where the config
 file is stored. If this is not possible, it will use the current working
@@ -667,9 +670,9 @@ directory.</p>
 <p>If the directory is not writeable, a temporary directory will be used instead</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.core.settings.settings">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">settings</code><em class="property"> = &lt;LazySettings [Unevaluated]&gt;</em><a class="headerlink" href="#terra.core.settings.settings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">settings</code><em class="property"> = {'logging': {'level': 'ERROR', 'format': '%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s', 'date_format': None, 'style': '%', 'server': {'hostname': &lt;function logging_hostname&gt;, 'port': 9020, 'listen_address': &lt;function logging_listen_address&gt;}}, 'executor': {'type': 'ProcessPoolExecutor', 'volume_map': []}, 'compute': {'arch': 'terra.compute.dummy', 'volume_map': []}, 'terra': {'config_file': &lt;function config_file&gt;, 'zone': 'controller', 'uuid': &lt;function terra_uuid&gt;}, 'settings_dir': &lt;function settings_dir&gt;, 'status_file': &lt;function status_file&gt;, 'processing_dir': &lt;function processing_dir&gt;, 'unittest': &lt;function unittest&gt;, 'resume': False}</em><a class="headerlink" href="#terra.core.settings.settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>The setting object to use through out all of terra</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -678,17 +681,17 @@ directory.</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.settings_dir">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">settings_dir</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.settings_dir" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">settings_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.settings_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for settings dumps as JSON files.
 The default is <a class="reference internal" href="#terra.core.settings.processing_dir" title="terra.core.settings.processing_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">processing_dir/settings</span></code></a>.
 This directory is not used if <code class="docutils literal notranslate"><span class="pre">TERRA_DISABLE_SETTINGS_DUMP</span></code> is true.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.settings_property">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">settings_property</code><span class="sig-paren">(</span><em class="sig-param">func</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.settings_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">settings_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.settings_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Functions wrapped with this decorator will only be called once, and the value
 from the call will be cached, and replace the function altogether in the
 settings structure, similar to a cached lazy evaluation</p>
@@ -701,21 +704,21 @@ settings structure, similar to a cached lazy evaluation</p>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.status_file">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">status_file</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.status_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">status_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.status_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for the status_file. The default is
 <a class="reference internal" href="#terra.core.settings.processing_dir" title="terra.core.settings.processing_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">processing_dir/status.json</span></code></a></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.terra_uuid">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">terra_uuid</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.terra_uuid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">terra_uuid</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.terra_uuid" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.core.settings.unittest">
-<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">unittest</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.unittest" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.settings.</code><code class="sig-name descname">unittest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.unittest" title="Permalink to this definition">¶</a></dt>
 <dd><p>A <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for determing if unittests are running or not</p>
 <p>Checks the value of <span class="target" id="index-3"></span><a class="reference internal" href="terra.html#envvar-TERRA_UNITTEST"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_UNITTEST</span></code></a> and returns True or False based
 off of that.</p>
@@ -731,9 +734,9 @@ certain senders to notify a set of receivers that some action has taken place.
 They’re especially useful when many pieces of code may be interested in the
 same events.</p>
 <p>See <a class="reference external" href="https://docs.djangoproject.com/en/2.2/topics/signals/">https://docs.djangoproject.com/en/2.2/topics/signals/</a> for more info</p>
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.signals.Signal">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">Signal</code><span class="sig-paren">(</span><em class="sig-param">providing_args=None</em>, <em class="sig-param">use_caching=False</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">Signal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">providing_args</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_caching</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Base class for all signals</p>
 <dl class="field-list simple">
@@ -748,17 +751,17 @@ populated on <a class="reference internal" href="#terra.core.signals.Signal.send
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.signals.Signal._live_receivers">
-<code class="sig-name descname">_live_receivers</code><span class="sig-paren">(</span><em class="sig-param">sender</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal._live_receivers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_live_receivers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal._live_receivers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter sequence of receivers to get resolved, live receivers.</p>
 <p>This checks for weak references and resolves them, then returning only
 live receivers.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.signals.Signal.connect">
-<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param">receiver</em>, <em class="sig-param">sender=None</em>, <em class="sig-param">weak=True</em>, <em class="sig-param">dispatch_uid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.connect" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">connect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">sender</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weak</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dispatch_uid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect receiver to sender for signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -784,9 +787,9 @@ anything hashable.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.signals.Signal.disconnect">
-<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><em class="sig-param">receiver=None</em>, <em class="sig-param">sender=None</em>, <em class="sig-param">dispatch_uid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.disconnect" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">disconnect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">receiver</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sender</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dispatch_uid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.disconnect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disconnect receiver from sender for signal.</p>
 <p>If weak references are used, disconnect need not be called. The receiver
 will be removed from dispatch automatically.</p>
@@ -802,14 +805,14 @@ dispatch_uid is specified.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.signals.Signal.has_listeners">
-<code class="sig-name descname">has_listeners</code><span class="sig-paren">(</span><em class="sig-param">sender=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.has_listeners" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">has_listeners</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.has_listeners" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="terra.core.signals.Signal.receivers">
-<code class="sig-name descname">receivers</code><em class="property"> = None</em><a class="headerlink" href="#terra.core.signals.Signal.receivers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">receivers</code><a class="headerlink" href="#terra.core.signals.Signal.receivers" title="Permalink to this definition">¶</a></dt>
 <dd><p>The internal map of all signals that are connected to receivers</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -818,9 +821,9 @@ dispatch_uid is specified.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.signals.Signal.send">
-<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**named</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.send" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">named</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send signal from sender to all connected receivers.</p>
 <p>If any receiver raises an error, the error propagates back through send,
 terminating the dispatch loop. So it’s possible that all receivers
@@ -845,9 +848,9 @@ unittesting to prevent unexpected behavior</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.signals.Signal.send_robust">
-<code class="sig-name descname">send_robust</code><span class="sig-paren">(</span><em class="sig-param">sender</em>, <em class="sig-param">**named</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.send_robust" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">send_robust</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sender</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">named</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal.send_robust" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send signal from sender to all connected receivers catching errors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -875,9 +878,9 @@ unittesting to prevent unexpected behavior</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="terra.core.signals.Signal.sender_receivers_cache">
-<code class="sig-name descname">sender_receivers_cache</code><em class="property"> = None</em><a class="headerlink" href="#terra.core.signals.Signal.sender_receivers_cache" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sender_receivers_cache</code><a class="headerlink" href="#terra.core.signals.Signal.sender_receivers_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores receivers for a sender if
 <a class="reference internal" href="#terra.core.signals.Signal.use_caching" title="terra.core.signals.Signal.use_caching"><code class="xref py py-data docutils literal notranslate"><span class="pre">use_caching</span></code></a> is on</p>
 <dl class="field-list simple">
@@ -887,9 +890,9 @@ unittesting to prevent unexpected behavior</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="terra.core.signals.Signal.use_caching">
-<code class="sig-name descname">use_caching</code><em class="property"> = None</em><a class="headerlink" href="#terra.core.signals.Signal.use_caching" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">use_caching</code><a class="headerlink" href="#terra.core.signals.Signal.use_caching" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set if caching was turned on</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -900,9 +903,42 @@ unittesting to prevent unexpected behavior</p></li>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py data">
+<dt id="terra.core.signals.logger_configure">
+<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">logger_configure</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.logger_configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signal:
+Sent to the executor after the logger has been configured. This will happen
+after the post_settings_configured signal.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="terra.core.signals.logger_reconfigure">
+<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">logger_reconfigure</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.logger_reconfigure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signal:
+Sent to the executor after the logger has been reconfigured. This will happen
+after the logger_configure signal.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="terra.core.signals.post_settings_configured">
+<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">post_settings_configured</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.post_settings_configured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signal:
+Sent after settings has been configured. This will either happen after
+<a class="reference internal" href="#terra.core.settings.LazySettings._setup" title="terra.core.settings.LazySettings._setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.core.settings.LazySettings._setup()</span></code></a> is trigger by accessing any
+element in the settings (which is done automatically), or in rare cases after a
+manual call to <a class="reference internal" href="#terra.core.settings.LazySettings.configure" title="terra.core.settings.LazySettings.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.core.settings.LazySettings.configure()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="terra.core.signals.post_settings_context">
+<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">post_settings_context</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.post_settings_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signal:
+Sent after scope __exit__ from a settings context (i.e., with statement).</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="terra.core.signals.receiver">
-<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">receiver</code><span class="sig-paren">(</span><em class="sig-param">signal</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.receiver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">receiver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">signal</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.receiver" title="Permalink to this definition">¶</a></dt>
 <dd><p>A decorator for connecting receivers to signals.</p>
 <p>Used by passing in the signal (or list of signals) and keyword arguments to
 connect:</p>
@@ -915,57 +951,24 @@ connect:</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">def</span> <span class="nf">signal_receiver</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">stuff</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@receiver</span><span class="p">([</span><span class="n">post_save</span><span class="p">,</span> <span class="n">post_delete</span><span class="p">],</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nd">@receiver</span><span class="p">([</span><span class="n">post_save</span><span class="p">,</span> <span class="n">post_delete</span><span class="p">],</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">def</span> <span class="nf">signals_receiver</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">stuff</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<dl class="data">
-<dt id="terra.core.signals.post_settings_configured">
-<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">post_settings_configured</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.post_settings_configured" title="Permalink to this definition">¶</a></dt>
-<dd><p>Signal:
-Sent after settings has been configured. This will either happen after
-<a class="reference internal" href="#terra.core.settings.LazySettings._setup" title="terra.core.settings.LazySettings._setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.core.settings.LazySettings._setup()</span></code></a> is trigger by accessing any
-element in the settings (which is done automatically), or in rare cases after a
-manual call to <a class="reference internal" href="#terra.core.settings.LazySettings.configure" title="terra.core.settings.LazySettings.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.core.settings.LazySettings.configure()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="terra.core.signals.post_settings_context">
-<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">post_settings_context</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.post_settings_context" title="Permalink to this definition">¶</a></dt>
-<dd><p>Signal:
-Sent after scope __exit__ from a settings context (i.e., with statement).</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="terra.core.signals.logger_configure">
-<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">logger_configure</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.logger_configure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Signal:
-Sent to the executor after the logger has been configured. This will happen
-after the post_settings_configured signal.</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="terra.core.signals.logger_reconfigure">
-<code class="sig-prename descclassname">terra.core.signals.</code><code class="sig-name descname">logger_reconfigure</code><em class="property"> = &lt;terra.core.signals.Signal object&gt;</em><a class="headerlink" href="#terra.core.signals.logger_reconfigure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Signal:
-Sent to the executor after the logger has been reconfigured. This will happen
-after the logger_configure signal.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-terra.core.utils">
 <span id="terra-core-utils-module"></span><h2>terra.core.utils module<a class="headerlink" href="#module-terra.core.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.utils.ClassHandler">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.utils.</code><code class="sig-name descname">ClassHandler</code><span class="sig-paren">(</span><em class="sig-param">override_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.ClassHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.utils.</code><code class="sig-name descname">ClassHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">override_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.ClassHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#terra.core.utils.Handler" title="terra.core.utils.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.utils.Handler</span></code></a></p>
 <p>The <a class="reference internal" href="#terra.core.utils.ClassHandler" title="terra.core.utils.ClassHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassHandler</span></code></a> is a generic handler class for abstracting specific
 type of class and the base class, essentially letting you to make calls on a
@@ -973,38 +976,38 @@ type of class and the base class, essentially letting you to make calls on a
 <p>Like <a class="reference internal" href="#terra.core.utils.Handler" title="terra.core.utils.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></a>, except operates on a class instead of an instance of a
 class.</p>
 <p>Based loosely on <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.utils.ConnectionHandler</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.utils.ClassHandler._connect_backend">
-<code class="sig-name descname">_connect_backend</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.ClassHandler._connect_backend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_connect_backend</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.ClassHandler._connect_backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overload this function in children classes</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.utils.Handler">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.utils.</code><code class="sig-name descname">Handler</code><span class="sig-paren">(</span><em class="sig-param">override_type=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.Handler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.utils.</code><code class="sig-name descname">Handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">override_type</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.Handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The <a class="reference internal" href="#terra.core.utils.Handler" title="terra.core.utils.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></a> is a generic handler class for abstracting specific
 type of class and the base class, essentially letting you to make calls on a
 “base” class easily, without any complications.</p>
 <p>Based loosly on <code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.utils.ConnectionHandler</span></code></p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.utils.Handler._connect_backend">
 <code class="sig-name descname">_connect_backend</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.Handler._connect_backend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Overload this function in children classes</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.utils.Handler.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.Handler.close" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.core.utils.cached_property">
-<em class="property">class </em><code class="sig-prename descclassname">terra.core.utils.</code><code class="sig-name descname">cached_property</code><span class="sig-paren">(</span><em class="sig-param">func</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.core.utils.</code><code class="sig-name descname">cached_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">func</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Decorator that converts a method with a single self argument into a
 property cached on the instance.</p>
@@ -1041,20 +1044,20 @@ function from being evaluated even once:</p>
 </div>
 <p>See <a class="reference external" href="https://docs.python.org/3/howto/descriptor.html#invoking-descriptors">https://docs.python.org/3/howto/descriptor.html#invoking-descriptors</a>
 for more details</p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.utils.cached_property.__get__">
-<code class="sig-name descname">__get__</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property.__get__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__get__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">cls</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property.__get__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call the function and puts the return value in <code class="docutils literal notranslate"><span class="pre">instance.__dict__</span></code> so
 that subsequent attribute access on the instance returns the cached value
 instead of calling <a class="reference internal" href="#terra.core.utils.cached_property.__get__" title="terra.core.utils.cached_property.__get__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__get__()</span></code></a> again.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.core.utils.cached_property.func">
-<em class="property">static </em><code class="sig-name descname">func</code><span class="sig-paren">(</span><em class="sig-param">instance</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property.func" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">func</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property.func" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="terra.core.utils.cached_property.name">
 <code class="sig-name descname">name</code><em class="property"> = None</em><a class="headerlink" href="#terra.core.utils.cached_property.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1087,11 +1090,19 @@ instead of calling <a class="reference internal" href="#terra.core.utils.cached_
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, VSI
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1102,7 +1113,6 @@ instead of calling <a class="reference internal" href="#terra.core.utils.cached_
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

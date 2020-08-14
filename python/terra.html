@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,27 +11,29 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="terra.compute package" href="terra.compute.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Terra
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -114,6 +116,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -152,7 +155,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">terra</a> &raquo;</li>
         
@@ -295,14 +298,7 @@ verbose)</p></li>
 <li><p>All logging level variables exist in <a class="reference internal" href="#module-terra.logger" title="terra.logger"><code class="xref py py-mod docutils literal notranslate"><span class="pre">terra.logger</span></code></a>: <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code>,
 <code class="docutils literal notranslate"><span class="pre">WARN</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG2</span></code>, etc…</p></li>
 </ul>
-<dl class="function">
-<dt id="terra.logger.getLogger">
-<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">getLogger</code><span class="sig-paren">(</span><em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a logger with the specified name, creating it if necessary.</p>
-<p>If no name is specified, return the root logger.</p>
-</dd></dl>
-
-<dl class="data">
+<dl class="py data">
 <dt id="terra.logger.DEBUG1">
 <code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG1</code><em class="property"> = 10</em><a class="headerlink" href="#terra.logger.DEBUG1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Debug level one. Same as the original <code class="xref py py-data docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> level, but now
@@ -311,7 +307,7 @@ called <a class="reference internal" href="#terra.logger.DEBUG1" title="terra.lo
 users to see</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.logger.DEBUG2">
 <code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG2</code><em class="property"> = 9</em><a class="headerlink" href="#terra.logger.DEBUG2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Debug level two, more verbose.</p>
@@ -319,7 +315,7 @@ users to see</p>
 developer to see when debugging</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.logger.DEBUG3">
 <code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG3</code><em class="property"> = 8</em><a class="headerlink" href="#terra.logger.DEBUG3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Debug level three, even more verbose.</p>
@@ -327,114 +323,105 @@ developer to see when debugging</p>
 output used to debug algorithms</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.logger.DEBUG4">
 <code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">DEBUG4</code><em class="property"> = 7</em><a class="headerlink" href="#terra.logger.DEBUG4" title="Permalink to this definition">¶</a></dt>
 <dd><p>Debug level four, even more verbose.</p>
 <p>Should be used for spamming the screen</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.logger.Logger">
-<em class="property">class </em><code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">Logger</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">Logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#logging.Logger" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Logger</span></code></a></p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.logger.Logger.debug1">
-<code class="sig-name descname">debug1</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">debug1</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG1" title="terra.logger.DEBUG1"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG1</span></code></a> on this logger. Same as <code class="docutils literal notranslate"><span class="pre">debug</span></code>.
 The arguments are interpreted as for <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#logging.debug" title="(in Python v3.6)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.logger.Logger.debug2">
-<code class="sig-name descname">debug2</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">debug2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG2" title="terra.logger.DEBUG2"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG2</span></code></a> on this logger. The arguments are
 interpreted as for <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#logging.debug" title="(in Python v3.6)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.logger.Logger.debug3">
-<code class="sig-name descname">debug3</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug3" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">debug3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG3" title="terra.logger.DEBUG3"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG3</span></code></a> on this logger. The arguments are
 interpreted as for <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#logging.debug" title="(in Python v3.6)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.logger.Logger.debug4">
-<code class="sig-name descname">debug4</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug4" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">debug4</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug4" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG4" title="terra.logger.DEBUG4"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG4</span></code></a> on this logger. The arguments are
 interpreted as for <a class="reference external" href="https://docs.python.org/3.6/library/logging.html#logging.debug" title="(in Python v3.6)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.logger.Logger.fatal">
-<code class="sig-name descname">fatal</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.fatal" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fatal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.fatal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delegate a critical call to the underlying logger.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.logger.Logger.findCaller">
-<code class="sig-name descname">findCaller</code><span class="sig-paren">(</span><em class="sig-param">stack_info=False</em>, <em class="sig-param">stacklevel=1</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.findCaller" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">findCaller</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stack_info</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">stacklevel</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.findCaller" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the stack frame of the caller so that we can note the source
 file name, line number and function name.</p>
 </dd></dl>
 
 </dd></dl>
 
+<dl class="py function">
+<dt id="terra.logger.getLogger">
+<code class="sig-prename descclassname">terra.logger.</code><code class="sig-name descname">getLogger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a logger with the specified name, creating it if necessary.</p>
+<p>If no name is specified, return the root logger.</p>
+</dd></dl>
+
 </div>
 </div>
 <div class="section" id="module-terra.task">
 <span id="terra-task-module"></span><h2>terra.task module<a class="headerlink" href="#module-terra.task" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="terra.task.TerraTask">
-<em class="property">class </em><code class="sig-prename descclassname">terra.task.</code><code class="sig-name descname">TerraTask</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.celeryproject.org/en/stable/reference/celery.app.task.html#celery.app.task.Task" title="(in Celery v4.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">celery.app.task.Task</span></code></a></p>
-<dl class="method">
-<dt id="terra.task.TerraTask.apply_async">
-<code class="sig-name descname">apply_async</code><span class="sig-paren">(</span><em class="sig-param">args=None</em>, <em class="sig-param">kwargs=None</em>, <em class="sig-param">task_id=None</em>, <em class="sig-param">*args2</em>, <em class="sig-param">**kwargs2</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask.apply_async" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="terra.task.TerraTask.translate_paths">
-<code class="sig-name descname">translate_paths</code><span class="sig-paren">(</span><em class="sig-param">payload</em>, <em class="sig-param">reverse_compute_volume_map</em>, <em class="sig-param">executor_volume_map</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask.translate_paths" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
+<dl class="py function">
 <dt id="terra.task.shared_task">
-<code class="sig-prename descclassname">terra.task.</code><code class="sig-name descname">shared_task</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.shared_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.task.</code><code class="sig-name descname">shared_task</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.shared_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-terra.workflow">
 <span id="terra-workflow-module"></span><h2>terra.workflow module<a class="headerlink" href="#module-terra.workflow" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="terra.workflow.BaseWorkflow">
 <em class="property">class </em><code class="sig-prename descclassname">terra.workflow.</code><code class="sig-name descname">BaseWorkflow</code><a class="headerlink" href="#terra.workflow.BaseWorkflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The base class for all Terra Workflows</p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.workflow.BaseWorkflow.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.BaseWorkflow.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.workflow.PipelineWorkflow">
 <em class="property">class </em><code class="sig-prename descclassname">terra.workflow.</code><code class="sig-name descname">PipelineWorkflow</code><a class="headerlink" href="#terra.workflow.PipelineWorkflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A simple workflow that runs a set of services, serially.</p>
 <p>self.pipeline need to be set to a list of services calls.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="terra.workflow.PipelineWorkflow.run">
 <code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="terra.workflow.PipelineWorkflow.service_index">
-<code class="sig-name descname">service_index</code><span class="sig-paren">(</span><em class="sig-param">service_name=None</em>, <em class="sig-param">default_index=0</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.service_index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">service_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">service_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_index</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.service_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -445,15 +432,15 @@ file name, line number and function name.</p>
 <p>Terra in an infrastructure with the purpose of running algorithms in a compute
 architecture agnostic way. The goal is, once an algorithm (app) is setup, the
 same algorithm can be deployed on multiple compute arches</p>
-<dl class="envvar">
+<dl class="std envvar">
 <dt id="envvar-TERRA_UNITTEST">
 <code class="sig-name descname">TERRA_UNITTEST</code><a class="headerlink" href="#envvar-TERRA_UNITTEST" title="Permalink to this definition">¶</a></dt>
 <dd><p>A environment variable that is <code class="docutils literal notranslate"><span class="pre">1</span></code> when running unit tests.</p>
 </dd></dl>
 
-<dl class="data">
+<dl class="py data">
 <dt id="terra.settings">
-<code class="sig-prename descclassname">terra.</code><code class="sig-name descname">settings</code><em class="property"> = &lt;LazySettings [Unevaluated]&gt;</em><a class="headerlink" href="#terra.settings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.</code><code class="sig-name descname">settings</code><em class="property"> = {'logging': {'level': 'ERROR', 'format': '%(asctime)s (%(hostname)s:%(zone)s): %(levelname)s/%(processName)s - %(filename)s - %(message)s', 'date_format': None, 'style': '%', 'server': {'hostname': &lt;function logging_hostname&gt;, 'port': 9020, 'listen_address': &lt;function logging_listen_address&gt;}}, 'executor': {'type': 'ProcessPoolExecutor', 'volume_map': []}, 'compute': {'arch': 'terra.compute.dummy', 'volume_map': []}, 'terra': {'config_file': &lt;function config_file&gt;, 'zone': 'controller', 'uuid': &lt;function terra_uuid&gt;}, 'settings_dir': &lt;function settings_dir&gt;, 'status_file': &lt;function status_file&gt;, 'processing_dir': &lt;function processing_dir&gt;, 'unittest': &lt;function unittest&gt;, 'resume': False}</em><a class="headerlink" href="#terra.settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>The settings object easily accessible from all
 of terra and any terra app</p>
 <dl class="field-list simple">
@@ -486,11 +473,19 @@ of terra and any terra app</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, VSI
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -501,7 +496,6 @@ of terra and any terra app</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

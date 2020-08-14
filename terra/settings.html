@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,27 +11,29 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Adding Apps" href="apps.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Terra
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -94,6 +96,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -132,7 +135,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Terra Settings</li>
     
@@ -155,9 +158,9 @@
             
   <div class="section" id="terra-settings">
 <span id="settings"></span><h1>Terra Settings<a class="headerlink" href="#terra-settings" title="Permalink to this headline">¶</a></h1>
-<dl class="option">
-<dt id="cmdoption-arg-terra-zone">
-<code class="sig-name descname">terra.zone</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-terra-zone" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-terra.zone">
+<code class="sig-name descname">terra.zone</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-terra.zone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Terra can be running in one of three areas of execution, or “zones”: the master controller (<code class="docutils literal notranslate"><span class="pre">controller</span></code>), a service runner (<code class="docutils literal notranslate"><span class="pre">runner</span></code>), or a task (<code class="docutils literal notranslate"><span class="pre">task</span></code>). The different zones could all be running on the main host, or other containers or computers, depending on the compute and executor.</p>
 <p>The master controller includes: the CLI, workflow, stage and service definitions layers.</p>
 <p>This variable is automatically updated, and should only be read.</p>
@@ -167,16 +170,16 @@
 </div>
 <div class="section" id="workflow-settings">
 <h1>Workflow Settings<a class="headerlink" href="#workflow-settings" title="Permalink to this headline">¶</a></h1>
-<dl class="option">
-<dt id="cmdoption-arg-service-start">
-<code class="sig-name descname">service_start</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service-start" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-service_start">
+<code class="sig-name descname">service_start</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>For <a class="reference internal" href="../python/terra.html#terra.workflow.PipelineWorkflow" title="terra.workflow.PipelineWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.PipelineWorkflow</span></code></a>, choose which service to start at, if you’d like to skip some of the initial services. Inclusive, so this first service will be run. Options are and of the services in the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, case insensitive.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">{First</span> <span class="pre">service}</span></code></p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-arg-service-end">
-<code class="sig-name descname">service_end</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service-end" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-service_end">
+<code class="sig-name descname">service_end</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>For <a class="reference internal" href="../python/terra.html#terra.workflow.PipelineWorkflow" title="terra.workflow.PipelineWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.PipelineWorkflow</span></code></a>, choose which service to end at, if you don’t want to run all the way to the end. Inclusive, so this last service will be run. Options are and of the services in the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, case insensitive.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">{Last</span> <span class="pre">Service}</span></code></p>
 </dd></dl>
@@ -184,29 +187,29 @@
 </div>
 <div class="section" id="logging-settings">
 <span id="settings-logging"></span><h1>Logging Settings<a class="headerlink" href="#logging-settings" title="Permalink to this headline">¶</a></h1>
-<dl class="option">
-<dt id="cmdoption-arg-logging-level">
-<code class="sig-name descname">logging.level</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging-level" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-logging.level">
+<code class="sig-name descname">logging.level</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.level" title="Permalink to this definition">¶</a></dt>
 <dd><p>The logging level, set by using either a string (e.g. <code class="docutils literal notranslate"><span class="pre">WARNING</span></code>) or a number (e.g. <code class="docutils literal notranslate"><span class="pre">30</span></code>)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-arg-logging-format">
-<code class="sig-name descname">logging.format</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging-format" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-logging.format">
+<code class="sig-name descname">logging.format</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The logging output format.
 <a class="reference external" href="https://docs.python.org/3/library/logging.html#logrecord-attributes">https://docs.python.org/3/library/logging.html#logrecord-attributes</a>. Default:
 <code class="docutils literal notranslate"><span class="pre">%(asctime)s</span> <span class="pre">:</span> <span class="pre">%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span></code></p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-arg-logging-date-format">
-<code class="sig-name descname">logging.date_format</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging-date-format" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-logging.date_format">
+<code class="sig-name descname">logging.date_format</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.date_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The date format. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-arg-logging-format-style">
-<code class="sig-name descname">logging.format_style</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging-format-style" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-arg-logging.format_style">
+<code class="sig-name descname">logging.format_style</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.format_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>The format style, <code class="docutils literal notranslate"><span class="pre">%</span></code>, <code class="docutils literal notranslate"><span class="pre">{</span></code>, or <code class="docutils literal notranslate"><span class="pre">$</span></code> notation. Default: <code class="docutils literal notranslate"><span class="pre">%</span></code></p>
 </dd></dl>
 
@@ -232,11 +235,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, VSI
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -247,7 +258,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

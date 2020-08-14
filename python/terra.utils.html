@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,27 +11,29 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Contributing Guidlines" href="../terra/contributing.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Terra
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +113,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -149,7 +152,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">terra</a> &raquo;</li>
         
@@ -182,78 +185,48 @@
 <div class="section" id="module-terra.utils.cli">
 <span id="terra-utils-cli-module"></span><h2>terra.utils.cli module<a class="headerlink" href="#module-terra.utils.cli" title="Permalink to this headline">¶</a></h2>
 <p>Utilities to help write CLIs</p>
-<dl class="class">
+<dl class="py class">
 <dt id="terra.utils.cli.ArgumentParser">
-<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">ArgumentParser</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.ArgumentParser" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">ArgumentParser</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.ArgumentParser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.ArgumentParser</span></code></a></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.utils.cli.DbStopAction">
-<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">DbStopAction</code><span class="sig-paren">(</span><em class="sig-param">option_strings</em>, <em class="sig-param">dest</em>, <em class="sig-param">nargs=None</em>, <em class="sig-param">const=None</em>, <em class="sig-param">default=None</em>, <em class="sig-param">type=None</em>, <em class="sig-param">choices=None</em>, <em class="sig-param">required=False</em>, <em class="sig-param">help=None</em>, <em class="sig-param">metavar=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.DbStopAction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">DbStopAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.DbStopAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/argparse.html#argparse.Action" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Action</span></code></a></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.utils.cli.FullPaths">
-<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">FullPaths</code><span class="sig-paren">(</span><em class="sig-param">option_strings</em>, <em class="sig-param">dest</em>, <em class="sig-param">nargs=None</em>, <em class="sig-param">const=None</em>, <em class="sig-param">default=None</em>, <em class="sig-param">type=None</em>, <em class="sig-param">choices=None</em>, <em class="sig-param">required=False</em>, <em class="sig-param">help=None</em>, <em class="sig-param">metavar=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.FullPaths" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">FullPaths</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.FullPaths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/argparse.html#argparse.Action" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">argparse.Action</span></code></a></p>
 <p>Expand user home directory, and turns relative paths into absolute paths</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="terra.utils.cli.FullPathsAppend">
-<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">FullPathsAppend</code><span class="sig-paren">(</span><em class="sig-param">option_strings</em>, <em class="sig-param">dest</em>, <em class="sig-param">nargs=None</em>, <em class="sig-param">const=None</em>, <em class="sig-param">default=None</em>, <em class="sig-param">type=None</em>, <em class="sig-param">choices=None</em>, <em class="sig-param">required=False</em>, <em class="sig-param">help=None</em>, <em class="sig-param">metavar=None</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.FullPathsAppend" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">FullPathsAppend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">option_strings</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">nargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">const</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">choices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">required</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metavar</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.FullPathsAppend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">argparse._AppendAction</span></code></p>
 <p>Expand user home directory, and turns relative paths into absolute paths</p>
 <p>Works on multiple paths for one argument</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="terra.utils.cli.clean_path">
-<code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">clean_path</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.clean_path" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">terra.utils.cli.</code><code class="sig-name descname">clean_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.clean_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-terra.utils.workflow">
 <span id="terra-utils-workflow-module"></span><h2>terra.utils.workflow module<a class="headerlink" href="#module-terra.utils.workflow" title="Permalink to this headline">¶</a></h2>
 <p>Utilities that will be used by apps</p>
-<dl class="exception">
+<dl class="py exception">
 <dt id="terra.utils.workflow.AlreadyRunException">
 <em class="property">exception </em><code class="sig-prename descclassname">terra.utils.workflow.</code><code class="sig-name descname">AlreadyRunException</code><a class="headerlink" href="#terra.utils.workflow.AlreadyRunException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception thrown when a stage is run more than once. Stages are designed to
 be run only once</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="terra.utils.workflow.resumable">
-<em class="property">class </em><code class="sig-prename descclassname">terra.utils.workflow.</code><code class="sig-name descname">resumable</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.workflow.resumable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vsi.tools.python.BasicDecorator</span></code></p>
-<p>Decorate for setting up a resumable stage in a workflow</p>
-<p>Simply using this decorator on a function makes that function a “stage” in
-the workflow. Stage execution is tracked in the
-<a class="reference internal" href="terra.core.html#terra.core.settings.status_file" title="terra.core.settings.status_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.core.settings.status_file()</span></code></a> and when using the
-<code class="docutils literal notranslate"><span class="pre">settings.resume</span></code> flag, will skip already run stages to attempt to pick up
-where a workflow left off.</p>
-<p>Resuming stages is good for failure cases, or situations where you want to
-skip the begining of a workflow</p>
-<p>Not every function in a workflow has to be a stage. These non-stage functions
-will always be run</p>
-<p>The decorated function must have at least one argument named <code class="docutils literal notranslate"><span class="pre">self</span></code>.
-<code class="docutils literal notranslate"><span class="pre">self.status</span></code> is injected into the <code class="docutils literal notranslate"><span class="pre">self</span></code> object, and can be used to read
-and write pieces of information to the <code class="docutils literal notranslate"><span class="pre">status.json</span></code> file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#terra.utils.workflow.AlreadyRunException" title="terra.utils.workflow.AlreadyRunException"><strong>AlreadyRunException</strong></a> – Thrown when function attempts to run a second time.</p>
-</dd>
-</dl>
-<dl class="method">
-<dt id="terra.utils.workflow.resumable.save_status">
-<code class="sig-name descname">save_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.workflow.resumable.save_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Safe update the file</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -282,11 +255,19 @@ and write pieces of information to the <code class="docutils literal notranslate
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, VSI
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -297,7 +278,6 @@ and write pieces of information to the <code class="docutils literal notranslate
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

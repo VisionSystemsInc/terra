@@ -1,9 +1,7 @@
 
 
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -13,27 +11,29 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> Terra
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Terra
           
 
           
@@ -72,6 +72,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -93,6 +94,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -131,7 +133,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Index</li>
     
@@ -166,6 +168,7 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
@@ -263,8 +266,6 @@
 </li>
       <li><a href="python/terra.utils.html#terra.utils.workflow.AlreadyRunException">AlreadyRunException</a>
 </li>
-      <li><a href="python/terra.html#terra.task.TerraTask.apply_async">apply_async() (terra.task.TerraTask method)</a>
-</li>
       <li><a href="python/terra.utils.html#terra.utils.cli.ArgumentParser">ArgumentParser (class in terra.utils.cli)</a>
 </li>
   </ul></td>
@@ -313,19 +314,19 @@
     command line option
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-date-format">logging.date_format</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.date_format">logging.date_format</a>
 </li>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-format">logging.format</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.format">logging.format</a>
 </li>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-format-style">logging.format_style</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.format_style">logging.format_style</a>
 </li>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-level">logging.level</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.level">logging.level</a>
 </li>
-        <li><a href="terra/settings.html#cmdoption-arg-service-end">service_end</a>
+        <li><a href="terra/settings.html#cmdoption-arg-service_end">service_end</a>
 </li>
-        <li><a href="terra/settings.html#cmdoption-arg-service-start">service_start</a>
+        <li><a href="terra/settings.html#cmdoption-arg-service_start">service_start</a>
 </li>
-        <li><a href="terra/settings.html#cmdoption-arg-terra-zone">terra.zone</a>
+        <li><a href="terra/settings.html#cmdoption-arg-terra.zone">terra.zone</a>
 </li>
       </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.docker.Compute">Compute (class in terra.compute.docker)</a>
@@ -555,7 +556,7 @@
     logging.date_format
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-date-format">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.date_format">command line option</a>
 </li>
       </ul></li>
   </ul></td>
@@ -564,27 +565,98 @@
     logging.format
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-format">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.format">command line option</a>
 </li>
       </ul></li>
       <li>
     logging.format_style
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-format-style">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.format_style">command line option</a>
 </li>
       </ul></li>
       <li>
     logging.level
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-logging-level">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-logging.level">command line option</a>
 </li>
       </ul></li>
       <li><a href="python/terra.core.html#terra.core.settings.logging_hostname">logging_hostname() (in module terra.core.settings)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.logging_listen_address">logging_listen_address() (in module terra.core.settings)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="python/terra.html#module-terra">terra</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute">terra.compute</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.base">terra.compute.base</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.container">terra.compute.container</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.docker">terra.compute.docker</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.dummy">terra.compute.dummy</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.singularity">terra.compute.singularity</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.utils">terra.compute.utils</a>
+</li>
+        <li><a href="python/terra.compute.html#module-terra.compute.virtualenv">terra.compute.virtualenv</a>
+</li>
+        <li><a href="python/terra.core.html#module-terra.core">terra.core</a>
+</li>
+        <li><a href="python/terra.core.html#module-terra.core.exceptions">terra.core.exceptions</a>
+</li>
+        <li><a href="python/terra.core.html#module-terra.core.settings">terra.core.settings</a>
+</li>
+        <li><a href="python/terra.core.html#module-terra.core.signals">terra.core.signals</a>
+</li>
+        <li><a href="python/terra.core.html#module-terra.core.utils">terra.core.utils</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor">terra.executor</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor.base">terra.executor.base</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#module-terra.executor.celery">terra.executor.celery</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.celeryconfig">terra.executor.celery.celeryconfig</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.executor">terra.executor.celery.executor</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor.dummy">terra.executor.dummy</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor.process">terra.executor.process</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor.sync">terra.executor.sync</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor.thread">terra.executor.thread</a>
+</li>
+        <li><a href="python/terra.executor.html#module-terra.executor.utils">terra.executor.utils</a>
+</li>
+        <li><a href="python/terra.html#module-terra.logger">terra.logger</a>
+</li>
+        <li><a href="python/terra.html#module-terra.task">terra.task</a>
+</li>
+        <li><a href="python/terra.utils.html#module-terra.utils">terra.utils</a>
+</li>
+        <li><a href="python/terra.utils.html#module-terra.utils.cli">terra.utils.cli</a>
+</li>
+        <li><a href="python/terra.utils.html#module-terra.utils.workflow">terra.utils.workflow</a>
+</li>
+        <li><a href="python/terra.html#module-terra.workflow">terra.workflow</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -669,11 +741,9 @@
       </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.register">register() (terra.compute.base.BaseCompute class method)</a>
 </li>
-      <li><a href="python/terra.compute.html#terra.compute.dummy.Compute.remove_service">remove_service() (terra.compute.dummy.Compute method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.utils.html#terra.utils.workflow.resumable">resumable (class in terra.utils.workflow)</a>
+      <li><a href="python/terra.compute.html#terra.compute.dummy.Compute.remove_service">remove_service() (terra.compute.dummy.Compute method)</a>
 </li>
       <li><a href="python/terra.html#terra.workflow.BaseWorkflow.run">run() (terra.workflow.BaseWorkflow method)</a>
 
@@ -699,8 +769,6 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.utils.html#terra.utils.workflow.resumable.save_status">save_status() (terra.utils.workflow.resumable method)</a>
-</li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal.send">send() (terra.core.signals.Signal method)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal.send_robust">send_robust() (terra.core.signals.Signal method)</a>
@@ -723,7 +791,7 @@
     service_end
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-service-end">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-service_end">command line option</a>
 </li>
       </ul></li>
       <li><a href="python/terra.html#terra.workflow.PipelineWorkflow.service_index">service_index() (terra.workflow.PipelineWorkflow method)</a>
@@ -732,7 +800,7 @@
     service_start
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-service-start">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-service_start">command line option</a>
 </li>
       </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.base.ServiceRunFailed">ServiceRunFailed</a>
@@ -791,73 +859,223 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.html#module-terra">terra (module)</a>
+      <li>
+    terra
+
+      <ul>
+        <li><a href="python/terra.html#module-terra">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute">terra.compute (module)</a>
+      </ul></li>
+      <li>
+    terra.compute
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.base">terra.compute.base (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.base
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.base">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.container">terra.compute.container (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.container
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.container">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.docker">terra.compute.docker (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.docker
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.docker">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.dummy">terra.compute.dummy (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.dummy
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.dummy">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.singularity">terra.compute.singularity (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.singularity
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.singularity">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.utils">terra.compute.utils (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.utils
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.utils">module</a>
 </li>
-      <li><a href="python/terra.compute.html#module-terra.compute.virtualenv">terra.compute.virtualenv (module)</a>
+      </ul></li>
+      <li>
+    terra.compute.virtualenv
+
+      <ul>
+        <li><a href="python/terra.compute.html#module-terra.compute.virtualenv">module</a>
 </li>
-      <li><a href="python/terra.core.html#module-terra.core">terra.core (module)</a>
+      </ul></li>
+      <li>
+    terra.core
+
+      <ul>
+        <li><a href="python/terra.core.html#module-terra.core">module</a>
 </li>
-      <li><a href="python/terra.core.html#module-terra.core.exceptions">terra.core.exceptions (module)</a>
+      </ul></li>
+      <li>
+    terra.core.exceptions
+
+      <ul>
+        <li><a href="python/terra.core.html#module-terra.core.exceptions">module</a>
 </li>
-      <li><a href="python/terra.core.html#module-terra.core.settings">terra.core.settings (module)</a>
+      </ul></li>
+      <li>
+    terra.core.settings
+
+      <ul>
+        <li><a href="python/terra.core.html#module-terra.core.settings">module</a>
 </li>
-      <li><a href="python/terra.core.html#module-terra.core.signals">terra.core.signals (module)</a>
+      </ul></li>
+      <li>
+    terra.core.signals
+
+      <ul>
+        <li><a href="python/terra.core.html#module-terra.core.signals">module</a>
 </li>
-      <li><a href="python/terra.core.html#module-terra.core.utils">terra.core.utils (module)</a>
+      </ul></li>
+      <li>
+    terra.core.utils
+
+      <ul>
+        <li><a href="python/terra.core.html#module-terra.core.utils">module</a>
 </li>
-      <li><a href="python/terra.executor.html#module-terra.executor">terra.executor (module)</a>
+      </ul></li>
+      <li>
+    terra.executor
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor">module</a>
 </li>
-      <li><a href="python/terra.executor.html#module-terra.executor.base">terra.executor.base (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.base
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.base">module</a>
 </li>
-      <li><a href="python/terra.executor.celery.html#module-terra.executor.celery">terra.executor.celery (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.celery
+
+      <ul>
+        <li><a href="python/terra.executor.celery.html#module-terra.executor.celery">module</a>
 </li>
-      <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.celeryconfig">terra.executor.celery.celeryconfig (module)</a>
-</li>
-      <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.executor">terra.executor.celery.executor (module)</a>
-</li>
-      <li><a href="python/terra.executor.html#module-terra.executor.dummy">terra.executor.dummy (module)</a>
-</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.executor.html#module-terra.executor.process">terra.executor.process (module)</a>
+      <li>
+    terra.executor.celery.celeryconfig
+
+      <ul>
+        <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.celeryconfig">module</a>
 </li>
-      <li><a href="python/terra.executor.html#module-terra.executor.sync">terra.executor.sync (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.celery.executor
+
+      <ul>
+        <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.executor">module</a>
 </li>
-      <li><a href="python/terra.executor.html#module-terra.executor.thread">terra.executor.thread (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.dummy
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.dummy">module</a>
 </li>
-      <li><a href="python/terra.executor.html#module-terra.executor.utils">terra.executor.utils (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.process
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.process">module</a>
 </li>
-      <li><a href="python/terra.html#module-terra.logger">terra.logger (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.sync
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.sync">module</a>
 </li>
-      <li><a href="python/terra.html#module-terra.task">terra.task (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.thread
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.thread">module</a>
 </li>
-      <li><a href="python/terra.utils.html#module-terra.utils">terra.utils (module)</a>
+      </ul></li>
+      <li>
+    terra.executor.utils
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.utils">module</a>
 </li>
-      <li><a href="python/terra.utils.html#module-terra.utils.cli">terra.utils.cli (module)</a>
+      </ul></li>
+      <li>
+    terra.logger
+
+      <ul>
+        <li><a href="python/terra.html#module-terra.logger">module</a>
 </li>
-      <li><a href="python/terra.utils.html#module-terra.utils.workflow">terra.utils.workflow (module)</a>
+      </ul></li>
+      <li>
+    terra.task
+
+      <ul>
+        <li><a href="python/terra.html#module-terra.task">module</a>
 </li>
-      <li><a href="python/terra.html#module-terra.workflow">terra.workflow (module)</a>
+      </ul></li>
+      <li>
+    terra.utils
+
+      <ul>
+        <li><a href="python/terra.utils.html#module-terra.utils">module</a>
 </li>
+      </ul></li>
+      <li>
+    terra.utils.cli
+
+      <ul>
+        <li><a href="python/terra.utils.html#module-terra.utils.cli">module</a>
+</li>
+      </ul></li>
+      <li>
+    terra.utils.workflow
+
+      <ul>
+        <li><a href="python/terra.utils.html#module-terra.utils.workflow">module</a>
+</li>
+      </ul></li>
+      <li>
+    terra.workflow
+
+      <ul>
+        <li><a href="python/terra.html#module-terra.workflow">module</a>
+</li>
+      </ul></li>
       <li>
     terra.zone
 
       <ul>
-        <li><a href="terra/settings.html#cmdoption-arg-terra-zone">command line option</a>
+        <li><a href="terra/settings.html#cmdoption-arg-terra.zone">command line option</a>
 </li>
       </ul></li>
       <li><a href="python/terra.core.html#index-0">TERRA_SETTINGS_FILE</a>, <a href="python/terra.core.html#index-1">[1]</a>, <a href="python/terra.core.html#index-2">[2]</a>, <a href="terra/getting_started.html#index-0">[3]</a>
@@ -868,11 +1086,7 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.TerraJSONEncoder">TerraJSONEncoder (class in terra.core.settings)</a>
 </li>
-      <li><a href="python/terra.html#terra.task.TerraTask">TerraTask (class in terra.task)</a>
-</li>
       <li><a href="python/terra.executor.html#terra.executor.thread.ThreadPoolExecutor">ThreadPoolExecutor (class in terra.executor.thread)</a>
-</li>
-      <li><a href="python/terra.html#terra.task.TerraTask.translate_paths">translate_paths() (terra.task.TerraTask method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.utils.translate_settings_paths">translate_settings_paths() (in module terra.compute.utils)</a>
 </li>
@@ -913,11 +1127,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, VSI
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -928,7 +1150,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
