@@ -13,6 +13,6 @@ COPY --from=vsi /vsi /vsi
 ADD terra.env /terra/
 ADD docker/redis.Justfile /terra/docker/
 
-ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_files/just_entrypoint.sh"]
 
 CMD ["redis-server"]

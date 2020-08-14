@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-source "${VSI_COMMON_DIR}/linux/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
+source "${VSI_COMMON_DIR}/linux/just_files/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
 
 # Plugins
 source "${VSI_COMMON_DIR}/linux/ask_question"
 source "${VSI_COMMON_DIR}/linux/command_tools.bsh"
-source "${VSI_COMMON_DIR}/linux/docker_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_docker_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_singularity_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_git_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_sphinx_functions.bsh"
-source "${VSI_COMMON_DIR}/linux/just_makeself_functions.bsh"
-# source "${VSI_COMMON_DIR}/linux/just_pyinstaller_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/docker_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_docker_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_singularity_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_git_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_sphinx_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_makeself_functions.bsh"
+# source "${VSI_COMMON_DIR}/linux/just_files/just_pyinstaller_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
 
@@ -401,9 +401,9 @@ function terra_caseify()
       ;;
 
     terra_pyinstaller) # Deploy terra using pyinstaller
-      # if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
-      #   justify terra pipenv sync --dev
-      # fi
+      if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
+        justify terra pipenv run pip install pyinstaller
+      fi
       local indirect
       local app_prefix
       local terra_apps
