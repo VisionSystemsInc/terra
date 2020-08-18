@@ -60,7 +60,6 @@ terra.compute.virtualenv module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 
