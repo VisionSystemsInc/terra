@@ -28,13 +28,11 @@ temp.flush()
 
 # Don't load terra here, it'll mess up the monkey patching sphinx does
 os.environ['TERRA_SETTINGS_FILE']=temp.name
-# import terra
-# terra.settings.configure({})
 
 # -- Project information -----------------------------------------------------
 
 project = 'Terra'
-copyright = '2019, VSI'
+copyright = '2020, VSI'
 author = 'VSI'
 
 # The short X.Y version
