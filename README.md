@@ -53,8 +53,8 @@ These commands should be run from the app's just project directory, not Terra's 
 - `just sync` # Sync your app and terra
 - `just makeself` # To create a makeself. This should call `justify terra makeself` internally
 - `just terra pyinstaller`
-- `just deploy` # to build docker images
-- `just deploy singular` # If your app has this, and you want to use singularity
+- `just deploy` # (not optional if using singularity:) to build docker images
+- `just deploy singular` # (optional) If your app has this, and you want to use singularity
 
 ### How to use
 
