@@ -470,7 +470,7 @@ function terra_caseify()
       justify makeself just-project
       local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
 
-      local VSI_COMMON_JUST_SETTINGS="${JUST_PATH_ESC}/src/terra.env"
+      local JUST_SETTINGS=("${JUST_PATH_ESC}/src/terra.env")
 
       justify makeself add-files "${TERRA_CWD}" \
         "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
