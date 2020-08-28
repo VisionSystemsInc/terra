@@ -12,6 +12,7 @@ source "${VSI_COMMON_DIR}/linux/just_files/just_git_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_files/just_sphinx_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_files/just_makeself_functions.bsh"
 # source "${VSI_COMMON_DIR}/linux/just_files/just_pyinstaller_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_ci_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
 
@@ -81,9 +82,10 @@ function terra_caseify()
       ;;
 
     ci_load) # Load images and rebuild from dockerhub cache
-      # justify build recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
-      justify docker-compose_ci-load "${TERRA_CWD}/docker-compose-main.yml" terra terra_pipenv
+      justify ci load-recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
+      justify ci load-services "${TERRA_CWD}/docker-compose-main.yml" terra terra_pipenv ${@+"${@}"}
       # terra_pipenv is needed for `justify terra pipenv sync --dev` in terra_pep8
+      extra_args=$#
       ;;
 
     terra_build-services) # Build services. Takes arguments that are passed to the \
