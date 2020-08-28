@@ -58,9 +58,10 @@ jobs:
             # The new better docker build system, should be faster
             # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
             if [ "${CIRCLE_BRANCH}" != "master" ]; then
-              export JUST_DOCKER_COMPOSE_PUSH=0
+              CI_LOAD_OPTIONS=" --no-push"
             fi
-            just ci load
+            pip3 install pyyaml
+            just ci load ${CI_LOAD_OPTIONS:-}
 
       - run:
           name: Running test code
