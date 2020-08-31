@@ -130,13 +130,17 @@ class TerraTask(Task):
     else:
       # Must call (synchronous) apply or python __call__ with no volume
       # mappings
+      # Use a flag for people who are somehow getting here with settings
+      # unconfigured
+      saved_original_zone = False
       if settings.configured:
+        saved_original_zone = True
         original_zone = settings.terra.zone
       settings.terra.zone = 'task'
       try:
         return_value = self.run(*args, **kwargs)
       finally:
-        if settings.configured:
+        if saved_original_zone:
           settings.terra.zone = original_zone
     return return_value
 
