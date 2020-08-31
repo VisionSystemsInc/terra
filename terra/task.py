@@ -132,15 +132,14 @@ class TerraTask(Task):
       # mappings
       # Use a flag for people who are somehow getting here with settings
       # unconfigured
-      saved_original_zone = False
+      original_zone = None
       if settings.configured:
-        saved_original_zone = True
         original_zone = settings.terra.zone
       settings.terra.zone = 'task'
       try:
         return_value = self.run(*args, **kwargs)
       finally:
-        if saved_original_zone:
+        if original_zone is not None:
           settings.terra.zone = original_zone
     return return_value
 
