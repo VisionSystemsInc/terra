@@ -11,7 +11,12 @@ x-references:
     docker:
       - image: vsiri/circleci:bash-compose-lfs
 
+# -----
+# CircleCI custom commands
+# -----
 commands:
+
+  # checkout submodules
   submodule_checkout:
     description: Checks out submodules
     steps:
@@ -21,6 +26,7 @@ commands:
             git submodule sync
             git submodule update --recursive --init
 
+  # common setup (clone, submodules, remote docker, etc.)
   common_setup:
     description: Setup terra environment
     steps:
@@ -43,25 +49,56 @@ commands:
             echo hi > redis_password.secret
             tar zc --exclude .git . | docker run -i -v /root/repo:/repo -w /repo alpine:3.6 tar zx
 
+  # run "just ci load" command for repository
+  # - latest cache is pushed only from master branch of main repo (not forks)
+  # - assumes python3 with pip is available
+  # - required environment variables
+  #     $DOCKER_USER - docker username
+  #     $DOCKER_PASS - docker password
+  # - optional enviromment variables
+  #   (see https://github.com/VisionSystemsInc/vsi_common/blob/master/linux/just_files/just_ci_functions.bsh)
+  #     $JUST_CI_RECIPE_REPO - dockerhub recipe cache (default = "vsiri/ci_cache_recipes")
+  #     $JUST_CI_RECIPE_VERSION - version string for recipe cache (default = "")
+  #     $JUST_CI_CACHE_REPO - dockerhub service cache (default = "vsiri/ci_cache")
+  #     $JUST_CI_CACHE_VERSION - version string for service cache (default = "")
+  ci_load:
+    description: "Build dockers (ci_load)"
+    steps:
+      - run:
+          name: "Build dockers (ci_load)"
+          command: |
 
+            # The new better docker build system, should be faster
+            # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
+
+            # ci_load requires python3 with pyyaml
+            pip3 install pyyaml
+
+            # dockerhub access
+            docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+
+            # push only from master branch of main repo
+            if [ "${CIRCLE_PROJECT_USERNAME,,}" == "visionsystemsinc" ] && \
+               [ "${CIRCLE_BRANCH}" == "master" ]
+            then
+              CI_LOAD_OPTIONS=""
+            else
+              CI_LOAD_OPTIONS="--no-push"
+            fi
+
+            # ci_load
+            source setup.env
+            just ci load ${CI_LOAD_OPTIONS:-}
+
+# -----
+# CircleCI jobs
+# -----
 jobs:
   run_tests:
     <<: *container_config
     steps:
       - common_setup
-
-      - run:
-          name: Build dockers
-          command: |
-            source setup.env
-            docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
-            # The new better docker build system, should be faster
-            # Doesn't work yet: export DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1
-            if [ "${CIRCLE_BRANCH}" != "master" ]; then
-              CI_LOAD_OPTIONS=" --no-push"
-            fi
-            pip3 install pyyaml
-            just ci load ${CI_LOAD_OPTIONS:-}
+      - ci_load
 
       - run:
           name: Running test code
