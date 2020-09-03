@@ -108,7 +108,7 @@ function terra_caseify()
       # ${DRYRUN} singularity run -e -c -B "${TERRA_TERRA_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
       justify singular-compose instance start redis terra.redis
       ;;
-    
+
     terra_down-redis-singular) # Stop redis in singularity
       justify singular-compose instance stop terra.redis
       ;;
