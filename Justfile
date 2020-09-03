@@ -103,9 +103,14 @@ function terra_caseify()
       done
       ;;
 
-    terra_run-singular-redis) # Run redis in singularity
-      mkdir -p "${TERRA_TERRA_SOURCE_DIR}/singular/redis"
-      ${DRYRUN} singularity run -e -c -B "${TERRA_TERRA_SOURCE_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
+    terra_up-redis-singular) # Start redis in singularity
+      mkdir -p "${TERRA_TERRA_DIR}/singular/redis"
+      # ${DRYRUN} singularity run -e -c -B "${TERRA_TERRA_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
+      justify singular-compose instance start redis terra.redis
+      ;;
+    
+    terra_down-redis-singular) # Stop redis in singularity
+      justify singular-compose instance stop terra.redis
       ;;
 
     ### Running containers ###
