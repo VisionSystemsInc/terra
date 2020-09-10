@@ -283,8 +283,8 @@ class TestTranslateUtils(TestComputeUtilsCase):
   def test_patch_volume_expand(self):
     # Test variable expansion and user home dir expansion
     volume_map = [('/foo/bar', '/dst')]
-    self.assertEqual(utils.patch_volume('${FOO}/bar', volume_map, 'linux'),
-                     '/dst/bar')
+    self.assertEqual(utils.patch_volume('${FOO}/baz', volume_map, 'linux'),
+                     '/dst/baz')
     self.assertEqual(utils.patch_volume('/foo/${BAR}/car',
                                         volume_map,
                                         'linux'),
