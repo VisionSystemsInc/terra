@@ -266,7 +266,12 @@ def patch_volume(value, volume_map, container_platform='linux'):
 
   '''
   if isinstance(value, str):
-    value_pathlib = pathlib.Path(value).resolve()
+    # If we don't expand before resolve, then both ${FOO} and ~/foo are treated
+    # as relative paths, and the PWD is prepended. Further, without proper
+    # expansion, the correct translations can't be made, so the variables need
+    # to be expanded here, and no later.
+    value_pathlib = pathlib.Path(os.path.expandvars(value))
+    value_pathlib = value_pathlib.expanduser().resolve()
     volume_map_pathlib = pathlib_map(volume_map, container_platform)
 
     for host_pathlib, container_pathlib in volume_map_pathlib:
