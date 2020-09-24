@@ -13,6 +13,7 @@ source "${VSI_COMMON_DIR}/linux/just_files/just_sphinx_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_files/just_makeself_functions.bsh"
 # source "${VSI_COMMON_DIR}/linux/just_files/just_pyinstaller_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_files/just_ci_functions.bsh"
+source "${VSI_COMMON_DIR}/linux/just_files/just_install_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
 
