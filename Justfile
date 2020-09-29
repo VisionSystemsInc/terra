@@ -105,17 +105,20 @@ function terra_caseify()
 
     terra_up-redis-singular) # Start redis in singularity
       mkdir -p "${TERRA_TERRA_DIR}/singular/redis"
-      # ${DRYRUN} singularity run -e -c -B "${TERRA_TERRA_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
-      justify singular-compose instance start redis terra.redis
+      SINGULARITY_IGNORE_EXIT_CODES='.*'
+      justify singular-compose instance start redis
       ;;
 
     terra_down-redis-singular) # Stop redis in singularity
-      justify singular-compose instance stop terra.redis
+      SINGULARITY_IGNORE_EXIT_CODES='.*'
+      justify singular-compose instance stop redis
       ;;
 
     ### Running containers ###
     run) # Run python module/cli in terra
-      local JUST_IGNORE_EXIT_CODES=62
+      # 2 is the exit code of an error in arg parsing
+      # 62 for any other terra error
+      local JUST_IGNORE_EXIT_CODES='2$|^62'
       if [[ ${JUST_RODEO-} == 1 ]]; then
         extra_args=$#
         local app_name="${1}"
@@ -393,7 +396,7 @@ function terra_caseify()
       fi
       ;;
 
-    terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
+    terra_pipenv) # Run pipenv commands in Terra's pipenv container. Useful for \
                   # installing/updating pipenv packages into terra
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
       extra_args=$#

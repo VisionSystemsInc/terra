@@ -1,4 +1,5 @@
 from terra import settings
+from terra.core.exceptions import NoStackValueError
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -38,8 +39,8 @@ class PipelineWorkflow:
     try:
       return pipeline_names_lower.index(service_name.lower())
     except ValueError as err:
-      newerr = ValueError(f"Could not find service {service_name}"
-                          f" in {pipeline_names}")
+      newerr = NoStackValueError(f"Could not find service {service_name}"
+                                 f" in {pipeline_names}")
       raise newerr from err
 
   # run main workflow
@@ -51,7 +52,7 @@ class PipelineWorkflow:
                                    len(self.pipeline) - 1)
 
     if (start_index > end_index):
-      raise ValueError(
+      raise NoStackValueError(
           f"Start service {self.pipeline[start_index].__name__} "
           f"must precede end service {self.pipeline[end_index].__name__}"
       )

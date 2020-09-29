@@ -123,6 +123,7 @@ class ImproperlyConfigured(NoStackException):
 
 class NoStackValueError(NoStackException, ValueError):
   pass
+NoStackValueError.__name__ = 'ValueError'
 
 
 class ConfigurationWarning(Warning):

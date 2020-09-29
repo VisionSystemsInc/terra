@@ -1,10 +1,11 @@
 import os
+import inspect
 from tempfile import gettempdir
 
 from celery import shared_task as original_shared_task
 from celery.app.task import Task
 
-from vsi.tools.python import args_to_kwargs, ARGS, KWARGS
+from vsi.tools.python import args_to_kwargs, ARGS, KWARGS, unwrap_wraps
 
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
@@ -113,7 +114,19 @@ class TerraTask(Task):
                          f'"{settings.processing_dir}" for the processing dir')
 
         # Calculate the executor's mapped version of the arguments
-        kwargs = args_to_kwargs(self.run, args, kwargs)
+        func, is_method = unwrap_wraps(self)
+        # Note: This code won't handle decorators that add/remove args. Oh well
+        # Only have to do this if it's a bound method, but inspect would not
+        # detect this. This happens when you have multiple layers of decorating
+        if is_method and not inspect.ismethod(func):
+          mySelf = object()
+          kwargs = args_to_kwargs(func, (mySelf,) + args, kwargs)
+          self_key = [key
+                      for (key, value) in kwargs.items()
+                      if value == mySelf][0]
+          kwargs.pop(self_key)
+        else:
+          kwargs = args_to_kwargs(func, args, kwargs)
         args_only = kwargs.pop(ARGS, ())
         kwargs.update(kwargs.pop(KWARGS, ()))
         kwargs = self.translate_paths(kwargs,
@@ -121,6 +134,7 @@ class TerraTask(Task):
                                       executor_volume_map)
         # Set up logger to talk to master controller
         terra.logger._logs.reconfigure_logger(pre_run_task=True)
+        # Don't call func here, you'll miss any other decorators
         return_value = self.run(*args_only, **kwargs)
 
         # Calculate the runner mapped version of the executor's return value
