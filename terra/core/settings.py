@@ -153,6 +153,7 @@ from logging.handlers import DEFAULT_TCP_LOGGING_PORT
 from inspect import isfunction
 from functools import wraps
 from json import JSONEncoder
+import multiprocessing
 import socket
 import platform
 import warnings
@@ -366,6 +367,7 @@ global_templates = [
         }
       },
       "executor": {
+        "num_workers": multiprocessing.cpu_count(),
         "type": "ProcessPoolExecutor",
         'volume_map': []
       },
