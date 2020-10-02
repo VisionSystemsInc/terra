@@ -383,6 +383,7 @@ global_templates = [
         # 'start_time': datetime.now(), # Not json serializable yet
         'uuid': terra_uuid
       },
+      "overwrite": False,
       "service_start": None,
       "service_end": None,
       'settings_dir': settings_dir,
