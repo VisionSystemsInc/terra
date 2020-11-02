@@ -109,6 +109,15 @@ function terra_caseify()
       justify singular-compose instance start redis
       ;;
 
+    terra_ping-redis-singular) # Ping the redis server, to see if it is up
+      local rv=0
+      SINGULARITY_IGNORE_EXIT_CODES=1
+      justify singular-compose exec redis bash /vsi/linux/just_files/just_entrypoint.sh redis-ping
+
+      JUST_IGNORE_EXIT_CODES=1
+      return ${rv}
+      ;;
+
     terra_down-redis-singular) # Stop redis in singularity
       SINGULARITY_IGNORE_EXIT_CODES='.*'
       justify singular-compose instance stop redis

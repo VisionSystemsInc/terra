@@ -6,6 +6,12 @@ import os
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
+# Put all celery values set here, so an app can inherit the config by saying:
+# from terra.executor.celery.celeryconfig import *
+__all__ = ['password', 'broker_url', 'result_backend', 'task_serializer',
+           'result_serializer', 'accept_content', 'result_accept_content',
+           'result_expires', 'include']
+
 try:
   with open(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE']),
             'r') as fid:

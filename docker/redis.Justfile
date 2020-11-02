@@ -14,6 +14,10 @@ function caseify()
       # Start redis
       redis-server "${conf}"
       ;;
+    redis-ping) # Ping the redis server
+      JUST_IGNORE_EXIT_CODES=1
+      REDISCLI_AUTH="$(cat /run/secrets/redis_password)" redis-cli ping
+      ;;
     *)
       exec "${cmd}" ${@+"${@}"}
       ;;
