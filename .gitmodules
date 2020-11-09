@@ -1,3 +1,3 @@
 [submodule "external/vsi_common"]
 	path = external/vsi_common
-	url = https://github.com/VisionSystemsInc/vsi_common.git
+	url = ../../VisionSystemsInc/vsi_common.git
