@@ -282,11 +282,13 @@ class TestTranslateUtils(TestComputeUtilsCase):
   @mock.patch.dict(os.environ, FOO='/foo/bar', BAR='bar')
   def test_patch_volume_expand(self):
     # Test variable expansion and user home dir expansion
-    volume_map=[('/foo/bar', '/dst')]
-    self.assertEqual(utils.patch_volume('${FOO}/bar', volume_map, 'linux'),
-                     '/dst/bar')
-    self.assertEqual(utils.patch_volume('/foo/${BAR}/car', volume_map, 'linux'),
+    volume_map = [('/foo/bar', '/dst')]
+    self.assertEqual(utils.patch_volume('${FOO}/baz', volume_map, 'linux'),
+                     '/dst/baz')
+    self.assertEqual(utils.patch_volume('/foo/${BAR}/car',
+                                        volume_map,
+                                        'linux'),
                      '/dst/car')
-    volume_map=[(os.path.expanduser('~'), '/myhome')]
+    volume_map = [(os.path.expanduser('~'), '/myhome')]
     self.assertEqual(utils.patch_volume('~/${BAR}/car', volume_map, 'linux'),
                      '/myhome/bar/car')
