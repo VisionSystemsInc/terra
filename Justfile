@@ -15,6 +15,7 @@ source "${VSI_COMMON_DIR}/linux/just_files/just_makeself_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_files/just_ci_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
+source "${VSI_COMMON_DIR}/linux/aliases.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
