@@ -16,6 +16,7 @@ source "${VSI_COMMON_DIR}/linux/just_files/just_ci_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/just_files/just_install_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
+source "${VSI_COMMON_DIR}/linux/aliases.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
@@ -104,14 +105,31 @@ function terra_caseify()
       done
       ;;
 
-    terra_run-singular-redis) # Run redis in singularity
-      mkdir -p "${TERRA_TERRA_SOURCE_DIR}/singular/redis"
-      ${DRYRUN} singularity run -e -c -B "${TERRA_TERRA_SOURCE_DIR}/singular/redis:/data:rw" --pwd /data ${TERRA_REDIS_SINGULAR_IMAGE}
+    terra_up-redis-singular) # Start redis in singularity
+      mkdir -p "${TERRA_REDIS_DIR_HOST_SINGULAR}"
+      SINGULARITY_IGNORE_EXIT_CODES='.*'
+      justify singular-compose instance start redis
+      ;;
+
+    terra_ping-redis-singular) # Ping the redis server, to see if it is up
+      local rv=0
+      SINGULARITY_IGNORE_EXIT_CODES=1
+      justify singular-compose exec redis bash /vsi/linux/just_files/just_entrypoint.sh redis-ping
+
+      JUST_IGNORE_EXIT_CODES=1
+      return ${rv}
+      ;;
+
+    terra_down-redis-singular) # Stop redis in singularity
+      SINGULARITY_IGNORE_EXIT_CODES='.*'
+      justify singular-compose instance stop redis
       ;;
 
     ### Running containers ###
     run) # Run python module/cli in terra
-      local JUST_IGNORE_EXIT_CODES=62
+      # 2 is the exit code of an error in arg parsing
+      # 62 for any other terra error
+      local JUST_IGNORE_EXIT_CODES='2$|^62'
       if [[ ${JUST_RODEO-} == 1 ]]; then
         extra_args=$#
         local app_name="${1}"
@@ -389,7 +407,7 @@ function terra_caseify()
       fi
       ;;
 
-    terra_pipenv) # Run pipenv commands in Terra's pipenv conatainer. Useful for \
+    terra_pipenv) # Run pipenv commands in Terra's pipenv container. Useful for \
                   # installing/updating pipenv packages into terra
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
       extra_args=$#
@@ -473,7 +491,7 @@ function terra_caseify()
       justify makeself just-project
       local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
 
-      local VSI_COMMON_JUST_SETTINGS="${JUST_PATH_ESC}/src/terra.env"
+      local JUST_SETTINGS=("${JUST_PATH_ESC}/src/terra.env")
 
       justify makeself add-files "${TERRA_CWD}" \
         "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"

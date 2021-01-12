@@ -73,7 +73,10 @@ import select
 import pickle
 
 import terra
-from terra.core.exceptions import ImproperlyConfigured
+from terra.core.exceptions import (
+  ImproperlyConfigured, setup_logging_exception_hook,
+  setup_logging_ipython_exception_hook
+)
 # Do not import terra.settings or terra.signals here, or any module that
 # imports them
 
@@ -255,8 +258,8 @@ class _SetupTerraLogger():
     self.root_logger.addHandler(self.preconfig_main_log_handler)
 
     # Replace the exception hook with our exception handler
-    self.setup_logging_exception_hook()
-    self.setup_logging_ipython_exception_hook()
+    setup_logging_exception_hook()
+    setup_logging_ipython_exception_hook()
 
     # This will use the default logger, not my adaptor, and fail on hostname
     # captureWarnings(True)
@@ -295,90 +298,6 @@ class _SetupTerraLogger():
   @main_log_handler.setter
   def main_log_handler(self, value):
     self.__main_log_handler = value
-
-  def setup_logging_exception_hook(self):
-    '''
-    Setup logging of uncaught exceptions
-
-    MITM insert an error logging call on all uncaught exceptions. Should only
-    be called once, or else errors will be logged multiple times
-    '''
-
-    # Make a copy of the original hook so the inner function can call it
-    original_hook = sys.excepthook
-
-    # https://stackoverflow.com/a/16993115/4166604
-    def handle_exception(exc_type, exc_value, exc_traceback):
-      # Try catch here because I want to make sure the original hook is called
-      try:
-        # Use getLogger instead of logger (defined below) incase there is an
-        # exception on import, this will make it easier to get a normal error
-        # message
-        getLogger(__name__).critical("Uncaught exception",
-                                     extra={'skip_stderr': True},
-                                     exc_info=(exc_type,
-                                               exc_value,
-                                               exc_traceback))
-      except Exception:  # pragma: no cover
-        print('There was an exception logging in the exception handler!',
-              file=sys.stderr)
-        traceback.print_exc()
-
-      try:
-        from terra import settings
-        zone = settings.terra.zone
-      except Exception:
-        zone = 'preconfig'
-      print(f'Exception in {zone} on {platform.node()}',
-            file=sys.stderr)
-
-      return original_hook(exc_type, exc_value, exc_traceback)
-
-    # Replace the hook
-    sys.excepthook = handle_exception
-
-  # https://stackoverflow.com/a/49176714/4166604
-  def setup_logging_ipython_exception_hook(self):
-    '''
-    Setup logging of uncaught exceptions in ipython
-
-    MITM insert an error logging call on all uncaught exceptions. Should only
-    be called once, or else errors will be logged multiple times
-
-    If IPython cannot be imported, nothing happens.
-    '''
-    try:
-      import warnings
-      with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        from IPython.core.interactiveshell import InteractiveShell
-
-      original_exception = InteractiveShell.showtraceback
-
-      def handle_traceback(*args, **kwargs):  # pragma: no cover
-        try:
-          getLogger(__name__).critical("Uncaught exception",
-                                       extra={'skip_stderr': True},
-                                       exc_info=sys.exc_info())
-        except Exception:
-          print('There was an exception logging in the exception handler!',
-                file=sys.stderr)
-          traceback.print_exc()
-
-        try:
-          from terra import settings
-          zone = settings.terra.zone
-        except Exception:
-          zone = 'preconfig'
-        print(f'Exception in {zone} on {platform.node()}',
-              file=sys.stderr)
-
-        return original_exception(*args, **kwargs)
-
-      InteractiveShell.showtraceback = handle_traceback
-
-    except ImportError:  # pragma: no cover
-      pass
 
   def set_level_and_formatter(self):
     from terra import settings

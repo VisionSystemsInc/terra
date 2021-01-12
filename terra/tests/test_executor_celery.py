@@ -48,6 +48,7 @@ class MockAsyncResult:
     self.id = id
     self.fun = fun
     self.forgotten = False
+    self.traceback = "A traceback"
 
   def ready(self):
     return True
