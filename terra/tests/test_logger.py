@@ -11,6 +11,7 @@ from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
 from .utils import TestCase, make_traceback, TestLoggerConfigureCase
 from terra import logger
+from terra.core.exceptions import setup_logging_exception_hook
 
 
 class TestHandlerLoggingContext(TestCase):
@@ -58,9 +59,9 @@ class TestLogger(TestLoggerConfigureCase):
   def test_exception_hook_installed(self):
     self.assertEqual(
         sys.excepthook.__qualname__,
-        '_SetupTerraLogger.setup_logging_exception_hook.'
+        'setup_logging_exception_hook.'
         '<locals>.handle_exception')
-    self.assertEqual('terra.logger', sys.excepthook.__module__)
+    self.assertEqual('terra.core.exceptions', sys.excepthook.__module__)
 
   def test_exception_hook(self):
     def save_exec_info(exc_type, exc, tb):
@@ -68,7 +69,7 @@ class TestLogger(TestLoggerConfigureCase):
       self.exc = exc
       self.tb = tb
     sys.excepthook = save_exec_info
-    self._logs.setup_logging_exception_hook()
+    setup_logging_exception_hook()
     with mock.patch('sys.stderr', new_callable=io.StringIO):
       with self.assertLogs() as cm:
         # with self.assertRaises(ZeroDivisionError):

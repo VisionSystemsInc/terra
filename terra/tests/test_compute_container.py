@@ -80,7 +80,7 @@ class TestContainerService(TestComputeContainerCase,
     service.post_run()
 
     # Test that the config dir was set to be mounted
-    self.assertIn(f'{setup_dir}:/tmp_settings:rw',
+    self.assertIn(f'{setup_dir}:/tmp_settings',
                   (v for k, v in service.env.items()
                    if k.startswith('TERRA_VOLUME_')),
                   'Configuration failed to injected into container')
