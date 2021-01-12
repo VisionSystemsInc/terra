@@ -33,6 +33,7 @@ result_accept_content = ['json', 'pickle']
 result_expires = 3600
 
 # App needs to define include
+include = []
 celery_include = env.get('TERRA_CELERY_INCLUDE', None)
 if celery_include:
   import ast
