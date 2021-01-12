@@ -106,7 +106,7 @@ function terra_caseify()
       ;;
 
     terra_up-redis-singular) # Start redis in singularity
-      mkdir -p "${TERRA_TERRA_DIR}/singular/redis"
+      mkdir -p "${TERRA_REDIS_DIR_HOST_SINGULAR}"
       SINGULARITY_IGNORE_EXIT_CODES='.*'
       justify singular-compose instance start redis
       ;;
