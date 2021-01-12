@@ -194,8 +194,52 @@
 <dl class="py exception">
 <dt id="terra.core.exceptions.ImproperlyConfigured">
 <em class="property">exception </em><code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">ImproperlyConfigured</code><a class="headerlink" href="#terra.core.exceptions.ImproperlyConfigured" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#terra.core.exceptions.NoStackException" title="terra.core.exceptions.NoStackException"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.exceptions.NoStackException</span></code></a></p>
 <p>Exception for Terra is somehow improperly configured</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="terra.core.exceptions.NO_STACK_EXCEPTIONS">
+<code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">NO_STACK_EXCEPTIONS</code><em class="property"> = (&lt;class 'terra.core.exceptions.NoStackException'&gt;,)</em><a class="headerlink" href="#terra.core.exceptions.NO_STACK_EXCEPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple of Exceptions classes that will not</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="terra.core.exceptions.NoStackException">
+<em class="property">exception </em><code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">NoStackException</code><a class="headerlink" href="#terra.core.exceptions.NoStackException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>An exception class that when unhandled, does not print the stack trace</p>
+<p>Still behaves like an exception, but ideal for errors that you don’t want to
+clutter the screen with stack traces, because the error message is all you
+need to know. E.g. “File not found”, you just need the filename.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="terra.core.exceptions.NoStackValueError">
+<code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">NoStackValueError</code><a class="headerlink" href="#terra.core.exceptions.NoStackValueError" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#terra.core.exceptions.NoStackValueError" title="terra.core.exceptions.NoStackValueError"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.core.exceptions.NoStackValueError</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="terra.core.exceptions.setup_logging_exception_hook">
+<code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">setup_logging_exception_hook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.exceptions.setup_logging_exception_hook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup logging of uncaught exceptions</p>
+<p>MITM insert an error logging call on all uncaught exceptions. Should only
+be called once, or else errors will be logged multiple times</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="terra.core.exceptions.setup_logging_ipython_exception_hook">
+<code class="sig-prename descclassname">terra.core.exceptions.</code><code class="sig-name descname">setup_logging_ipython_exception_hook</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.exceptions.setup_logging_ipython_exception_hook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup logging of uncaught exceptions in ipython</p>
+<p>MITM insert an error logging call on all uncaught exceptions. Should only
+be called once, or else errors will be logged multiple times</p>
+<p>If IPython cannot be imported, nothing happens.</p>
 </dd></dl>
 
 </div>
