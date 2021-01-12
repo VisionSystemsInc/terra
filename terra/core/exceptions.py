@@ -1,5 +1,6 @@
 import sys
 import platform
+import traceback
 
 handledExitCode = 62  # 20 + 5 + 18 + 18 + 1
 
@@ -20,6 +21,7 @@ NO_STACK_EXCEPTIONS = (NoStackException,)
 
 # TODO: Rewrite both functions as a singleton class
 
+
 def setup_logging_exception_hook():
   '''
   Setup logging of uncaught exceptions
@@ -36,10 +38,10 @@ def setup_logging_exception_hook():
     try:
       from terra.logger import getLogger
       getLogger(__name__).critical("Uncaught exception",
-                                  extra={'skip_stderr': True},
-                                  exc_info=(exc_type,
-                                            exc_value,
-                                            exc_traceback))
+                                   extra={'skip_stderr': True},
+                                   exc_info=(exc_type,
+                                             exc_value,
+                                             exc_traceback))
 
       # Skip calling the original_hook when I don't want to print the stack
       if issubclass(exc_type, NO_STACK_EXCEPTIONS):
@@ -87,12 +89,12 @@ def setup_logging_ipython_exception_hook():
       try:
         from terra.logger import getLogger
         getLogger(__name__).critical("Uncaught exception",
-                                      extra={'skip_stderr': True},
-                                      exc_info=sys.exc_info())
+                                     extra={'skip_stderr': True},
+                                     exc_info=sys.exc_info())
 
         # Skip calling the original_hook when I don't want to print the stack
-        if issubclass(exc_type, NO_STACK_EXCEPTIONS):
-          print(f'ERROR: {exc_value}', file=sys.stderr)
+        if issubclass(sys.exc_info()[0], NO_STACK_EXCEPTIONS):
+          print(f'ERROR: {sys.exc_info()[1]}', file=sys.stderr)
           return
       except Exception:
         print('There was an exception logging in the exception handler!',
@@ -123,6 +125,8 @@ class ImproperlyConfigured(NoStackException):
 
 class NoStackValueError(NoStackException, ValueError):
   pass
+
+
 NoStackValueError.__name__ = 'ValueError'
 
 

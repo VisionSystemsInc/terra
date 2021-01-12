@@ -170,7 +170,8 @@ class CeleryExecutor(BaseExecutor):
         elif ar.state == 'FAILURE':
           logger.error('Celery task "%s" resolved with error.', ar.id)
           exc = ar.result
-          exc = type(exc)(f'{str(exc)}\n\nThe task stack trace:\n\n{ar.traceback}')
+          exc = type(exc)(
+              f'{str(exc)}\n\nThe task stack trace:\n\n{ar.traceback}')
           fut.set_exception(exc)
           # Future is FINISHED
 

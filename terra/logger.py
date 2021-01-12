@@ -71,11 +71,10 @@ import socketserver
 import struct
 import select
 import pickle
-import functools
 
 import terra
 from terra.core.exceptions import (
-  ImproperlyConfigured, NO_STACK_EXCEPTIONS, setup_logging_exception_hook,
+  ImproperlyConfigured, setup_logging_exception_hook,
   setup_logging_ipython_exception_hook
 )
 # Do not import terra.settings or terra.signals here, or any module that
