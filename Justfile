@@ -165,7 +165,12 @@ function terra_caseify()
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
         node_name="local@%h"
       else
-        node_name="docker@%h"
+        node_name="container@%h"
+      fi
+
+      local extra_args=()
+      if [ -n "${TERRA_CELERY_WORKERS:+set}" ]; then
+        extra_args+=("-c" "${TERRA_CELERY_WORKERS}")
       fi
 
       # Untested
@@ -176,12 +181,17 @@ function terra_caseify()
       fi
 
       # We might be able to use CELERY_LOADER to avoid the -A argument
-      Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app worker --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" -n "${node_name}"
+      Terra_Pipenv run python -m terra.executor.celery \
+                              -A terra.executor.celery.app worker \
+                              --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" \
+                              -n "${node_name}" \
+                              ${extra_args[@]+"${extra_args[@]}"}
       ;;
 
     run_flower) # Start the flower server
       # Flower doesn't actually need the tasks loaded in the app, so clear it
-      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m terra.executor.celery -A terra.executor.celery.app flower
+      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m terra.executor.celery \
+                                                        -A terra.executor.celery.app flower
       ;;
     shutdown_celery) # Shuts down all celery workers on all nodes
       Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"
