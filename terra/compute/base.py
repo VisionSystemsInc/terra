@@ -59,7 +59,6 @@ class BaseService:
     '''
     return ast.literal_eval(self.env[key])
 
-
   def _validate_volume(self, local, remote,
                        check_remote=True,
                        local_must_exist=False):
