@@ -367,7 +367,7 @@ global_templates = [
         }
       },
       "executor": {
-        "num_workers": multiprocessing.cpu_count(),
+        "num_workers": multiprocessing.cpu_count() - 1,
         "type": "ProcessPoolExecutor",
         'volume_map': []
       },
