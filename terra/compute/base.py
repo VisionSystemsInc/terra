@@ -1,3 +1,4 @@
+import ast
 import os
 import time
 import atexit
@@ -36,6 +37,27 @@ class BaseService:
     self.env = os.environ.copy()
     self.volumes = []
     ''' A copy of the processes environment variables local to a service '''
+
+  def _env_array(self, key):
+    '''
+    Recover array environment variables
+
+    For example, define the following in ``terra.env``
+
+    .. code-block:: bash
+
+        SOMETHING=( "hello" "there" )
+        array_to_python_ast_list_of_strings SOMETHING_AST "${SOMETHING[@]}"
+
+    Services can recover the environment variable as a python compatible
+    array via
+
+    .. code-block:: python
+
+        self._env_array('SOMETHING_AST')
+
+    '''
+    return ast.literal_eval(self.env[key])
 
   def _validate_volume(self, local, remote,
                        check_remote=True,
