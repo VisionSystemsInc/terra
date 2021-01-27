@@ -30,8 +30,7 @@ class ContainerService(BaseService):
     # default compose_service_name
     app_prefixes = self._env_array('TERRA_APP_PREFIXES_AST')
     env_key = f"{app_prefixes[0]}_COMPOSE_SERVICE_RUNNER"
-    if env_key in self.env:
-      self.compose_service_name = env_key
+    self.compose_service_name = self.env.get(env_key)
 
   def pre_run(self):
     # Need to run Base's pre_run first, so it has a chance to update settings
