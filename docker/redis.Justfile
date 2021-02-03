@@ -16,7 +16,7 @@ function caseify()
       ;;
     redis-ping) # Ping the redis server
       JUST_IGNORE_EXIT_CODES=1
-      REDISCLI_AUTH="$(cat /run/secrets/redis_password)" redis-cli -h "${TERRA_REDIS_HOSTNAME}" -p "${TERRA_REDIS_PORT}" ping
+      REDISCLI_AUTH="$(cat "/run/secrets/${TERRA_REDIS_SECRET}")" redis-cli -h "${TERRA_REDIS_HOSTNAME}" -p "${TERRA_REDIS_PORT}" ping
       ;;
     *)
       exec "${cmd}" ${@+"${@}"}
