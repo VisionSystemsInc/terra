@@ -34,8 +34,23 @@ result_expires = 3600
 
 # App needs to define include
 include = []
-celery_include = env.get('TERRA_CELERY_INCLUDE', None)
-if celery_include:
+_include_env_var = env.get('TERRA_CELERY_INCLUDE', None)
+if _include_env_var:
   import ast
-  include = ast.literal_eval(celery_include)
+  include = ast.literal_eval(_include_env_var)
   include += type(include)(['terra.tests.demo.tasks'])
+
+# This is how it was done in Voxel Globe, but some detail is missing
+# from kombu import Queue, Exchange
+# task_queues = (
+#     Queue('gpu', exchange=Exchange('default', type='direct'),
+#           routing_key='gpu'),
+# )
+
+# This is "Automatic routing", but a less preferred method
+# task_routes = {'dsm.tasks.match_features.*': {'queue': 'gpu'}}
+
+# task_default_queue = 'cpu' # This works!
+# task_default_exchange = 'default' # Doesn't seem to do anything
+# Doesn't seem to do anything, even with default_exchange
+# task_default_routing_key = 'cpu'

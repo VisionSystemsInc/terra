@@ -225,6 +225,17 @@ class _SetupTerraLogger():
     # args any other terra.logger.Logger would get
     self.root_logger.addFilter(TerraAddFilter())
 
+    # In cases where getLogger is called before _SetupTerraLogger, this will
+    # patch all the loggers in the manager, to have have TerraAddFilter. This
+    # will solve the KeyError: 'hostname' and 'zone' issue that sometimes pops
+    # up.
+    for _logger in logging.Logger.manager.loggerDict.values():
+      if isinstance(_logger, logging.PlaceHolder):
+        continue
+      if not any(isinstance(filter, TerraAddFilter)
+                 for filter in _logger.filters):
+        _logger.addFilter(TerraAddFilter())
+
     # stream -> stderr
     self.stderr_handler = logging.StreamHandler(sys.stderr)
     self.stderr_handler.setLevel(self.default_stderr_handler_level)
