@@ -435,7 +435,7 @@ function terra_caseify()
 
     terra_pyinstaller) # Deploy terra using pyinstaller
       if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
-        justify terra pipenv run pip install pyinstaller
+        justify terra pipenv sync --dev
       fi
       local indirect
       local app_prefix
@@ -498,13 +498,17 @@ function terra_caseify()
     #   ;;
 
     terra_makeself) # Create terra makeself, then append to it
-      justify makeself just-project
-      local terra_rel="$(relative_path "${TERRA_CWD}" .)" # Does not start with ./
+      local include_unit_tests
+      parse_args extra_args --tests include_unit_tests -- ${@+"${@}"}
+      local tests_args=()
+      if [ "${include_unit_tests}" != "0" ]; then
+        tests_args=(--tests)
+      fi
 
-      local JUST_SETTINGS=("${JUST_PATH_ESC}/src/terra.env")
+      local tar_extra="--exclude=./docs --exclude=./external --exclude ./terra"
 
-      justify makeself add-files "${TERRA_CWD}" \
-        "--show-transformed --transform s|^\./|./${terra_rel}/| --exclude=.git --exclude=./docs --exclude=./external --exclude=./*.secret --exclude=./build --exclude=*.egg-info --exclude test_*.py --exclude ./terra"
+      justify makeself just-project ${tests_args[@]+"${tests_args[@]}"}
+      justify makeself add-git-files "${TERRA_CWD}" "${tar_extra}"
       ;;
 
     ### Other ###
