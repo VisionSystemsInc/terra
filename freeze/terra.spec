@@ -5,6 +5,10 @@ import os
 import importlib
 from os import environ as env
 
+import warnings
+warnings.filterwarnings("ignore", category=ResourceWarning,
+                        module='pyinstaller', message="unclosed file")
+
 block_cipher = None
 
 # Pyinstaller removes this, but I want it. Put it back
@@ -43,8 +47,8 @@ for app_path, app_name in zip(app_paths, app_names):
                          pathex=[env['TERRA_CWD']],
                          binaries=[],
                          datas=[],
-                         hiddenimports=['pkg_resources.py2_warn'] \
-                                       + extra_hidden_imports,
+                         hiddenimports=extra_hidden_imports,
+                         # setuptools 45 - 49.0.0 needed pkg_resources.py2_warn
                          hookspath=hooks_dirs,
                          runtime_hooks=[],
                          excludes=[],
