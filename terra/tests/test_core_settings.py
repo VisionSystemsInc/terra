@@ -6,7 +6,7 @@ from unittest import mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 import tempfile
 
-from envcontext import EnvironmentContext
+from vsi.vendored.envcontext import EnvironmentContext
 
 from .utils import TestCase, TestLoggerCase, TestLoggerConfigureCase
 from terra import settings
