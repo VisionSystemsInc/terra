@@ -279,8 +279,9 @@ class _SetupTerraLogger():
     _warnings_showwarning = warnings.showwarning
     warnings.showwarning = handle_warning
 
-    # Enable warnings to default
-    warnings.simplefilter('default')
+    # Enable warnings to default, append this to the end of the filter list,
+    # so that any filters set elsewhere are not overridden by the behavior
+    warnings.simplefilter('default', append=True)
     # Disable known warnings that there's nothing to be done about.
     for module in ('yaml', 'celery.app.amqp'):
       warnings.filterwarnings("ignore",

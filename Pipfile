@@ -13,13 +13,17 @@ flake8 = "*"
 pylint = "*"
 ipykernel = "*"
 coverage = "==5.0a5" # I need a prerelease, change to * after 5 is released
+pyinstaller = "*"
+# pyinstaller dependencies: not picked up my pipenv
+pefile = {version = ">= 2017.8.1", markers = "sys_platform == 'win32'"}
+pywin32-ctypes = {version = ">= 0.2.0", markers = "sys_platform == 'win32'"}
+macholib = {version = ">= 1.8", markers = "sys_platform == 'darwin'"}
 
 [packages]
 terra = {path = ".",editable = true}
 vsi-common = {editable = true,path = "./external/vsi_common"}
-# Repeat this dependencies possibly due to a bug
+# Repeat this dependencies possibly due to an editable bug
 jstyleson = "*"
-envcontext = "*"
 celery = {extras = ["redis"], version = "*"}
 flower = "*"
 pyyaml = "*"
@@ -27,7 +31,10 @@ pyyaml = "*"
 # docker and/or docker-compose are not handling win32-specific packages correctly
 # e.g., https://github.com/docker/compose/pull/6848/files
 # define these win32 packages directly to pipfile as workaround
+# docker-compose dependencies
 docker-compose = {markers = "sys_platform != 'win32'"}
 colorama = {version = ">=0.4, <1", markers = "sys_platform == 'win32'"}
+# docker dependencies
 pypiwin32 = {version = "==223", markers = "sys_platform == 'win32'"}
-pywin32 = {version = "==223", markers = "sys_platform == 'win32'"}
+# This doesn't work anymore, see: https://github.com/mhammond/pywin32/issues/1177
+# pywin32 = {version = "==223", markers = "sys_platform == 'win32'"}

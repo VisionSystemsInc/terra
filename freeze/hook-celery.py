@@ -1,0 +1,2 @@
+
+hiddenimports = ['celery.fixups.django']

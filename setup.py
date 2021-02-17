@@ -12,7 +12,6 @@ setup(name="terra",
       install_requires=[
         "pyyaml",
         "jstyleson",
-        "envcontext",
         # I use signal and task from celery, no matter what
         "celery"
       ]
