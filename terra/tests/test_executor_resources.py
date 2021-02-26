@@ -2,6 +2,47 @@ import os
 from concurrent.futures import (
   ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 )
+from unittest import mock
+import filelock
+
+from terra.tests.utils import TestSettingsConfiguredCase, TestSettingsUnconfiguredCase, TestCase
+from terra.executor.resources import (
+  Resource
+)
+from terra import settings
+
+class TestResource(TestSettingsConfiguredCase):
+  def test_dir(self):
+    resource = Resource('test', 1, 1)
+    self.assertFalse(os.path.exists(resource.lock_dir))
+    resource.acquire()
+    self.assertTrue(os.path.exists(resource.lock_dir))
+    resource.release()
+    self.assertFalse(os.path.exists(resource.lock_dir))
+
+    os.makedirs(resource.lock_dir)
+    with mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock):
+      with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
+        resource = Resource('test', 1, 1)
+
+    self.assertIn('is not empty. Deleting it now...', cm.output[0])
+    self.assertFalse(os.path.exists(resource.lock_dir))
+
+  def test_acquire_thread(self):
+    resource = Resource('test', 2, 1)
+    r1 = resource.__enter__()
+    r2 = resource.__enter__()
+
+    self.assertEqual(r1, r2)
+
+class TestResourceManagerSingle(TestSettingsUnconfiguredCase):
+  '''
+  Test that ResourceManager backend picks the right Queue
+  '''
+  def setUp(self):
+    super().setUp()
+    settings.configure({'executor': {"type": "ThreadPoolExecutor"},
+                        'processing_dir': self.temp_dir.name})
 
 # from .utils import TestCase, TestResourceCase, TestSettingsUnconfiguredCase
 # from terra import settings
