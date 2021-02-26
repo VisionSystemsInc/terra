@@ -24,10 +24,9 @@ terra = {path = ".",editable = true}
 vsi-common = {editable = true,path = "./external/vsi_common"}
 # Repeat this dependencies possibly due to an editable bug
 jstyleson = "*"
-celery = {extras = ["redis"], version = "*"}
+celery = {extras = ["redis"], version = "<5"}
 flower = "*"
 pyyaml = "*"
-
 # docker and/or docker-compose are not handling win32-specific packages correctly
 # e.g., https://github.com/docker/compose/pull/6848/files
 # define these win32 packages directly to pipfile as workaround
@@ -38,3 +37,4 @@ colorama = {version = ">=0.4, <1", markers = "sys_platform == 'win32'"}
 pypiwin32 = {version = "==223", markers = "sys_platform == 'win32'"}
 # This doesn't work anymore, see: https://github.com/mhammond/pywin32/issues/1177
 # pywin32 = {version = "==223", markers = "sys_platform == 'win32'"}
+filelock = "*"
