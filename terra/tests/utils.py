@@ -17,6 +17,11 @@ __all__ = ["TestCase", "make_traceback", "TestNamedTemporaryFileCase",
 
 
 class TestSettingsUnconfiguredCase(TestCase):
+  '''
+  A Test Case that is ready to allow a terra settings configure for a single
+  test case only. It handles the mocking of ``TERRA_SETTINGS_FILE`` and
+  ``terra.settings``
+  '''
   def __init__(self, *args, **kwargs):
     self.settings_filename = ''
     super().__init__(*args, **kwargs)
@@ -35,12 +40,24 @@ class TestSettingsUnconfiguredCase(TestCase):
 
 
 class TestSettingsConfiguredCase(TestSettingsUnconfiguredCase):
+  '''
+  Like :class:`TestSettingsUnconfiguredCase`, but configures ``terra.settings``
+  using an empty dictionary for you.
+  '''
   def setUp(self):
     super().setUp()
     settings.configure({})
 
 
 class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
+  '''
+  A Test Case that allows for configuring the logging for a single test case.
+  It handles details like: ``sys.excepthook``,
+  ``terra.logger.LogRecordSocketReceiver``, and
+  ``terra.compute.base.LogRecordSocketReceiver``. Also sets up a config file
+  for ``terra.setting`` to load, and starts the stage 1 setup of logging via
+  ``terra.logger._setup_terra_logger``.
+  '''
   def setUp(self):
     self.original_system_hook = sys.excepthook
     attrs = {'serve_until_stopped.return_value': True, 'ready': True}
@@ -87,17 +104,28 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
 
 
 class TestComputeCase(TestCase):
+  '''
+  Test case that mocks for ``_connection`` in
+  ``terra.compute.utils.compute``. This allows for a compute to be retrieved
+  from the ``ComputeHandler`` for a single test case. More useful when used in
+  :class:`TestLoggerConfigureCase`
+  '''
   def setUp(self):
-    import terra.compute.utils
-    self.patches.append(mock.patch.dict(terra.compute.utils.compute.__dict__))
+    from terra.compute.utils import compute
+    self.patches.append(mock.patch.dict(compute.__dict__))
     super().setUp()
 
 
 class TestExecutorCase(TestCase):
+  '''
+  Test case for that mocks for ``_connection`` in
+  ``terra.executor.utils.Executor``. This allows for an executor to be
+  retrieved from the ``ExecutorHandler`` for a single test case. More useful
+  when used in :class:`TestLoggerConfigureCase`
+  '''
   def setUp(self):
-    import terra.executor.utils
-    self.patches.append(mock.patch.dict(
-        terra.executor.utils.Executor.__dict__))
+    from terra.executor.utils import Executor
+    self.patches.append(mock.patch.dict(Executor.__dict__))
     super().setUp()
 
 
@@ -127,14 +155,22 @@ class TestThreadPoolExecutorCase(TestExecutorCase):
 
 
 class TestSignalCase(TestCase):
+  '''
+  Disables the ``TERRA_UNITTEST`` environment vairable which stops logging from
+  being fully configured and signals from being sent during unit testings.
+  :class:`TestLoggerConfigureCase` needs an actual working logger for the
+  logging tests.
+  '''
   def setUp(self):
     self.patches.append(mock.patch.dict(os.environ, TERRA_UNITTEST='0'))
     super().setUp()
 
 
-# Enable signals. Most logging tests require configure logger to actually
-# be called. LogRecordSocketReceiver is mocked out, so no lasting side
-# effects should occur.
 class TestLoggerConfigureCase(TestLoggerCase, TestSignalCase,
                               TestComputeCase, TestExecutorCase):
+  '''
+  Enable signals and logging. Most logging tests require configure logger to
+  actually be called. LogRecordSocketReceiver is mocked out, so no lasting side
+  effects should occur.
+  '''
   pass

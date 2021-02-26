@@ -38,7 +38,7 @@ _include_env_var = env.get('TERRA_CELERY_INCLUDE', None)
 if _include_env_var:
   import ast
   include = ast.literal_eval(_include_env_var)
-  include += type(include)(['terra.tests.demo.tasks'])
+include += type(include)(['terra.tests.demo.tasks'])
 
 # This is how it was done in Voxel Globe, but some detail is missing
 # from kombu import Queue, Exchange

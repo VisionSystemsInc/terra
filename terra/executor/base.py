@@ -5,6 +5,8 @@ logger = getLogger(__name__)
 
 
 class BaseExecutor(Executor):
+  multiprocess = False
+
   @staticmethod
   def configure_logger(sender, **kwargs):
     pass
