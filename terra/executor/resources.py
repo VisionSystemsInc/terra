@@ -29,6 +29,12 @@ class ResourceQueueMixin:
   compute backend name, or a partial (``terra.executor.{partial}.executor``),
   and then returns a connection to the backend
 
+  Internally, a resource queue uses a queue of index numbers that indexes
+  ``items``, but ``get`` and ``put`` will give the feel of putting and getting
+  the actual items.
+
+  Note: ``put`` does not support adding a new item.
+
   Parameters
   ----------
   items : int or :term:`iterable`
@@ -37,6 +43,33 @@ class ResourceQueueMixin:
   repeat : :class:`int`, optional
       The numver of times you want items repeated
   '''
+
+  def __init__(self, items, repeat=1, **kwargs):
+    if isinstance(items, int):
+      items = range(items)
+
+    self.items = items
+
+    super().__init__(len(items)*repeat, **kwargs)
+
+    for _ in range(repeat):
+      for x in range(len(items)):
+        super().put(x, False)
+
+    self.local = threading.local()
+
+  def get(self, *args, **kwargs):
+    index = super().get(*args, **kwargs)
+    return self.items[index]
+
+  def put(self, item, *args, **kwargs):
+    # This has the potential to ValueError, as adding a new resource in
+    # is not supported
+    index = self.items.index(item)
+    super().put(index, *args, **kwargs)
+
+  def put_index(self, item, *args, **kwargs):
+    super().put(item, *args, **kwargs)
 
   def __enter__(self):
     try:
@@ -56,15 +89,7 @@ class ResourceQueueMixin:
 class MultiprocessResourceQueue(ResourceQueueMixin, MultiprocessingQueue):
   def __init__(self, items, repeat=1):
         # self.ledger = Queue(len(items)*repeat)
-    if isinstance(items, int):
-      items = range(items)
-
-    super().__init__(len(items)*repeat, ctx=_default_context.get_context())
-    for _ in range(repeat):
-      for x in items:
-        self.put(x, False)
-
-    self.local = threading.local()
+    super().__init__(items, repeat, ctx=_default_context.get_context())
 
     # self.pid_ledger = multiprocessing.Array
     # self.resource_ledger = multiprocessing.Array
@@ -79,17 +104,7 @@ class MultiprocessResourceQueue(ResourceQueueMixin, MultiprocessingQueue):
 
 
 class ThreadedResourceQueue(ResourceQueueMixin, ThreadingQueue):
-  def __init__(self, items, repeat=1):
-        # self.ledger = Queue(len(items)*repeat)
-    if isinstance(items, int):
-      items = range(items)
-
-    super().__init__(len(items)*repeat)
-    for _ in range(repeat):
-      for x in items:
-        self.put(x, False)
-
-    self.local = threading.local()
+  pass
 
 
 class ResourceManager:
