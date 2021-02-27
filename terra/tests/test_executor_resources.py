@@ -18,22 +18,31 @@ class TestResource(TestSettingsConfiguredCase):
     resource.acquire()
     self.assertTrue(os.path.exists(resource.lock_dir))
     resource.release()
-    self.assertFalse(os.path.exists(resource.lock_dir))
+    # self.assertFalse(os.path.exists(resource.lock_dir))
+    # os.makedirs(resource.lock_dir)
 
-    os.makedirs(resource.lock_dir)
-    with mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock):
-      with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
-        resource = Resource('test', 1, 1)
+    with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
+      resource = Resource('test', 1, 1, True)
 
     self.assertIn('is not empty. Deleting it now...', cm.output[0])
     self.assertFalse(os.path.exists(resource.lock_dir))
 
-  def test_acquire_thread(self):
+  def test_enter(self):
     resource = Resource('test', 2, 1)
     r1 = resource.__enter__()
     r2 = resource.__enter__()
 
     self.assertEqual(r1, r2)
+
+data = {}
+
+def acquire(name):
+  # import time
+  # import random
+  # time.sleep(random.randint(200, 500)/1000.0)
+  lock = data[name].acquire()
+  # print(os.getpid(), lock[0]._lock_file)
+  return lock[1]
 
 class TestResourceManagerSingle(TestSettingsUnconfiguredCase):
   '''
@@ -43,6 +52,29 @@ class TestResourceManagerSingle(TestSettingsUnconfiguredCase):
     super().setUp()
     settings.configure({'executor': {"type": "ThreadPoolExecutor"},
                         'processing_dir': self.temp_dir.name})
+
+  def test_acquire_single(self):
+    data['test2'] = Resource('test2', 2, 1)
+
+    lock1 = data['test2'].acquire()
+
+    # lock2 = data['test2'].acquire()
+    # print(lock1, lock2)
+
+  def test_acquire_thread(self):
+    data['test1'] = Resource('test1', 2, 1)
+
+    futures = []
+    results = []
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+      for _ in range(2):
+        futures.append(executor.submit(acquire, 'test1'))
+
+      for future in as_completed(futures):
+        results.append(future.result())
+
+    self.assertNotEqual(results[0], results[1])
 
 # from .utils import TestCase, TestResourceCase, TestSettingsUnconfiguredCase
 # from terra import settings

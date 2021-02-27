@@ -18,7 +18,7 @@ import platform
 import multiprocessing
 from ctypes import c_int32
 from shutil import rmtree
-import filelock
+import vsi.vendored.filelock as filelock
 
 from vsi.tools.dir_util import is_dir_empty
 
@@ -51,7 +51,8 @@ class Resource:
       The numver of times you want items repeated
   '''
 
-  def __init__(self, resource_name, resources, repeat=1):
+  def __init__(self, resource_name, resources, repeat=1,
+               force_softfilelock=False):
     if isinstance(resources, int):
       resources = range(resources)
 
@@ -63,7 +64,8 @@ class Resource:
                                  str(os.getpid()),
                                  resource_name)
 
-    self.FileLock = filelock.FileLock
+    # self.FileLock = filelock.FileLock
+    self.force_softfilelock = force_softfilelock
     # In case I need to check if I have to use SoftFileLock for specific,
     # directories, that can go here. Currently it will use Unix/Windows if the
     # os supports it.
@@ -74,7 +76,7 @@ class Resource:
       self._lock = threading.local()
     self._lock.value = None
 
-    if self.FileLock == filelock.SoftFileLock:
+    if filelock.FileLock == filelock.SoftFileLock or self.force_softfilelock:
       if os.path.exists(self.lock_dir):
         logger.warning(f'Lock dir "{self.lock_dir}" is not empty. Deleting it '
                       'now...')
@@ -84,12 +86,15 @@ class Resource:
     return os.path.join(self.lock_dir, f'{resource_index}.{repeat}.lock')
 
   def acquire(self):
-    if not os.path.exists(self.lock_dir):
-      os.makedirs(self.lock_dir)
+    os.makedirs(self.lock_dir, exist_ok=True)
     for repeat in range(self.repeat):
       for resource_index in range(len(self.resources)):
         try:
-          lock = self.FileLock(self.lock_file_name(resource_index, repeat), 0)
+          if self.force_softfilelock:
+            lock = filelock.SoftFileLock(self.lock_file_name(resource_index, repeat), 0)
+          else:
+            lock = filelock.FileLock(self.lock_file_name(resource_index, repeat), 0)
+          lock.acquire()
           self._lock.value = (lock, self.resources[resource_index])
           return self._lock.value
         except filelock.Timeout:
@@ -107,6 +112,16 @@ class Resource:
 
   def __exit__(self, exc_type, exc_value, exc_tb):
     pass
+
+  def __del__(self):
+    if self._lock.value is not None:
+      try:
+        self._lock.value[0].release()
+      except TypeError:
+        print("Eating it")
+        print(os.close)
+        self._lock.value[0]._release()
+        self._lock.value[0]._lock_counter = 0
 
   def release(self):
     if self._lock.value is None:
