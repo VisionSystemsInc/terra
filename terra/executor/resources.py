@@ -54,11 +54,13 @@ class Resource:
   A :class:`Resource` instance will represent a set of resources that can be
   acquired among multiple threads or processes.
 
-  This library is intended to be a coarse grain allocation, thus it is intended
-  that acquiring a resource lasts the life of the thread/process. Multiple
-  calls to :meth:`acquire` will result in the same resource. Futher, calls to
-  :meth:`release` are not required, unless the thread/process is ending, in
-  which cause it is called automatically on delete at exit.
+  This library is intended to be a coarse grain allocation, meaning it is
+  intended that acquiring a resource lasts the life of the thread/process, not
+  just a function or section of a function. Multiple calls to :meth:`acquire`
+  or using ``with`` will result in the same resource, that was never released
+  between calls. Calls to :meth:`release` are never needed. The only time a
+  resource need to be released is when the thread/process is ending, in which
+  cause it is called automatically on delete at exit.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
   creating worker threads/processes, so that they are configured correctly
@@ -84,6 +86,11 @@ class Resource:
       hard locking, and update ``self._use_softfilelock`` to ``True`` or
       ``False``. Setting ``use_softfilelock`` to ``True`` or ``False`` will
       bypass testing, and always use the supplied value.
+
+
+  Note
+  ----
+  This class is based on using lock files to lock resources. Why use lock files? Hard lock files are one of the few methods that are tolerant to unlocking after a seg faults. Given that both windows and linux support hard file locking, it is easy to use and makes more sense to use lock files than other forms of IPC to track resources and handle seg faults. Soft file locking is also supported, but less preferred.
   '''
 
   _resources = weakref.WeakSet()
@@ -100,7 +107,8 @@ class Resource:
                                  platform.node(),
                                  str(os.getpid()),
                                  resource_name)
-    '''str: The directory where the lock files will be stored.
+    '''
+    str: The directory where the lock files will be stored.
 
     By default, uses the ``settings.processing_dir`` to store the lock files. A
     specific lock dir represents a specific resource, and contains the pid of
@@ -116,7 +124,7 @@ class Resource:
 
     # Check if I have to use SoftFileLock for specific, directories
     if self._use_softfilelock is None and \
-        filelock.FileLock == filelock.SoftFileLock:
+        filelock.FileLock != filelock.SoftFileLock:
       os.makedirs(self.lock_dir, exist_ok=True)
       self._use_softfilelock = not test_dir(self.lock_dir)
 
@@ -177,7 +185,7 @@ class Resource:
     '''
     # Reuse for life of thread/process, unless someone calls release
     if self._local.resource_id is not None:
-      return self._local.resource_id
+      return self.resources[self._local.resource_id]
 
     os.makedirs(self.lock_dir, exist_ok=True)
     # with self.master_lock:
@@ -188,9 +196,9 @@ class Resource:
           self._local.lock = self.FileLock(lock_file, 0)
           self._local.lock.acquire()
           os.write(self._local.lock._lock_file_fd, str(os.getpid()).encode())
-          self._local.resource_id = self.resources[resource_index]
+          self._local.resource_id = resource_index
           self._local.instance_id = repeat
-          return self._local.resource_id
+          return self.resources[self._local.resource_id]
         except filelock.Timeout:
           # If softlock is used on multiprocessing, there is a chance to
           # recover resources
@@ -288,15 +296,20 @@ class ResourceManager:
     '''
     Registers a new resource
 
+    Resources should be registered in: ``{app}/tasks/__init__.py``. This works
+    out because tasks are loaded fairly late in terra, so settings and logging
+    is already setup, but all Executors need to have tasks loaded before the
+    spawn workers.
+
     Parameters
     ----------
     name : str
         A unique name for the resource. Needs to not contain symbols
         incompatible with the filesystem. Simple alphanumerics suggested
     *args
-        Args passed to :class:`Resource` init
-    *kwargs
-        Keyword args passed to :class:`Resource` init
+        Additional args passed to :class:`Resource` init
+    **kwargs
+        Additional keyword args passed to :class:`Resource` init
 
     Raises
     ------

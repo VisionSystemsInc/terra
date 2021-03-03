@@ -3,7 +3,8 @@ from concurrent.futures import (
   ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 )
 from unittest import mock
-import filelock
+import terra.filelock
+import platform
 
 from terra.tests.utils import TestSettingsConfiguredCase, TestSettingsUnconfiguredCase, TestCase
 from terra.executor.resources import (
@@ -43,49 +44,103 @@ class TestResourceSingle(TestSettingsUnconfiguredCase):
                         'processing_dir': self.temp_dir.name})
 
   def test_acquire_single(self):
-    data['single_test1'] = Resource('single', 2, 1)
+    lock_dir = os.path.join(settings.processing_dir, '.resource.locks',
+                            platform.node(), str(os.getpid()), 'single')
+    self.assertNotExist(lock_dir)
+    test1 = Resource('single', 2, 1)
+    self.assertNotExist(lock_dir)
 
-    lock1 = data['single_test1'].acquire()
-    lock2 = data['single_test1'].acquire()
+    lock1 = test1.acquire()
+    lock2 = test1.acquire()
 
     # Acquiring twice, should use the cached value
     self.assertEqual(lock1, lock2)
 
-    data['single_test2'] = Resource('single', 2, 1)
-    lock3 = data['single_test2'].acquire()
+    test2 = Resource('single', 2, 1)
+    lock3 = test2.acquire()
     # However, using an entirely different resource instance, won't have cache
     self.assertNotEqual(lock1, lock3)
 
     # At this point, I should be out of resources
-    data['single_test3'] = Resource('single', 2, 1)
+    test3 = Resource('single', 2, 1)
     with self.assertRaises(ResourceError):
-      lock4 = data['single_test3'].acquire()
+      test3.acquire()
 
   def test_repeats(self):
-    data['single_repeat1'] = Resource('repeat', 2, 2)
-    data['single_repeat2'] = Resource('repeat', 2, 2)
-    data['single_repeat3'] = Resource('repeat', 2, 2)
-    data['single_repeat4'] = Resource('repeat', 2, 2)
-    data['single_repeat5'] = Resource('repeat', 2, 2)
+    repeat1 = Resource('repeat', 2, 2)
+    repeat2 = Resource('repeat', 2, 2)
+    repeat3 = Resource('repeat', 2, 2)
+    repeat4 = Resource('repeat', 2, 2)
+    repeat5 = Resource('repeat', 2, 2)
 
-    lock1 = data['single_repeat1'].acquire()
-    lock2 = data['single_repeat2'].acquire()
-    lock3 = data['single_repeat3'].acquire()
-    lock4 = data['single_repeat4'].acquire()
+    lock1 = repeat1.acquire()
+    lock2 = repeat2.acquire()
+    lock3 = repeat3.acquire()
+    lock4 = repeat4.acquire()
+
+    # Four unique names
+    self.assertEqual(len({repeat1._local.lock.lock_file,
+                          repeat2._local.lock.lock_file,
+                          repeat3._local.lock.lock_file,
+                          repeat4._local.lock.lock_file}), 4)
 
     with self.assertRaises(ResourceError):
-      lock5 = data['single_repeat5'].acquire()
+      repeat5.acquire()
 
     self.assertEqual(lock1, 0)
-    self.assertEqual(data['single_repeat1']._local.instance_id, 0)
+    self.assertEqual(repeat1._local.instance_id, 0)
     self.assertEqual(lock2, 1)
-    self.assertEqual(data['single_repeat2']._local.instance_id, 0)
+    self.assertEqual(repeat2._local.instance_id, 0)
     self.assertEqual(lock3, 0)
-    self.assertEqual(data['single_repeat3']._local.instance_id, 1)
+    self.assertEqual(repeat3._local.instance_id, 1)
     self.assertEqual(lock4, 1)
-    self.assertEqual(data['single_repeat4']._local.instance_id, 1)
+    self.assertEqual(repeat4._local.instance_id, 1)
 
-  # def test_items(self):
+  def test_items(self):
+    resource1 = Resource('items', ['foo', 'bar'])
+    resource2 = Resource('items', ['foo', 'bar'])
+    resource3 = Resource('items', ['foo', 'bar'])
+
+    foo = resource1.acquire()
+    self.assertEqual(foo, 'foo')
+    self.assertEqual(foo, resource1.acquire())
+
+    bar = resource2.acquire()
+    self.assertEqual(bar, 'bar')
+    self.assertEqual(bar, resource2.acquire())
+
+    with self.assertRaises(ResourceError):
+      resource3.acquire()
+
+  def test_none(self):
+    # Early version of the code used None in such a way it tripped up the logic
+    # This test is to make sure that doesn't happen again.
+
+    resource1 = Resource('none', [None, None, 1], 1)
+    resource2 = Resource('none', [None, None, 1], 1)
+    resource3 = Resource('none', [None, None], 1)
+
+    n1 = resource1.acquire()
+    self.assertIsNone(n1)
+    # Prevent the accidental delete lock loophole, which would create a race
+    # condition, if not caught
+    lock1 = resource1._local.lock
+    self.assertIsNone(resource1.acquire())
+
+    n2 = resource2.acquire()
+    self.assertIsNone(n2)
+    # resource2 should already be acquired, make sure it's not accidentally
+    # unlocking and relocking again
+    lock1.release()
+    self.assertIsNone(resource2.acquire())
+    lock1.acquire(timeout=0)
+
+    # two unique names
+    self.assertEqual(len({resource1._local.lock.lock_file,
+                          resource2._local.lock.lock_file}), 2)
+
+    with self.assertRaises(ResourceError):
+      resource3.acquire()
 
 
 # Cannot be member of test case class, because testcase's _outcome cannot be
