@@ -7,7 +7,7 @@ import filelock
 
 from terra.tests.utils import TestSettingsConfiguredCase, TestSettingsUnconfiguredCase, TestCase
 from terra.executor.resources import (
-  Resource
+  Resource, ResourceError
 )
 from terra import settings
 
@@ -36,45 +36,111 @@ class TestResource(TestSettingsConfiguredCase):
 
 data = {}
 
-def acquire(name):
-  # import time
-  # import random
-  # time.sleep(random.randint(200, 500)/1000.0)
-  lock = data[name].acquire()
-  # print(os.getpid(), lock[0]._lock_file)
-  return lock[1]
-
-class TestResourceManagerSingle(TestSettingsUnconfiguredCase):
-  '''
-  Test that ResourceManager backend picks the right Queue
-  '''
+class TestResourceSingle(TestSettingsUnconfiguredCase):
   def setUp(self):
     super().setUp()
-    settings.configure({'executor': {"type": "ThreadPoolExecutor"},
+    settings.configure({'executor': {"type": 'SyncExecutor'},
                         'processing_dir': self.temp_dir.name})
 
   def test_acquire_single(self):
-    data['test2'] = Resource('test2', 2, 1)
+    data['single_test1'] = Resource('single', 2, 1)
 
-    lock1 = data['test2'].acquire()
+    lock1 = data['single_test1'].acquire()
+    lock2 = data['single_test1'].acquire()
 
-    # lock2 = data['test2'].acquire()
-    # print(lock1, lock2)
+    # Acquiring twice, should use the cached value
+    self.assertEqual(lock1, lock2)
 
-  def test_acquire_thread(self):
-    data['test1'] = Resource('test1', 2, 1)
+    data['single_test2'] = Resource('single', 2, 1)
+    lock3 = data['single_test2'].acquire()
+    # However, using an entirely different resource instance, won't have cache
+    self.assertNotEqual(lock1, lock3)
+
+    # At this point, I should be out of resources
+    data['single_test3'] = Resource('single', 2, 1)
+    with self.assertRaises(ResourceError):
+      lock4 = data['single_test3'].acquire()
+
+  def test_repeats(self):
+    data['single_repeat1'] = Resource('repeat', 2, 2)
+    data['single_repeat2'] = Resource('repeat', 2, 2)
+    data['single_repeat3'] = Resource('repeat', 2, 2)
+    data['single_repeat4'] = Resource('repeat', 2, 2)
+    data['single_repeat5'] = Resource('repeat', 2, 2)
+
+    lock1 = data['single_repeat1'].acquire()
+    lock2 = data['single_repeat2'].acquire()
+    lock3 = data['single_repeat3'].acquire()
+    lock4 = data['single_repeat4'].acquire()
+
+    with self.assertRaises(ResourceError):
+      lock5 = data['single_repeat5'].acquire()
+
+    self.assertEqual(lock1, 0)
+    self.assertEqual(data['single_repeat1']._local.instance_id, 0)
+    self.assertEqual(lock2, 1)
+    self.assertEqual(data['single_repeat2']._local.instance_id, 0)
+    self.assertEqual(lock3, 0)
+    self.assertEqual(data['single_repeat3']._local.instance_id, 1)
+    self.assertEqual(lock4, 1)
+    self.assertEqual(data['single_repeat4']._local.instance_id, 1)
+
+  # def test_items(self):
+
+
+# Cannot be member of test case class, because testcase's _outcome cannot be
+# pickled "cannot serialize '_io.TextIOWrapper' object" error somewhere in
+# there
+def acquire(name):
+  return (data[name].acquire(), data[name].acquire())
+
+
+class TestResource:
+  '''
+  Test that Resource works
+  '''
+
+  def setUp(self):
+    super().setUp()
+    settings.configure({'executor': {"type": self.name},
+                        'processing_dir': self.temp_dir.name})
+
+  def test_acquire(self):
+    data[self.name] = Resource(self.name, 2, 1)
 
     futures = []
     results = []
+    exceptions = 0
 
-    with ThreadPoolExecutor(max_workers=2) as executor:
-      for _ in range(2):
-        futures.append(executor.submit(acquire, 'test1'))
+    with self.Executor(max_workers=3) as executor:
+      for _ in range(3):
+        futures.append(executor.submit(acquire, self.name))
 
       for future in as_completed(futures):
-        results.append(future.result())
+        try:
+          results.append(future.result())
+        except ResourceError:
+          exceptions += 1
+
+    self.assertEqual(exceptions, 1)
 
     self.assertNotEqual(results[0], results[1])
+    self.assertEqual(results[0][0], results[0][1])
+    self.assertEqual(results[1][0], results[1][1])
+
+class TestResourceThread(TestResource,
+                         TestSettingsUnconfiguredCase):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ThreadPoolExecutor
+    self.name = "ThreadPoolExecutor"
+
+class TestResourceProcess(TestResource,
+                          TestSettingsUnconfiguredCase):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutor
+    self.name = "ProcessPoolExecutor"
 
 # from .utils import TestCase, TestResourceCase, TestSettingsUnconfiguredCase
 # from terra import settings

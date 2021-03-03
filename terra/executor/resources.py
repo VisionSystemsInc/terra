@@ -1,22 +1,23 @@
 '''
 In a multithreaded or multiprocessing environment, it may become necessary to
-divide up and balance a "resource" among multiple workers.
+divide up and balance a limited "resource" among multiple workers. When a
+:class:`terra.task.TerraTask` is distributed to a worker, each worker might
+need to know what resource id to use, when you have a limited resource.
 
-For example if you have 4 GPUs and each GPU can only handle two workers at a
+For example if you have 4 GPUs and each GPU can only handle two simultaneous
+workers at a
 time, you want to have a total of 8 workers, but at any one time, you want two
 workings working on a specific GPU.
 
-In order to balance this, a resource queue is maintained
+In order to balance this, a :class:`Resource` is maintained
 '''
 
 import os
-# from multiprocessing.queues import Queue as MultiprocessingQueue
-# from multiprocessing.context import _default_context
-# from queue import Empty, Full, Queue as ThreadingQueue
 import threading
 import platform
-import multiprocessing
-from ctypes import c_int32
+import tempfile
+import atexit
+import weakref
 from shutil import rmtree
 import vsi.vendored.filelock as filelock
 
@@ -24,35 +25,71 @@ from vsi.tools.dir_util import is_dir_empty
 
 from terra import settings
 from terra.executor import Executor
-from terra.core.utils import cached_property
 
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
 
+class ResourceError(Exception):
+  pass
+
+
+class ProcessLocalStorage:
+  '''
+  Processor local storage class
+  '''
+  resource_id = None
+  instance_id = None
+  lock = None
+
+
+class ThreadLocalStorage(ProcessLocalStorage, threading.local):
+  '''
+  Thread version of :class:`ProcessLocalStorage`
+  '''
+
+
 class Resource:
   '''
-  Loads the executor backend's base module, given either a fully qualified
-  compute backend name, or a partial (``terra.executor.{partial}.executor``),
-  and then returns a connection to the backend
+  A :class:`Resource` instance will represent a set of resources that can be
+  acquired among multiple threads or processes.
 
-  Internally, a resource queue uses a queue of index numbers that indexes
-  ``items``, but ``get`` and ``put`` will give the feel of putting and getting
-  the actual items.
+  This library is intended to be a coarse grain allocation, thus it is intended
+  that acquiring a resource lasts the life of the thread/process. Multiple
+  calls to :meth:`acquire` will result in the same resource. Futher, calls to
+  :meth:`release` are not required, unless the thread/process is ending, in
+  which cause it is called automatically on delete at exit.
 
-  Note: ``put`` does not support adding a new item.
+  Resources need to be registered via the :class:`ResourceManager` prior to
+  creating worker threads/processes, so that they are configured correctly
 
   Parameters
   ----------
-  items : int or :term:`iterable`
+  resource_name: str
+      A unique name of resource. Must not contain symbols incompatible with the
+      filesystem
+  resources : int or :term:`iterable`
       A sequence of items to represent the different resources. An integer is
-      shorthand for ``range(0, items_integer)``
+      shorthand for ``range(0, items_integer)``. If objects are used for
+      resources, they need to be pickleable, or else multiprocessing will fail.
   repeat : :class:`int`, optional
-      The numver of times you want items repeated
+      The number of times you want a resource to be repeated
+  use_softfilelock: bool or NoneType
+      If an OS does not support hard locks, :class:`filelock.SoftFileLock` will
+      be used automatically. However, even if the OS supports hard locks, some
+      filesystems (especially network file systems) may not support successful
+      hard locking. In these cases, hardlock support needs to be tested on a
+      per directory basis. By default, ``use_softfilelock`` is set to ``None``,
+      which will run :func:`test_dir` to determine if the directory can handle
+      hard locking, and update ``self._use_softfilelock`` to ``True`` or
+      ``False``. Setting ``use_softfilelock`` to ``True`` or ``False`` will
+      bypass testing, and always use the supplied value.
   '''
 
+  _resources = weakref.WeakSet()
+
   def __init__(self, resource_name, resources, repeat=1,
-               force_softfilelock=False):
+               use_softfilelock=None):
     if isinstance(resources, int):
       resources = range(resources)
 
@@ -63,104 +100,183 @@ class Resource:
                                  platform.node(),
                                  str(os.getpid()),
                                  resource_name)
+    '''str: The directory where the lock files will be stored.
 
-    # self.FileLock = filelock.FileLock
-    self.force_softfilelock = force_softfilelock
-    # In case I need to check if I have to use SoftFileLock for specific,
-    # directories, that can go here. Currently it will use Unix/Windows if the
-    # os supports it.
+    By default, uses the ``settings.processing_dir`` to store the lock files. A
+    specific lock dir represents a specific resource, and contains the pid of
+    the parent process so that spawned processes will be able to communicate
+    about the same resource. Also contains the hostname so that multiple host
+    workers will not collide when using a common network based filesystem.
+    '''
+
+    self.name = resource_name
+
+    # self.FileLock = filelock.FileLock # Not pickleable
+    self._use_softfilelock = use_softfilelock
+
+    # Check if I have to use SoftFileLock for specific, directories
+    if self._use_softfilelock is None and \
+        filelock.FileLock == filelock.SoftFileLock:
+      os.makedirs(self.lock_dir, exist_ok=True)
+      self._use_softfilelock = not test_dir(self.lock_dir)
+
+    # SoftLocks can only work if a file isn't left over by accident.
+    if self.FileLock == filelock.SoftFileLock:
+      if os.path.isdir(self.lock_dir) and not is_dir_empty(self.lock_dir):
+        logger.warning(f'Lock dir "{self.lock_dir}" is not empty. Deleting it '
+                       'now for soft lock support.')
+        rmtree(self.lock_dir)
 
     if Executor._connect_backend().multiprocess:
-      self._lock = type("pls", (object,), {'value': None})
+      self._local = ProcessLocalStorage()
     else:
-      self._lock = threading.local()
-    self._lock.value = None
+      self._local = ThreadLocalStorage()
 
-    if filelock.FileLock == filelock.SoftFileLock or self.force_softfilelock:
-      if os.path.exists(self.lock_dir):
-        logger.warning(f'Lock dir "{self.lock_dir}" is not empty. Deleting it '
-                      'now...')
-        rmtree(self.lock_dir)
+    Resource._resources.add(self)
 
   def lock_file_name(self, resource_index, repeat):
     return os.path.join(self.lock_dir, f'{resource_index}.{repeat}.lock')
 
+  # If a race condition I missed happens, a master lock could take care of
+  # things. Currently not needed.
+  # @property
+  # def master_lock(self):
+  #   return self.FileLock(os.path.join(self.lock_dir, 'master.lock'))
+
+  @property
+  def FileLock(self):
+    '''
+    :obj:`class`: The class of :class:`filelock.FileLock` used for
+    :attr:`Resource.lock_dir`.
+
+    Hard locking is better, but only works if the OS and Filesystem supports
+    it. Sometimes it is necessary to use softlinking, so this property will
+    always return the correct class to use.
+    '''
+    if self._use_softfilelock:
+      return filelock.SoftFileLock
+    return filelock.FileLock
+
   def acquire(self):
+    '''
+    Acquires and locks a resource. Multiple calls will return the same resource
+    and not additional locks.
+
+    Raises
+    ------
+    ResourceError
+        If there are no more resources available. This should not happen if the
+        total number of resources and workers are equal.
+
+        If a thread/process worker spawns additional threads/processes, then
+        the resource needs to be acquired by the actual worker (in celery, this
+        is called the "worker child", not to be confused with the "worker"
+        parent, that is more of a manager process, and thus does not need a
+        resource) and then passed along to the other threads without using this
+        class.
+    '''
+    # Reuse for life of thread/process, unless someone calls release
+    if self._local.resource_id is not None:
+      return self._local.resource_id
+
     os.makedirs(self.lock_dir, exist_ok=True)
+    # with self.master_lock:
     for repeat in range(self.repeat):
       for resource_index in range(len(self.resources)):
         try:
-          if self.force_softfilelock:
-            lock = filelock.SoftFileLock(self.lock_file_name(resource_index, repeat), 0)
-          else:
-            lock = filelock.FileLock(self.lock_file_name(resource_index, repeat), 0)
-          lock.acquire()
-          self._lock.value = (lock, self.resources[resource_index])
-          return self._lock.value
+          lock_file = self.lock_file_name(resource_index, repeat)
+          self._local.lock = self.FileLock(lock_file, 0)
+          self._local.lock.acquire()
+          os.write(self._local.lock._lock_file_fd, str(os.getpid()).encode())
+          self._local.resource_id = self.resources[resource_index]
+          self._local.instance_id = repeat
+          return self._local.resource_id
         except filelock.Timeout:
-          continue
+          # If softlock is used on multiprocessing, there is a chance to
+          # recover resources
+          if self.FileLock == filelock.SoftFileLock and \
+            not isinstance(self._local, threading.local):
+            pid = open(self.lock_file_name(resource_index, repeat),
+                        'r').read()
+            # if file is empty, it hasn't flushed, which means still running!
+            if pid:
+              try:
+                os.kill(pid, 0)
+              except ProcessLookupError:
+                # Clean up what was probably a seg fault
+                os.remove(lock_file)
+                self._local.lock = self.FileLock(lock_file, 0)
+                self._local.lock.acquire()
+                os.write(self._local.lock._lock_file_fd,
+                          str(os.getpid()).encode())
+                self._local.resource_id = self.resources[resource_index]
+                self._local_instance_id = repeat
+                return self._local.resource_id
+    raise ResourceError(f'No more resources available for "{self.name}"')
 
-    raise ValueError('No lock available')
-    # logger.error('No lock available for {self.name}')
-    # Attempt reclamation if SoftFileLock, else attempt timeout
+  def release(self):
+    '''
+    Releases a resource and unlocks the associated lock file.
+
+    Calling :meth:`release` is not be typically necessary, it is
+    called on cleanup automatically.
+    '''
+    if self._local.resource_id is None:
+      raise ValueError('Release called with no lock acquired')
+
+    # with self.master_lock:
+    self._local.lock.release()
+    self._local.lock = None
+    self._local.resource_id = None
+    self._local.instance_id = None
+
+    # Only really applicable for SoftFileLock
+    if os.path.isdir(self.lock_dir) and is_dir_empty(self.lock_dir):
+      os.rmdir(self.lock_dir)
 
   def __enter__(self):
-    if self._lock.value is None:
-      self._lock.value = self.acquire()
-
-    return self._lock.value[1]
+    return self.acquire()
 
   def __exit__(self, exc_type, exc_value, exc_tb):
+    # Does not release, want to reuse resource for life of thread/process
     pass
 
   def __del__(self):
-    if self._lock.value is not None:
-      try:
-        self._lock.value[0].release()
-      except TypeError:
-        print("Eating it")
-        print(os.close)
-        self._lock.value[0]._release()
-        self._lock.value[0]._lock_counter = 0
-
-  def release(self):
-    if self._lock.value is None:
-      raise ValueError('Release called with no lock acquired')
-
-    self._lock.value[0].release()
-
-    if is_dir_empty(self.lock_dir):
-      os.rmdir(self.lock_dir)
-
-    # super().__init__(len(items)*repeat, **kwargs)
-
-    # for _ in range(repeat):
-    #   for x in range(len(items)):
-    #     super().put(x, False)
+    if self._local.resource_id:
+      self.release()
 
 
-  # def get(self, *args, **kwargs):
-  #   if self._lock.value is None:
-  #     index = super().get(*args, **kwargs)
-  #     return self.items[index]
-  #   return self._lock.value
+def atexit_resource_release():
+  '''
+  Clean up all resources before python starts unloading :mod:`os`, because
+  then it's too late.
+  '''
+  for resource in Resource._resources:
+    if resource._local.resource_id:
+      resource.release()
 
-  # def __enter__(self):
-  #   try:
-  #     self.local.value = self.get(False)
-  #   except Empty as exc:
-  #     raise Empty("No more resources. Either a task didn't finish and clean up, or too many workers are running") from exc
-
-  #   return self.local.value
-
-  # def __exit__(self, exc_type, exc_value, exc_tb):
-  #   try:
-  #     self.put(self.local.value, False)
-  #   except Full as exc:
-  #     raise Full('Too many resources were added back') from exc
+atexit.register(atexit_resource_release)
 
 
 class ResourceManager:
+  '''
+  A singleton class that provides global scope access to :class:`Resource`-s
+
+  Resources need to be registered before worker threads or processes are
+  created or else they will not inherit the correct resource settings.
+
+  Example
+  -------
+
+      ResourceManager.register_resource("gpu", 2, 4)
+
+      def run():
+        with ResourceManager.get_resource("gpu") as gpu:
+          print(f"I'm using gpu {gpu}")
+
+      with ProcessPoolExecutor(max_workers=8) as executor:
+        executor.submit(run)
+  '''
   resources = {}
 
   @classmethod
@@ -168,9 +284,80 @@ class ResourceManager:
     return cls.resources[name]
 
   @classmethod
-  def add_resource(cls, name, *args, **kwargs):
+  def register_resource(cls, name, *args, **kwargs):
+    '''
+    Registers a new resource
+
+    Parameters
+    ----------
+    name : str
+        A unique name for the resource. Needs to not contain symbols
+        incompatible with the filesystem. Simple alphanumerics suggested
+    *args
+        Args passed to :class:`Resource` init
+    *kwargs
+        Keyword args passed to :class:`Resource` init
+
+    Raises
+    ------
+    ValueError
+        If a resource with that name already exists
+    '''
     if name in cls.resources:
       raise ValueError(f'A "{name}" queue has already been added.')
     queue = Resource(name, *args, **kwargs)
 
     cls.resources[name] = queue
+
+
+def test_dir(path):
+  '''
+  Test if a directory will support os level file locking.
+
+  If the directory cannot support os level file locking, then the
+  ``use_softfilelock`` needs to be set to True.
+  '''
+
+  if not os.path.isdir(path):
+    raise TypeError(f'Existing directory expected, instead got {path}')
+
+  # Use unsafe method on purpose, I don't want the file precreated
+  tmp_file = tempfile.mktemp(dir=path)
+
+  lock1 = filelock.FileLock(tmp_file)
+  lock2 = filelock.FileLock(tmp_file)
+
+  # If this fails miserably, just don't even try and use hard locks
+  try:
+    lock1.acquire(timeout=0)
+
+    try:
+      lock2.acquire(timeout=0)
+    except filelock.Timeout:
+      pass
+    else:
+      raise Exception("No timeout exception")
+
+    lock2.release()
+    lock1.release()
+  except Exception:
+    return False
+  finally:
+    # Best effort cleanup
+    try:
+      lock2.release(force=True)
+    except Exception:
+      pass
+
+    try:
+      lock1.release(force=True)
+    except Exception:
+      pass
+
+    # Best effort delete file
+    try:
+      os.remove(tmp_file)
+    except Exception:
+      pass
+
+  return True

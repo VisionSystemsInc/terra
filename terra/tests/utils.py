@@ -46,7 +46,7 @@ class TestSettingsConfiguredCase(TestSettingsUnconfiguredCase):
   '''
   def setUp(self):
     super().setUp()
-    settings.configure({})
+    settings.configure({'processing_dir': self.temp_dir.name})
 
 
 class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
@@ -101,18 +101,6 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
     terra.core.signals.post_settings_context.disconnect(
         self._logs.reconfigure_logger)
     super().tearDown()
-
-
-# class TestResourceCase(TestCase):
-#   '''
-#   Test case that mocks out the ResourceManager queues and _backend, so that
-#   unit tests can test out the ResourceManager
-#   '''
-#   def setUp(self):
-#     from terra.executor.resources import ResourceManager
-#     self.patches.append(mock.patch.dict(ResourceManager.queues))
-#     self.patches.append(mock.patch.object(ResourceManager, '_backend', None))
-#     super().setUp()
 
 
 class TestComputeCase(TestCase):
