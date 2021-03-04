@@ -237,7 +237,7 @@ class Resource:
       raise ValueError('Release called with no lock acquired')
 
     # with self.master_lock:
-    # Clear the cached result first, in case other thread are watching?
+    # Clear the local cached first, in case other threads are watching
     lock = self._local.lock
     self._local.lock = None
     self._local.resource_id = None
@@ -247,7 +247,7 @@ class Resource:
       if os.path.exists(lock.lock_file):
         # Only UnixFileLock doesn't remove the file _after_ unlocking due to a
         # race condition. This can be avoided by simply removing the file
-        # _before_ unlocking. Testing useing lslock shows that this cleans up
+        # _before_ unlocking. Testing using lslock shows that this cleans up
         # and works exactly as expected.
         os.remove(lock.lock_file)
     lock.release()

@@ -11,13 +11,22 @@ import vsi.vendored.filelock as filelock
 from vsi.tools.dir_util import is_dir_empty
 
 from terra.tests.utils import (
-  TestSettingsConfiguredCase, TestSettingsUnconfiguredCase, TestCase
+  TestSettingsConfigureCase, TestCase
 )
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
-  ProcessLocalStorage, ThreadLocalStorage
+  ProcessLocalStorage, ThreadLocalStorage, ResourceManager
 )
 from terra import settings
+
+# Cheat code: Run test 100 times, efficiently, good for looking for
+# intermittent issues automatically
+# TERRA_UNITTEST=1 python -c "from unittest.main import main; main(
+#   module=None,
+#   argv=['', '-f']+100*[
+#     'terra.tests.test_executor_resources.TestResourceLock.test_items'
+#   ]
+# )"
 
 
 def get_lock_dir(name):
@@ -25,14 +34,13 @@ def get_lock_dir(name):
                       platform.node(), str(os.getpid()), name)
 
 
-class TestResourceCase:
+class TestResourceCase(TestSettingsConfigureCase):
   def setUp(self):
+    self.config.executor = {'type': 'SyncExecutor'}
     super().setUp()
-    settings.configure({'executor': {"type": 'SyncExecutor'},
-                        'processing_dir': self.temp_dir.name})
 
 
-class TestResourceSimple(TestResourceCase, TestSettingsUnconfiguredCase):
+class TestResourceSimple(TestResourceCase):
   def test_resource_registry(self):
     resource = Resource('ok', 1)
     self.assertIn(resource, Resource._resources)
@@ -50,7 +58,7 @@ class TestResourceSimple(TestResourceCase, TestSettingsUnconfiguredCase):
                      os.path.join(lock_dir, '10.999.lock'))
 
 
-class TestResourceLock(TestResourceCase, TestSettingsUnconfiguredCase):
+class TestResourceLock(TestResourceCase):
   def test_acquire_single(self):
     lock_dir = get_lock_dir('single')
     test1 = Resource('single', 2, 1)
@@ -71,16 +79,34 @@ class TestResourceLock(TestResourceCase, TestSettingsUnconfiguredCase):
     with self.assertRaises(ResourceError):
       test3.acquire()
 
+  def test_release(self):
+    test = Resource('test', 1, 1)
+
+    test.acquire()
+    lock = test._local.lock
+    self.assertIsNotNone(test._local.lock)
+    self.assertIsNotNone(test._local.resource_id)
+    self.assertIsNotNone(test._local.instance_id)
+
+    test.release()
+    self.assertNotExist(lock.lock_file)
+    self.assertIsNone(test._local.lock)
+    self.assertIsNone(test._local.resource_id)
+    self.assertIsNone(test._local.instance_id)
+
   def test_dir_cleanup(self):
     resource = Resource('test', 1, 1)
     if filelock.FileLock == filelock.SoftFileLock:
-      self.assertFalse(os.path.exists(resource.lock_dir))
+      self.assertNotExist(resource.lock_dir)
     else:
-      self.assertTrue(os.path.exists(resource.lock_dir))
+      self.assertExist(resource.lock_dir, is_dir=True)
     resource.acquire()
-    self.assertTrue(os.path.exists(resource.lock_dir))
+    self.assertExist(resource.lock_dir, is_dir=True)
+    lock_file = resource._local.lock.lock_file
+    self.assertExist(lock_file)
     resource.release()
-    self.assertFalse(os.path.exists(resource.lock_dir))
+    self.assertNotExist(lock_file)
+    self.assertNotExist(resource.lock_dir)
 
   def test_with_context(self):
     resource = Resource('test', 2, 1)
@@ -179,7 +205,7 @@ class TestResourceLock(TestResourceCase, TestSettingsUnconfiguredCase):
       resource3.acquire()
 
 
-class TestResourceSoftLock(TestResourceLock, TestSettingsUnconfiguredCase):
+class TestResourceSoftLock(TestResourceLock):
   def setUp(self):
     self.patches.append(mock.patch.object(filelock, 'FileLock',
                                           filelock.SoftFileLock))
@@ -203,8 +229,7 @@ class TestResourceSoftLock(TestResourceLock, TestSettingsUnconfiguredCase):
     self.assertFalse(os.path.exists(resource2.lock_dir))
 
 
-class TestResourceSoftLockSelection(TestResourceCase,
-                                    TestSettingsUnconfiguredCase):
+class TestResourceSoftLockSelection(TestResourceCase):
   # Just testing the switch to softlock mechanism works
   @mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock)
   def test_no_os_hard(self):
@@ -262,12 +287,9 @@ class TestResourceSoftLockSelection(TestResourceCase,
     self.assertNotExist(lock_dir3)
     self.assertTrue(is_dir_empty(lock_dir1))
 
-    # soft1 = resource1.acquire()
-    # lock_file = resource1._local.lock.lock_file
-    # self.assertExist(lock_file, is_dir=False)
-    # resource1.release()
-    # self.assertNotExist(lock_file)
 
+# tearDown will auto clean this, 1) preventing inter-test name collisions and
+# 2) stopping strong refs of resources from being kept around
 
 data = {}
 
@@ -275,23 +297,34 @@ data = {}
 # Cannot be member of test case class, because testcase's _outcome cannot be
 # pickled "cannot serialize '_io.TextIOWrapper' object" error somewhere in
 # there
-def acquire_delay(name):
-  rv = (data[name].acquire(), data[name].acquire())
-  time.sleep(0.1)
-  return rv
+def acquire(name, i):
+  # This function is meant to be called once for a worker, and has some hacks
+  # to guarantee simulation of that. If you are adding another test, you
+  # probably don't want to use this function, so copy it and make a similar one
+  l1 = data[name].acquire()
+  l2 = data[name].acquire()
 
-def acquire(name):
-  return (data[name].acquire(), data[name].acquire())
+  # There is a chance that the same thread/process will be reused because of
+  # how concurrent.futures optimizes, but i is unique, and used to prevent
+  # deleting the local storage locks, for the purpose of this test. This is
+  # meant to simulate "three _different_ threads/processes"
+  data[name+str(i)] = data[name]._local.lock
 
-class TestResource:
+  # Reset "worker local storage"
+  data[name]._local.lock = None
+  data[name]._local.resource_id = None
+  data[name]._local.instance_id = None
+
+  return (l1, l2)
+
+class TestResourceMulti:
   '''
   Test that Resource works
   '''
 
   def setUp(self):
+    self.config.executor = {'type': self.name}
     super().setUp()
-    settings.configure({'executor': {"type": self.name},
-                        'processing_dir': self.temp_dir.name})
 
   def tearDown(self):
     data.clear()
@@ -305,17 +338,16 @@ class TestResource:
     exceptions = 0
 
     with self.Executor(max_workers=3) as executor:
-      for _ in range(3):
-        # Need a delay, or else a worker might be reused because of how
-        # concurrent.futures optimizes, which screw up because acquire uses
-        # worker local storage
-        futures.append(executor.submit(acquire_delay, self.name))
+      for i in range(3):
+        futures.append(executor.submit(acquire, self.name, i))
 
       for future in as_completed(futures):
         try:
           results.append(future.result())
         except ResourceError:
           exceptions += 1
+    if exceptions != 1:
+      import pdb; pdb.set_trace()
     self.assertEqual(exceptions, 1)
 
     self.assertNotEqual(results[0], results[1])
@@ -330,8 +362,8 @@ class TestResource:
       self.assertIsInstance(resource._local, ThreadLocalStorage)
 
 
-class TestResourceThread(TestResource,
-                         TestSettingsUnconfiguredCase):
+class TestResourceThread(TestResourceMulti,
+                         TestSettingsConfigureCase):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.Executor = ThreadPoolExecutor
@@ -340,8 +372,8 @@ class TestResourceThread(TestResource,
     self.ans_multiprocess = False
 
 
-class TestResourceProcess(TestResource,
-                          TestSettingsUnconfiguredCase):
+class TestResourceProcess(TestResourceMulti,
+                          TestSettingsConfigureCase):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.Executor = ProcessPoolExecutor
@@ -373,113 +405,32 @@ class TestResourceProcess(TestResource,
 
     self.assertEqual(lock, 0)
 
-# class CommonResourceManager:
-#   def get_resource(self):
-#     return global_data['test1'].get(True)
 
-#   def resource_queue_test(self, QueueType, Executor):
-#     items = [11, 22, 33]
-#     global_data['test1'] = QueueType(items)
-#     futures = []
-#     results = []
+class TestResourceManager(TestResourceCase):
+  def setUp(self):
+    self.patches.append(mock.patch.dict(ResourceManager.resources))
+    super().setUp()
 
-#     with Executor(max_workers=3) as executor:
-#       for _ in range(3):
-#         futures.append(executor.submit(get_resource))
+  def test_register(self):
+    ResourceManager.register_resource('registered', 3, 2)
+    ResourceManager.register_resource('pets', ['cat', 'dog', 'bird'], 1)
 
-#       for future in as_completed(futures):
-#         results.append(future.result())
+    resource = ResourceManager.get_resource('registered')
+    self.assertEqual(resource.name, 'registered')
+    self.assertEqual(resource.repeat, 2)
+    self.assertEqual(resource.resources, range(3))
 
-#     self.assertIn(11, results)
-#     self.assertIn(22, results)
-#     self.assertIn(33, results)
+    resource = ResourceManager.get_resource('pets')
+    self.assertEqual(resource.name, 'pets')
+    self.assertEqual(resource.repeat, 1)
+    self.assertEqual(resource.resources, ['cat', 'dog', 'bird'])
 
-#     with self.assertRaises(Empty):
-#       global_data['test1'].get(False)
-
-#     # with Executor(max_workers=3) as executor:
-#     #   for x in range(3):
-#     #     futures.append(executor.submit(put_resource, items[x]))
-
-#     #   for future in as_completed(futures):
-#     #     future.result()
-
-#     # with self.assertRaises(Full):
-#     #   global_data['test1'].put(items[0], False)
-
-#     # with self.assertRaises(ValueError):
-#     #   global_data['test1'].put(15, False)
-
-#     # self.assertIn(global_data['test1'].get(False), items)
-
-#     # while not global_data['test1'].empty():
-#     #   global_data['test1'].get(False)
-
-#     # global_data['test1'].put(items[0], False)
-#     # global_data['test1'].put(items[0], False)
-#     # global_data['test1'].put_index(0, False)
-
-#     # print('------------')
-#     # while not global_data['test1'].empty():
-#     #   global_data['test1'].get(False)
-#     #   # self.assertEqual(global_data['test1'].get(False), items[0])
-
-#     # if hasattr(global_data['test1'], 'close'):
-#     #   global_data['test1'].close()
-#     #   global_data['test1'].join_thread()
+  def test_unregistered(self):
+    with self.assertRaises(KeyError):
+      ResourceManager.get_resource('unregisterd')
 
 
-# class TestThreadResourceManger(TestResourceCase, CommonResourceManager):
-#   def setUp(self):
-#     super().setUp()
-#     ResourceManager._backend = ThreadedResourceQueue
-
-#   # def test_resource_queue(self):
-#   #   self.resource_queue_test(ThreadedResourceQueue, ThreadPoolExecutor)
-
-
-# class TestMultiprocessResourceManger(TestResourceCase, CommonResourceManager):
-#   def setUp(self):
-#     super().setUp()
-#     ResourceManager._backend = MultiprocessResourceQueue
-
-#   def test_resource_queue(self):
-#     self.resource_queue_test(MultiprocessResourceQueue, ProcessPoolExecutor)
-
-
-# # class TestResourceManagerMulti(TestResourceCase, TestSettingsUnconfiguredCase):
-# #   '''
-# #   Test that ResourceManager backend picks the right Queue
-# #   '''
-# #   def setUp(self):
-# #     super().setUp()
-# #     settings.configure({'executor': {"type": "ProcessPoolExecutor"}})
-
-# #   def test_thread_queue(self):
-# #     ResourceManager.add_resource('test1', 2, 1)
-# #     resource = ResourceManager.get_resource('test1')
-# #     self.assertIsInstance(resource,
-# #                           MultiprocessResourceQueue)
-
-# #     # Prevent: https://stackoverflow.com/q/51680479/4166604
-# #     while not resource.empty():
-# #       resource.get()
-
-
-# # class TestResourceManagerSingle(TestResourceCase, TestSettingsUnconfiguredCase):
-# #   '''
-# #   Test that ResourceManager backend picks the right Queue
-# #   '''
-# #   def setUp(self):
-# #     super().setUp()
-# #     settings.configure({'executor': {"type": "ThreadPoolExecutor"}})
-
-# #   def test_thread_queue(self):
-# #     ResourceManager.add_resource('test1', 2, 1)
-# #     self.assertIsInstance(ResourceManager.get_resource('test1'),
-# #                           ThreadedResourceQueue)
-
-
-# class TestOtherThings(TestCase):
-#   def last_test_stray_resources(self):
-#     self.assertDictEqual(ResourceManager.queues, {})
+class TestStrayResources(TestCase):
+  def last_test_stray_resources(self):
+    self.assertDictEqual(ResourceManager.resources, {})
+    self.assertSetEqual(Resource._resources, set())

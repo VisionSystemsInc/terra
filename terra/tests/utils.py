@@ -8,6 +8,7 @@ from vsi.test.utils import (
 )
 
 from terra import settings
+from terra.core.settings import ObjectDict
 
 
 __all__ = ["TestCase", "make_traceback", "TestNamedTemporaryFileCase",
@@ -47,6 +48,25 @@ class TestSettingsConfiguredCase(TestSettingsUnconfiguredCase):
   def setUp(self):
     super().setUp()
     settings.configure({'processing_dir': self.temp_dir.name})
+
+
+class TestSettingsConfigureCase(TestSettingsUnconfiguredCase):
+  '''
+  Like :class:`TestSettingsUnconfiguredCase`, but configures ``terra.settings``
+  using ``self.config`` dictionary for you. ``self.config`` should be modified
+  in ``setUp`` before ``super().setUp()`` is called, or anywhere in
+  ``__init__``
+  '''
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.config = ObjectDict()
+
+  def setUp(self):
+    super().setUp()
+    if 'processing_dir' not in self.config:
+      self.config.processing_dir=self.temp_dir.name
+    settings.configure(self.config)
 
 
 class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
