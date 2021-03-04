@@ -154,7 +154,7 @@ class Resource:
   @property
   def FileLock(self):
     '''
-    :obj:`class`: The class of :class:`filelock.FileLock` used for
+    :obj:`class`: The class of :class:`filelock.FileLock` used for locks in
     :attr:`Resource.lock_dir`.
 
     Hard locking is better, but only works if the OS and Filesystem supports
@@ -204,19 +204,23 @@ class Resource:
           # recover resources
           if self.FileLock == filelock.SoftFileLock and \
             not isinstance(self._local, threading.local):
-            pid = open(self.lock_file_name(resource_index, repeat),
-                        'r').read()
+            with open(self.lock_file_name(resource_index, repeat), 'r') as fid:
+              pid = fid.read()
             # if file is empty, it hasn't flushed, which means still running!
             if pid:
               try:
-                os.kill(pid, 0)
+                os.kill(int(pid), 0)
+              # except PermissionError:
+              #   # This only happens if the pid exists, but you don't have
+              #   # permissions... still, that shouldn't happen
+              #   pass
               except ProcessLookupError:
                 # Clean up what was probably a seg fault
                 os.remove(lock_file)
                 self._local.lock = self.FileLock(lock_file, 0)
                 self._local.lock.acquire()
                 os.write(self._local.lock._lock_file_fd,
-                          str(os.getpid()).encode())
+                         str(os.getpid()).encode())
                 self._local.resource_id = self.resources[resource_index]
                 self._local_instance_id = repeat
                 return self._local.resource_id
@@ -233,12 +237,21 @@ class Resource:
       raise ValueError('Release called with no lock acquired')
 
     # with self.master_lock:
-    self._local.lock.release()
+    # Clear the cached result first, in case other thread are watching?
+    lock = self._local.lock
     self._local.lock = None
     self._local.resource_id = None
     self._local.instance_id = None
 
-    # Only really applicable for SoftFileLock
+    if isinstance(lock, filelock.UnixFileLock):
+      if os.path.exists(lock.lock_file):
+        # Only UnixFileLock doesn't remove the file _after_ unlocking due to a
+        # race condition. This can be avoided by simply removing the file
+        # _before_ unlocking. Testing useing lslock shows that this cleans up
+        # and works exactly as expected.
+        os.remove(lock.lock_file)
+    lock.release()
+
     if os.path.isdir(self.lock_dir) and is_dir_empty(self.lock_dir):
       os.rmdir(self.lock_dir)
 
