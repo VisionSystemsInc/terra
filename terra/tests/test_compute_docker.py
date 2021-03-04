@@ -10,10 +10,10 @@ from terra.compute import base
 from terra.compute import docker
 import terra.compute.utils
 
-from .utils import TestSettingsUnconfiguredCase
+from .utils import TestSettingsConfigureCase
 
 
-class TestComputeDockerCase(TestSettingsUnconfiguredCase):
+class TestComputeDockerCase(TestSettingsConfigureCase):
   def setUp(self):
     # This will resets the _connection to an uninitialized state
     self.patches.append(
@@ -21,14 +21,12 @@ class TestComputeDockerCase(TestSettingsUnconfiguredCase):
                           '_connection',
                           mock.PropertyMock(return_value=docker.Compute())))
 
+    # Configure for docker
+    self.config.compute = {'arch': 'docker'}
+
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
 
-    # Configure for docker
-    settings.configure({
-        'compute': {'arch': 'docker'},
-        'processing_dir': self.temp_dir.name,
-        'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
 
 class TestDockerRe(TestComputeDockerCase):

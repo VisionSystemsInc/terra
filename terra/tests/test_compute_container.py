@@ -7,7 +7,7 @@ from terra import settings
 from terra.executor.utils import Executor
 from terra.compute import base
 import terra.compute.container
-from .utils import TestNamedTemporaryFileCase, TestSettingsUnconfiguredCase
+from .utils import TestNamedTemporaryFileCase, TestSettingsConfigureCase
 
 
 class SomeService(terra.compute.container.ContainerService):
@@ -29,7 +29,7 @@ def mock_map_lcow(self, *args, **kwargs):
   return [('/c/foo', '/bar')]
 
 
-class TestComputeContainerCase(TestSettingsUnconfiguredCase):
+class TestComputeContainerCase(TestSettingsConfigureCase):
   def setUp(self):
     self.temp_dir
     # This will resets the _connection to an uninitialized state
@@ -38,14 +38,11 @@ class TestComputeContainerCase(TestSettingsUnconfiguredCase):
                           '_connection',
                           mock.PropertyMock(return_value=base.BaseCompute())))
 
+    # Configure for base
+    self.config.compute = {'arch': 'terra.compute.base.BaseCompute'}
+
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
-
-    # Configure for base
-    settings.configure({
-        'compute': {'arch': 'terra.compute.base.BaseCompute'},
-        'processing_dir': self.temp_dir.name,
-        'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
 
 class TestContainerService(TestComputeContainerCase,

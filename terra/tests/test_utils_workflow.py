@@ -4,18 +4,14 @@ import json
 from terra.utils.workflow import resumable, AlreadyRunException
 from terra import settings
 from terra.logger import DEBUG1
-from .utils import TestSettingsUnconfiguredCase
+from .utils import TestSettingsConfigureCase
 
 
 class Klass:
   pass
 
 
-class TestResumable(TestSettingsUnconfiguredCase):
-  def setUp(self):
-    super().setUp()
-    settings.configure({'processing_dir': self.temp_dir.name})
-
+class TestResumable(TestSettingsConfigureCase):
   def test_simple(self):
     @resumable
     def test1(self):

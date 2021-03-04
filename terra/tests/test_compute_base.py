@@ -4,11 +4,11 @@ from unittest import mock
 from terra import settings
 import terra.compute.base
 from .utils import (
-  TestCase, TestSettingsConfiguredCase, TestSettingsUnconfiguredCase
+  TestCase, TestSettingsConfigureCase, TestSettingsUnconfiguredCase
 )
 
 
-class TestServiceBase(TestSettingsConfiguredCase):
+class TestServiceBase(TestSettingsConfigureCase):
   # Simulate external env var
   @mock.patch.dict(os.environ, {'FOO': "BAR"})
   def test_env(self):

@@ -12,7 +12,7 @@ from terra.core.settings import ObjectDict
 
 
 __all__ = ["TestCase", "make_traceback", "TestNamedTemporaryFileCase",
-           "TestSettingsUnconfiguredCase", "TestSettingsConfiguredCase",
+           "TestSettingsUnconfiguredCase", "TestSettingsConfigureCase",
            "TestComputeCase", "TestExecutorCase", "TestSignalCase",
            "TestLoggerConfigureCase"]
 
@@ -38,16 +38,6 @@ class TestSettingsUnconfiguredCase(TestCase):
     self.patches.append(mock.patch.object(terra.core.settings.config_file,
                                           'filename', None))
     super().setUp()
-
-
-class TestSettingsConfiguredCase(TestSettingsUnconfiguredCase):
-  '''
-  Like :class:`TestSettingsUnconfiguredCase`, but configures ``terra.settings``
-  using an empty dictionary for you.
-  '''
-  def setUp(self):
-    super().setUp()
-    settings.configure({'processing_dir': self.temp_dir.name})
 
 
 class TestSettingsConfigureCase(TestSettingsUnconfiguredCase):
