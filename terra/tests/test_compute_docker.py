@@ -5,7 +5,6 @@ import warnings
 
 import yaml
 
-from terra import settings
 from terra.compute import base
 from terra.compute import docker
 import terra.compute.utils
@@ -26,7 +25,6 @@ class TestComputeDockerCase(TestSettingsConfigureCase):
 
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
-
 
 
 class TestDockerRe(TestComputeDockerCase):

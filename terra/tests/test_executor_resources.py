@@ -4,7 +4,6 @@ from concurrent.futures import (
 )
 from multiprocessing import Process
 import platform
-import time
 from unittest import mock
 
 import vsi.vendored.filelock as filelock
@@ -60,7 +59,6 @@ class TestResourceSimple(TestResourceCase):
 
 class TestResourceLock(TestResourceCase):
   def test_acquire_single(self):
-    lock_dir = get_lock_dir('single')
     test1 = Resource('single', 2, 1)
     test2 = Resource('single', 2, 1)
     test3 = Resource('single', 2, 1)
@@ -133,7 +131,6 @@ class TestResourceLock(TestResourceCase):
     lock2b = repeat2.acquire()
     lock3b = repeat3.acquire()
     lock4b = repeat4.acquire()
-
 
     # Four unique names
     self.assertEqual(len({repeat1._local.lock.lock_file,
@@ -217,7 +214,7 @@ class TestResourceSoftLock(TestResourceLock):
 
     with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
       resource_logger.warning('None')
-      resource1 = Resource('dirty', 1, 1)
+      Resource('dirty', 1, 1)
     self.assertEqual(len(cm.output), 1)
 
     with open(os.path.join(lock_dir, 'foo'), 'w') as fid:
@@ -258,8 +255,10 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertNotExist(lock_dir2)
     self.assertNotExist(lock_dir3)
     resource1 = Resource('no_dir_hard1', 1, use_softfilelock=None)
-    resource2 = Resource('no_dir_hard2', 1, use_softfilelock=True)
-    resource3 = Resource('no_dir_hard3', 1, use_softfilelock=False)
+    resource2 = Resource('no_dir_hard2', 1,  # noqa: F841
+                         use_softfilelock=True)
+    resource3 = Resource('no_dir_hard3', 1,  # noqa: F841
+                         use_softfilelock=False)
     self.assertExist(lock_dir1, is_dir=True)
     self.assertNotExist(lock_dir2)
     self.assertNotExist(lock_dir3)
@@ -267,10 +266,9 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertEqual(resource1.FileLock, filelock.SoftFileLock)
 
   @mock.patch.object(filelock, 'FileLock',
-      filelock.WindowsFileLock if os.name == 'nt' else filelock.UnixFileLock)
+                     filelock.WindowsFileLock if os.name == 'nt'
+                     else filelock.UnixFileLock)
   def test_softlock_test(self):
-    supports_hard_lock = test_dir(self.temp_dir.name)
-
     lock_dir1 = get_lock_dir('soft1')
     lock_dir2 = get_lock_dir('soft2')
     lock_dir3 = get_lock_dir('soft3')
@@ -278,9 +276,9 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertNotExist(lock_dir1)
     self.assertNotExist(lock_dir2)
     self.assertNotExist(lock_dir3)
-    resource1 = Resource('soft1', 1, use_softfilelock=None)
-    resource2 = Resource('soft2', 1, use_softfilelock=True)
-    resource3 = Resource('soft3', 1, use_softfilelock=False)
+    resource1 = Resource('soft1', 1, use_softfilelock=None)  # noqa: F841
+    resource2 = Resource('soft2', 1, use_softfilelock=True)  # noqa: F841
+    resource3 = Resource('soft3', 1, use_softfilelock=False)  # noqa: F841
 
     self.assertExist(lock_dir1, is_dir=True)
     self.assertNotExist(lock_dir2)
@@ -308,7 +306,7 @@ def acquire(name, i):
   # how concurrent.futures optimizes, but i is unique, and used to prevent
   # deleting the local storage locks, for the purpose of this test. This is
   # meant to simulate "three _different_ threads/processes"
-  data[name+str(i)] = data[name]._local.lock
+  data[name + str(i)] = data[name]._local.lock
 
   # Reset "worker local storage"
   data[name]._local.lock = None
@@ -316,6 +314,7 @@ def acquire(name, i):
   data[name]._local.instance_id = None
 
   return (l1, l2)
+
 
 class TestResourceMulti:
   '''
@@ -346,8 +345,6 @@ class TestResourceMulti:
           results.append(future.result())
         except ResourceError:
           exceptions += 1
-    if exceptions != 1:
-      import pdb; pdb.set_trace()
     self.assertEqual(exceptions, 1)
 
     self.assertNotEqual(results[0], results[1])

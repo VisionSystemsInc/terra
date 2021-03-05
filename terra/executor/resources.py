@@ -90,7 +90,12 @@ class Resource:
 
   Note
   ----
-  This class is based on using lock files to lock resources. Why use lock files? Hard lock files are one of the few methods that are tolerant to unlocking after a seg faults. Given that both windows and linux support hard file locking, it is easy to use and makes more sense to use lock files than other forms of IPC to track resources and handle seg faults. Soft file locking is also supported, but less preferred.
+  This class is based on using lock files to lock resources. Why use lock
+  files? Hard lock files are one of the few methods that are tolerant to
+  unlocking after a seg faults. Given that both windows and linux support hard
+  file locking, it is easy to use and makes more sense to use lock files than
+  other forms of IPC to track resources and handle seg faults. Soft file
+  locking is also supported, but less preferred.
   '''
 
   _resources = weakref.WeakSet()
@@ -275,6 +280,7 @@ def atexit_resource_release():
   for resource in Resource._resources:
     if resource._local.resource_id:
       resource.release()
+
 
 atexit.register(atexit_resource_release)
 

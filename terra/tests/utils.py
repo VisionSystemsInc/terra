@@ -23,6 +23,7 @@ class TestSettingsUnconfiguredCase(TestCase):
   test case only. It handles the mocking of ``TERRA_SETTINGS_FILE`` and
   ``terra.settings``
   '''
+
   def __init__(self, *args, **kwargs):
     self.settings_filename = ''
     super().__init__(*args, **kwargs)
@@ -55,7 +56,7 @@ class TestSettingsConfigureCase(TestSettingsUnconfiguredCase):
   def setUp(self):
     super().setUp()
     if 'processing_dir' not in self.config:
-      self.config.processing_dir=self.temp_dir.name
+      self.config.processing_dir = self.temp_dir.name
     settings.configure(self.config)
 
 
@@ -68,6 +69,7 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
   for ``terra.setting`` to load, and starts the stage 1 setup of logging via
   ``terra.logger._setup_terra_logger``.
   '''
+
   def setUp(self):
     self.original_system_hook = sys.excepthook
     attrs = {'serve_until_stopped.return_value': True, 'ready': True}
@@ -120,6 +122,7 @@ class TestComputeCase(TestCase):
   from the ``ComputeHandler`` for a single test case. More useful when used in
   :class:`TestLoggerConfigureCase`
   '''
+
   def setUp(self):
     from terra.compute.utils import compute
     self.patches.append(mock.patch.dict(compute.__dict__))
@@ -133,6 +136,7 @@ class TestExecutorCase(TestCase):
   retrieved from the ``ExecutorHandler`` for a single test case. More useful
   when used in :class:`TestLoggerConfigureCase`
   '''
+
   def setUp(self):
     from terra.executor.utils import Executor
     self.patches.append(mock.patch.dict(Executor.__dict__))
@@ -171,6 +175,7 @@ class TestSignalCase(TestCase):
   :class:`TestLoggerConfigureCase` needs an actual working logger for the
   logging tests.
   '''
+
   def setUp(self):
     self.patches.append(mock.patch.dict(os.environ, TERRA_UNITTEST='0'))
     super().setUp()

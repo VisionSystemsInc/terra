@@ -1,7 +1,6 @@
 import os
 from unittest import mock
 
-from terra import settings
 from terra.compute import base
 from terra.compute import singularity
 import terra.compute.utils
@@ -20,7 +19,6 @@ class TestComputeSingularityCase(TestSettingsConfigureCase):
     # Configure for singularity
     self.config.compute = {'arch': 'singularity'}
     super().setUp()
-
 
 
 class MockJustService:
