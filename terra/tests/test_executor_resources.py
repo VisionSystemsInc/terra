@@ -1,7 +1,6 @@
 import os
-from concurrent.futures import (
-  ThreadPoolExecutor, ProcessPoolExecutor, as_completed
-)
+from concurrent.futures import as_completed
+
 from multiprocessing import Process
 import platform
 from unittest import mock
@@ -10,8 +9,10 @@ import vsi.vendored.filelock as filelock
 from vsi.tools.dir_util import is_dir_empty
 
 from terra.tests.utils import (
-  TestSettingsConfigureCase, TestCase
+  TestSettingsConfigureCase, TestCase, TestThreadPoolExecutorCase
 )
+from terra.executor.process import ProcessPoolExecutor
+from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
   ProcessLocalStorage, ThreadLocalStorage, ResourceManager
@@ -19,7 +20,7 @@ from terra.executor.resources import (
 from terra import settings
 
 # Cheat code: Run test 100 times, efficiently, good for looking for
-# intermittent issues automatically
+# intermittent issues
 # TERRA_UNITTEST=1 python -c "from unittest.main import main; main(
 #   module=None,
 #   argv=['', '-f']+100*[
@@ -41,12 +42,14 @@ class TestResourceCase(TestSettingsConfigureCase):
 
 class TestResourceSimple(TestResourceCase):
   def test_resource_registry(self):
+    # Test that the ledger of all resources is working
     resource = Resource('ok', 1)
     self.assertIn(resource, Resource._resources)
     resource = None
     self.assertNotIn(resource, Resource._resources)
 
   def test_file_name(self):
+    # test Resource.lock_file_name
     resource = Resource('stuff', 1)
     lock_dir = get_lock_dir('stuff')
 
@@ -59,6 +62,7 @@ class TestResourceSimple(TestResourceCase):
 
 class TestResourceLock(TestResourceCase):
   def test_acquire_single(self):
+    # test acquiring a lock in a single thread
     test1 = Resource('single', 2, 1)
     test2 = Resource('single', 2, 1)
     test3 = Resource('single', 2, 1)
@@ -78,6 +82,7 @@ class TestResourceLock(TestResourceCase):
       test3.acquire()
 
   def test_release(self):
+    # test releasing a lock in a single thread
     test = Resource('test', 1, 1)
 
     test.acquire()
@@ -87,12 +92,14 @@ class TestResourceLock(TestResourceCase):
     self.assertIsNotNone(test._local.instance_id)
 
     test.release()
+    # make sure file and cache is cleaned up
     self.assertNotExist(lock.lock_file)
     self.assertIsNone(test._local.lock)
     self.assertIsNone(test._local.resource_id)
     self.assertIsNone(test._local.instance_id)
 
   def test_dir_cleanup(self):
+    # Test that empty lock dir is auto deleted
     resource = Resource('test', 1, 1)
     if filelock.FileLock == filelock.SoftFileLock:
       self.assertNotExist(resource.lock_dir)
@@ -107,6 +114,7 @@ class TestResourceLock(TestResourceCase):
     self.assertNotExist(resource.lock_dir)
 
   def test_with_context(self):
+    # test with
     resource = Resource('test', 2, 1)
     with resource as r1:
       pass
@@ -117,6 +125,7 @@ class TestResourceLock(TestResourceCase):
     self.assertEqual(r1, r2)
 
   def test_repeats(self):
+    # test repeated resources
     repeat1 = Resource('repeat', 2, 2)
     repeat2 = Resource('repeat', 2, 2)
     repeat3 = Resource('repeat', 2, 2)
@@ -127,16 +136,18 @@ class TestResourceLock(TestResourceCase):
     lock2 = repeat2.acquire()
     lock3 = repeat3.acquire()
     lock4 = repeat4.acquire()
-    lock1b = repeat1.acquire()
-    lock2b = repeat2.acquire()
-    lock3b = repeat3.acquire()
-    lock4b = repeat4.acquire()
 
     # Four unique names
     self.assertEqual(len({repeat1._local.lock.lock_file,
                           repeat2._local.lock.lock_file,
                           repeat3._local.lock.lock_file,
                           repeat4._local.lock.lock_file}), 4)
+
+    # reacquire, cache
+    lock1b = repeat1.acquire()
+    lock2b = repeat2.acquire()
+    lock3b = repeat3.acquire()
+    lock4b = repeat4.acquire()
 
     self.assertEqual(lock1, lock1b)
     self.assertEqual(lock2, lock2b)
@@ -156,6 +167,7 @@ class TestResourceLock(TestResourceCase):
     self.assertEqual(repeat4._local.instance_id, 1)
 
   def test_items(self):
+    # Test list of objects as resources
     resource1 = Resource('items', ['foo', 'bar'])
     resource2 = Resource('items', ['foo', 'bar'])
     resource3 = Resource('items', ['foo', 'bar'])
@@ -203,12 +215,14 @@ class TestResourceLock(TestResourceCase):
 
 
 class TestResourceSoftLock(TestResourceLock):
+  # test soft lock specific behaviors
   def setUp(self):
     self.patches.append(mock.patch.object(filelock, 'FileLock',
                                           filelock.SoftFileLock))
     super().setUp()
 
   def test_dirty_dir(self):
+    # test leftover locks are detected and cleaned up
     lock_dir = get_lock_dir('dirty')
     os.makedirs(lock_dir, exist_ok=True)
 
@@ -230,6 +244,7 @@ class TestResourceSoftLockSelection(TestResourceCase):
   # Just testing the switch to softlock mechanism works
   @mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock)
   def test_no_os_hard(self):
+    # test when the os doesn't support hard locks
     lock_dir = get_lock_dir('no_os_hard')
     self.assertNotExist(lock_dir)
     resource1 = Resource('no_os_hard', 1, use_softfilelock=None)
@@ -246,6 +261,7 @@ class TestResourceSoftLockSelection(TestResourceCase):
   @mock.patch.object(filelock.WindowsFileLock, '_acquire',
                      lambda self: exec("raise OSError('Fake fail')"))
   def test_no_dir_hard_support(self):
+    # Test dir test creating when dir does not support hard lock
     self.assertFalse(test_dir(self.temp_dir.name))
     lock_dir1 = get_lock_dir('no_dir_hard1')
     lock_dir2 = get_lock_dir('no_dir_hard2')
@@ -254,6 +270,7 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertNotExist(lock_dir1)
     self.assertNotExist(lock_dir2)
     self.assertNotExist(lock_dir3)
+    # When test would show using hard locks would fail
     resource1 = Resource('no_dir_hard1', 1, use_softfilelock=None)
     resource2 = Resource('no_dir_hard2', 1,  # noqa: F841
                          use_softfilelock=True)
@@ -269,6 +286,7 @@ class TestResourceSoftLockSelection(TestResourceCase):
                      filelock.WindowsFileLock if os.name == 'nt'
                      else filelock.UnixFileLock)
   def test_softlock_test(self):
+    # Test dir test creating when os does support hard lock
     lock_dir1 = get_lock_dir('soft1')
     lock_dir2 = get_lock_dir('soft2')
     lock_dir3 = get_lock_dir('soft3')
@@ -286,15 +304,16 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertTrue(is_dir_empty(lock_dir1))
 
 
-# tearDown will auto clean this, 1) preventing inter-test name collisions and
+# tearDown will auto clear this:
+# 1) preventing inter-test name collisions
 # 2) stopping strong refs of resources from being kept around
 
 data = {}
 
 
-# Cannot be member of test case class, because testcase's _outcome cannot be
-# pickled "cannot serialize '_io.TextIOWrapper' object" error somewhere in
-# there
+# Cannot be member of test case class, because TestCase is not serializable.
+# Somewhere in testcase's _outcome "cannot serialize '_io.TextIOWrapper'
+# object" error occurs
 def acquire(name, i):
   # This function is meant to be called once for a worker, and has some hacks
   # to guarantee simulation of that. If you are adding another test, you
@@ -330,6 +349,7 @@ class TestResourceMulti:
     super().tearDown()
 
   def test_acquire(self):
+    # test acquiring in parallel
     data[self.name] = Resource(self.name, 2, 1)
 
     futures = []
@@ -352,36 +372,37 @@ class TestResourceMulti:
     self.assertEqual(results[1][0], results[1][1])
 
   def test_local_storage_type(self):
+    # test the types are right
     resource = Resource('storage', 2, 1)
-    if self.ans_multiprocess:
+    if self.Executor.multiprocess:
       self.assertIsInstance(resource._local, ProcessLocalStorage)
     else:
       self.assertIsInstance(resource._local, ThreadLocalStorage)
 
 
 class TestResourceThread(TestResourceMulti,
-                         TestSettingsConfigureCase):
+                         TestSettingsConfigureCase,
+                         TestThreadPoolExecutorCase):
+  # Test for multithreaded case
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.Executor = ThreadPoolExecutor
     self.name = "ThreadPoolExecutor"
 
-    self.ans_multiprocess = False
-
 
 class TestResourceProcess(TestResourceMulti,
                           TestSettingsConfigureCase):
+  # Test for multiprocess case
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.Executor = ProcessPoolExecutor
     self.name = "ProcessPoolExecutor"
 
-    self.ans_multiprocess = True
-
   @mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock)
   def test_full(self):
+    # Test resource recovery after a premature termination
     lock_dir = get_lock_dir('full')
-    resource = Resource('full', 1, 1)
+    resource = Resource('full', ['foo'], 1)
 
     os.makedirs(lock_dir, exist_ok=True)
     with open(os.path.join(lock_dir, '0.0.lock'), 'w') as fid:
@@ -400,7 +421,9 @@ class TestResourceProcess(TestResourceMulti,
 
     lock = resource.acquire()
 
-    self.assertEqual(lock, 0)
+    self.assertEqual(lock, 'foo')
+    # Test that additional calls to acquire after recovering resource, work
+    self.assertEqual(lock, resource.acquire())
 
 
 class TestResourceManager(TestResourceCase):
@@ -409,6 +432,7 @@ class TestResourceManager(TestResourceCase):
     super().setUp()
 
   def test_register(self):
+    # test registration and recall work
     ResourceManager.register_resource('registered', 3, 2)
     ResourceManager.register_resource('pets', ['cat', 'dog', 'bird'], 1)
 
@@ -423,11 +447,17 @@ class TestResourceManager(TestResourceCase):
     self.assertEqual(resource.resources, ['cat', 'dog', 'bird'])
 
   def test_unregistered(self):
+    # Test getting unregistered fails
     with self.assertRaises(KeyError):
-      ResourceManager.get_resource('unregisterd')
+      ResourceManager.get_resource('unregistered')
 
 
 class TestStrayResources(TestCase):
   def last_test_stray_resources(self):
+    # Makes sure no tests leave any resources registered, possibly interfering
+    # with other tests.
     self.assertDictEqual(ResourceManager.resources, {})
+    # Make sure there aren't any resources left over after all the tests have
+    # run. Passing this means that every test that has run has used the correct
+    # mock patches or haven't kept any references around in global persistence
     self.assertSetEqual(Resource._resources, set())

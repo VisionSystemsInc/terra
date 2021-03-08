@@ -2,12 +2,11 @@
 In a multithreaded or multiprocessing environment, it may become necessary to
 divide up and balance a limited "resource" among multiple workers. When a
 :class:`terra.task.TerraTask` is distributed to a worker, each worker might
-need to know what resource id to use, when you have a limited resource.
+need to know what resource id to use, when you have this limited resource.
 
 For example if you have 4 GPUs and each GPU can only handle two simultaneous
-workers at a
-time, you want to have a total of 8 workers, but at any one time, you want two
-workings working on a specific GPU.
+workers at a time, you want to have a total of 8 workers, but at any one time,
+you want two workings working on a specific GPU.
 
 In order to balance this, a :class:`Resource` is maintained
 '''
@@ -56,11 +55,11 @@ class Resource:
 
   This library is intended to be a coarse grain allocation, meaning it is
   intended that acquiring a resource lasts the life of the thread/process, not
-  just a function or section of a function. Multiple calls to :meth:`acquire`
-  or using ``with`` will result in the same resource, that was never released
-  between calls. Calls to :meth:`release` are never needed. The only time a
-  resource need to be released is when the thread/process is ending, in which
-  cause it is called automatically on delete at exit.
+  just for a function call or a section of a function. Multiple calls to
+  :meth:`acquire` or using ``with`` will result in the same resource, that was
+  not released between calls. Calls to :meth:`release` are never needed. The
+  only time a resource need to be released is when the thread/process is
+  ending, in which cause it is called automatically on delete at exit.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
   creating worker threads/processes, so that they are configured correctly
@@ -86,7 +85,6 @@ class Resource:
       hard locking, and update ``self._use_softfilelock`` to ``True`` or
       ``False``. Setting ``use_softfilelock`` to ``True`` or ``False`` will
       bypass testing, and always use the supplied value.
-
 
   Note
   ----
@@ -170,15 +168,28 @@ class Resource:
       return filelock.SoftFileLock
     return filelock.FileLock
 
+  def _acquire(self, lock_file, resource_index, repeat):
+    self._local.lock = self.FileLock(lock_file, 0)
+    self._local.lock.acquire()
+    os.write(self._local.lock._lock_file_fd, str(os.getpid()).encode())
+    self._local.resource_id = resource_index
+    self._local.instance_id = repeat
+    return self.resources[self._local.resource_id]
+
   def acquire(self):
     '''
     Acquires and locks a resource. Multiple calls will return the same resource
     and not additional locks.
 
+    Returns
+    ----------
+    :obj:`object`
+        Returns the resource that is allocated to this worker
+
     Raises
     ------
     ResourceError
-        If there are no more resources available. This should not happen if the
+        There are no more resources available. This should not happen if the
         total number of resources and workers are equal.
 
         If a thread/process worker spawns additional threads/processes, then
@@ -198,12 +209,7 @@ class Resource:
       for resource_index in range(len(self.resources)):
         try:
           lock_file = self.lock_file_name(resource_index, repeat)
-          self._local.lock = self.FileLock(lock_file, 0)
-          self._local.lock.acquire()
-          os.write(self._local.lock._lock_file_fd, str(os.getpid()).encode())
-          self._local.resource_id = resource_index
-          self._local.instance_id = repeat
-          return self.resources[self._local.resource_id]
+          return self._acquire(lock_file, resource_index, repeat)
         except filelock.Timeout:
           # If softlock is used on multiprocessing, there is a chance to
           # recover resources
@@ -222,13 +228,7 @@ class Resource:
               except ProcessLookupError:
                 # Clean up what was probably a seg fault
                 os.remove(lock_file)
-                self._local.lock = self.FileLock(lock_file, 0)
-                self._local.lock.acquire()
-                os.write(self._local.lock._lock_file_fd,
-                         str(os.getpid()).encode())
-                self._local.resource_id = self.resources[resource_index]
-                self._local_instance_id = repeat
-                return self._local.resource_id
+                return self._acquire(lock_file, resource_index, repeat)
     raise ResourceError(f'No more resources available for "{self.name}"')
 
   def release(self):
@@ -317,14 +317,14 @@ class ResourceManager:
 
     Resources should be registered in: ``{app}/tasks/__init__.py``. This works
     out because tasks are loaded fairly late in terra, so settings and logging
-    is already setup, but all Executors need to have tasks loaded before the
+    is already setup, but all Executors need to have tasks loaded before they
     spawn workers.
 
     Parameters
     ----------
     name : str
         A unique name for the resource. Needs to not contain symbols
-        incompatible with the filesystem. Simple alphanumerics suggested
+        incompatible with the filesystem. Simple alphanumerics suggested.
     *args
         Additional args passed to :class:`Resource` init
     **kwargs
@@ -336,18 +336,18 @@ class ResourceManager:
         If a resource with that name already exists
     '''
     if name in cls.resources:
-      raise ValueError(f'A "{name}" queue has already been added.')
-    queue = Resource(name, *args, **kwargs)
+      raise ValueError(f'A "{name}" resource has already been added.')
+    resource = Resource(name, *args, **kwargs)
 
-    cls.resources[name] = queue
+    cls.resources[name] = resource
 
 
 def test_dir(path):
   '''
-  Test if a directory will support os level file locking.
+  Test if a directory will support hard file locking.
 
-  If the directory cannot support os level file locking, then the
-  ``use_softfilelock`` needs to be set to True.
+  If the directory cannot support hard file locking, then the
+  ``use_softfilelock`` needs to be set to ``True``.
   '''
 
   if not os.path.isdir(path):
@@ -359,7 +359,7 @@ def test_dir(path):
   lock1 = filelock.FileLock(tmp_file)
   lock2 = filelock.FileLock(tmp_file)
 
-  # If this fails miserably, just don't even try and use hard locks
+  # If this fails miserably, just don't even try and use soft locks
   try:
     lock1.acquire(timeout=0)
 

@@ -19,8 +19,8 @@ __all__ = ["TestCase", "make_traceback", "TestNamedTemporaryFileCase",
 
 class TestSettingsUnconfiguredCase(TestCase):
   '''
-  A Test Case that is ready to allow a terra settings configure for a single
-  test case only. It handles the mocking of ``TERRA_SETTINGS_FILE`` and
+  A Test Case that is ready to allow terra settings to be configured for each
+  test. It handles the mocking of ``TERRA_SETTINGS_FILE`` and
   ``terra.settings``
   '''
 
@@ -62,8 +62,8 @@ class TestSettingsConfigureCase(TestSettingsUnconfiguredCase):
 
 class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
   '''
-  A Test Case that allows for configuring the logging for a single test case.
-  It handles details like: ``sys.excepthook``,
+  A Test Case that allows for configuring the logging for each test . It
+  handles details like: ``sys.excepthook``,
   ``terra.logger.LogRecordSocketReceiver``, and
   ``terra.compute.base.LogRecordSocketReceiver``. Also sets up a config file
   for ``terra.setting`` to load, and starts the stage 1 setup of logging via
@@ -117,10 +117,9 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
 
 class TestComputeCase(TestCase):
   '''
-  Test case that mocks for ``_connection`` in
-  ``terra.compute.utils.compute``. This allows for a compute to be retrieved
-  from the ``ComputeHandler`` for a single test case. More useful when used in
-  :class:`TestLoggerConfigureCase`
+  Test case that mocks for ``_connection`` in ``terra.compute.utils.compute``.
+  This allows for a compute to be retrieved from the ``ComputeHandler`` for a
+  single test. More useful when used in :class:`TestLoggerConfigureCase`
   '''
 
   def setUp(self):
@@ -133,8 +132,8 @@ class TestExecutorCase(TestCase):
   '''
   Test case for that mocks for ``_connection`` in
   ``terra.executor.utils.Executor``. This allows for an executor to be
-  retrieved from the ``ExecutorHandler`` for a single test case. More useful
-  when used in :class:`TestLoggerConfigureCase`
+  retrieved from the ``ExecutorHandler`` for a single test. More useful when
+  used in conjunction with :class:`TestLoggerConfigureCase`
   '''
 
   def setUp(self):
@@ -184,7 +183,7 @@ class TestSignalCase(TestCase):
 class TestLoggerConfigureCase(TestLoggerCase, TestSignalCase,
                               TestComputeCase, TestExecutorCase):
   '''
-  Enable signals and logging. Most logging tests require configure logger to
+  Enable signals and logging. Most logging tests require a configured logger to
   actually be called. LogRecordSocketReceiver is mocked out, so no lasting side
   effects should occur.
   '''
