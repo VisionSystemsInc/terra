@@ -19,6 +19,7 @@ import tempfile
 sys.path.insert(0, os.path.abspath(os.environ['TERRA_CWD']))
 sys.path.insert(0, os.path.abspath(os.path.join(os.environ['VSI_COMMON_DIR'],
                                                 'python')))
+sys.path.append(os.path.abspath("./_ext"))
 # Disable logging from fully initializing. It's just a mess we don't need
 os.environ['TERRA_UNITTEST']='1'
 
@@ -56,7 +57,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
-    'vsi_domains'
+    'vsi_domains',
+    'celerydocs'
 ]
 
 # Link to other documentation (e.g., numpy, python, terra, etc.)
