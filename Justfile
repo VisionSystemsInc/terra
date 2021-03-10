@@ -134,7 +134,7 @@ function terra_caseify()
         extra_args=$#
         local app_name="${1}"
         shift 1
-        ${DRYRUN} "${TERRA_APP_DIR}/${app_name}" ${@+"${@}"}
+        ${DRYRUN} "${TERRA_RUN_DIR}/${app_name}" ${@+"${@}"}
       else
         Terra_Pipenv run python -m ${@+"${@}"}
         extra_args=$#
