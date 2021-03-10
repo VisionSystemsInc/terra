@@ -158,7 +158,8 @@ class Service(ContainerService):
     super().__init__()
 
     # default docker-compose file (if file exists)
-    compose_file = os.path.join(self.env['TERRA_APP_DIR'],
-                                'docker-compose.yml')
-    if os.path.isfile(compose_file):
-      self.compose_files = [compose_file]
+    for compose_dir in self.compose_dirs:
+      compose_file = os.path.join(compose_dir, 'docker-compose.yml')
+      if os.path.isfile(compose_file):
+        self.compose_files = [compose_file]
+        break

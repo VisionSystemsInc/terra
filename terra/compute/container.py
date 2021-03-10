@@ -32,6 +32,17 @@ class ContainerService(BaseService):
     env_key = f"{app_prefixes[0]}_COMPOSE_SERVICE_RUNNER"
     self.compose_service_name = self.env.get(env_key)
 
+    # possible directories containing a compose file
+    # Note we don't rely just on TERRA_APP_DIR, as compose files will not
+    # be present in TERRA_APP_DIR in JUST_RODEO/makeself mode
+    compose_dirs = [
+        self.env.get('TERRA_APP_DIR'),
+        self.env.get(f"{app_prefixes[0]}_SOURCE_DIR"),
+    ]
+    compose_dirs = [os.path.abspath(d) for d in compose_dirs
+                    if d and os.path.isdir(d)]
+    self.compose_dirs = compose_dirs
+
   def pre_run(self):
     # Need to run Base's pre_run first, so it has a chance to update settings
     # for special executors, etc...

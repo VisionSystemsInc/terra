@@ -109,8 +109,9 @@ class Service(ContainerService):
   def __init__(self):
     super().__init__()
 
-    # default compose file (if file exists)
-    compose_file = os.path.join(self.env['TERRA_APP_DIR'],
-                                'singular-compose.env')
-    if os.path.isfile(compose_file):
-      self.compose_files = [compose_file]
+    # default singular-compose file (if file exists)
+    for compose_dir in self.compose_dirs:
+      compose_file = os.path.join(compose_dir, 'singular-compose.env')
+      if os.path.isfile(compose_file):
+        self.compose_files = [compose_file]
+        break
