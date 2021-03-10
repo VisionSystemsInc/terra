@@ -75,7 +75,7 @@ class Resource:
       resources, they need to be pickleable, or else multiprocessing will fail.
   repeat : :class:`int`, optional
       The number of times you want a resource to be repeated
-  use_softfilelock: bool or NoneType
+  use_softfilelock: bool or None
       If an OS does not support hard locks, :class:`filelock.SoftFileLock` will
       be used automatically. However, even if the OS supports hard locks, some
       filesystems (especially network file systems) may not support successful
@@ -157,7 +157,7 @@ class Resource:
   @property
   def FileLock(self):
     '''
-    :obj:`class`: The class of :class:`filelock.FileLock` used for locks in
+    :term:`class`: The class of :attr:`filelock.FileLock` used for locks in
     :attr:`Resource.lock_dir`.
 
     Hard locking is better, but only works if the OS and Filesystem supports

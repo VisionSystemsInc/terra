@@ -42,7 +42,7 @@ Utilizing :py:class:`concurrent.futures.ProcessPoolExecutor`, ProcessPoolExecuto
 
 .. note::
 
-   :py:class:`concurrent.futures.ProcessPoolExecutor` is not robust against seg faults. As soon as one worker crashes, the main process halts executing additional tasks and raises :py:exc:`concurrent.futures.BrokenProcessPool`.
+   :py:class:`concurrent.futures.ProcessPoolExecutor` is not robust against seg faults. As soon as one worker crashes, the main process halts executing additional tasks and raises :py:exc:`concurrent.futures.process.BrokenProcessPool`.
 
 CeleryExecutor
 ^^^^^^^^^^^^^^
@@ -56,6 +56,6 @@ For example, if a service mounts ``/nfs/project1/date15/images`` to ``/images``,
 Using custom executors
 ----------------------
 
-To wrap your own executor up for terra, all you have to do is mix in :py:class:`terra.executor.BaseExecutor` into your class. If the executor is multiprocess (on a single node) then ``multiprocess`` needs to be set to ``True`` for the class. For example: celery sets multiprocess to ``True`` because the :setting:`worker_pool` is defaulted to use prefork, which is multiprocess on a single node. It is not set to ``True`` because celery can be distributed on multiple machines.
+To wrap your own executor up for terra, all you have to do is mix in :py:class:`terra.executor.base.BaseExecutor` into your class. If the executor is multiprocess (on a single node) then ``multiprocess`` needs to be set to ``True`` for the class. For example: celery sets multiprocess to ``True`` because the :setting:`worker_pool` is defaulted to use prefork, which is multiprocess on a single node. It is not set to ``True`` because celery can be distributed on multiple machines.
 
 For workers like :py:class:`terra.executor.celery.executor.CeleryExecutor`, the worker is started before the terra app runs. These type of special workers outlives a single run of terra, and thus need a way to hook into the logger each time it changes. This is done by defining a ``configure_logger`` and ``reconfigure_logger`` method to connect to the correct logger for a task.

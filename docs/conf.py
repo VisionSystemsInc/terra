@@ -116,6 +116,7 @@ nitpick_ignore = [
     ('py:mod',   'django.conf'),
     ('py:class', 'django.db.utils.ConnectionHandler'),
     ('py:class', 'json.encoder.JSONEncoder'),
+    ('py:class', '_thread._local'),
     ('py:class', 'concurrent.futures._base.Executor'),
     ('py:class', 'concurrent.futures._base.Future'),
     ('py:class', 'concurrent.futures.process.ProcessPoolExecutor'),
