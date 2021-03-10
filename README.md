@@ -58,7 +58,7 @@ These commands should be run from the app's just project directory, not Terra's 
 
 ### How to use
 
-After `makeself` and `pyinstaller` are run, you will have a `./just` project executable to run all just related tasks, and `{app name}` executables too. By default, the app executables should be in the same directory as the `./just` executable, but may be moved by setting the `TERRA_APP_DIR` environment variable in `local.env` (see below).
+After `makeself` and `pyinstaller` are run, you will have a `./just` project executable to run all just related tasks, and `{app name}` executables too. By default, the app executables should be in the same directory as the `./just` executable, but may be moved by setting the `TERRA_RUN_DIR` environment variable in `local.env` (see below).
 
 #### local.env
 
