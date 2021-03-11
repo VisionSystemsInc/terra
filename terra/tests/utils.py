@@ -62,7 +62,7 @@ class TestSettingsConfigureCase(TestSettingsUnconfiguredCase):
 
 class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
   '''
-  A Test Case that allows for configuring the logging for each test . It
+  A Test Case that allows for configuring the logging for each test. It
   handles details like: ``sys.excepthook``,
   ``terra.logger.LogRecordSocketReceiver``, and
   ``terra.compute.base.LogRecordSocketReceiver``. Also sets up a config file
@@ -117,9 +117,10 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
 
 class TestComputeCase(TestCase):
   '''
-  Test case that mocks for ``_connection`` in ``terra.compute.utils.compute``.
-  This allows for a compute to be retrieved from the ``ComputeHandler`` for a
-  single test. More useful when used in :class:`TestLoggerConfigureCase`
+  Test case that allows for a compute to be retrieved from the
+  ``ComputeHandler`` for a single test. This is done by mocking ``_connection``
+  in ``terra.compute.utils.compute``, so that the Handler does not stay
+  initialized. More useful when used in :class:`TestLoggerConfigureCase`.
   '''
 
   def setUp(self):
@@ -130,10 +131,11 @@ class TestComputeCase(TestCase):
 
 class TestExecutorCase(TestCase):
   '''
-  Test case for that mocks for ``_connection`` in
-  ``terra.executor.utils.Executor``. This allows for an executor to be
-  retrieved from the ``ExecutorHandler`` for a single test. More useful when
-  used in conjunction with :class:`TestLoggerConfigureCase`
+  Test case allows for an executor to be retrieved from the ``ExecutorHandler``
+  for a single test. This is done by mocking ``_connection`` in
+  ``terra.executor.utils.Executor``, so that the Handler does not stay
+  initialized. This  More useful when used in conjunction with
+  :class:`TestLoggerConfigureCase`
   '''
 
   def setUp(self):

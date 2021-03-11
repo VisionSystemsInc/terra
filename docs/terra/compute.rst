@@ -13,7 +13,7 @@ Built in computes
 DummyCompute
 ^^^^^^^^^^^^
 
-The :py:class:`terra.compute.dummy.Compute` is a debugging tool that simply dry run logs what services would have been run.
+The :py:class:`terra.compute.dummy.Compute` is a debugging tool that simply dry-runs (and logs) what services would have been run.
 
 DockerCompute
 ^^^^^^^^^^^^^
@@ -28,7 +28,7 @@ The :py:class:`terra.compute.singularity.Compute` compute is for running in sing
 VirtualEnvCompute
 ^^^^^^^^^^^^^^^^^
 
-The :py:class:`terra.compute.virtualenv.Compute` is used to run services locally in a virtualenv. While terra runs in a virtualenv, the terra app has its own virtualenv, that typically exists in the container, but exists locally when using this compute. This compute does not use :ref:`settings-path-translation`.
+The :py:class:`terra.compute.virtualenv.Compute` is used to run services locally in a virtualenv. While terra itself runs in a virtualenv, the terra app has its own virtualenv, which typically exists in the container, but exists locally when using this compute. This compute does not use :ref:`settings-path-translation`.
 
 Using custom computes
 ---------------------

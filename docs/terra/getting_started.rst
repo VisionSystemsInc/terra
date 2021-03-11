@@ -33,13 +33,13 @@ Default values of settings are prepopulated by :py:data:`terra.core.settings.glo
 Path translation
 ^^^^^^^^^^^^^^^^
 
-Since services and tasks can run in different containers or even on different computers, terra settings has a "path translation" feature built in. If any settings name ends in ``_dir``/``_dirs``/``_file``/``_files``/``_path``/``paths``, then terra will automatically convert the paths between containers, e.g. ``settings.foo.bar_path``. This is done my inspecting the compute's configuration and creating a mount map. If ``/opt/test/foo`` is mounted to ``/data`` in a container, then if ``bar_path`` is set to ``/opt/test/foo/bar/file.txt``, on the other container/computer, it will have the value ``/data/bar/file.txt``. For computes that utilize the environment variables ``TERRA_*_VOLUMES``, these will be included in the volume mapping.
+Because services and tasks can run in different containers or even on different computers, terra settings has a "path translation" feature built in. If any setting's name ends in ``_dir``/``_dirs``/``_file``/``_files``/``_path``/``paths``, then terra will automatically convert the path between the host and container, e.g. ``settings.foo.bar_path``. This is done by inspecting the compute's configuration and creating a mount map. If ``/opt/test/foo`` is mounted to ``/data`` in a container and if ``bar_path`` is set to ``/opt/test/foo/bar/file.txt``, then in the container it will have the value ``/data/bar/file.txt``. For computes that utilize the environment variables ``TERRA_*_VOLUMES``, these will be included in the volume mapping.
 
-For tasks, keyword arguments are also translated, if their names end with the same suffixes. This includes the keyword arguments themselves, and any nested combination of list/tuple/dict that has a dict key value ending with the same suffixes.
+For tasks, keyword arguments are also translated if their names end with the same suffixes. This includes the keyword arguments themselves, and any nested combination of list/tuple/dict that has a dict key value ending with the same suffixes.
 
 If the return value of a task is also a nested list/tuple/dict, those keys ending with the same suffixes are also translated back.
 
-When a compute/executor has the potential to change paths, a ``configuration_map_service``/``configuration_map`` method is needed to return this list of tuple pairs (host, container) of mounts mounts.
+When a compute/executor has the potential to change paths, a ``configuration_map_service``/``configuration_map`` method is needed to return this list of tuple pairs (host, container) of mounts.
 
 Advanced usage
 ^^^^^^^^^^^^^^

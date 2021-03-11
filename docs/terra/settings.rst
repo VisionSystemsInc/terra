@@ -56,7 +56,7 @@ Executor Settings
 
 .. option:: executor.num_workers
 
-    The maximum number of workers that will be used. Not honored by :py:class:`terra.executor.sync.SyncExecutor` or :py:class:`terra.executor.celery.executor.CeleryExecutor`
+    The maximum number of workers that will be used. Not applicable to :py:class:`terra.executor.sync.SyncExecutor`. Not honored by :py:class:`terra.executor.celery.executor.CeleryExecutor`
 
     Default: number of cores
 

@@ -4,7 +4,7 @@ Terra Apps
 
 An app in terra consists of 6 layers
 
-#. A CLI is typically a ``__main__.py``. The main goal of an CLI is to setup settings and call the next layer, a workflow
+#. A CLI is typically a ``__main__.py``. The main goal of an CLI is to setup settings and call the next layer, a workflow.
 
   .. rubric:: Example:
 
@@ -38,7 +38,7 @@ An app in terra consists of 6 layers
        def example(self):
          compute.run('example.services.example1')
 
-3. A stage is an optional but often utilized part of a workflow. Instead of calling services directly from the workflow, the workflow calls methods that have a :func:`@resumable <terra.utils.workflow.resumable>` decorator on them, these functions are made resumable and skip-able. Stages are useful as they let you rerun a workflow, resuming after the last stage that successfully finish.
+3. A stage is an optional but often utilized part of a workflow. Instead of calling services directly from the workflow, the workflow calls methods that have a :func:`@resumable <terra.utils.workflow.resumable>` decorator on them. These functions are made resumable and skip-able. Stages are useful as they let you rerun a workflow, resuming after the last stage that successfully finish.
 
   .. rubric:: Example:
 
@@ -60,7 +60,7 @@ An app in terra consists of 6 layers
 
   .. code:: bash
 
-     # Example of just calling a service runner: example.service1
+     # Example of calling a service runner directly: example.service1
      python -m example.service1
 
      # Example of calling using a virtualenv
@@ -69,8 +69,8 @@ An app in terra consists of 6 layers
      # Example of calling using a docker
      docker run -it --rm -v /data/stuff:/images service1_image pipenv run python -m example.service1
 
-5. The "service runner" executed by the "service definition" is the actual algorithm that gets run. It must use the settings to get any paths to files or directories it will access, so that terra can perform any necessary :ref:`path translations <settings-path-translation>`. Technically the service runner does not need to by python, as the primary interface is a json file, environment variables, and a single CLI call. But non-python apps would not be able to take full advantage of the executor layer.
-#. The final terra app layer is the "task". If there are functions that can be called independently in parallel, :ref:`tasks <executor>` offer a single abstract API that will run your function in parallel
+5. The "service runner" executed by the "service definition" is the actual algorithm that gets run. It must use the settings to get any paths to files or directories it will access, so that terra can perform any necessary :ref:`path translations <settings-path-translation>`. Technically the service runner does not need to be python, as the primary interface is a json file, environment variables, and a single CLI call. But then non-python apps would not be able to take full advantage of the executor layer.
+#. The final terra app layer is the "task". If there are functions that can be called independently in parallel, :ref:`tasks <executor>` offer a single abstract API that will run your function in parallel.
 
 Adding Apps
 ===========

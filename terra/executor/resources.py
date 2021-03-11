@@ -1,12 +1,11 @@
 '''
 In a multithreaded or multiprocessing environment, it may become necessary to
-divide up and balance a limited "resource" among multiple workers. When a
-:class:`terra.task.TerraTask` is distributed to a worker, each worker might
-need to know what resource id to use, when you have this limited resource.
-
-For example if you have 4 GPUs and each GPU can only handle two simultaneous
-workers at a time, you want to have a total of 8 workers, but at any one time,
-you want two workings working on a specific GPU.
+divide up and balance a limited "resource" among multiple workers. For example,
+if you have 4 GPUs and each GPU can only handle two workers at a time, you
+would have a total of 8 workers. However, while running a
+:class:`terra.task.TerraTask` each worker would need to know what resource id
+(i.e. which specific GPU) to use. A :class:`Resource` would handle this for you
+in an easy-to-manage way.
 
 In order to balance this, a :class:`Resource` is maintained
 '''
@@ -50,16 +49,16 @@ class ThreadLocalStorage(ProcessLocalStorage, threading.local):
 
 class Resource:
   '''
-  A :class:`Resource` instance will represent a set of resources that can be
-  acquired among multiple threads or processes.
+  A :class:`Resource` instance represents a set of resources that can be
+  shared between multiple threads or processes.
 
-  This library is intended to be a coarse grain allocation, meaning it is
-  intended that acquiring a resource lasts the life of the thread/process, not
-  just for a function call or a section of a function. Multiple calls to
-  :meth:`acquire` or using ``with`` will result in the same resource, that was
-  not released between calls. Calls to :meth:`release` are never needed. The
-  only time a resource need to be released is when the thread/process is
-  ending, in which cause it is called automatically on delete at exit.
+  This library is intended to be a coarse-grain allocation. A resource is
+  allocated for the life of the worker thread/process. It should not be
+  released every time a task is run. Multiple calls to :meth:`acquire` or using
+  ``with`` are ok, as it will simply use the same result every time. Calls to
+  :meth:`release` are never needed. The only time a resource needs to be
+  released is when the thread/process is ending, in which case it is called
+  automatically on delete at exit.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
   creating worker threads/processes, so that they are configured correctly
@@ -74,7 +73,8 @@ class Resource:
       shorthand for ``range(0, items_integer)``. If objects are used for
       resources, they need to be pickleable, or else multiprocessing will fail.
   repeat : :class:`int`, optional
-      The number of times you want a resource to be repeated
+      The number of workers you want to be able to acquire a resource, e.g.,
+      two simultaneous workers per resource.
   use_softfilelock: bool or None
       If an OS does not support hard locks, :class:`filelock.SoftFileLock` will
       be used automatically. However, even if the OS supports hard locks, some
@@ -89,8 +89,8 @@ class Resource:
   Note
   ----
   This class is based on using lock files to lock resources. Why use lock
-  files? Hard lock files are one of the few methods that are tolerant to
-  unlocking after a seg faults. Given that both windows and linux support hard
+  files? Hard-lock files are one of the few methods that are tolerant to
+  unlocking after a seg fault. Given that both windows and linux support hard
   file locking, it is easy to use and makes more sense to use lock files than
   other forms of IPC to track resources and handle seg faults. Soft file
   locking is also supported, but less preferred.
@@ -125,7 +125,7 @@ class Resource:
     # self.FileLock = filelock.FileLock # Not pickleable
     self._use_softfilelock = use_softfilelock
 
-    # Check if I have to use SoftFileLock for specific, directories
+    # Check if I have to use SoftFileLock for specific directories
     if self._use_softfilelock is None and \
         filelock.FileLock != filelock.SoftFileLock:
       os.makedirs(self.lock_dir, exist_ok=True)
@@ -135,7 +135,7 @@ class Resource:
     if self.FileLock == filelock.SoftFileLock:
       if os.path.isdir(self.lock_dir) and not is_dir_empty(self.lock_dir):
         logger.warning(f'Lock dir "{self.lock_dir}" is not empty. Deleting it '
-                       'now for soft lock support.')
+                       'now for soft-lock support.')
         rmtree(self.lock_dir)
 
     if Executor._connect_backend().multiprocess:
@@ -161,7 +161,7 @@ class Resource:
     :attr:`Resource.lock_dir`.
 
     Hard locking is better, but only works if the OS and Filesystem supports
-    it. Sometimes it is necessary to use softlinking, so this property will
+    it. Sometimes it is necessary to use soft locking, so this property will
     always return the correct class to use.
     '''
     if self._use_softfilelock:
@@ -195,7 +195,7 @@ class Resource:
         If a thread/process worker spawns additional threads/processes, then
         the resource needs to be acquired by the actual worker (in celery, this
         is called the "worker child", not to be confused with the "worker"
-        parent, that is more of a manager process, and thus does not need a
+        parent, which is more of a manager process and thus does not need a
         resource) and then passed along to the other threads without using this
         class.
     '''
@@ -235,7 +235,7 @@ class Resource:
     '''
     Releases a resource and unlocks the associated lock file.
 
-    Calling :meth:`release` is not be typically necessary, it is
+    Calling :meth:`release` is not be typically necessary; it is
     called on cleanup automatically.
     '''
     if self._local.resource_id is None:
@@ -274,7 +274,7 @@ class Resource:
 
 def atexit_resource_release():
   '''
-  Clean up all resources before python starts unloading :mod:`os`, because
+  Clean up all resources before python starts unloading :mod:`os` because
   then it's too late.
   '''
   for resource in Resource._resources:
@@ -316,14 +316,13 @@ class ResourceManager:
     Registers a new resource
 
     Resources should be registered in: ``{app}/tasks/__init__.py``. This works
-    out because tasks are loaded fairly late in terra, so settings and logging
-    is already setup, but all Executors need to have tasks loaded before they
-    spawn workers.
+    out because tasks are loaded after settings and logging are loaded, but
+    before the Executor spawns workers.
 
     Parameters
     ----------
     name : str
-        A unique name for the resource. Needs to not contain symbols
+        A unique name for the resource. Must not contain symbols
         incompatible with the filesystem. Simple alphanumerics suggested.
     *args
         Additional args passed to :class:`Resource` init
