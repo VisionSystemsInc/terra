@@ -223,8 +223,7 @@ class TestLogger(TestLoggerConfigureCase):
 
   def test_configured_file(self):
     settings._setup()
-    log_filename = os.path.join(self.temp_dir.name,
-                                self._logs.default_log_prefix)
+    log_filename = os.path.join(self.temp_dir.name, "terra_log")
 
     log_handler = [
         h for h in self._logs.root_logger.handlers

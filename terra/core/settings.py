@@ -310,6 +310,19 @@ def terra_uuid(self):
 
 
 @settings_property
+def log_file(self):
+  '''
+  The default :func:`settings_property` for the log_file.
+  The default is :func:`processing_dir/terra.log<processing_dir>`.
+  This log file is not used if ``TERRA_DISABLE_TERRA_LOG`` is true.
+  '''
+  if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
+    return os.path.join(self.processing_dir, 'terra_log')
+  else:
+    return None
+
+
+@settings_property
 def logging_hostname(self):
   '''
   A :func:`settings_property` for getting the hostname for logging.
@@ -364,7 +377,8 @@ global_templates = [
           "hostname": logging_hostname,
           "port": DEFAULT_TCP_LOGGING_PORT,
           "listen_address": logging_listen_address,
-        }
+        },
+        "log_file": log_file,
       },
       "executor": {
         "num_workers": multiprocessing.cpu_count(),
