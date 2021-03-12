@@ -124,6 +124,9 @@ nitpick_ignore = [
     ('py:class', 'argparse._AppendAction'),
     ('py:data',  'logging.DEBUG'),
     ('py:data',  'logging.WARNING'),
+    # Since I'm not including 'celery.contrib.sphinx' yet
+    # https://stackoverflow.com/questions/33416296/sphinx-not-autodocumenting-decorated-celery-tasks
+    ('py:class', 'celery.app.task.')
 ]
 
 # -- Options for HTML output -------------------------------------------------

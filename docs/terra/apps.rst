@@ -38,7 +38,7 @@ An app in terra consists of 6 layers
        def example(self):
          compute.run('example.services.example1')
 
-3. A stage is an optional but often utilized part of a workflow. Instead of calling services directly from the workflow, the workflow calls methods that have a :func:`@resumable <terra.utils.workflow.resumable>` decorator on them. These functions are made resumable and skip-able. Stages are useful as they let you rerun a workflow, resuming after the last stage that successfully finish.
+3. A stage is an optional but often utilized part of a workflow. Instead of calling services directly from the workflow, the workflow calls methods that have a ``@resumable`` decorator on them, these functions are made resumable and skip-able. Stages are useful as they let you rerun a workflow, resuming after the last stage that successfully finish.
 
   .. rubric:: Example:
 

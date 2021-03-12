@@ -5,7 +5,7 @@
 Compute
 =======
 
-The goal of the compute layer is to offer an abstraction interface between the service runner (the actual algorithm) and the computer architecture it is running on: be it locally, in a container, a VM, or on the cloud.
+The goal of the compute layer is to offer an abstraction interface between the service runner (the actual algorithm) and the computing model it is running on: be it locally, in a container, a VM, or on the cloud.
 
 Built in computes
 -----------------
