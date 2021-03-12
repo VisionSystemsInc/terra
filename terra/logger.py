@@ -212,7 +212,6 @@ class _SetupTerraLogger():
                                         ' %(message)s')
   default_stderr_handler_level = logging.WARNING
   default_tmp_prefix = "terra_initial_tmp_"
-  default_log_prefix = "terra_log"
 
   def __init__(self):
     self._configured = False

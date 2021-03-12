@@ -219,10 +219,9 @@ class BaseCompute:
   def configure_logger(sender, **kwargs):
     if settings.terra.zone == 'controller':
       # Setup log file for use in configure
-      if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
-        sender._log_file = os.path.join(
-            settings.processing_dir,
-            terra.logger._SetupTerraLogger.default_log_prefix)
+      if settings.logging.log_file:
+        os.makedirs(os.path.dirname(settings.logging.log_file), exist_ok=True)
+        sender._log_file = settings.logging.log_file
       else:
         sender._log_file = os.devnull
       os.makedirs(settings.processing_dir, exist_ok=True)
@@ -275,10 +274,9 @@ class BaseCompute:
     # output stream
 
     if settings.terra.zone == 'controller':
-      if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
-        log_file = os.path.join(
-            settings.processing_dir,
-            terra.logger._SetupTerraLogger.default_log_prefix)
+      if settings.logging.log_file:
+        os.makedirs(os.path.dirname(settings.logging.log_file), exist_ok=True)
+        log_file = settings.logging.log_file
       else:
         log_file = os.devnull
 
