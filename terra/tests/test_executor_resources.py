@@ -21,12 +21,13 @@ from terra import settings
 
 # Cheat code: Run test 100 times, efficiently, good for looking for
 # intermittent issues
-# TERRA_UNITTEST=1 python -c "from unittest.main import main; main(
-#   module=None,
-#   argv=['', '-f']+100*[
-#     'terra.tests.test_executor_resources.TestResourceLock.test_items'
-#   ]
-# )"
+# just --wrap Terra_Pipenv run env TERRA_UNITTEST=1 python -c \
+#   "from unittest.main import main; main(
+#     module=None,
+#     argv=['', '-f']+100*[
+#       'terra.tests.test_executor_resources.TestResourceLock.test_items'
+#     ]
+#   )"
 
 
 def get_lock_dir(name):

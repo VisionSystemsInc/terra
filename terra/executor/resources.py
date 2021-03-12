@@ -4,10 +4,8 @@ divide up and balance a limited "resource" among multiple workers. For example,
 if you have 4 GPUs and each GPU can only handle two workers at a time, you
 would have a total of 8 workers. However, while running a
 :class:`terra.task.TerraTask` each worker would need to know what resource id
-(i.e. which specific GPU) to use. A :class:`Resource` would handle this for you
-in an easy-to-manage way.
-
-In order to balance this, a :class:`Resource` is maintained
+(i.e. which specific GPU) to use. A :class:`Resource` would handles and
+balances this for you in an easy-to-manage way.
 '''
 
 import os
@@ -29,7 +27,9 @@ logger = getLogger(__name__)
 
 
 class ResourceError(Exception):
-  pass
+  '''
+  Exception thrown when no more resources are available
+  '''
 
 
 class ProcessLocalStorage:
@@ -52,13 +52,16 @@ class Resource:
   A :class:`Resource` instance represents a set of resources that can be
   shared between multiple threads or processes.
 
-  This library is intended to be a coarse-grain allocation. A resource is
-  allocated for the life of the worker thread/process. It should not be
-  released every time a task is run. Multiple calls to :meth:`acquire` or using
-  ``with`` are ok, as it will simply use the same result every time. Calls to
-  :meth:`release` are never needed. The only time a resource needs to be
-  released is when the thread/process is ending, in which case it is called
-  automatically on delete at exit.
+  This class will allocate a resource for a worker to use by simply calling
+  :meth:`acquire` or using a ``with`` context manager. For each call to
+  acquire, the resource should also be :meth:`release`-ed. It should not
+  constantly acquiring and releasing thoughout a single task, it intended that
+  the resource is assigned to the task for the entire time, so there is no need
+  to release early. Multiple calls to :meth:`acquire` or using ``with`` are ok,
+  as it will simply use the same resource every time. For every call to
+  :meth:`acquire, an equal number of calls to :meth:`release` are required.
+  For this reason, using ``with`` context managers is often the easier way to
+  go.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
   creating worker threads/processes, so that they are configured correctly
@@ -94,6 +97,19 @@ class Resource:
   file locking, it is easy to use and makes more sense to use lock files than
   other forms of IPC to track resources and handle seg faults. Soft file
   locking is also supported, but less preferred.
+
+  Note
+  ----
+  This class supports :ref:`executor`-s that use threading or multiprocessing
+  for spawning workers. There is no additional effort needed to maintain this
+  worker isolation. However, if a single non-multiprocess executor (e.g.
+  ``ThreadPoolExecutor``) worker were to spawn additional threads or processes
+  during a task's execution, then :class:`Resource` would have no way of
+  knowing that the new threads/processes were part of the same worker. The same
+  is true if a single multiprocess executor worker were to spawn additional
+  processes (additional threads would not be an issue). If this were to ever
+  occur, be sure to acquire the resource before spawning to get the intended
+  result.
   '''
 
   _resources = weakref.WeakSet()
@@ -187,7 +203,7 @@ class Resource:
   def acquire(self):
     '''
     Acquires and locks a resource. Multiple calls will return the same resource
-    and not additional locks.
+    and increase the lock counter.
 
     Returns
     ----------
@@ -245,10 +261,15 @@ class Resource:
     '''
     Releases a resource and unlocks the associated lock file.
 
-    Calling :meth:`release` is not be typically necessary; it is
-    called on cleanup automatically.
+    If the resource has been locked multiple times, calling :meth:`release`
+    decrements the counter, and only releases when the counter reaches zero.
+
+    Raises
+    ------
+    ValueError
+        Raised if the resource is not currently locked
     '''
-    if self._local.resource_id is None:
+    if not self.is_locked:
       raise ValueError('Release called with no lock acquired')
 
     if self._local.lock._lock_counter > 1:
@@ -283,7 +304,8 @@ class Resource:
     return None
 
   def __del__(self):
-    if self._local.resource_id:
+    if self.is_locked:
+      logger.warning(f"A {self.name} resource was not released. Cleaning up on delete.")
       self.release()
 
 
@@ -293,7 +315,7 @@ def atexit_resource_release():
   then it's too late.
   '''
   for resource in Resource._resources:
-    if resource._local.resource_id:
+    if resource.is_locked:
       resource.release()
 
 
