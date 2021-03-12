@@ -168,10 +168,18 @@ class Resource:
       return filelock.SoftFileLock
     return filelock.FileLock
 
+  @property
+  def is_locked(self):
+    if self._local.lock is None:
+      return False
+    return self._local.lock.is_locked
+
   def _acquire(self, lock_file, resource_index, repeat):
-    self._local.lock = self.FileLock(lock_file, 0)
-    self._local.lock.acquire()
-    os.write(self._local.lock._lock_file_fd, str(os.getpid()).encode())
+    lock = self.FileLock(lock_file, 0)
+    lock.acquire()
+    os.write(lock._lock_file_fd, str(os.getpid()).encode())
+    # If you get this far, the lock is good, so save it in the class
+    self._local.lock = lock
     self._local.resource_id = resource_index
     self._local.instance_id = repeat
     return self.resources[self._local.resource_id]
@@ -200,7 +208,9 @@ class Resource:
         class.
     '''
     # Reuse for life of thread/process, unless someone calls release
-    if self._local.resource_id is not None:
+    if self.is_locked:
+      # Increment current counter
+      self._local.lock.acquire()
       return self.resources[self._local.resource_id]
 
     os.makedirs(self.lock_dir, exist_ok=True)
@@ -241,8 +251,13 @@ class Resource:
     if self._local.resource_id is None:
       raise ValueError('Release called with no lock acquired')
 
+    if self._local.lock._lock_counter > 1:
+      self._local.lock.release()
+      return
+
     # with self.master_lock:
-    # Clear the local cached first, in case other threads are watching
+    # Clear the local cached first, in case other threads are watching, which
+    # is unlikely
     lock = self._local.lock
     self._local.lock = None
     self._local.resource_id = None
@@ -264,8 +279,8 @@ class Resource:
     return self.acquire()
 
   def __exit__(self, exc_type, exc_value, exc_tb):
-    # Does not release, want to reuse resource for life of thread/process
-    pass
+    self.release()
+    return None
 
   def __del__(self):
     if self._local.resource_id:

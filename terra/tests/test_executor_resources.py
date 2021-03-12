@@ -70,7 +70,7 @@ class TestResourceLock(TestResourceCase):
     lock1 = test1.acquire()
     lock2 = test1.acquire()
 
-    # Acquiring twice, should use the cached value
+    # Acquiring twice, should use the same value
     self.assertEqual(lock1, lock2)
 
     lock3 = test2.acquire()
@@ -98,6 +98,27 @@ class TestResourceLock(TestResourceCase):
     self.assertIsNone(test._local.resource_id)
     self.assertIsNone(test._local.instance_id)
 
+  def test_multiple_release(self):
+    test = Resource('test', 1, 1)
+    self.assertFalse(test.is_locked)
+    test.acquire()
+    self.assertTrue(test.is_locked)
+    self.assertEqual(test._local.lock._lock_counter, 1)
+    test.acquire()
+    self.assertTrue(test.is_locked)
+    self.assertEqual(test._local.lock._lock_counter, 2)
+
+    test.release()
+    self.assertTrue(test.is_locked)
+    self.assertEqual(test._local.lock._lock_counter, 1)
+
+    test.release()
+    self.assertFalse(test.is_locked)
+
+    with self.assertRaisesRegex(ValueError,
+                                "Release called with no lock acquired"):
+      test.release()
+
   def test_dir_cleanup(self):
     # Test that empty lock dir is auto deleted
     resource = Resource('test', 1, 1)
@@ -116,13 +137,22 @@ class TestResourceLock(TestResourceCase):
   def test_with_context(self):
     # test with
     resource = Resource('test', 2, 1)
+
+    self.assertFalse(resource.is_locked)
     with resource as r1:
-      pass
+      self.assertTrue(resource.is_locked)
+
+    self.assertFalse(resource.is_locked)
 
     with resource as r2:
-      pass
+      with resource as r3:
+        self.assertTrue(resource.is_locked)
+        self.assertEqual(resource._local.lock._lock_counter, 2)
+      self.assertTrue(resource.is_locked)
+    self.assertFalse(resource.is_locked)
 
     self.assertEqual(r1, r2)
+    self.assertEqual(r2, r3)
 
   def test_repeats(self):
     # test repeated resources
