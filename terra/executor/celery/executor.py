@@ -29,7 +29,6 @@ from logging.handlers import SocketHandler
 from celery.signals import setup_logging
 
 from terra.executor.base import BaseFuture, BaseExecutor
-import terra
 from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
