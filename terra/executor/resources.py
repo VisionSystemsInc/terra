@@ -53,15 +53,15 @@ class Resource:
   shared between multiple threads or processes.
 
   This class will allocate a resource for a worker to use by simply calling
-  :meth:`acquire` or using a ``with`` context manager. For each call to
-  acquire, the resource should also be :meth:`release`-ed. It should not
-  constantly acquiring and releasing thoughout a single task, it intended that
-  the resource is assigned to the task for the entire time, so there is no need
-  to release early. Multiple calls to :meth:`acquire` or using ``with`` are ok,
-  as it will simply use the same resource every time. For every call to
-  :meth:`acquire, an equal number of calls to :meth:`release` are required.
-  For this reason, using ``with`` context managers is often the easier way to
-  go.
+  :meth:`acquire` or using a :ref:`with <python:with>` context manager. For
+  each call to acquire, the resource should also be :meth:`release`-ed. It
+  should not constantly acquiring and releasing thoughout a single task, it is
+  intended that the resource is assigned to the task for the entire time, so
+  there is no need to release early. Multiple calls to :meth:`acquire` or using
+  :ref:`with <python:with>` are ok, as it will simply use the same resource
+  every time. For every call to :meth:`acquire`, an equal number of calls to
+  :meth:`release` are required. For this reason, using
+  :ref:`with <python:with>` context managers is often the easier way to go.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
   creating worker threads/processes, so that they are configured correctly
@@ -312,7 +312,36 @@ class Resource:
   def __del__(self):
     if self.is_locked:
       logger.warning(f"A {self.name} resource was not released. Cleaning up on delete.")
-      self.release()
+      self.release(force=True)
+
+
+# class CachedResource(Resource):
+#   '''
+#   Like the :class:`Resource`, but instead of using normal context managers,
+#   it uses `cached context managers <https://www.python.org/dev/peps/pep-0343/
+#   #caching-context-managers>`_
+#
+#   Calls to :meth:`release` are never needed. The only time a resource needs
+#   to be released is when the thread/process is ending, in which case it is
+#   called automatically on delete at exit.
+#   '''
+#   def __exit__(self, exc_type, exc_value, exc_tb):
+#      pass
+
+#   def acquire(self):
+#     '''
+#     Unlike :meth:`Resource.acquire`, :class:`CachedResource` does not use a
+#     counter on the lock. Instead multiple calls to acquires returns the
+#     resource object.
+#     '''
+#     # Reuse for life of thread/process, unless someone calls release
+#     if self.is_locked:
+#       return self.resources[self._local.resource_id]
+#     return super().acquire()
+
+#   def __del__(self):
+#     if self.is_locked:
+#       self.release()
 
 @atexit.register
 def atexit_resource_release():
@@ -351,6 +380,7 @@ class ResourceManager:
     return cls.resources[name]
 
   @classmethod
+  # def register_resource(cls, name, cached=True, *args, **kwargs):
   def register_resource(cls, name, *args, **kwargs):
     '''
     Registers a new resource
@@ -374,8 +404,16 @@ class ResourceManager:
     ValueError
         If a resource with that name already exists
     '''
+    '''
+    cached: bool
+        Choose to use cached context manager via :class:`CachedResource` over
+        normal context manager using :class:`Resource`.
+    '''
     if name in cls.resources:
       raise ValueError(f'A "{name}" resource has already been added.')
+    # if cached:
+    #   resource = CachedResource(name, *args, **kwargs)
+    # else:
     resource = Resource(name, *args, **kwargs)
 
     cls.resources[name] = resource

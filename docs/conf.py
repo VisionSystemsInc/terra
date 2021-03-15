@@ -33,7 +33,7 @@ os.environ['TERRA_SETTINGS_FILE']=temp.name
 # -- Project information -----------------------------------------------------
 
 project = 'Terra'
-copyright = '2020, VSI'
+copyright = '2021, VSI'
 author = 'VSI'
 
 # The short X.Y version
@@ -109,6 +109,7 @@ autodoc_mock_imports = [
     "terra._terra",
     "yaml",
     "celery",
+    "filelock"
 ]
 
 nitpick_ignore = [

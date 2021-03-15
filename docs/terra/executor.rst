@@ -29,7 +29,7 @@ The :py:class:`terra.executor.sync.SyncExecutor` is a single-threaded executor t
 ThreadPoolExecutor
 ^^^^^^^^^^^^^^^^^^
 
-The :py:class:`concurrent.futures.ThreadPoolExecutor` is the default executor used due to its ease of setup. However, it is limited by the :ref:`GIL <threads>`. So while pickling of task arguments and return values are not required (as they are for :py:class:`concurrent.futures.ProcessPoolExecutor`), python code should not be expected to use more than one core at a time, even when multithreaded.
+The :py:class:`concurrent.futures.ThreadPoolExecutor` is the default executor used due to its ease of setup. However, it is limited by the :ref:`GIL <python:threads>`. So while pickling of task arguments and return values are not required (as they are for :py:class:`concurrent.futures.ProcessPoolExecutor`), python code should not be expected to use more than one core at a time, even when multithreaded.
 
 ProcessPoolExecutor
 ^^^^^^^^^^^^^^^^^^^

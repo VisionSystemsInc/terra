@@ -423,6 +423,13 @@ def acquire(name, i):
   return (l1, l2)
 
 
+def simple_acquire(name):
+  rv = data[name].acquire()
+  # import time
+  # time.sleep(0.1)
+  return rv
+
+
 class TestResourceMulti:
   '''
   Test that Resource works
@@ -458,6 +465,25 @@ class TestResourceMulti:
     self.assertNotEqual(results[0], results[1])
     self.assertEqual(results[0][0], results[0][1])
     self.assertEqual(results[1][0], results[1][1])
+
+  def test_multiple_executor(self):
+    # unlike test_acquire, this is not trying to test the exception, so there
+    # is no need to force locks to not unlock. In fact that would break this
+    # test. Test to see that locks are indeed cleaned up automatically in a
+    # way that means one executor after the other will not interfere with each
+    # other.
+    data[self.name] = Resource(self.name, 1, 1)
+    for _ in range(2):
+      futures = []
+      with self.Executor(max_workers=1) as executor:
+        futures.append(executor.submit(simple_acquire, self.name))
+
+        for future in as_completed(futures):
+          future.result()
+
+    # double check resource was freed
+    data[self.name].acquire()
+    data[self.name].release()
 
   def test_local_storage_type(self):
     # test the types are right
