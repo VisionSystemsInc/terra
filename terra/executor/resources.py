@@ -15,7 +15,7 @@ import tempfile
 import atexit
 import weakref
 from shutil import rmtree
-import vsi.vendored.filelock as filelock
+import filelock
 
 from vsi.tools.dir_util import is_dir_empty
 
@@ -257,12 +257,18 @@ class Resource:
                 return self._acquire(lock_file, resource_index, repeat)
     raise ResourceError(f'No more resources available for "{self.name}"')
 
-  def release(self):
+  def release(self, force=False):
     '''
     Releases a resource and unlocks the associated lock file.
 
     If the resource has been locked multiple times, calling :meth:`release`
     decrements the counter, and only releases when the counter reaches zero.
+
+    Parameters
+    ----------
+    force: bool
+        If true, the lock counter is ignored and the lock is released in every
+        case.
 
     Raises
     ------
@@ -272,7 +278,7 @@ class Resource:
     if not self.is_locked:
       raise ValueError('Release called with no lock acquired')
 
-    if self._local.lock._lock_counter > 1:
+    if not force and self._local.lock._lock_counter > 1:
       self._local.lock.release()
       return
 
@@ -291,7 +297,7 @@ class Resource:
         # _before_ unlocking. Testing using lslock shows that this cleans up
         # and works exactly as expected.
         os.remove(lock.lock_file)
-    lock.release()
+    lock.release(force)
 
     if os.path.isdir(self.lock_dir) and is_dir_empty(self.lock_dir):
       os.rmdir(self.lock_dir)
@@ -308,7 +314,7 @@ class Resource:
       logger.warning(f"A {self.name} resource was not released. Cleaning up on delete.")
       self.release()
 
-
+@atexit.register
 def atexit_resource_release():
   '''
   Clean up all resources before python starts unloading :mod:`os` because
@@ -316,10 +322,7 @@ def atexit_resource_release():
   '''
   for resource in Resource._resources:
     if resource.is_locked:
-      resource.release()
-
-
-atexit.register(atexit_resource_release)
+      resource.release(force=True)
 
 
 class ResourceManager:

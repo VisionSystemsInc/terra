@@ -5,7 +5,7 @@ from multiprocessing import Process
 import platform
 from unittest import mock
 
-import vsi.vendored.filelock as filelock
+import filelock
 from vsi.tools.dir_util import is_dir_empty
 
 from terra.tests.utils import (
@@ -15,7 +15,8 @@ from terra.executor.process import ProcessPoolExecutor
 from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
-  ProcessLocalStorage, ThreadLocalStorage, ResourceManager
+  ProcessLocalStorage, ThreadLocalStorage, ResourceManager,
+  atexit_resource_release
 )
 from terra import settings
 
@@ -82,6 +83,10 @@ class TestResourceLock(TestResourceCase):
     with self.assertRaises(ResourceError):
       test3.acquire()
 
+    # cleanup warnings
+    test1.release(force=True)
+    test2.release(force=True)
+
   def test_release(self):
     # test releasing a lock in a single thread
     test = Resource('test', 1, 1)
@@ -98,6 +103,44 @@ class TestResourceLock(TestResourceCase):
     self.assertIsNone(test._local.lock)
     self.assertIsNone(test._local.resource_id)
     self.assertIsNone(test._local.instance_id)
+
+  def test_force_release(self):
+    test = Resource('test', 1, 1)
+    test.acquire()
+    test.acquire()
+    test.release(force=True)
+    self.assertFalse(test.is_locked)
+
+  def test_release_on_delete(self):
+    # test leftover locks are detected and cleaned up
+    test = Resource('test', 1, 1)
+
+    lock = test.acquire()
+
+    with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
+      filename = test._local.lock._lock_file
+      self.assertExist(filename)
+      del(test)
+      self.assertNotExist(filename)
+    self.assertIn('A test resource was not released. Cleaning up on delete.', cm.output[0])
+
+  def test_atexit(self):
+    test1 = Resource('test1', 1, 1)
+    test2 = Resource('test2', 1, 1)
+    test3 = Resource('test3', 1, 1)
+
+    lock2 = test2.acquire()
+    lock3 = test3.acquire()
+    lock3 = test3.acquire()
+
+    filename2 = test2._local.lock._lock_file
+    filename3 = test3._local.lock._lock_file
+    self.assertExist(filename2)
+    self.assertExist(filename3)
+    atexit_resource_release()
+    self.assertNotExist(filename2)
+    self.assertNotExist(filename3)
+
 
   def test_multiple_release(self):
     test = Resource('test', 1, 1)
@@ -197,6 +240,12 @@ class TestResourceLock(TestResourceCase):
     self.assertEqual(lock4, 1)
     self.assertEqual(repeat4._local.instance_id, 1)
 
+    # Clean up warnings
+    repeat1.release(force=True)
+    repeat2.release(force=True)
+    repeat3.release(force=True)
+    repeat4.release(force=True)
+
   def test_items(self):
     # Test list of objects as resources
     resource1 = Resource('items', ['foo', 'bar'])
@@ -213,6 +262,10 @@ class TestResourceLock(TestResourceCase):
 
     with self.assertRaises(ResourceError):
       resource3.acquire()
+
+    # Clean up warnings
+    resource1.release(force=True)
+    resource2.release(force=True)
 
   def test_none(self):
     # Early version of the code used None in such a way it tripped up the logic
@@ -243,6 +296,10 @@ class TestResourceLock(TestResourceCase):
 
     with self.assertRaises(ResourceError):
       resource3.acquire()
+
+    # Clean up warnings
+    resource1.release(force=True)
+    resource2.release(force=True)
 
 
 class TestResourceSoftLock(TestResourceLock):
@@ -455,6 +512,9 @@ class TestResourceProcess(TestResourceMulti,
     self.assertEqual(lock, 'foo')
     # Test that additional calls to acquire after recovering resource, work
     self.assertEqual(lock, resource.acquire())
+
+    # Clean up warnings
+    resource.release(force=True)
 
 
 class TestResourceManager(TestResourceCase):
