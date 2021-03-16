@@ -4,8 +4,8 @@ divide up and balance a limited "resource" among multiple workers. For example,
 if you have 4 GPUs and each GPU can only handle two workers at a time, you
 would have a total of 8 workers. However, while running a
 :class:`terra.task.TerraTask` each worker would need to know what resource id
-(i.e. which specific GPU) to use. A :class:`Resource` would handles and
-balances this for you in an easy-to-manage way.
+(i.e. which specific GPU) to use. A :class:`Resource` handles and balances this
+for you in an easy-to-manage way.
 '''
 
 import os
@@ -50,20 +50,21 @@ class ThreadLocalStorage(ProcessLocalStorage, threading.local):
 class Resource:
   '''
   A :class:`Resource` instance represents a set of resources that can be
-  shared between multiple threads or processes.
+  shared between multiple threads or processes on a single computer.
 
   This class will allocate a resource for a task to use by simply calling
-  :meth:`acquire` or using a :ref:`with <python:with>` context manager. For
-  each call to acquire, the resource should also be :meth:`release`-ed. It
-  should not be constantly acquiring and releasing thoughout a single task, it
-  is intended that the resource is assigned to the task for the entire task
-  There should be as most the same number of workers as resources available for
-  a specific queue, so there is no need to release early because no one is
-  waiting for resources. Multiple calls to :meth:`acquire` or using
-  :ref:`with <python:with>` are ok, as it will simply use the same resource
-  every time. For every call to :meth:`acquire`, an equal number of calls to
-  :meth:`release` are required. For this reason, using
-  :ref:`with <python:with>` context managers is often the easier way to go.
+  :meth:`acquire` or using a :ref:`with <python:with>` context manager.
+  Multiple calls to :meth:`acquire` or using nested :ref:`with <python:with>`-s
+  are ok, as it will simply use the same resource every time. For each call to
+  :meth:`acquire`, an equal number of calls to :meth:`release` are required.
+  For this reason, using :ref:`with <python:with>` context managers are often
+  the easier way to go.
+
+  There should be at most as many workers as resources available for a specific
+  queue of workers. Because there are enough resources for every worker, the
+  resource can be considered reserved for the entire time a task runs---there
+  is no need to release early after a function call or a small piece of the
+  task because no one is waiting for resources.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
   creating worker threads/processes, so that they are configured correctly
@@ -103,15 +104,14 @@ class Resource:
   Note
   ----
   This class supports :ref:`executor`-s that use threading or multiprocessing
-  for spawning workers. There is no additional effort needed to maintain this
-  worker isolation. However, if a single non-multiprocess executor (e.g.
-  ``ThreadPoolExecutor``) worker were to spawn additional threads or processes
-  during a task's execution, then :class:`Resource` would have no way of
-  knowing that the new threads/processes were part of the same worker. The same
-  is true if a single multiprocess executor worker were to spawn additional
-  processes (additional threads would not be an issue). If this were to ever
-  occur, be sure to acquire the resource before spawning to get the intended
-  result.
+  to spawn workers. There is no additional effort needed to maintain this
+  worker isolation. However, if a single task in a threaded executor worker
+  were to spawn additional threads (a new process has a new thread too) during
+  a task's execution, then :class:`Resource` would have no way of knowing that
+  the new threads were part of the same worker. The same is true if a single
+  task in a multiprocess executor worker were to spawn additional processes. If
+  this were to ever occur, be sure to acquire the resource before spawning to
+  get the intended result.
   '''
 
   _resources = weakref.WeakSet()

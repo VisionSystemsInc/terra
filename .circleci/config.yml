@@ -114,7 +114,7 @@ jobs:
             # This is faster than pipenv sync --dev. pyzmq (via ipykernel)
             # wastes several minutes, and I don't need it
             just terra pipenv run pip install autopep8 flake8
-            just terra test-pep8
+            just terra pep8
 
   compile_docs:
     <<: *container_config
