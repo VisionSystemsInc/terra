@@ -29,6 +29,7 @@ class TerraTask(Task):
   '''
   A task function that can be run in parallel using :ref:`executor`-s
   '''
+
   def _get_volume_mappings(self):
     executor_volume_map = self.request.settings['executor']['volume_map']
 

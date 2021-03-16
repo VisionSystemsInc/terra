@@ -115,23 +115,23 @@ class TestResourceLock(TestResourceCase):
     # test leftover locks are detected and cleaned up
     test = Resource('test', 1, 1)
 
-    lock = test.acquire()
+    test.acquire()
 
     with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
       filename = test._local.lock._lock_file
       self.assertExist(filename)
       del(test)
       self.assertNotExist(filename)
-    self.assertIn('A test resource was not released. Cleaning up on delete.', cm.output[0])
+    self.assertIn('A test resource was not released. Cleaning up on delete.',
+                  cm.output[0])
 
   def test_atexit(self):
-    test1 = Resource('test1', 1, 1)
     test2 = Resource('test2', 1, 1)
     test3 = Resource('test3', 1, 1)
 
-    lock2 = test2.acquire()
-    lock3 = test3.acquire()
-    lock3 = test3.acquire()
+    test2.acquire()
+    test3.acquire()
+    test3.acquire()
 
     filename2 = test2._local.lock._lock_file
     filename3 = test3._local.lock._lock_file
@@ -140,7 +140,6 @@ class TestResourceLock(TestResourceCase):
     atexit_resource_release()
     self.assertNotExist(filename2)
     self.assertNotExist(filename3)
-
 
   def test_multiple_release(self):
     test = Resource('test', 1, 1)

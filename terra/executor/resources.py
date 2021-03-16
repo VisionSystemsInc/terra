@@ -313,7 +313,8 @@ class Resource:
 
   def __del__(self):
     if self.is_locked:
-      logger.warning(f"A {self.name} resource was not released. Cleaning up on delete.")
+      logger.warning(f"A {self.name} resource was not released. Cleaning up "
+                     "on delete.")
       self.release(force=True)
 
 
