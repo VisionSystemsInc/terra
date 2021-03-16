@@ -331,7 +331,7 @@ class Resource:
 #   def acquire(self):
 #     '''
 #     Unlike :meth:`Resource.acquire`, :class:`CachedResource` does not use a
-#     counter on the lock. Instead multiple calls to acquires returns the
+#     counter on the lock. Instead multiple calls to acquire returns the
 #     resource object.
 #     '''
 #     # Reuse for life of thread/process, unless someone calls release
@@ -406,8 +406,8 @@ class ResourceManager:
     '''
     '''
     cached: bool
-        Choose to use cached context manager via :class:`CachedResource` over
-        normal context manager using :class:`Resource`.
+        Choose to use a cached context manager via :class:`CachedResource` over
+        a normal context manager using :class:`Resource`.
     '''
     if name in cls.resources:
       raise ValueError(f'A "{name}" resource has already been added.')
