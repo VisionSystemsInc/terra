@@ -55,9 +55,11 @@ class Resource:
   This class will allocate a resource for a task to use by simply calling
   :meth:`acquire` or using a :ref:`with <python:with>` context manager. For
   each call to acquire, the resource should also be :meth:`release`-ed. It
-  should not constantly acquiring and releasing thoughout a single task, it is
-  intended that the resource is assigned to the task for the entire time, so
-  there is no need to release early. Multiple calls to :meth:`acquire` or using
+  should not be constantly acquiring and releasing thoughout a single task, it
+  is intended that the resource is assigned to the task for the entire task
+  There should be as most the same number of workers as resources available for
+  a specific queue, so there is no need to release early because no one is
+  waiting for resources. Multiple calls to :meth:`acquire` or using
   :ref:`with <python:with>` are ok, as it will simply use the same resource
   every time. For every call to :meth:`acquire`, an equal number of calls to
   :meth:`release` are required. For this reason, using
