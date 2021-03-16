@@ -52,7 +52,7 @@ class Resource:
   A :class:`Resource` instance represents a set of resources that can be
   shared between multiple threads or processes.
 
-  This class will allocate a resource for a worker to use by simply calling
+  This class will allocate a resource for a task to use by simply calling
   :meth:`acquire` or using a :ref:`with <python:with>` context manager. For
   each call to acquire, the resource should also be :meth:`release`-ed. It
   should not constantly acquiring and releasing thoughout a single task, it is
