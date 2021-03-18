@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import time
+import pickle
 from unittest import mock
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 import tempfile
@@ -118,6 +119,14 @@ class TestLazyObject(TestCase):
     self.assertEqual(lazy[0], 17)
     self.assertEqual(lazy[1], 33)
     self.assertEqual(len(lazy), 2)
+
+  def test_pickle(self):
+    lazy = LazyObject()
+    lazy._wrapped = (11, 22, 33)
+    s = pickle.dumps(lazy)
+    pickled = pickle.loads(s)
+    self.assertTupleEqual(pickled._wrapped, lazy._wrapped)
+    self.assertIsNot(pickled._wrapped, lazy._wrapped)
 
 
 class TestObjectDict(TestCase):
@@ -628,6 +637,13 @@ class TestSettings(TestLoggerCase):
     with EnvironmentContext(GKLDGSJLGKJSGURNAONV="FOO"):
       # Show it is not evaluated again here
       self.assertEqual(settings.test2, 'a${GKLDGSJLGKJSGURNAONV}b')
+
+  def test_pickle(self):
+    settings.configure({'key': 'value'})
+    s = pickle.dumps(settings)
+    pickled = pickle.loads(s)
+    self.assertDictEqual(pickled._wrapped, settings._wrapped)
+    self.assertIsNot(pickled._wrapped, settings._wrapped)
 
 
 class TestUnitTests(TestCase):

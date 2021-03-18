@@ -114,7 +114,7 @@ jobs:
             # This is faster than pipenv sync --dev. pyzmq (via ipykernel)
             # wastes several minutes, and I don't need it
             just terra pipenv run pip install autopep8 flake8
-            just terra test-pep8
+            just terra pep8
 
   compile_docs:
     <<: *container_config
@@ -129,7 +129,7 @@ jobs:
       - run:
           name: Smuggle docs back from remote docker
           command: |
-            docker run --rm -v /root/repo:/src -w /src alpine:3.8 tar c ./docs/_build/html | tar x
+            docker run --rm -v /root/repo:/src -w /src alpine:3 tar c ./docs/_build/html | tar x
 
       - persist_to_workspace:
           root: docs/_build

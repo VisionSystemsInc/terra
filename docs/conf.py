@@ -19,6 +19,7 @@ import tempfile
 sys.path.insert(0, os.path.abspath(os.environ['TERRA_CWD']))
 sys.path.insert(0, os.path.abspath(os.path.join(os.environ['VSI_COMMON_DIR'],
                                                 'python')))
+sys.path.append(os.path.abspath("./_ext"))
 # Disable logging from fully initializing. It's just a mess we don't need
 os.environ['TERRA_UNITTEST']='1'
 
@@ -32,7 +33,7 @@ os.environ['TERRA_SETTINGS_FILE']=temp.name
 # -- Project information -----------------------------------------------------
 
 project = 'Terra'
-copyright = '2020, VSI'
+copyright = '2021, VSI'
 author = 'VSI'
 
 # The short X.Y version
@@ -56,14 +57,16 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'sphinx.ext.intersphinx',
-    'vsi_domains'
+    'vsi_domains',
+    'celerydocs'
 ]
 
 # Link to other documentation (e.g., numpy, python, terra, etc.)
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'vsi_common': ('https://visionsystemsinc.github.io/vsi_common/', None),
-    'celery': ('https://docs.celeryproject.org/en/stable/', None)
+    'celery': ('https://docs.celeryproject.org/en/stable/', None),
+    'filelock': ('https://filelock.readthedocs.io/en/latest/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -106,6 +109,7 @@ autodoc_mock_imports = [
     "terra._terra",
     "yaml",
     "celery",
+    "filelock"
 ]
 
 nitpick_ignore = [
@@ -113,6 +117,7 @@ nitpick_ignore = [
     ('py:mod',   'django.conf'),
     ('py:class', 'django.db.utils.ConnectionHandler'),
     ('py:class', 'json.encoder.JSONEncoder'),
+    ('py:class', '_thread._local'),
     ('py:class', 'concurrent.futures._base.Executor'),
     ('py:class', 'concurrent.futures._base.Future'),
     ('py:class', 'concurrent.futures.process.ProcessPoolExecutor'),
@@ -120,6 +125,9 @@ nitpick_ignore = [
     ('py:class', 'argparse._AppendAction'),
     ('py:data',  'logging.DEBUG'),
     ('py:data',  'logging.WARNING'),
+    # Since I'm not including 'celery.contrib.sphinx' yet
+    # https://stackoverflow.com/questions/33416296/sphinx-not-autodocumenting-decorated-celery-tasks
+    ('py:class', 'celery.app.task.')
 ]
 
 # -- Options for HTML output -------------------------------------------------

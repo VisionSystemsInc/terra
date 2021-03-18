@@ -522,6 +522,14 @@ class LazyObject:
       self._setup()
     return iter(self._wrapped)
 
+  def __getstate__(self):
+    if self._wrapped is None:
+      self._setup()
+    return {'_wrapped': self._wrapped}
+
+  def __setstate__(self, state):
+    self._wrapped = state['_wrapped']
+
 
 class LazySettings(LazyObject):
   '''
@@ -561,14 +569,6 @@ class LazySettings(LazyObject):
     # Store in global variable :-\
     config_file.filename = settings_file
     self.configure(json_load(settings_file))
-
-  def __getstate__(self):
-    if self._wrapped is None:
-      self._setup()
-    return {'_wrapped': self._wrapped}
-
-  def __setstate__(self, state):
-    self._wrapped = state['_wrapped']
 
     # This should NOT be done on a per instance basis, this is only for
     # the global terra.settings. So maybe this should be done in a context

@@ -107,21 +107,15 @@ function terra_caseify()
 
     terra_up-redis-singular) # Start redis in singularity
       mkdir -p "${TERRA_REDIS_DIR_HOST_SINGULAR}"
-      SINGULARITY_IGNORE_EXIT_CODES='.*'
       justify singular-compose instance start redis
       ;;
 
     terra_ping-redis-singular) # Ping the redis server, to see if it is up
-      local rv=0
       SINGULARITY_IGNORE_EXIT_CODES=1
       justify singular-compose exec redis bash /vsi/linux/just_files/just_entrypoint.sh redis-ping
-
-      JUST_IGNORE_EXIT_CODES=1
-      return ${rv}
       ;;
 
     terra_down-redis-singular) # Stop redis in singularity
-      SINGULARITY_IGNORE_EXIT_CODES='.*'
       justify singular-compose instance stop redis
       ;;
 
@@ -258,7 +252,7 @@ function terra_caseify()
 
     # How do I know what error code causes a problem in autopep8? You don't!
     # At least not as far as I can tell.
-    terra_pep8) # Check pep8 compliance in ./terra
+    terra_autopep8) # Check PEP 8 compliance in ./terra using autopep8
       echo "Checking for autopep8..."
       if ! Terra_Pipenv run sh -c "command -v autopep8" &> /dev/null; then
         justify terra pipenv sync --dev
@@ -268,12 +262,15 @@ function terra_caseify()
       Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
                                 "${TERRA_TERRA_DIR}/terra"'
       ;;
-    terra_test-pep8) # Run pep8 test
-      justify terra pep8
+    terra_flake8) # Check PEP 8 compliance in ./terra using flake8
       echo "Running flake8..."
       Terra_Pipenv run bash -c 'cd ${TERRA_TERRA_DIR};
                                 flake8 \
                                 "${TERRA_TERRA_DIR}/terra"'
+      ;;
+
+    terra_pep8) # Run PEP 8 tests
+      justify terra autopep8 flake8
       ;;
 
     ### Syncing ###

@@ -18,7 +18,7 @@ crashes before it is even configured.
 After the :data:`terra.settings` are
 :data:`initialized<terra.core.signals.post_settings_configured>`, the
 ``terra_initial_tmp_XXXXXXXX`` file is removed, and another log file is used
-according to the :ref:`settings_logging`, named ``terra_log`` in your
+according to the :ref:`settings-logging`, named ``terra_log`` in your
 :data:`terra.core.settings.processing_dir`. The ``terra_log`` file is appended
 to if it already exists.
 
@@ -33,7 +33,7 @@ interest will be seen on stdout and saved in the final log file.
     time on ``stdout``. This repetition only occurs on ``stdout`` and is
     expected
 
-See :ref:`settings_logging` for how to customize the logger
+See :ref:`settings-logging` for how to customize the logger
 
 Usage
 -----
@@ -290,13 +290,6 @@ class _SetupTerraLogger():
                             category=DeprecationWarning, module='osgeo',
                             message="the imp module is deprecated")
 
-    # This disables a message that spams the screen:
-    # "pipbox received method enable_events() [reply_to:None ticket:None]"
-    # This is the only debug message in all of kombu.pidbox, so this is pretty
-    # safe to do
-    pidbox_logger = getLogger('kombu.pidbox')
-    pidbox_logger.setLevel(INFO)
-
   @property
   def main_log_handler(self):
     try:
@@ -333,6 +326,16 @@ class _SetupTerraLogger():
     if getattr(self, 'main_log_handler', None) is not None:
       self.main_log_handler.setLevel(level)
       self.main_log_handler.setFormatter(formatter)
+
+    # This disables a message that spams the screen:
+    # "pipbox received method enable_events() [reply_to:None ticket:None]"
+    # This is the only debug message in all of kombu.pidbox, so this is pretty
+    # safe to do
+    pidbox_logger = getLogger('kombu.pidbox')
+    pidbox_logger.setLevel(INFO)
+
+    bootsteps_logger = getLogger('celery.bootsteps')
+    bootsteps_logger.setLevel(INFO)
 
   def configure_logger(self, sender=None, signal=None, **kwargs):
     '''

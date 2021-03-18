@@ -7,7 +7,7 @@ FROM vsiri/recipe:pipenv as pipenv
 
 ###############################################################################
 
-FROM python:3.7.3-alpine3.8 as dep_stage
+FROM python:3.7-alpine as dep_stage
 SHELL ["/usr/bin/env", "sh", "-euxvc"]
 
 # Install any runtime dependencies
@@ -28,7 +28,9 @@ RUN for patch in /usr/local/share/just/container_build_patch/*; do "${patch}"; d
 
 FROM dep_stage as pipenv_cache
 
-RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers
+RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers \
+    # More dependencies for cryptography, which takes 75 seconds to compile
+    rust cargo
 
 COPY external/vsi_common/setup.py /terra/external/vsi_common/
 COPY setup.py Pipfile Pipfile.lock /terra/

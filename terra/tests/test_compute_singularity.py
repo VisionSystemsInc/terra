@@ -1,15 +1,14 @@
 import os
 from unittest import mock
 
-from terra import settings
 from terra.compute import base
 from terra.compute import singularity
 import terra.compute.utils
 
-from .utils import TestSettingsUnconfiguredCase
+from .utils import TestSettingsConfigureCase
 
 
-class TestComputeSingularityCase(TestSettingsUnconfiguredCase):
+class TestComputeSingularityCase(TestSettingsConfigureCase):
   def setUp(self):
     # This will reset the _connection to an uninitialized state
     self.patches.append(
@@ -17,13 +16,9 @@ class TestComputeSingularityCase(TestSettingsUnconfiguredCase):
                           '_connection',
                           mock.PropertyMock(
                               return_value=singularity.Compute())))
-    super().setUp()
-
     # Configure for singularity
-    settings.configure({
-        'compute': {'arch': 'singularity'},
-        'processing_dir': self.temp_dir.name,
-        'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
+    self.config.compute = {'arch': 'singularity'}
+    super().setUp()
 
 
 class MockJustService:

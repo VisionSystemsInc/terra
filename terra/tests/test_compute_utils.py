@@ -6,7 +6,7 @@ from unittest import mock
 import warnings
 
 from terra import settings
-from .utils import TestSettingsUnconfiguredCase
+from .utils import TestSettingsConfigureCase
 import terra.compute.utils as utils
 import terra.compute.dummy
 import terra.compute.docker
@@ -37,19 +37,18 @@ class Service2_test:
 
 # I am purposefully showing multiple ways to mock _wrapped for demonstration
 # purposes
-class TestComputeUtilsCase(TestSettingsUnconfiguredCase):
+class TestComputeUtilsCase(TestSettingsConfigureCase):
   def setUp(self):
     # Use setting
     self.patches.append(mock.patch.object(settings, '_wrapped', None))
     # For registering a service
     self.patches.append(mock.patch.dict(terra.compute.base.services,
                                         clear=True))
-    super().setUp()
-    # Register this Compute
-    settings.configure({'compute': {'arch': Compute.__module__},
-                        'processing_dir': self.temp_dir.name})
+    self.config.compute = {'arch': Compute.__module__}
 
-    # Manually register without using decorator
+    super().setUp()
+
+    # Manually register this Compute without using decorator
     Compute.register(Service)(Service_test)
     # Manually register against base compute. Normally this is never done, but
     # done for some core case tests below

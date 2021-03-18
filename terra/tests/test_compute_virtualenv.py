@@ -7,7 +7,7 @@ from terra.compute import base
 from terra.compute import virtualenv
 import terra.compute.utils
 
-from .utils import TestSettingsUnconfiguredCase
+from .utils import TestSettingsConfigureCase
 
 
 class MockVirtualEnvService(virtualenv.Service):
@@ -17,7 +17,7 @@ class MockVirtualEnvService(virtualenv.Service):
     self.env["BAR"] = "FOO"
 
 
-class TestVirtualEnv(TestSettingsUnconfiguredCase):
+class TestVirtualEnv(TestSettingsConfigureCase):
   def setUp(self):
     # self.run trigger Executor
     self.patches.append(mock.patch.dict(Executor.__dict__))
@@ -33,12 +33,8 @@ class TestVirtualEnv(TestSettingsUnconfiguredCase):
                                           'Popen', self.mock_popen))
 
     # patches.append(mock.patch.dict(base.services, clear=True))
+    self.config.compute = {'arch': 'virtualenv', 'virtualenv_dir': None}
     super().setUp()
-    settings.configure({
-        'compute': {'arch': 'virtualenv',
-                    'virtualenv_dir': None},
-        'processing_dir': self.temp_dir.name,
-        'test_dir': '/opt/projects/terra/terra_dsm/external/terra/foo'})
 
   # Store args, and return an object with a wait call
   def mock_popen(_self, *args, **kwargs):
@@ -116,6 +112,6 @@ class TestVirtualEnv(TestSettingsUnconfiguredCase):
     # Added by Terra
     self.assertTrue(any(o.startswith('+ TERRA_SETTINGS_FILE:')
                         for o in env_lines))
-    # Added by TestSettingsUnconfiguredCase
+    # Added by TestSettingsConfigureCase
     self.assertTrue(any(o.startswith('- TERRA_SETTINGS_FILE:')
                         for o in env_lines))
