@@ -60,10 +60,10 @@ class Resource:
   For this reason, using :ref:`with <python:with>` context managers are often
   the easier way to go.
 
-  There should be at most as many workers as resources available for a specific
+  There should not be more workers than resources available for a specific
   queue of workers. Because there are enough resources for every worker, the
-  resource can be considered reserved for the entire time a task runs---there
-  is no need to release early after a function call or a small piece of the
+  resource can be considered reserved for the lifetime of the task---there
+  is no need to release early after a function call or a small section of the
   task because no one is waiting for resources.
 
   Resources need to be registered via the :class:`ResourceManager` prior to
