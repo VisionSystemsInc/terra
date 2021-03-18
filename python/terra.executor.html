@@ -324,10 +324,10 @@ are ok, as it will simply use the same resource every time. For each call to
 <a class="reference internal" href="#terra.executor.resources.Resource.acquire" title="terra.executor.resources.Resource.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a>, an equal number of calls to <a class="reference internal" href="#terra.executor.resources.Resource.release" title="terra.executor.resources.Resource.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> are required.
 For this reason, using <a class="reference external" href="https://docs.python.org/3.6/reference/compound_stmts.html#with" title="(in Python v3.6)"><span class="xref std std-ref">with</span></a> context managers are often
 the easier way to go.</p>
-<p>There should be at most as many workers as resources available for a specific
+<p>There should not be more workers than resources available for a specific
 queue of workers. Because there are enough resources for every worker, the
-resource can be considered reserved for the entire time a task runs—there
-is no need to release early after a function call or a small piece of the
+resource can be considered reserved for the lifetime of the task—there
+is no need to release early after a function call or a small section of the
 task because no one is waiting for resources.</p>
 <p>Resources need to be registered via the <a class="reference internal" href="#terra.executor.resources.ResourceManager" title="terra.executor.resources.ResourceManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceManager</span></code></a> prior to
 creating worker threads/processes, so that they are configured correctly</p>
