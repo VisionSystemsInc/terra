@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Compute &mdash; Terra 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Executor" href="executor.html" />
+    <link rel="prev" title="Terra Apps" href="apps.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Terra
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">What is Terra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#executor-settings">Executor Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#compute-settings">Compute Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#workflow-settings">Workflow Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#logging-settings">Logging Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Terra Apps</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-computes">Built in computes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dummycompute">DummyCompute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dockercompute">DockerCompute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#singularitycompute">SingularityCompute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtualenvcompute">VirtualEnvCompute</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-custom-computes">Using custom computes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="executor.html">Executor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/modules.html">terra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Terra</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Compute</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/terra/compute.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compute">
+<span id="id1"></span><h1>Compute<a class="headerlink" href="#compute" title="Permalink to this headline">¶</a></h1>
+<p>The goal of the compute layer is to offer an abstraction interface between the service runner (the actual algorithm) and the computing platform it is running on: be it locally, in a cluster, a grid, or on the cloud.</p>
+<div class="section" id="built-in-computes">
+<h2>Built in computes<a class="headerlink" href="#built-in-computes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dummycompute">
+<h3>DummyCompute<a class="headerlink" href="#dummycompute" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../python/terra.compute.html#terra.compute.dummy.Compute" title="terra.compute.dummy.Compute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.dummy.Compute</span></code></a> is a debugging tool that simply dry-runs (and logs) what services would have been run.</p>
+</div>
+<div class="section" id="dockercompute">
+<h3>DockerCompute<a class="headerlink" href="#dockercompute" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../python/terra.compute.html#terra.compute.docker.Compute" title="terra.compute.docker.Compute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.docker.Compute</span></code></a> compute is for running in docker containers, creating and running a container for each service that is run. By default, <code class="docutils literal notranslate"><span class="pre">docker-compose</span></code> is used by the service definition to run the container. Supports <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">Path translation</span></a>.</p>
+</div>
+<div class="section" id="singularitycompute">
+<h3>SingularityCompute<a class="headerlink" href="#singularitycompute" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../python/terra.compute.html#terra.compute.singularity.Compute" title="terra.compute.singularity.Compute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.singularity.Compute</span></code></a> compute is for running in singularity containers, creating and running a container for each service run. By default, <a class="reference external" href="https://visionsystemsinc.github.io/vsi_common/just/plugins/singularity/just_singularity_functions.auto.html#command-just_singularity_functions.bsh singular_defaultify singular-compose" title="(in VSI Common)"><code class="xref bash bash-cmd docutils literal notranslate"><span class="pre">just_singularity_functions.bsh</span> <span class="pre">singular_defaultify</span> <span class="pre">singular-compose</span></code></a> is used by the service definition to run the container. Supports <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">Path translation</span></a>.</p>
+</div>
+<div class="section" id="virtualenvcompute">
+<h3>VirtualEnvCompute<a class="headerlink" href="#virtualenvcompute" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../python/terra.compute.html#terra.compute.virtualenv.Compute" title="terra.compute.virtualenv.Compute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.virtualenv.Compute</span></code></a> is used to run services locally in a virtualenv. While terra itself runs in a virtualenv, the terra app has its own virtualenv, which typically exists in the container, but exists locally when using this compute. This compute does not use <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">Path translation</span></a>.</p>
+</div>
+</div>
+<div class="section" id="using-custom-computes">
+<h2>Using custom computes<a class="headerlink" href="#using-custom-computes" title="Permalink to this headline">¶</a></h2>
+<p>Todo</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="executor.html" class="btn btn-neutral float-right" title="Executor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="apps.html" class="btn btn-neutral float-left" title="Terra Apps" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, VSI.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

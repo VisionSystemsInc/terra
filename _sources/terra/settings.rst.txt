@@ -14,6 +14,78 @@ Terra Settings
 
     Default: ``controller``
 
+.. _settings-executor:
+
+Executor Settings
+-----------------
+
+.. option:: executor.type
+
+    The :py:mod:`concurrent.futures <concurrent.futures>` executor to run tasks. Options are:
+
+        * DummyExecutor
+            Doesn't actually run the task, just prints out messages for each task.
+        * SyncExecutor
+            Runs each task one by one.
+        * ThreadPoolExecutor
+            Runs each task in its own thread.
+        * ProcessPoolExecutor
+            Runs each task in its own process.
+        * CeleryExecutor
+            Runs each task as a celery task. A message broker such as Redis should be initialized.
+
+    Default: ``ThreadPoolExecutor``
+
+    The value of executor.type is a string representing the python path for the selected executor. ``ThreadPoolExecutor`` is actually an alias for ``terra.executor.thread.ThreadPoolExecutor``. Other aliases include:
+
+    ====================================== ==========================================
+    Alias                                  Class
+    ====================================== ==========================================
+    DummyExecutor                          terra.executor.dummy.DummyExecutor
+    SyncExecutor                           terra.executor.sync.SyncExecutor
+    ThreadPoolExecutor                     terra.executor.thread.ThreadPoolExecutor
+    concurrent.futures.ThreadPoolExecutor  terra.executor.thread.ThreadPoolExecutor
+    ProcessPoolExecutor                    terra.executor.process.ProcessPoolExecutor
+    concurrent.futures.ProcessPoolExecutor terra.executor.process.ProcessPoolExecutor
+    CeleryExecutor                         terra.executor.celery.CeleryExecutor
+    ====================================== ==========================================
+
+.. note::
+
+   Do not force terra to use :py:class:`concurrent.futures.ThreadPoolExecutor` or :py:class:`concurrent.futures.ProcessPoolExecutor`, as it is missing customizations such as the ``multiprocess`` attribute. You can still :ref:`bring your own executor <custom-executor>`.
+
+.. option:: executor.num_workers
+
+    The maximum number of workers that will be used. Not applicable to :py:class:`terra.executor.sync.SyncExecutor`. Not honored by :py:class:`terra.executor.celery.executor.CeleryExecutor`
+
+    Default: number of cores
+
+.. _settings-compute:
+
+Compute Settings
+----------------
+
+.. option:: compute.arch
+
+    The compute architecture which defines how each service will be run. Options are:
+
+    * dummy
+        Does nothing but print out messages for every service and task. Useful for testing the app.
+    * virtualenv
+        Runs services on the host machine, using a python virtual environment.
+    * docker
+        Runs services on the host machine, inside a docker container.
+    * singularity
+        Runs services on the host machine, inside a singularity container.
+
+    Default: ``dummy``
+
+.. option:: compute.virtualenv_dir
+
+    Only needed when :option:`compute.arch` is ``virtualenv``. Specifies where the virtual environment's python executable is located.
+
+.. _settings-workflow:
+
 Workflow Settings
 -----------------
 
@@ -29,7 +101,7 @@ Workflow Settings
 
     Default: ``{Last Service}``
 
-.. _settings_logging:
+.. _settings-logging:
 
 Logging Settings
 ----------------

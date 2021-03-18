@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Welcome to Terra’s documentation! &mdash; Terra 0.0.1 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -50,7 +52,7 @@
           
 
           
-            <a href="#" class="icon icon-home" alt="Documentation Home"> Terra
+            <a href="#" class="icon icon-home"> Terra
           
 
           
@@ -85,9 +87,13 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="terra/getting_started.html">What is Terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#executor-settings">Executor Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#compute-settings">Compute Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#logging-settings">Logging Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Adding Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Terra Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/executor.html">Executor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="python/modules.html">terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/contributing.html">Contributing Guidlines</a></li>
 </ul>
@@ -130,6 +136,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -141,7 +149,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -157,6 +165,7 @@
             
   <div class="section" id="welcome-to-terra-s-documentation">
 <h1>Welcome to Terra’s documentation!<a class="headerlink" href="#welcome-to-terra-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Terra is an infrastructure for running an algorithm to support multiple compute types, without needing to rewrite the algorithm for each one.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -165,9 +174,24 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#executor-settings">Executor Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#compute-settings">Compute Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#logging-settings">Logging Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Adding Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Terra Apps</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra/apps.html#adding-apps">Adding Apps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terra/compute.html">Compute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra/compute.html#built-in-computes">Built in computes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra/compute.html#using-custom-computes">Using custom computes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="terra/executor.html">Executor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="terra/executor.html#built-in-executors">Built in executors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra/executor.html#using-custom-executors">Using custom executors</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="python/modules.html">terra</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="python/terra.html">terra package</a></li>
 </ul>
@@ -193,35 +217,28 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="terra/getting_started.html" class="btn btn-neutral float-right" title="What is Terra" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
+        <a href="terra/getting_started.html" class="btn btn-neutral float-right" title="What is Terra" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, VSI
+        &#169; Copyright 2021, VSI.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

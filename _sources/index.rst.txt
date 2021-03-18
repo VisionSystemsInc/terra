@@ -6,6 +6,8 @@
 Welcome to Terra's documentation!
 =================================
 
+Terra is an infrastructure for running an algorithm to support multiple compute types, without needing to rewrite the algorithm for each one.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -13,6 +15,8 @@ Welcome to Terra's documentation!
    terra/getting_started
    terra/settings
    terra/apps
+   terra/compute
+   terra/executor
    python/modules
    terra/contributing
 

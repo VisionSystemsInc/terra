@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>What is Terra &mdash; Terra 0.0.1 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -51,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Terra
+            <a href="../index.html" class="icon icon-home"> Terra
           
 
           
@@ -86,15 +88,24 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">What is Terra</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#settings">Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#settings">Settings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#templating">Templating</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#path-translation">Path translation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#advanced-usage">Advanced usage</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#executor-settings">Executor Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#compute-settings">Compute Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="settings.html#logging-settings">Logging Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="apps.html">Adding Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Terra Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="executor.html">Executor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../python/modules.html">terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
 </ul>
@@ -137,6 +148,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -148,7 +161,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/terra/getting_started.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -178,10 +191,21 @@
 </div>
 <p>The settings file used is controlled by the environment variable <span class="target" id="index-0"></span><a class="reference internal" href="../python/terra.core.html#envvar-TERRA_SETTINGS_FILE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_SETTINGS_FILE</span></code></a> and is usually set by the cli.</p>
 <p>While, underneath the hood the settings is a nested dictionary, it will be accessed via attributes instead of indexing, for ease of use.</p>
-<p class="rubric">Templating</p>
+<div class="section" id="templating">
+<h4>Templating<a class="headerlink" href="#templating" title="Permalink to this headline">¶</a></h4>
 <p>Default values of settings are prepopulated by <a class="reference internal" href="../python/terra.core.html#terra.core.settings.global_templates" title="terra.core.settings.global_templates"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.core.settings.global_templates</span></code></a>. This data structure is a list of tuple pair of <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>. Within the pair, the first <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> represents a <em>pattern</em>, and the second is the <em>default</em> values. When values of <em>pattern</em> match the configuration, then the <em>defaults</em> of that pattern are applied. These <em>defaults</em> are applied in order, where the last <em>default</em> overrides the earlier ones, but by combining all of the dictionaries into one, using <a class="reference external" href="https://visionsystemsinc.github.io/vsi_common/python/vsi.tools.html#vsi.tools.python.nested_update" title="(in VSI Common)"><code class="xref py py-func docutils literal notranslate"><span class="pre">vsi.tools.python.nested_update()</span></code></a></p>
-<p class="rubric">Advanced usage</p>
+</div>
+<div class="section" id="path-translation">
+<span id="settings-path-translation"></span><h4>Path translation<a class="headerlink" href="#path-translation" title="Permalink to this headline">¶</a></h4>
+<p>Because services and tasks can run in different containers or even on different computers, terra settings has a “path translation” feature built in. If any setting’s name ends in <code class="docutils literal notranslate"><span class="pre">_dir</span></code>/<code class="docutils literal notranslate"><span class="pre">_dirs</span></code>/<code class="docutils literal notranslate"><span class="pre">_file</span></code>/<code class="docutils literal notranslate"><span class="pre">_files</span></code>/<code class="docutils literal notranslate"><span class="pre">_path</span></code>/<code class="docutils literal notranslate"><span class="pre">paths</span></code>, then terra will automatically convert the path between the host and container, e.g. <code class="docutils literal notranslate"><span class="pre">settings.foo.bar_path</span></code>. This is done by inspecting the compute’s configuration and creating a mount map. If <code class="docutils literal notranslate"><span class="pre">/opt/test/foo</span></code> is mounted to <code class="docutils literal notranslate"><span class="pre">/data</span></code> in a container and if <code class="docutils literal notranslate"><span class="pre">bar_path</span></code> is set to <code class="docutils literal notranslate"><span class="pre">/opt/test/foo/bar/file.txt</span></code>, then in the container it will have the value <code class="docutils literal notranslate"><span class="pre">/data/bar/file.txt</span></code>. For computes that utilize the environment variables <code class="docutils literal notranslate"><span class="pre">TERRA_*_VOLUMES</span></code>, these will be included in the volume mapping.</p>
+<p>For tasks, keyword arguments are also translated if their names end with the same suffixes. This includes the keyword arguments themselves, and any nested combination of list/tuple/dict that has a dict key value ending with the same suffixes.</p>
+<p>If the return value of a task is also a nested list/tuple/dict, those keys ending with the same suffixes are also translated back.</p>
+<p>When a compute/executor has the potential to change paths, a <code class="docutils literal notranslate"><span class="pre">configuration_map_service</span></code>/<code class="docutils literal notranslate"><span class="pre">configuration_map</span></code> method is needed to return this list of tuple pairs (host, container) of mounts.</p>
+</div>
+<div class="section" id="advanced-usage">
+<h4>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h4>
 <p>Todo</p>
+</div>
 </div>
 </div>
 </div>
@@ -191,37 +215,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="settings.html" class="btn btn-neutral float-right" title="Terra Settings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to Terra’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="settings.html" class="btn btn-neutral float-right" title="Terra Settings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to Terra’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, VSI
+        &#169; Copyright 2021, VSI.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

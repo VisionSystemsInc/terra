@@ -36,6 +36,14 @@ terra.executor.process module
    :undoc-members:
    :show-inheritance:
 
+terra.executor.resources module
+-------------------------------
+
+.. automodule:: terra.executor.resources
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.executor.sync module
 --------------------------
 

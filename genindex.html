@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Index &mdash; Terra 0.0.1 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -49,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Terra
+            <a href="index.html" class="icon icon-home"> Terra
           
 
           
@@ -84,9 +86,13 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="terra/getting_started.html">What is Terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#executor-settings">Executor Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/settings.html#compute-settings">Compute Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/settings.html#logging-settings">Logging Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Adding Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/apps.html">Terra Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="terra/executor.html">Executor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="python/modules.html">terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="terra/contributing.html">Contributing Guidlines</a></li>
 </ul>
@@ -129,6 +135,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -140,7 +148,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -222,6 +230,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.LazyObject.__setitem__">__setitem__() (terra.core.settings.LazyObject method)</a>
 </li>
+      <li><a href="python/terra.html#terra.logger._acquireLock">_acquireLock() (in module terra.logger)</a>
+</li>
       <li><a href="python/terra.compute.html#terra.compute.utils.ComputeHandler._connect_backend">_connect_backend() (terra.compute.utils.ComputeHandler method)</a>
 
       <ul>
@@ -238,12 +248,16 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal._live_receivers">_live_receivers() (terra.core.signals.Signal method)</a>
 </li>
+      <li><a href="python/terra.html#terra.logger._releaseLock">_releaseLock() (in module terra.logger)</a>
+</li>
       <li><a href="python/terra.core.html#terra.core.settings.LazyObject._setup">_setup() (terra.core.settings.LazyObject method)</a>
 
       <ul>
         <li><a href="python/terra.core.html#terra.core.settings.LazySettings._setup">(terra.core.settings.LazySettings method)</a>
 </li>
       </ul></li>
+      <li><a href="python/terra.html#terra.logger._SetupTerraLogger">_SetupTerraLogger (class in terra.logger)</a>
+</li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseService._validate_volume">_validate_volume() (terra.compute.base.BaseService method)</a>
 </li>
   </ul></td>
@@ -252,6 +266,8 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource.acquire">acquire() (terra.executor.resources.Resource method)</a>
+</li>
       <li><a href="python/terra.core.html#terra.core.settings.LazySettings.add_templates">add_templates() (terra.core.settings.LazySettings method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseService.add_volume">add_volume() (terra.compute.base.BaseService method)</a>
@@ -268,7 +284,11 @@
 </li>
       <li><a href="python/terra.utils.html#terra.utils.workflow.AlreadyRunException">AlreadyRunException</a>
 </li>
+      <li><a href="python/terra.html#terra.task.TerraTask.apply_async">apply_async() (terra.task.TerraTask method)</a>
+</li>
       <li><a href="python/terra.utils.html#terra.utils.cli.ArgumentParser">ArgumentParser (class in terra.utils.cli)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.atexit_resource_release">atexit_resource_release() (in module terra.executor.resources)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -316,6 +336,14 @@
     command line option
 
       <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-compute.arch">compute.arch</a>
+</li>
+        <li><a href="terra/settings.html#cmdoption-arg-compute.virtualenv_dir">compute.virtualenv_dir</a>
+</li>
+        <li><a href="terra/settings.html#cmdoption-arg-executor.num_workers">executor.num_workers</a>
+</li>
+        <li><a href="terra/settings.html#cmdoption-arg-executor.type">executor.type</a>
+</li>
         <li><a href="terra/settings.html#cmdoption-arg-logging.date_format">logging.date_format</a>
 </li>
         <li><a href="terra/settings.html#cmdoption-arg-logging.format">logging.format</a>
@@ -341,10 +369,24 @@
         <li><a href="python/terra.compute.html#terra.compute.virtualenv.Compute">(class in terra.compute.virtualenv)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.utils.compute">compute (in module terra.compute.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    compute.arch
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-compute.arch">command line option</a>
+</li>
+      </ul></li>
+      <li>
+    compute.virtualenv_dir
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-compute.virtualenv_dir">command line option</a>
+</li>
+      </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.utils.ComputeHandler">ComputeHandler (class in terra.compute.utils)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.config_file">config_file() (in module terra.core.settings)</a>
@@ -384,6 +426,8 @@
 </li>
         <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor.configure_logger">(terra.executor.celery.executor.CeleryExecutor static method)</a>
 </li>
+        <li><a href="python/terra.html#terra.logger._SetupTerraLogger.configure_logger">(terra.logger._SetupTerraLogger method)</a>
+</li>
       </ul></li>
       <li><a href="python/terra.core.html#terra.core.settings.LazySettings.configured">configured() (terra.core.settings.LazySettings property)</a>
 </li>
@@ -415,11 +459,17 @@
 </li>
       <li><a href="python/terra.html#terra.logger.DEBUG4">DEBUG4 (in module terra.logger)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.html#terra.logger.Logger.debug4">debug4() (terra.logger.Logger method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.TerraJSONEncoder.default">default() (terra.core.settings.TerraJSONEncoder method)</a>
+</li>
+      <li><a href="python/terra.html#terra.logger._SetupTerraLogger.default_formatter">default_formatter (terra.logger._SetupTerraLogger attribute)</a>
+</li>
+      <li><a href="python/terra.html#terra.logger._SetupTerraLogger.default_stderr_handler_level">default_stderr_handler_level (terra.logger._SetupTerraLogger attribute)</a>
+</li>
+      <li><a href="python/terra.html#terra.logger._SetupTerraLogger.default_tmp_prefix">default_tmp_prefix (terra.logger._SetupTerraLogger attribute)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.Signal.disconnect">disconnect() (terra.core.signals.Signal method)</a>
 </li>
@@ -448,12 +498,26 @@
         <li><a href="python/terra.core.html#index-3">TERRA_UNITTEST</a>, <a href="python/terra.html#envvar-TERRA_UNITTEST">[1]</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.settings.ENVIRONMENT_VARIABLE">ENVIRONMENT_VARIABLE (in module terra.core.settings)</a>
 </li>
       <li><a href="python/terra.executor.html#terra.executor.utils.Executor">Executor (in module terra.executor.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    executor.num_workers
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-executor.num_workers">command line option</a>
+</li>
+      </ul></li>
+      <li>
+    executor.type
+
+      <ul>
+        <li><a href="terra/settings.html#cmdoption-arg-executor.type">command line option</a>
+</li>
+      </ul></li>
       <li><a href="python/terra.executor.html#terra.executor.utils.ExecutorHandler">ExecutorHandler (class in terra.executor.utils)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.ExpandedString">ExpandedString (class in terra.core.settings)</a>
@@ -466,12 +530,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.html#terra.logger.Logger.fatal">fatal() (terra.logger.Logger method)</a>
 </li>
-      <li><a href="python/terra.core.html#terra.core.settings.filename_suffixes">filename_suffixes (in module terra.core.settings)</a>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource.FileLock">FileLock() (terra.executor.resources.Resource property)</a>
 </li>
-      <li><a href="python/terra.html#terra.logger.Logger.findCaller">findCaller() (terra.logger.Logger method)</a>
+      <li><a href="python/terra.core.html#terra.core.settings.filename_suffixes">filename_suffixes (in module terra.core.settings)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.html#terra.logger.Logger.findCaller">findCaller() (terra.logger.Logger method)</a>
+</li>
       <li><a href="python/terra.utils.html#terra.utils.cli.FullPaths">FullPaths (class in terra.utils.cli)</a>
 </li>
       <li><a href="python/terra.utils.html#terra.utils.cli.FullPathsAppend">FullPathsAppend (class in terra.utils.cli)</a>
@@ -485,6 +551,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.compute.html#terra.compute.utils.get_default_service_class">get_default_service_class() (in module terra.compute.utils)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ResourceManager.get_resource">get_resource() (terra.executor.resources.ResourceManager class method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.get_volume_map">get_volume_map() (terra.compute.base.BaseCompute method)</a>
 
@@ -521,6 +589,12 @@
       <li><a href="python/terra.core.html#terra.core.exceptions.ImproperlyConfigured">ImproperlyConfigured</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ProcessLocalStorage.instance_id">instance_id (terra.executor.resources.ProcessLocalStorage attribute)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource.is_locked">is_locked() (terra.executor.resources.Resource property)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="J">J</h2>
@@ -548,12 +622,20 @@
 </li>
       <li><a href="python/terra.compute.html#terra.compute.utils.load_service">load_service() (in module terra.compute.utils)</a>
 </li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ProcessLocalStorage.lock">lock (terra.executor.resources.ProcessLocalStorage attribute)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource.lock_dir">lock_dir (terra.executor.resources.Resource attribute)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource.lock_file_name">lock_file_name() (terra.executor.resources.Resource method)</a>
+</li>
       <li><a href="python/terra.core.html#terra.core.settings.log_file">log_file() (in module terra.core.settings)</a>
 </li>
       <li><a href="python/terra.html#terra.logger.Logger">Logger (class in terra.logger)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.signals.logger_configure">logger_configure (in module terra.core.signals)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.signals.logger_reconfigure">logger_reconfigure (in module terra.core.signals)</a>
 </li>
       <li>
@@ -563,8 +645,6 @@
         <li><a href="terra/settings.html#cmdoption-arg-logging.date_format">command line option</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     logging.format
 
@@ -596,6 +676,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.html#terra.logger._SetupTerraLogger.main_log_handler">main_log_handler() (terra.logger._SetupTerraLogger property)</a>
+</li>
       <li>
     module
 
@@ -642,6 +724,8 @@
 </li>
         <li><a href="python/terra.executor.html#module-terra.executor.process">terra.executor.process</a>
 </li>
+        <li><a href="python/terra.executor.html#module-terra.executor.resources">terra.executor.resources</a>
+</li>
         <li><a href="python/terra.executor.html#module-terra.executor.sync">terra.executor.sync</a>
 </li>
         <li><a href="python/terra.executor.html#module-terra.executor.thread">terra.executor.thread</a>
@@ -659,6 +743,18 @@
         <li><a href="python/terra.utils.html#module-terra.utils.workflow">terra.utils.workflow</a>
 </li>
         <li><a href="python/terra.html#module-terra.workflow">terra.workflow</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="python/terra.executor.html#terra.executor.base.BaseExecutor.multiprocess">multiprocess (terra.executor.base.BaseExecutor attribute)</a>
+
+      <ul>
+        <li><a href="python/terra.executor.celery.html#terra.executor.celery.CeleryExecutor.multiprocess">(terra.executor.celery.CeleryExecutor attribute)</a>
+</li>
+        <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor.multiprocess">(terra.executor.celery.executor.CeleryExecutor attribute)</a>
+</li>
+        <li><a href="python/terra.executor.html#terra.executor.process.ProcessPoolExecutor.multiprocess">(terra.executor.process.ProcessPoolExecutor attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -709,10 +805,10 @@
         <li><a href="python/terra.compute.html#terra.compute.virtualenv.Service.post_run">(terra.compute.virtualenv.Service method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.signals.post_settings_configured">post_settings_configured (in module terra.core.signals)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="python/terra.core.html#terra.core.signals.post_settings_context">post_settings_context (in module terra.core.signals)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseService.pre_run">pre_run() (terra.compute.base.BaseService method)</a>
@@ -726,6 +822,8 @@
 </li>
       </ul></li>
       <li><a href="python/terra.core.html#terra.core.settings.processing_dir">processing_dir() (in module terra.core.settings)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ProcessLocalStorage">ProcessLocalStorage (class in terra.executor.resources)</a>
 </li>
       <li><a href="python/terra.executor.html#terra.executor.process.ProcessPoolExecutor">ProcessPoolExecutor (class in terra.executor.process)</a>
 </li>
@@ -748,12 +846,28 @@
 </li>
         <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor.reconfigure_logger">(terra.executor.celery.executor.CeleryExecutor static method)</a>
 </li>
+        <li><a href="python/terra.html#terra.logger._SetupTerraLogger.reconfigure_logger">(terra.logger._SetupTerraLogger method)</a>
+</li>
       </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.base.BaseCompute.register">register() (terra.compute.base.BaseCompute class method)</a>
 </li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ResourceManager.register_resource">register_resource() (terra.executor.resources.ResourceManager class method)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource.release">release() (terra.executor.resources.Resource method)</a>
+</li>
+      <li><a href="python/terra.compute.html#terra.compute.dummy.Compute.remove_service">remove_service() (terra.compute.dummy.Compute method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.compute.html#terra.compute.dummy.Compute.remove_service">remove_service() (terra.compute.dummy.Compute method)</a>
+      <li><a href="python/terra.executor.html#terra.executor.resources.Resource">Resource (class in terra.executor.resources)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ProcessLocalStorage.resource_id">resource_id (terra.executor.resources.ProcessLocalStorage attribute)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ResourceError">ResourceError</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ResourceManager">ResourceManager (class in terra.executor.resources)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ResourceManager.resources">resources (terra.executor.resources.ResourceManager attribute)</a>
 </li>
       <li><a href="python/terra.html#terra.workflow.BaseWorkflow.run">run() (terra.workflow.BaseWorkflow method)</a>
 
@@ -815,6 +929,8 @@
       </ul></li>
       <li><a href="python/terra.compute.html#terra.compute.base.ServiceRunFailed">ServiceRunFailed</a>
 </li>
+      <li><a href="python/terra.html#terra.logger._SetupTerraLogger.set_level_and_formatter">set_level_and_formatter() (terra.logger._SetupTerraLogger method)</a>
+</li>
       <li><a href="python/terra.core.html#terra.core.settings.Settings">Settings (class in terra.core.settings)</a>
 </li>
       <li><a href="python/terra.html#terra.settings">settings (in module terra)</a>
@@ -823,13 +939,11 @@
         <li><a href="python/terra.core.html#terra.core.settings.settings">(in module terra.core.settings)</a>
 </li>
       </ul></li>
-      <li><a href="python/terra.core.html#terra.core.settings.settings_dir">settings_dir() (in module terra.core.settings)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="python/terra.core.html#terra.core.settings.settings_property">settings_property() (in module terra.core.settings)</a>
+      <li><a href="python/terra.core.html#terra.core.settings.settings_dir">settings_dir() (in module terra.core.settings)</a>
 </li>
-      <li><a href="python/terra.executor.celery.html#terra.executor.celery.executor.setup_loggers">setup_loggers() (in module terra.executor.celery.executor)</a>
+      <li><a href="python/terra.core.html#terra.core.settings.settings_property">settings_property() (in module terra.core.settings)</a>
 </li>
       <li><a href="python/terra.core.html#terra.core.exceptions.setup_logging_exception_hook">setup_logging_exception_hook() (in module terra.core.exceptions)</a>
 </li>
@@ -992,8 +1106,6 @@
         <li><a href="python/terra.executor.celery.html#module-terra.executor.celery">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     terra.executor.celery.celeryconfig
 
@@ -1008,6 +1120,8 @@
         <li><a href="python/terra.executor.celery.html#module-terra.executor.celery.executor">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     terra.executor.dummy
 
@@ -1020,6 +1134,13 @@
 
       <ul>
         <li><a href="python/terra.executor.html#module-terra.executor.process">module</a>
+</li>
+      </ul></li>
+      <li>
+    terra.executor.resources
+
+      <ul>
+        <li><a href="python/terra.executor.html#module-terra.executor.resources">module</a>
 </li>
       </ul></li>
       <li>
@@ -1100,7 +1221,15 @@
 </li>
       <li><a href="python/terra.core.html#terra.core.settings.TerraJSONEncoder">TerraJSONEncoder (class in terra.core.settings)</a>
 </li>
+      <li><a href="python/terra.html#terra.task.TerraTask">TerraTask (class in terra.task)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.test_dir">test_dir() (in module terra.executor.resources)</a>
+</li>
+      <li><a href="python/terra.executor.html#terra.executor.resources.ThreadLocalStorage">ThreadLocalStorage (class in terra.executor.resources)</a>
+</li>
       <li><a href="python/terra.executor.html#terra.executor.thread.ThreadPoolExecutor">ThreadPoolExecutor (class in terra.executor.thread)</a>
+</li>
+      <li><a href="python/terra.html#terra.task.TerraTask.translate_paths">translate_paths() (terra.task.TerraTask method)</a>
 </li>
       <li><a href="python/terra.compute.html#terra.compute.utils.translate_settings_paths">translate_settings_paths() (in module terra.compute.utils)</a>
 </li>
@@ -1135,28 +1264,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, VSI
+        &#169; Copyright 2021, VSI.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Terra Settings &mdash; Terra 0.0.1 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,14 +32,13 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Adding Apps" href="apps.html" />
+    <link rel="next" title="Terra Apps" href="apps.html" />
     <link rel="prev" title="What is Terra" href="getting_started.html" /> 
 </head>
 
@@ -51,7 +53,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Terra
+            <a href="../index.html" class="icon icon-home"> Terra
           
 
           
@@ -86,9 +88,13 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">What is Terra</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Terra Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#executor-settings">Executor Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#compute-settings">Compute Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#workflow-settings">Workflow Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#logging-settings">Logging Settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="apps.html">Adding Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Terra Apps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compute.html">Compute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="executor.html">Executor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../python/modules.html">terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
 </ul>
@@ -131,6 +137,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -142,7 +150,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/terra/settings.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -160,7 +168,7 @@
 <span id="settings"></span><h1>Terra Settings<a class="headerlink" href="#terra-settings" title="Permalink to this headline">¶</a></h1>
 <dl class="std option">
 <dt id="cmdoption-arg-terra.zone">
-<span id="cmdoption-arg-terra-zone"></span><code class="sig-name descname">terra.zone</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-terra.zone" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-terra-zone"></span><code class="sig-name descname"><span class="pre">terra.zone</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-terra.zone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Terra can be running in one of three areas of execution, or “zones”: the master controller (<code class="docutils literal notranslate"><span class="pre">controller</span></code>), a service runner (<code class="docutils literal notranslate"><span class="pre">runner</span></code>), or a task (<code class="docutils literal notranslate"><span class="pre">task</span></code>). The different zones could all be running on the main host, or other containers or computers, depending on the compute and executor.</p>
 <p>The master controller includes: the CLI, workflow, stage and service definitions layers.</p>
 <p>This variable is automatically updated, and should only be read.</p>
@@ -168,18 +176,141 @@
 </dd></dl>
 
 </div>
+<div class="section" id="executor-settings">
+<span id="settings-executor"></span><h1>Executor Settings<a class="headerlink" href="#executor-settings" title="Permalink to this headline">¶</a></h1>
+<dl class="std option">
+<dt id="cmdoption-arg-executor.type">
+<span id="cmdoption-arg-executor-type"></span><code class="sig-name descname"><span class="pre">executor.type</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-executor.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference external" href="https://docs.python.org/3.6/library/concurrent.futures.html#module-concurrent.futures" title="(in Python v3.6)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">concurrent.futures</span></code></a> executor to run tasks. Options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>DummyExecutor</dt><dd><p>Doesn’t actually run the task, just prints out messages for each task.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>SyncExecutor</dt><dd><p>Runs each task one by one.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>ThreadPoolExecutor</dt><dd><p>Runs each task in its own thread.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>ProcessPoolExecutor</dt><dd><p>Runs each task in its own process.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>CeleryExecutor</dt><dd><p>Runs each task as a celery task. A message broker such as Redis should be initialized.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></p>
+<p>The value of executor.type is a string representing the python path for the selected executor. <code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code> is actually an alias for <code class="docutils literal notranslate"><span class="pre">terra.executor.thread.ThreadPoolExecutor</span></code>. Other aliases include:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 53%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Alias</p></th>
+<th class="head"><p>Class</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DummyExecutor</p></td>
+<td><p>terra.executor.dummy.DummyExecutor</p></td>
+</tr>
+<tr class="row-odd"><td><p>SyncExecutor</p></td>
+<td><p>terra.executor.sync.SyncExecutor</p></td>
+</tr>
+<tr class="row-even"><td><p>ThreadPoolExecutor</p></td>
+<td><p>terra.executor.thread.ThreadPoolExecutor</p></td>
+</tr>
+<tr class="row-odd"><td><p>concurrent.futures.ThreadPoolExecutor</p></td>
+<td><p>terra.executor.thread.ThreadPoolExecutor</p></td>
+</tr>
+<tr class="row-even"><td><p>ProcessPoolExecutor</p></td>
+<td><p>terra.executor.process.ProcessPoolExecutor</p></td>
+</tr>
+<tr class="row-odd"><td><p>concurrent.futures.ProcessPoolExecutor</p></td>
+<td><p>terra.executor.process.ProcessPoolExecutor</p></td>
+</tr>
+<tr class="row-even"><td><p>CeleryExecutor</p></td>
+<td><p>terra.executor.celery.CeleryExecutor</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do not force terra to use <a class="reference external" href="https://docs.python.org/3.6/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code></a> or <a class="reference external" href="https://docs.python.org/3.6/library/concurrent.futures.html#concurrent.futures.ProcessPoolExecutor" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ProcessPoolExecutor</span></code></a>, as it is missing customizations such as the <code class="docutils literal notranslate"><span class="pre">multiprocess</span></code> attribute. You can still <a class="reference internal" href="executor.html#custom-executor"><span class="std std-ref">bring your own executor</span></a>.</p>
+</div>
+<dl class="std option">
+<dt id="cmdoption-arg-executor.num_workers">
+<span id="cmdoption-arg-executor-num-workers"></span><code class="sig-name descname"><span class="pre">executor.num_workers</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-executor.num_workers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum number of workers that will be used. Not applicable to <a class="reference internal" href="../python/terra.executor.html#terra.executor.sync.SyncExecutor" title="terra.executor.sync.SyncExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.sync.SyncExecutor</span></code></a>. Not honored by <a class="reference internal" href="../python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor" title="terra.executor.celery.executor.CeleryExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.celery.executor.CeleryExecutor</span></code></a></p>
+<p>Default: number of cores</p>
+</dd></dl>
+
+</div>
+<div class="section" id="compute-settings">
+<span id="settings-compute"></span><h1>Compute Settings<a class="headerlink" href="#compute-settings" title="Permalink to this headline">¶</a></h1>
+<dl class="std option">
+<dt id="cmdoption-arg-compute.arch">
+<span id="cmdoption-arg-compute-arch"></span><code class="sig-name descname"><span class="pre">compute.arch</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-compute.arch" title="Permalink to this definition">¶</a></dt>
+<dd><p>The compute architecture which defines how each service will be run. Options are:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>dummy</dt><dd><p>Does nothing but print out messages for every service and task. Useful for testing the app.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>virtualenv</dt><dd><p>Runs services on the host machine, using a python virtual environment.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>docker</dt><dd><p>Runs services on the host machine, inside a docker container.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>singularity</dt><dd><p>Runs services on the host machine, inside a singularity container.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">dummy</span></code></p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-arg-compute.virtualenv_dir">
+<span id="cmdoption-arg-compute-virtualenv-dir"></span><code class="sig-name descname"><span class="pre">compute.virtualenv_dir</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-compute.virtualenv_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only needed when <a class="reference internal" href="#cmdoption-arg-compute.arch"><code class="xref std std-option docutils literal notranslate"><span class="pre">compute.arch</span></code></a> is <code class="docutils literal notranslate"><span class="pre">virtualenv</span></code>. Specifies where the virtual environment’s python executable is located.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="workflow-settings">
-<h1>Workflow Settings<a class="headerlink" href="#workflow-settings" title="Permalink to this headline">¶</a></h1>
+<span id="settings-workflow"></span><h1>Workflow Settings<a class="headerlink" href="#workflow-settings" title="Permalink to this headline">¶</a></h1>
 <dl class="std option">
 <dt id="cmdoption-arg-service_start">
-<span id="cmdoption-arg-service-start"></span><code class="sig-name descname">service_start</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service_start" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-service-start"></span><code class="sig-name descname"><span class="pre">service_start</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>For <a class="reference internal" href="../python/terra.html#terra.workflow.PipelineWorkflow" title="terra.workflow.PipelineWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.PipelineWorkflow</span></code></a>, choose which service to start at, if you’d like to skip some of the initial services. Inclusive, so this first service will be run. Options are and of the services in the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, case insensitive.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">{First</span> <span class="pre">service}</span></code></p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-arg-service_end">
-<span id="cmdoption-arg-service-end"></span><code class="sig-name descname">service_end</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service_end" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-service-end"></span><code class="sig-name descname"><span class="pre">service_end</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-service_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>For <a class="reference internal" href="../python/terra.html#terra.workflow.PipelineWorkflow" title="terra.workflow.PipelineWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.PipelineWorkflow</span></code></a>, choose which service to end at, if you don’t want to run all the way to the end. Inclusive, so this last service will be run. Options are and of the services in the <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, case insensitive.</p>
 <p>Default: <code class="docutils literal notranslate"><span class="pre">{Last</span> <span class="pre">Service}</span></code></p>
 </dd></dl>
@@ -189,13 +320,13 @@
 <span id="settings-logging"></span><h1>Logging Settings<a class="headerlink" href="#logging-settings" title="Permalink to this headline">¶</a></h1>
 <dl class="std option">
 <dt id="cmdoption-arg-logging.level">
-<span id="cmdoption-arg-logging-level"></span><code class="sig-name descname">logging.level</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.level" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-logging-level"></span><code class="sig-name descname"><span class="pre">logging.level</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.level" title="Permalink to this definition">¶</a></dt>
 <dd><p>The logging level, set by using either a string (e.g. <code class="docutils literal notranslate"><span class="pre">WARNING</span></code>) or a number (e.g. <code class="docutils literal notranslate"><span class="pre">30</span></code>)</p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-arg-logging.format">
-<span id="cmdoption-arg-logging-format"></span><code class="sig-name descname">logging.format</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.format" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-logging-format"></span><code class="sig-name descname"><span class="pre">logging.format</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The logging output format.
 <a class="reference external" href="https://docs.python.org/3/library/logging.html#logrecord-attributes">https://docs.python.org/3/library/logging.html#logrecord-attributes</a>. Default:
 <code class="docutils literal notranslate"><span class="pre">%(asctime)s</span> <span class="pre">:</span> <span class="pre">%(levelname)s</span> <span class="pre">-</span> <span class="pre">%(message)s</span></code></p>
@@ -203,13 +334,13 @@
 
 <dl class="std option">
 <dt id="cmdoption-arg-logging.date_format">
-<span id="cmdoption-arg-logging-date-format"></span><code class="sig-name descname">logging.date_format</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.date_format" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-logging-date-format"></span><code class="sig-name descname"><span class="pre">logging.date_format</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.date_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>The date format. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
 </dd></dl>
 
 <dl class="std option">
 <dt id="cmdoption-arg-logging.format_style">
-<span id="cmdoption-arg-logging-format-style"></span><code class="sig-name descname">logging.format_style</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.format_style" title="Permalink to this definition">¶</a></dt>
+<span id="cmdoption-arg-logging-format-style"></span><code class="sig-name descname"><span class="pre">logging.format_style</span></code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-arg-logging.format_style" title="Permalink to this definition">¶</a></dt>
 <dd><p>The format style, <code class="docutils literal notranslate"><span class="pre">%</span></code>, <code class="docutils literal notranslate"><span class="pre">{</span></code>, or <code class="docutils literal notranslate"><span class="pre">$</span></code> notation. Default: <code class="docutils literal notranslate"><span class="pre">%</span></code></p>
 </dd></dl>
 
@@ -220,37 +351,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="apps.html" class="btn btn-neutral float-right" title="Adding Apps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="getting_started.html" class="btn btn-neutral float-left" title="What is Terra" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="apps.html" class="btn btn-neutral float-right" title="Terra Apps" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="What is Terra" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, VSI
+        &#169; Copyright 2021, VSI.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
