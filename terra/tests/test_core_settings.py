@@ -558,11 +558,24 @@ class TestSettings(TestLoggerCase):
         ans = '/foobar/status.json'
       self.assertEqual(settings.status_file, ans)
 
-  def test_properties_processing_dir_default(self):
+  @mock.patch('os.access')
+  def test_properties_processing_dir_default_writable(self, mock_access):
+    mock_access.return_value = True   # mock cwd as always writable
     settings.configure({})
 
     with self.assertLogs(), settings:
       self.assertEqual(settings.processing_dir, os.getcwd())
+
+  @mock.patch('tempfile.mkdtemp')
+  @mock.patch('os.access')
+  def test_properties_processing_dir_default_nonwritable(self, mock_access, mock_mkdtemp):
+    mock_access.return_value = False   # mock cwd as never writable
+    mock_dir = "/tmp/mock"
+    mock_mkdtemp.return_value = mock_dir
+    settings.configure({})
+
+    with self.assertLogs(), settings:
+      self.assertEqual(settings.processing_dir, mock_dir)
 
   def test_properties_processing_dir_config_file(self):
     settings.configure({})
