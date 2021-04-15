@@ -568,7 +568,8 @@ class TestSettings(TestLoggerCase):
 
   @mock.patch('tempfile.mkdtemp')
   @mock.patch('os.access')
-  def test_properties_processing_dir_default_nonwritable(self, mock_access, mock_mkdtemp):
+  def test_properties_processing_dir_default_nonwritable(self, mock_access,
+                                                         mock_mkdtemp):
     mock_access.return_value = False   # mock cwd as never writable
     mock_dir = "/tmp/mock"
     mock_mkdtemp.return_value = mock_dir
