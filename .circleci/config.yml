@@ -153,13 +153,13 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /docs
+          at: /tmp/docs
       - run:
           name: Checkout gh-pages and update
           command: |
             git checkout gh-pages || git checkout --orphan gh-pages
             find . -maxdepth 1 -path ./.git -prune -o -name . -o  -exec rm -rf {} +
-            mv /docs/html/* ./
+            mv /tmp/docs/html/* ./
             touch .nojekyll
 
             git add --all
