@@ -55,12 +55,13 @@ class ContainerService(BaseService):
         f'{str(temp_dir)}:/tmp_settings'
     env_volume_index += 1
 
-    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
-      os.makedirs(settings.settings_dir, exist_ok=True)
-      self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
-               f'VOLUME_{env_volume_index}'] = \
-          f'{settings.settings_dir}:/settings'
-      env_volume_index += 1
+    # This directory is used for both locking and setting dump, so don't
+    # if TERRA_DISABLE_SETTINGS_DUMP here
+    os.makedirs(settings.settings_dir, exist_ok=True)
+    self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+              f'VOLUME_{env_volume_index}'] = \
+        f'{settings.settings_dir}:{self.env["TERRA_SETTINGS_DIR_DOCKER"]}'
+    env_volume_index += 1
 
     # Copy self.volumes to the environment variables
     for _, ((volume_host, volume_container), volume_flags) in \
