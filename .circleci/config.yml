@@ -4,12 +4,19 @@ version: 2.1
 # generic yaml anchors (reusable by multiple projects)
 # -----
 x-references:
+
+  # directories
+  directories:
+    - &linux_source_dir  /home/circleci/repo
+
   # container configuration & update
   container_config: &container_config
-    working_directory: ~/repo
+    working_directory: *linux_source_dir
     shell: /bin/bash -eu
     docker:
-      - image: vsiri/circleci:bash-compose-lfs
+      - image: cimg/python:3.8
+    environment:
+      SOURCE_DIR: *linux_source_dir
 
 # -----
 # CircleCI custom commands
@@ -35,7 +42,12 @@ commands:
       - setup_remote_docker
       - run:
           name: Additional setup
-          command: echo 'TERRA_LOCAL=0' >  local.env
+          command: |
+            echo 'TERRA_LOCAL=0' >  local.env
+
+            # cimg/python sets COMPOSE_VERSION with conflicts with vsi_common
+            echo 'COMPOSE_VERSION=' >> local.env
+
 
       # - run:
       #     name: Checkout test data (git-lfs)
@@ -47,7 +59,7 @@ commands:
           name: Smuggle repo to remote docker
           command: |
             echo hi > redis_password.secret
-            tar zc --exclude .git . | docker run -i -v /root/repo:/repo -w /repo alpine:3.6 tar zx
+            tar zc --exclude .git . | docker run -i -v ${SOURCE_DIR}:/repo -w /repo alpine:3.8 tar zx
 
   # run "just ci load" command for repository
   # - latest cache is pushed only from master branch of main repo (not forks)
@@ -129,7 +141,7 @@ jobs:
       - run:
           name: Smuggle docs back from remote docker
           command: |
-            docker run --rm -v /root/repo:/src -w /src alpine:3 tar c ./docs/_build/html | tar x
+            docker run --rm -v ${SOURCE_DIR}:/repo -w /repo alpine:3.8 tar c ./docs/_build/html | tar x
 
       - persist_to_workspace:
           root: docs/_build
@@ -141,13 +153,13 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /docs
+          at: /tmp/docs
       - run:
           name: Checkout gh-pages and update
           command: |
             git checkout gh-pages || git checkout --orphan gh-pages
             find . -maxdepth 1 -path ./.git -prune -o -name . -o  -exec rm -rf {} +
-            mv /docs/html/* ./
+            mv /tmp/docs/html/* ./
             touch .nojekyll
 
             git add --all
