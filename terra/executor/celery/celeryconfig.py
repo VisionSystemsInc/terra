@@ -13,11 +13,10 @@ __all__ = ['password', 'broker_url', 'result_backend', 'task_serializer',
            'result_expires', 'include']
 
 try:
-  with open(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE']),
-            'r') as fid:
+  with open(env['TERRA_REDIS_SECRET_FILE'], 'r') as fid:
     password = fid.readline().rstrip('\r\n')
 except FileNotFoundError:
-  logger.fatal(os.path.join(env['TERRA_CWD'], env['TERRA_REDIS_SECRET_FILE'])
+  logger.fatal(env['TERRA_REDIS_SECRET_FILE']
                + ": Redis password file not found. "
                + "'just' should auto generate this")
   raise
