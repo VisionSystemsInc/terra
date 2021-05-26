@@ -16,9 +16,10 @@ class TestCeleryConfig(TestCase):
   def setUp(self):
     self.patches.append(mock.patch.dict(os.environ,
                                         TERRA_CWD=self.temp_dir.name))
+    redis_secret = os.path.join(self.temp_dir.name, 'foo')
     self.patches.append(mock.patch.dict(os.environ,
-                                        TERRA_REDIS_SECRET_FILE='foo'))
-    with open(os.path.join(self.temp_dir.name, 'foo'), 'w') as fid:
+                                        TERRA_REDIS_SECRET_FILE=redis_secret))
+    with open(redis_secret, 'w') as fid:
       fid.write('hiya')
     super().setUp()
 
