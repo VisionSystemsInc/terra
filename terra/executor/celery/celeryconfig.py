@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from os import environ as env
-import os
 
 from terra.logger import getLogger
 logger = getLogger(__name__)
