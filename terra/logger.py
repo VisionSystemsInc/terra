@@ -623,29 +623,36 @@ logging.setLoggerClass(Logger)
 logger = getLogger(__name__)
 
 
-def _checkLevel(settings):
+def _checkLevel(log_level):
   '''
-  Translate ``settings.logging.level`` to integer.
+  Translate ``log_level`` to integer.
   '''
-  try:
-    log_level = settings.logging.level
-  except AttributeError:
-    return 0
-
   if isinstance(log_level, str):
     log_level = log_level.upper()
   return logging._checkLevel(log_level)
 
 
-def _disableDebug(settings, package_names):
+def _demoteLevel(package_names, from_level=DEBUG1, to_level=DEBUG4):
   '''
-  Disable debug logging for specific packages when ``settings.logging.level``
-  is between ``DEBUG1`` and ``DEBUG3`` (e.g., only enable for ``DEBUG4``)
+  Demote logging level for specific packages, disabling ``from_level`` log
+  messages unless ``terra.settings.logging.level > to_level``.
+
+  Arguments
+  ---------
+  package_names : :obj:`list` of :obj:`str`
+    List of package names
+  from_level
+    Log level to be demoted, default ``DEBUG1``
+  to_level
+    New log level, default ``DEBUG4``
+
   '''
-  log_level = _checkLevel(settings)
-  if DEBUG3 <= log_level and log_level <= DEBUG1:
+  from terra import settings
+  log_level = _checkLevel(settings.logging.level)
+
+  if to_level < log_level and log_level <= from_level:
     for package_name in package_names:
-      getLogger(package_name).setLevel('INFO')
+      getLogger(package_name).setLevel(from_level + 1)
 
 
 def _setup_terra_logger():
