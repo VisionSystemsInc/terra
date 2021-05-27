@@ -15,7 +15,7 @@ import terra.compute.utils
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
-__all__ = ['TerraTask', 'shared_task', 'run_app']
+__all__ = ['TerraTask', 'shared_task', 'subprocess']
 
 
 # Take the shared task decorator, and add some Terra defaults, so you don't
