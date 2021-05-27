@@ -1,5 +1,6 @@
 import os
 import inspect
+import subprocess as _subprocess
 from tempfile import gettempdir
 
 from celery import shared_task as original_shared_task
@@ -14,7 +15,7 @@ import terra.compute.utils
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
-__all__ = ['TerraTask', 'shared_task']
+__all__ = ['TerraTask', 'shared_task', 'run_app']
 
 
 # Take the shared task decorator, and add some Terra defaults, so you don't
@@ -165,3 +166,34 @@ class TerraTask(Task):
   # def on_failure(self, exc, task_id, args, kwargs, einfo):
   #   logger.exception('Celery task failure!!!', exc_info=exc)
   #   return super().on_failure(exc, task_id, args, kwargs, einfo)
+
+
+@shared_task(queue="terra")
+def subprocess(self, *args, **kwargs):
+  '''
+  Execute shell command via ``subprocess.run(*args, **kwargs)`` as a celery
+  task. Note any active pipenv/subprocess will be deactivated prior to run.
+  '''
+
+  logger.info(f"RUN A SUBPROCESS THROUGH THE TERRA CELERY TASK:\n"
+              f"args = {args}\n"
+              f"kwargs = {kwargs}")
+
+  # copy of submitted/current environment
+  env = kwargs.pop('env', os.environ).copy()
+
+  # remove keys
+  keys = ('PIPENV_ACTIVE', 'PIPENV_PIPFILE', 'PIP_PYTHON_PATH',
+          'PIP_DISABLE_PIP_VERSION_CHECK')
+  for key in keys:
+    env.pop(key, None)
+
+  # remove virtualenv key & remove virtualenv from path
+  virtual_env = env.pop('VIRTUAL_ENV', None)
+  if virtual_env:
+    path_list = [p for p in env['PATH'].split(os.pathsep)
+                 if not p.startswith(virtual_env)]
+    env['PATH'] = f'{os.pathsep}'.join(path_list)
+
+  # run command
+  return _subprocess.run(*args, env=env, **kwargs)
