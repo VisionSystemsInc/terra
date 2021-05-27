@@ -47,7 +47,6 @@ function Terra_Pipenv()
         return 1
       fi
     fi
-    echo "env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"}"
     ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
