@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from os import environ as env
-import kombu
 
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -10,7 +9,7 @@ logger = getLogger(__name__)
 # from terra.executor.celery.celeryconfig import *
 __all__ = ['password', 'broker_url', 'result_backend', 'task_serializer',
            'result_serializer', 'accept_content', 'result_accept_content',
-           'result_expires', 'include']
+           'result_expires']
 
 try:
   with open(env['TERRA_REDIS_SECRET_FILE'], 'r') as fid:
