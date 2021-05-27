@@ -2,6 +2,7 @@
 
 from os import environ as env
 from . import app
+import tempfile
 
 # Terra
 from terra import settings
@@ -13,7 +14,8 @@ def main():
       {
         'executor': {'type': 'CeleryExecutor'},
         'terra': {'zone': 'task_controller'},
-        'logging': {'level': 'NOTSET'}
+        'logging': {'level': 'NOTSET'},
+        'processing_dir': tempfile.mkdtemp(prefix="terra_celery_"),
       }
     )
 
