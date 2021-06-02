@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 # from terra.executor.celery.celeryconfig import *
 __all__ = ['password', 'broker_url', 'result_backend', 'task_serializer',
            'result_serializer', 'accept_content', 'result_accept_content',
-           'result_expires', 'include']
+           'result_expires']
 
 try:
   with open(env['TERRA_REDIS_SECRET_FILE'], 'r') as fid:
@@ -30,13 +30,17 @@ accept_content = ['json', 'pickle']
 result_accept_content = ['json', 'pickle']
 result_expires = 3600
 
-# App needs to define include
-include = []
-_include_env_var = env.get('TERRA_CELERY_INCLUDE', None)
-if _include_env_var:
-  import ast
-  include = ast.literal_eval(_include_env_var)
-include += type(include)(['terra.tests.demo.tasks'])
+# Each celery worker should define its own queues (-Q <queues>) and
+# task modules (-I <modules>) from the command line. For example,
+#
+# pipenv python -m terra.executor.celery \
+#   -A terra.executor.celery.app worker \
+#   -Q queue1,queue2 \
+#   -I A.module1,A.B.module2 \
+#   ...
+#
+# More info here:
+# https://docs.celeryproject.org/en/stable/reference/cli.html#celery-worker
 
 # This is how it was done in Voxel Globe, but some detail is missing
 # from kombu import Queue, Exchange

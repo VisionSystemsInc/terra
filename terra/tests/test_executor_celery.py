@@ -38,11 +38,6 @@ class TestCeleryConfig(TestCase):
     import terra.executor.celery.celeryconfig as cc
     self.assertEqual(cc.password, 'hiya')
 
-  @mock.patch.dict(os.environ, TERRA_CELERY_INCLUDE='["foo", "bar"]')
-  def test_include(self):
-    import terra.executor.celery.celeryconfig as cc
-    self.assertEqual(cc.include, ['foo', 'bar', 'terra.tests.demo.tasks'])
-
 
 class MockAsyncResult:
   def __init__(self, id, fun):
