@@ -32,6 +32,7 @@ class ContainerService(BaseService):
     env_key = f"{app_prefixes[0]}_COMPOSE_SERVICE_RUNNER"
     self.compose_service_name = self.env.get(env_key)
 
+
   def pre_run(self):
     # Need to run Base's pre_run first, so it has a chance to update settings
     # for special executors, etc...
@@ -62,6 +63,13 @@ class ContainerService(BaseService):
               f'VOLUME_{env_volume_index}'] = \
         f'{settings.settings_dir}:{self.env["TERRA_SETTINGS_DIR_DOCKER"]}'
     env_volume_index += 1
+
+    # Always mount in the lock dir, in case the resource manager is use
+    # If terra ends up needing other things mounted in, lock_dir should be
+    # renamed to something more generic like terra_var_dir, and everything
+    # share that, if it makes sense.
+    os.makedirs(settings.terra.lock_dir, exist_ok=True)
+    self.add_volume(settings.terra.lock_dir, '/var/lib/terra/lock')
 
     # Copy self.volumes to the environment variables
     for _, ((volume_host, volume_container), volume_flags) in \

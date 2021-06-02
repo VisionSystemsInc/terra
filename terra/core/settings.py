@@ -358,6 +358,22 @@ def logging_listen_address(self):
   return self.logging.server.hostname
 
 
+@settings_property
+def lock_dir(self):
+  '''
+  A :func:`settings_property` defining the directory where lock files should be
+  stored. In order for multiple terra workers to be able to communicate with
+  each other about a :class:`terra.executor.resource.Resource`, a common lock
+  directory needs to be established (that can be a network drive). The default
+  will be in the :func:`processing_dir`. However in cases such as celery, this
+  will need to be explicitly set, since celery starts before the processing dir
+  is defined. The lock_dir can be set by using environment variable
+  ``TERRA_LOCK_DIR``, or using a settings file to set ``terra.lock_dir``.
+  '''
+
+  return os.environ.get('TERRA_LOCK_DIR',
+                        os.path.join(self.processing_dir, '.resource.locks'))
+
 global_templates = [
   (
     # Global Defaults
@@ -391,6 +407,7 @@ global_templates = [
       },
       'terra': {
         'config_file': config_file,
+        'lock_dir': lock_dir,
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
         'zone': 'controller',

@@ -123,8 +123,7 @@ class Resource:
 
     self.resources = resources
     self.repeat = repeat
-    self.lock_dir = os.path.join(settings.settings_dir,
-                                 '.resource.locks',
+    self.lock_dir = os.path.join(settings.terra.lock_dir,
                                  platform.node(),
                                  str(os.getpid()),
                                  resource_name)
