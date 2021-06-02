@@ -499,6 +499,13 @@ messages unless <code class="docutils literal notranslate"><span class="pre">ter
 <code class="sig-prename descclassname"><span class="pre">terra.task.</span></code><code class="sig-name descname"><span class="pre">shared_task</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.shared_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt id="terra.task.subprocess">
+<code class="sig-prename descclassname"><span class="pre">terra.task.</span></code><code class="sig-name descname"><span class="pre">subprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.subprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute shell command via <code class="docutils literal notranslate"><span class="pre">subprocess.run(*args,</span> <span class="pre">**kwargs)</span></code> as a celery
+task. Note any active pipenv/subprocess will be deactivated prior to run.</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-terra.workflow">
 <span id="terra-workflow-module"></span><h2>terra.workflow module<a class="headerlink" href="#module-terra.workflow" title="Permalink to this headline">¶</a></h2>
