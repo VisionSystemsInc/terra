@@ -69,42 +69,35 @@ class resumable(BasicDecorator):
         fid.write("{}")
 
     with open(settings.status_file, 'r') as fid:
-      self.stage_self.status = ObjectDict(json.load(fid))
+      self.status = ObjectDict(json.load(fid))
 
     temporary_overwrite = False
 
     # If resume is turned on
     if settings.resume:
       try:
-        # Keep skipping until you match stage_name
-        if self.stage_self.status.stage != stage_name:
-          logger.debug(f"Skipping {stage_name}... "
-                       f"Resuming to {self.stage_self.status.stage}")
-          return None
-
-        # After here, we know the stage name has been matched
-        # i.e. self.stage_self.status.stage == stage_name
-
         # If the stage is done, skip it
-        elif self.stage_self.status.stage_status == "done":
-          logger.debug(f"Skipping {stage_name}... "
-                       f"Resuming after {self.stage_self.status.stage}")
-          # The resume feature is done now, disable it so that everything else
-          # can run
-          settings.resume = False
+        if self.status[stage_name].state == "done":
+          logger.debug(f"Skipping {stage_name} (settings.resume == true, "
+                       "and stage is marked as already done)")
           return None
         # the stage is being re-run, so we're going to set overwrite to True
         else:
           temporary_overwrite = True
-      except AttributeError:
+      except (KeyError, AttributeError):
         pass
-      # Set resume to false, so that this code isn't run again for this run.
-      # - The resuming is done, so no need for the resume flag
-      settings.resume = False
+
+    # reset stage info
+    self.status[stage_name] = ObjectDict({
+        "name": stage_name,
+        "state": None,
+    })
+
+    # add current stage status to stage_self.status
+    self.stage_self.status = self.status[stage_name]
 
     # Log starting...
-    self.stage_self.status.stage_status = "starting"
-    self.stage_self.status.stage = stage_name
+    self.status[stage_name].state = "starting"
     logger.debug(f"Starting stage: {stage_name}")
     self.save_status()
 
@@ -121,7 +114,7 @@ class resumable(BasicDecorator):
       result = self.fun(*args, **kwargs)
 
     # Log done
-    self.stage_self.status.stage_status = "done"
+    self.status[stage_name].state = "done"
     logger.debug(f"Finished stage: {stage_name}")
     self.save_status()
 
@@ -131,7 +124,9 @@ class resumable(BasicDecorator):
     '''
     Safe update the file
     '''
+    logger.debug4(f"status: {self.status}")
+    logger.debug4(f"stage.status: {self.stage_self.status}")
 
     shutil.move(settings.status_file, settings.status_file + '.bak')
     with open(settings.status_file, 'w') as fid:
-      json.dump(self.stage_self.status, fid)
+      json.dump(self.status, fid)
