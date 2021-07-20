@@ -50,7 +50,7 @@ services:
       - "${TERRA_REDIS_COMMANDER_PORT}:${TERRA_REDIS_COMMANDER_PORT_DOCKER}"
     secrets:
       - source: redis_secret
-        target: ${TERRA_REDIS_SECRET_DOCKER}
+        target: ${TERRA_REDIS_SECRET}
       - source: redis_commander_secret
         target: ${TERRA_REDIS_COMMANDER_SECRET}
     command: |
@@ -59,22 +59,22 @@ services:
           "connections":[
             {
               "password": "'"'"' > /redis-commander/config/local-production.json
-        cat /run/secrets/${TERRA_REDIS_SECRET_DOCKER} | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+        cat "${TERRA_REDIS_SECRET_FILE_DOCKER}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
         echo -n '"'"'",
               "host": "${TERRA_REDIS_HOSTNAME_DOCKER}",
               "label": "terra",
               "dbIndex": 0,
               "connectionName": "redis-commander",
-              "port": "6379"
+              "port": "${TERRA_REDIS_PORT_DOCKER}"
             }
           ],
           "server": {
             "address": "0.0.0.0",
-            "port": ${TERRA_REDIS_COMMANDER_PORT_DOCKER},
+            "port": "${TERRA_REDIS_COMMANDER_PORT_DOCKER}",
             "httpAuth": {
               "username": "admin",
               "passwordHash": "'"'"'>> /redis-commander/config/local-production.json
-          cat "/run/secrets/${TERRA_REDIS_COMMANDER_SECRET}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
+          cat "${TERRA_REDIS_COMMANDER_SECRET_FILE_DOCKER}" | sed '"'"'s|\\|\\\\|g;s|"|\\"|g'"'"' >> /redis-commander/config/local-production.json
           echo '"'"'"
             }
           }

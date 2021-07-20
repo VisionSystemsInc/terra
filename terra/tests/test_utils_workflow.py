@@ -12,6 +12,29 @@ class Klass:
 
 
 class TestResumable(TestSettingsConfigureCase):
+
+  @staticmethod
+  def _getStageName(func):
+    return f'{func.__module__}.{func.__qualname__}'
+
+  @staticmethod
+  def _setStatus(func_dict, status={}):
+    for func, state in func_dict.items():
+      func_name = TestResumable._getStageName(func)
+      status[func_name] = {'name': func_name, 'state': state}
+    with open(settings.status_file, 'w') as fid:
+      json.dump(status, fid)
+    return status
+
+  def assertStageStatus(self, func, state, status=None):
+    if not status:
+      with open(settings.status_file, 'r') as fid:
+        status = json.load(fid)
+
+    stage_name = self._getStageName(func)
+    self.assertIn(stage_name, status)
+    self.assertEqual(status[stage_name]['state'], state)
+
   def test_simple(self):
     @resumable
     def test1(self):
@@ -37,12 +60,7 @@ class TestResumable(TestSettingsConfigureCase):
       pass
 
     test1(Klass())
-
-    with open(settings.status_file, 'r') as fid:
-      status = json.load(fid)
-    self.assertEqual(status['stage_status'], 'done')
-    self.assertEqual(
-        status['stage'], f'{test1.__module__}.{test1.__qualname__}')
+    self.assertStageStatus(test1, 'done')
 
   def test_status_file_stop_in_middle(self):
     @resumable
@@ -54,20 +72,11 @@ class TestResumable(TestSettingsConfigureCase):
       raise RuntimeError('foobar')
 
     test1(Klass())
-    with open(settings.status_file, 'r') as fid:
-      status = json.load(fid)
-    self.assertEqual(status['stage_status'], 'done')
-    self.assertEqual(status['stage'],
-                     f'{test1.__module__}.{test1.__qualname__}')
+    self.assertStageStatus(test1, 'done')
 
     with self.assertRaisesRegex(RuntimeError, '^foobar$'):
       test2(Klass())
-
-    with open(settings.status_file, 'r') as fid:
-      status = json.load(fid)
-    self.assertEqual(status['stage_status'], 'starting')
-    self.assertEqual(status['stage'],
-                     f'{test2.__module__}.{test2.__qualname__}')
+    self.assertStageStatus(test2, 'starting')
 
   def test_resuming(self):
     @resumable
@@ -84,9 +93,7 @@ class TestResumable(TestSettingsConfigureCase):
 
     with settings:
       settings.resume = True
-      with open(settings.status_file, 'w') as fid:
-        json.dump({'stage_status': 'done',
-                   'stage': f'{test1.__module__}.{test1.__qualname__}'}, fid)
+      self._setStatus({test1: 'done'})
 
       with self.assertLogs(resumable.__module__, DEBUG1) as cm:
         self.assertIsNone(test1(klass))
@@ -117,9 +124,7 @@ class TestResumable(TestSettingsConfigureCase):
 
     with settings:
       settings.resume = True
-      with open(settings.status_file, 'w') as fid:
-        json.dump({'stage_status': 'starting',
-                   'stage': f'{test2.__module__}.{test2.__qualname__}'}, fid)
+      self._setStatus({test1: 'done', test2: 'starting'})
 
       with self.assertLogs(resumable.__module__, DEBUG1) as cm:
         self.assertIsNone(test1(klass))
@@ -156,13 +161,11 @@ class TestResumable(TestSettingsConfigureCase):
     with settings:
       settings.resume = True
       settings.overwrite = False
-      with open(settings.status_file, 'w') as fid:
-        json.dump({'stage_status': 'starting',
-                   'stage': f'{test2.__module__}.{test2.__qualname__}'}, fid)
+      self._setStatus({test1: 'done', test2: 'starting'})
 
       with self.assertLogs(resumable.__module__, DEBUG1) as cm:
 
-        # test1 shouldn't be run, so the resumable decorator will return False
+        # test1 is done and shouldn't be run
         self.assertIsNone(test1(klass))
 
         # the stage we resume should have overwrite set to True
@@ -210,13 +213,11 @@ class TestResumable(TestSettingsConfigureCase):
     with settings:
       settings.resume = True
       settings.overwrite = False
-      with open(settings.status_file, 'w') as fid:
-        json.dump({'stage_status': 'done',
-                   'stage': f'{test2.__module__}.{test2.__qualname__}'}, fid)
+      self._setStatus({test1: 'done', test2: 'done'})
 
       with self.assertLogs(resumable.__module__, DEBUG1) as cm:
 
-        # test1 shouldn't be run, so the resumable decorator will return False
+        # test1 is done and shouldn't be run
         self.assertIsNone(test1(klass))
 
         # test2 is done, so it shouldn't be run either

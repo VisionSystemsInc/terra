@@ -154,17 +154,14 @@ function terra_caseify()
       extra_args=$#
       ;;
 
-    run_celery) # Starts a celery worker
+    terra_celery) # Starts a celery worker
+
+      # node name (including node location)
       local node_name
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
-        node_name="local@%h"
+        node_name="terra-local@%h"
       else
-        node_name="container@%h"
-      fi
-
-      local extra_args=()
-      if [ -n "${TERRA_CELERY_WORKERS:+set}" ]; then
-        extra_args+=("-c" "${TERRA_CELERY_WORKERS}")
+        node_name="terra-container@%h"
       fi
 
       # Untested
@@ -179,7 +176,9 @@ function terra_caseify()
                               -A terra.executor.celery.app worker \
                               --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" \
                               -n "${node_name}" \
-                              ${extra_args[@]+"${extra_args[@]}"}
+                              ${TERRA_CELERY_WORKERS+ -c ${TERRA_CELERY_WORKERS}} \
+                              -Q "$(IFS=','; echo "${TERRA_CELERY_QUEUES[*]}")" \
+                              -I "$(IFS=','; echo "${TERRA_CELERY_INCLUDE[*]}")"
       ;;
 
     run_flower) # Start the flower server

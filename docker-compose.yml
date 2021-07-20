@@ -28,7 +28,7 @@ services:
       - "${TERRA_REDIS_PORT}:${TERRA_REDIS_PORT_DOCKER}"
     secrets:
       - source: redis_secret
-        target: ${TERRA_REDIS_SECRET_DOCKER}
+        target: ${TERRA_REDIS_SECRET}
     networks:
       default:
         aliases:

@@ -623,6 +623,38 @@ logging.setLoggerClass(Logger)
 logger = getLogger(__name__)
 
 
+def _checkLevel(log_level):
+  '''
+  Translate ``log_level`` to integer.
+  '''
+  if isinstance(log_level, str):
+    log_level = log_level.upper()
+  return logging._checkLevel(log_level)
+
+
+def _demoteLevel(package_names, from_level=DEBUG1, to_level=DEBUG4):
+  '''
+  Demote logging level for specific packages, disabling ``from_level`` log
+  messages unless ``terra.settings.logging.level > to_level``.
+
+  Arguments
+  ---------
+  package_names : :obj:`list` of :obj:`str`
+    List of package names
+  from_level
+    Log level to be demoted, default ``DEBUG1``
+  to_level
+    New log level, default ``DEBUG4``
+
+  '''
+  from terra import settings
+  log_level = _checkLevel(settings.logging.level)
+
+  if to_level < log_level and log_level <= from_level:
+    for package_name in package_names:
+      getLogger(package_name).setLevel(from_level + 1)
+
+
 def _setup_terra_logger():
   # Must be import signal after getLogger is defined... Currently this is
   # imported from logger. But if a custom getLogger is defined eventually, it

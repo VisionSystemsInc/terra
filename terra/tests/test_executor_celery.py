@@ -16,9 +16,10 @@ class TestCeleryConfig(TestCase):
   def setUp(self):
     self.patches.append(mock.patch.dict(os.environ,
                                         TERRA_CWD=self.temp_dir.name))
+    redis_secret = os.path.join(self.temp_dir.name, 'foo')
     self.patches.append(mock.patch.dict(os.environ,
-                                        TERRA_REDIS_SECRET_FILE='foo'))
-    with open(os.path.join(self.temp_dir.name, 'foo'), 'w') as fid:
+                                        TERRA_REDIS_SECRET_FILE=redis_secret))
+    with open(redis_secret, 'w') as fid:
       fid.write('hiya')
     super().setUp()
 
@@ -36,11 +37,6 @@ class TestCeleryConfig(TestCase):
   def test_redis_passwordfile(self):
     import terra.executor.celery.celeryconfig as cc
     self.assertEqual(cc.password, 'hiya')
-
-  @mock.patch.dict(os.environ, TERRA_CELERY_INCLUDE='["foo", "bar"]')
-  def test_include(self):
-    import terra.executor.celery.celeryconfig as cc
-    self.assertEqual(cc.include, ['foo', 'bar', 'terra.tests.demo.tasks'])
 
 
 class MockAsyncResult:
