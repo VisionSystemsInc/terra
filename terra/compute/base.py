@@ -260,9 +260,10 @@ class BaseCompute:
     elif settings.terra.zone == 'runner':
       sender.main_log_handler = SocketHandler(
           settings.logging.server.hostname, settings.logging.server.port)
-      # By default, all runners have access to the master controllers stderr,
-      # so there is no need for the master controller to echo out the log
-      # messages a second time.
+      # All runners have access to the master controller's stderr by virtue of
+      # running on the same host. By default, we go ahead and let them log
+      # there. Consequently, there is no need for the master controller to echo
+      # out the log messages a second time.
       sender.main_log_handler.addFilter(SkipStdErrAddFilter())
       sender.root_logger.addHandler(sender.main_log_handler)
 
