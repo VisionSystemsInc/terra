@@ -110,7 +110,7 @@ function terra_caseify()
       justify singular-compose instance start redis
       ;;
 
-    terra_ping-redis-singular) # Ping the redis server, to see if it is up
+    terra_redis-ping-singular) # Ping the redis server, to see if it is up
       SINGULARITY_IGNORE_EXIT_CODES=1
       justify singular-compose exec redis bash /vsi/linux/just_files/just_entrypoint.sh redis-ping
       ;;
@@ -204,6 +204,16 @@ function terra_caseify()
         '
       "
       ;;
+
+    terra_redis-monitor) # Monitor all messages sent/received from redis
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" exec redis bash /vsi/linux/just_files/just_entrypoint.sh redis-monitor
+      ;;
+
+    terra_redis-ping) # Ping the redis server, to see if it is up
+      JUST_IGNORE_EXIT_CODES=1
+      Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" exec redis bash /vsi/linux/just_files/just_entrypoint.sh redis-ping
+      ;;
+
     run_redis-commander) # Run redis-commander
       if [ ! -s "${TERRA_REDIS_COMMANDER_SECRET_FILE}" ]; then
         justify generate-redis-commander-hash
