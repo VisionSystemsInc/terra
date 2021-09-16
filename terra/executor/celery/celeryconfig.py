@@ -33,7 +33,7 @@ result_expires = 3600
 # Each celery worker should define its own queues (-Q <queues>) and
 # task modules (-I <modules>) from the command line. For example,
 #
-# pipenv python -m terra.executor.celery \
+# pipenv python -m celery \
 #   -A terra.executor.celery.app worker \
 #   -Q queue1,queue2 \
 #   -I A.module1,A.B.module2 \
