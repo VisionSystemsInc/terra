@@ -41,7 +41,7 @@ function Terra_Pipenv()
       echo "This can interfere with terra and cause unexpected consequences" >&2
       echo "Deactivate external virtual/conda envs before running just" >&2
       ask_question "Continue anyways?" answer_continue n
-      if [ "$answer_continue" == "0" ]; then
+      if [ "${answer_continue}" == "0" ]; then
         JUST_IGNORE_EXIT_CODES=1
         echo "Exiting..." >&2
         return 1
@@ -431,7 +431,7 @@ function terra_caseify()
 
     terra_clean-all) # Delete all local volumes
       ask_question "Are you sure? This will remove packages not in Pipfile!" answer_clean_all
-      [ "$answer_clean_all" == "0" ] && return 1
+      [ "${answer_clean_all}" == "0" ] && return 1
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
       COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker-compose clean terra-redis
       if [[ ${TERRA_LOCAL-} == 1 ]]; then
@@ -518,7 +518,7 @@ function terra_caseify()
       ;;
 
     ### Other ###
-    # command: bash -c "touch /tmp/watchdog; while [ -e /tmp/watchdog ]; do rm /tmp/watchdog; sleep 1000; done"
+    # command: bash -c 'touch /tmp/watchdog; while [ -e "/tmp/watchdog" ]; do rm /tmp/watchdog; sleep 1000; done'
     # terra_vscode) # Execute vscode magic in a vscode container
     #   local container="$(docker ps -q -f "label=com.docker.compose.service=vscode" -f "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}")"
     #   if [ -z "${container}" ]; then
@@ -526,7 +526,7 @@ function terra_caseify()
     #     container="$(docker ps -q -f "label=com.docker.compose.service=vscode" -f "label=com.docker.compose.project=${COMPOSE_PROJECT_NAME}")"
     #   fi
     #   local flags=""
-    #   if [ -t 0 ]; then
+    #   if [ -t "0" ]; then
     #     flags="-t"
     #   fi
     #

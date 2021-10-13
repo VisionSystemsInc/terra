@@ -2,7 +2,7 @@
 
 # Make the CMD arguments behave like docker does
 if [ -n "${CMD}" ]; then
-  sed -i $'s|^exec .*|if [ $# = 0 ]; then\\\n  &\\\nelse\\\n  exec '"${ENTRYPOINT}"$' "${@}"\\\nfi|' "${build_sandbox}/.singularity.d/runscript"
+  sed -i $'s|^exec .*|if [ "${#}" = "0" ]; then\\\n  &\\\nelse\\\n  exec '"${ENTRYPOINT}"$' "${@}"\\\nfi|' "${build_sandbox}/.singularity.d/runscript"
 fi
 
 # Remove tini, since it isn't needed or desired in singularity
