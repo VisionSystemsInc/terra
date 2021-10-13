@@ -172,7 +172,7 @@ function terra_caseify()
       fi
 
       # We might be able to use CELERY_LOADER to avoid the -A argument
-      Terra_Pipenv run python -m terra.executor.celery \
+      Terra_Pipenv run python -m celery \
                               -A terra.executor.celery.app worker \
                               --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" \
                               -n "${node_name}" \
@@ -183,7 +183,7 @@ function terra_caseify()
 
     run_flower) # Start the flower server
       # Flower doesn't actually need the tasks loaded in the app, so clear it
-      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m terra.executor.celery \
+      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m celery \
                                                         -A terra.executor.celery.app flower
       ;;
     shutdown_celery) # Shuts down all celery workers on all nodes
