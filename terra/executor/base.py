@@ -22,8 +22,8 @@ class BaseExecutor(Executor):
   # Currently, the CeleryExecutor is the only Executor that is not forked from
   # a runner; these tasks are forked off of the celery process. The loggers for
   # these tasks must be reconfigured once they are started up and the settings
-  # are avaliable. Similarly, any additional Executors that need custom behavior
-  # must also be configured/reconfigured appropriately.
+  # are avaliable. Similarly, any additional Executors that need custom
+  # behavior must also be configured/reconfigured appropriately.
 
   multiprocess = False
 
