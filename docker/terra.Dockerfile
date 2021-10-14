@@ -7,7 +7,7 @@ FROM vsiri/recipe:pipenv as pipenv
 
 ###############################################################################
 
-FROM python:3.7-alpine as dep_stage
+FROM python:3.7-alpine3.13 as dep_stage
 SHELL ["/usr/bin/env", "sh", "-euxvc"]
 
 # Install any runtime dependencies
