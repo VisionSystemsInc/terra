@@ -97,11 +97,20 @@ function terra_caseify()
       ;;
 
     terra_build-singular) # Build singularity images for terra
+      # If a terra project calls build, it would "terra build-singular", but
+      # when that same terra project calls sync, it would call it's own build
+      # plus terra sync-singular, which would call this a second time. This is
+      # a check to make sure build-singular is only done once.
+      if [ "${TERRA_JUST_BUILD_SINGULAR-}" = "1" ]; then
+        return 0
+      fi
+      TERRA_JUST_BUILD_SINGULAR=1
+
       justify build recipes-auto "${TERRA_CWD}"/docker/*.Dockerfile
       justify terra build-services
 
       for image in "${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}"; do
-        justify singularity import -n "${image##*:}.simg" "${image}"
+        justify singular-compose import redis "${TERRA_DOCKER_REPO}:redis_${TERRA_USERNAME}"
       done
       ;;
 
