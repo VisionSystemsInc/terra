@@ -35,6 +35,8 @@ JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 
 function Terra_Pipenv()
 {
+  local answer_continue="${answer_continue-}"
+
   if [[ ${TERRA_LOCAL-} == 1 ]]; then
     if [ -n "${VIRTUAL_ENV+set}" ] || [ -n "${CONDA_DEFAULT_ENV+set}" ]; then
       echo "Warning: You appear to be in a virtual/conda env" >&2
@@ -429,7 +431,7 @@ function terra_caseify()
       source "${VSI_COMMON_DIR}/docker/recipes/30_get-pipenv"
       PIPENV_PYTHON="${PYTHON}" PIPENV_VIRTUALENV="${output_dir}" install_pipenv
 
-      local add_to_local
+      local add_to_local="${add_to_local-}"
       echo "" >&2
       ask_question "Do you want to add \"${output_dir}/${platform_bin}\" to your local.env automatically?" add_to_local y
       if [ "${add_to_local}" == "1" ]; then
@@ -444,6 +446,7 @@ function terra_caseify()
       ;;
 
     terra_clean-all) # Delete all local volumes
+      local answer_clean_all="${answer_clean_all-}"
       ask_question "Are you sure? This will remove packages not in Pipfile!" answer_clean_all
       [ "${answer_clean_all}" == "0" ] && return 1
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
