@@ -190,6 +190,11 @@ function terra_caseify()
                               -I "$(IFS=','; echo "${TERRA_CELERY_INCLUDE[*]}")"
       ;;
 
+    terra_celery-status) # Get the status on all celery workers currently connected
+      Terra_Pipenv run python -m celery \
+                              -A terra.executor.celery.app status
+      ;;
+
     run_flower) # Start the flower server
       # Flower doesn't actually need the tasks loaded in the app, so clear it
       TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m celery \
