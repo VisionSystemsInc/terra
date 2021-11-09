@@ -17,6 +17,7 @@ source "${VSI_COMMON_DIR}/linux/just_files/just_install_functions.bsh"
 source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/python_tools.bsh"
 source "${VSI_COMMON_DIR}/linux/aliases.bsh"
+source "${VSI_COMMON_DIR}/linux/web_tools.bsh"
 
 # Make terra's justfile a plugin if it is not the main Justfile
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
@@ -309,10 +310,33 @@ function terra_caseify()
       justify git_submodule-update # For those users who don't remember!
       if [[ ${TERRA_LOCAL-} == 0 ]]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
-        justify terra_sync-pipenv
+        justify terra sync-pipenv
         justify terra build-services
       else
         justify terra sync-pipenv
+        local pipenv_dir="$(Terra_Pipenv --venv)"
+        if [ "${OS-}" = "Windows_NT" ]; then
+          if [ ! -e "${pipenv_dir}/Scripts/docker-compose.exe" ] || [ "$(stat -c %s "${pipenv_dir}/Scripts/docker-compose.exe")" -lt 1000000 ]; then
+            download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-windows-x86_64.exe \
+                            "${pipenv_dir}/Scripts/docker-compose.exe"
+          fi
+        else
+          if [ ! -e "${pipenv_dir}/bin/docker-compose" ] || [ "$(stat -c %s "${pipenv_dir}/bin/docker-compose")" -lt 1000000 ]; then
+            if [[ ${OSTYPE-} = darwin* ]]; then
+              if [ "${HOSTTYPE}" = "x86_64" ]; then
+                download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-darwin-x86_64 \
+                                "${pipenv_dir}/bin/docker-compose"
+              else
+                download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-darwin-aarch64 \
+                                "${pipenv_dir}/bin/docker-compose"
+              fi
+            else
+              download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64 \
+                              "${pipenv_dir}/bin/docker-compose"
+            fi
+            chmod 755 "${pipenv_dir}/bin/docker-compose"
+          fi
+        fi
       fi
       ;;
 
