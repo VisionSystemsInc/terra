@@ -357,12 +357,12 @@ function terra_caseify()
 
     terra_setup) # Setup pipenv using system python and/or conda
       local output_dir
-      local CONDA
-      local PYTHON
+      local conda_exe
+      local python_exe
       local download_conda=0
       local conda_install
 
-      parse_args extra_args --dir output_dir: --python PYTHON: --conda CONDA: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
+      parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
       if [ -z "${output_dir:+set}" ]; then
         echo "--dir must be specified" >& 2
@@ -379,71 +379,51 @@ function terra_caseify()
 
       local use_conda
       local platform_bin
+
       if [ "${OS-}" = "Windows_NT" ]; then
         platform_bin=Scripts
       else
         platform_bin=bin
       fi
 
-      if [ -n "${PYTHON:+set}" ]; then
-        use_conda=0
-      elif [ -n "${CONDA:+set}" ]; then
+      local installer_args
+      local python_activate
+      local python_version
+      local conda_python_extra_args
+
+      if [ -n "${python_exe:+set}" ]; then
+        :
+      elif [ -n "${conda_exe:+set}" ]; then
         use_conda=1
+      elif [ "${download_conda}" != "0" ]; then
+        use_conda=1
+      elif command -v python3 &> /dev/null; then
+        python_exe="$(command -v python3)"
+      elif command -v python &> /dev/null; then
+        python_exe="$(command -v python3)"
       else
-        if [ "${download_conda}" == "0" ] && command -v python3 &> /dev/null; then
-          PYTHON=python3
-          use_conda=0
-        elif [ "${download_conda}" == "0" ] && command -v python &> /dev/null; then
-          PYTHON=python
-          use_conda=0
-        elif [ "${download_conda}" == "0" ] && command -v conda3 &> /dev/null; then
-          CONDA=conda3
-          use_conda=1
-        elif [ "${download_conda}" == "0" ] && command -v conda &> /dev/null; then
-          CONDA=conda
-          use_conda=1
-        elif [ "${download_conda}" == "0" ] && command -v conda2 &> /dev/null; then
-          CONDA=conda2
-          use_conda=1
-        else
-          source "${VSI_COMMON_DIR}/linux/web_tools.bsh"
-          source "${VSI_COMMON_DIR}/linux/dir_tools.bsh"
-          make_temp_path temp_dir -d
-          local URL
-          if [ "${OS-}" = "Windows_NT" ]; then
-            URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
-            if [ -z "${conda_install:+set}" ]; then
-              echo "Downloading miniconda..."
-              download_to_stdout "${URL}" > "${temp_dir}/install_conda.exe"
-              conda_install="${temp_dir}/install_conda.exe"
-            fi
-            MSYS2_ARG_CONV_EXCL="*" "${conda_install}" /NoRegistry=1 /InstallationType=JustMe /S "/D=$(cygpath -aw "${temp_dir}/conda")"
-            CONDA="${temp_dir}/conda/Scripts/conda"
-          else
-            if [[ ${OSTYPE-} = darwin* ]]; then
-              URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
-            else
-              URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-            fi
-            if [ -z "${conda_install:+set}" ]; then
-              echo "Downloading miniconda..."
-              download_to_stdout "${URL}" > "${temp_dir}/install_conda.sh"
-              conda_install="${temp_dir}/install_conda.sh"
-            fi
-            bash "${conda_install}" -b -p "${temp_dir}/conda" -s
-            CONDA="${temp_dir}/conda/bin/conda"
-          fi
-          use_conda=1
-        fi
+        use_conda=1
       fi
 
-      if [ "${use_conda}" = "1" ]; then
-        "${CONDA}" create -y -p "${output_dir}/.python" 'python<=3.8'
-        PYTHON="${output_dir}/.python/${platform_bin}/python"
+      if [ "${use_conda-}" = "1" ]; then
+        installer_args=()
+
+        if [ "${download_conda}" != "0" ]; then
+          installer_args+=("--download")
+        fi
+        if [ -n "${conda_install:+set}" ]; then
+          installer_args+=("--conda-install" "${conda_install}")
+        fi
+        if [ -n "${conda_exe:+set}" ]; then
+          installer_args+=("--conda" "${conda_exe}")
+        fi
+
+        # sets python_exe
+        conda-python-install --dir "${output_dir}/.python" ${installer_args[@]+"${installer_args[@]}"}
       fi
 
       # Make sure python is 3.6 or newer
-      local python_version="$("${PYTHON}" --version | awk '{print $2}')"
+      local python_version="$("${python_exe}" --version 2>&1 | awk '{print $2}')"
       source "${VSI_COMMON_DIR}/linux/requirements.bsh"
       if ! meet_requirements "${python_version}" '>=3.6' '<3.10'; then
         echo "Python version ${python_version} does not meet the expected requirements" >&2
@@ -452,8 +432,11 @@ function terra_caseify()
         echo
       fi
 
-      source "${VSI_COMMON_DIR}/docker/recipes/30_get-pipenv"
-      PIPENV_PYTHON="${PYTHON}" PIPENV_VIRTUALENV="${output_dir}" install_pipenv
+      installer_args=()
+      if [ -n "${python_activate:+set}" ]; then
+        installer_args+=("--python-activate" "${python_activate}")
+      fi
+      pipenv-install --python "${python_exe}" --dir "${output_dir}" ${installer_args[@]+"${installer_args[@]}"}
 
       local add_to_local="${add_to_local-}"
       echo "" >&2
