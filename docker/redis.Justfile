@@ -25,7 +25,13 @@ function caseify()
       ;;
     redis-monitor) # Monitor all messages on the redis server
       JUST_IGNORE_EXIT_CODES=1
-      redis_cli monitor
+      redis_cli monitor | awk $'{
+                                  if (NF>=4) {
+                                    $1="\e[0;31m"strftime(PROCINFO["strftime"],$1)" +"$1-int($1)"\e[0m";
+                                    $4="\e[0;32m"$4"\e[0m"
+                                  };
+                                  print
+                                }'
       ;;
     *)
       exec "${cmd}" ${@+"${@}"}

@@ -4,7 +4,7 @@ FROM vsiri/recipe:vsi as vsi
 
 FROM redis:5.0.4-alpine3.9
 
-RUN apk add --no-cache bash tzdata
+RUN apk add --no-cache bash tzdata gawk
 
 COPY --from=tini /usr/local /usr/local
 COPY --from=gosu /usr/local /usr/local
