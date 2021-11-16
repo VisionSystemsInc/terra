@@ -20,10 +20,9 @@ pywin32-ctypes = {version = ">= 0.2.0", markers = "sys_platform == 'win32'"}
 macholib = {version = ">= 1.8", markers = "sys_platform == 'darwin'"}
 
 [packages]
-terra = {path = ".",editable = true}
 vsi-common = {editable = true,path = "./external/vsi_common"}
-# Repeat this dependencies possibly due to an editable bug
-jstyleson = "*"
+
+terra = {path = ".", extras = ["celery"], editable = true}
+# The Extras don't work on this editable, so manually copy the extra part
 celery = {extras = ["redis"]}
 flower = "*"
-pyyaml = "*"
