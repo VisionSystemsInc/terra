@@ -71,8 +71,11 @@ commands:
   #   (see https://github.com/VisionSystemsInc/vsi_common/blob/master/linux/just_files/just_ci_functions.bsh)
   #     $JUST_CI_RECIPE_REPO - dockerhub recipe cache (default = "vsiri/ci_cache_recipes")
   #     $JUST_CI_RECIPE_VERSION - version string for recipe cache (default = "")
+  #     $JUST_CI_RECIPE_ARGS - additional `ci_load` arguments for recipe cache (default = "--no-push")
   #     $JUST_CI_CACHE_REPO - dockerhub service cache (default = "vsiri/ci_cache")
   #     $JUST_CI_CACHE_VERSION - version string for service cache (default = "")
+  #     $JUST_CI_CACHE_ARGS - additional `ci_load` arguments for service cache
+  #     $JUST_CI_BRANCH_PUSH - branch (besides master) for dockerhub push
   ci_load:
     description: "Build dockers (ci_load)"
     steps:
@@ -89,18 +92,22 @@ commands:
             # dockerhub access
             docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
 
-            # push only from master branch of main repo
-            if [ "${CIRCLE_PROJECT_USERNAME,,}" == "visionsystemsinc" ] && \
-               [ "${CIRCLE_BRANCH}" == "master" ]
+            # push only from selected branches of main repo
+            if [[ "${CIRCLE_PROJECT_USERNAME,,}" == "visionsystemsinc" && \
+                  ("${CIRCLE_BRANCH}" == "master" || \
+                   "${CIRCLE_BRANCH}" == "${JUST_CI_BRANCH_PUSH-}") ]]
             then
-              CI_LOAD_OPTIONS=""
+              : ${JUST_CI_CACHE_ARGS=""}
             else
-              CI_LOAD_OPTIONS="--no-push"
+              : ${JUST_CI_CACHE_ARGS="--no-push"}
             fi
+
+            # export local variables
+            export JUST_CI_CACHE_ARGS
 
             # ci_load
             source setup.env
-            just ci load ${CI_LOAD_OPTIONS:-}
+            just ci load
 
 # -----
 # CircleCI jobs
