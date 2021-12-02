@@ -364,7 +364,7 @@ def lock_dir(self):
   '''
   A :func:`settings_property` defining the directory where lock files should be
   stored. In order for multiple terra workers to be able to communicate with
-  each other about a :class:`terra.executor.resource.Resource`, a common lock
+  each other about a :class:`terra.executor.resources.Resource`, a common lock
   directory needs to be established (that can be a network drive). The default
   will be in the :func:`processing_dir`. However in cases such as celery, this
   will need to be explicitly set, since celery starts before the processing dir
