@@ -21,7 +21,8 @@ class TestComputeDockerCase(TestSettingsConfigureCase):
                           mock.PropertyMock(return_value=docker.Compute())))
 
     # Configure for docker
-    self.config.compute = {'arch': 'docker'}
+    self.config.compute = {'arch': 'docker',
+                           'tty': True}
 
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
@@ -96,7 +97,7 @@ class TestDockerRun(TestComputeDockerCase):
     compute.run(MockJustService())
     # Run a docker service
     self.assertEqual(('--wrap', 'Just-docker-compose',
-                      '-f', 'file1', 'run', '-T', 'launch', 'ls'),
+                      '-f', 'file1', 'run', 'launch', 'ls'),
                      self.just_args)
     self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
