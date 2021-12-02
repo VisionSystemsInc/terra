@@ -126,7 +126,7 @@ class CeleryExecutor(BaseExecutor):
     self._monitor_started = False
     self._monitor_stopping = False
     self._monitor = Thread(target=self._update_futures)
-    self._monitor.setDaemon(True)
+    self._monitor.daemon = True
 
   def _update_futures(self):
     while True:
