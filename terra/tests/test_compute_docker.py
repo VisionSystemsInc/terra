@@ -195,7 +195,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
       TZ: /usr/share/zoneinfo/America/New_York]
@@ -256,7 +256,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
     image: rediscommander/redis-commander
@@ -301,7 +301,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
       TZ: /usr/share/zoneinfo/America/New_York]
@@ -354,7 +354,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
       TZ: /usr/share/zoneinfo/America/New_York]
