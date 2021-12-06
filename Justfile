@@ -400,7 +400,7 @@ function terra_caseify()
       elif command -v python3 &> /dev/null; then
         python_exe="$(command -v python3)"
       elif command -v python &> /dev/null; then
-        python_exe="$(command -v python3)"
+        python_exe="$(command -v python)"
       else
         use_conda=1
       fi
