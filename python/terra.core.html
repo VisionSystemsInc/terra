@@ -195,7 +195,7 @@
 <dl class="py exception">
 <dt id="terra.core.exceptions.ConfigurationWarning">
 <em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.exceptions.</span></code><code class="sig-name descname"><span class="pre">ConfigurationWarning</span></code><a class="headerlink" href="#terra.core.exceptions.ConfigurationWarning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Warning" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#Warning" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Warning</span></code></a></p>
 <p>Warning that Terra may be improperly configured</p>
 </dd></dl>
 
@@ -212,7 +212,7 @@
 <dd><p>A tuple of Exceptions classes that will not</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -220,7 +220,7 @@
 <dl class="py exception">
 <dt id="terra.core.exceptions.NoStackException">
 <em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.exceptions.</span></code><code class="sig-name descname"><span class="pre">NoStackException</span></code><a class="headerlink" href="#terra.core.exceptions.NoStackException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>An exception class that when unhandled, does not print the stack trace</p>
 <p>Still behaves like an exception, but ideal for errors that you don’t want to
 clutter the screen with stack traces, because the error message is all you
@@ -337,9 +337,9 @@ calling:</p>
 </pre></div>
 </div>
 <p>Pass <a class="reference internal" href="#terra.core.settings.LazySettings.configure" title="terra.core.settings.LazySettings.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">setting.configure()</span></code></a> the same arguments you
-would pass to a <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, such as keyword arguments as in this example
+would pass to a <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, such as keyword arguments as in this example
 where each keyword argument represents a setting and its value, or a
-<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>. Each argument name should be the same name as the settings. If a
+<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>. Each argument name should be the same name as the settings. If a
 particular setting is not passed to
 <a class="reference internal" href="#terra.core.settings.LazySettings.configure" title="terra.core.settings.LazySettings.configure"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings.configure()</span></code></a> and is needed at some
 later point, Terra will use the default setting value.</p>
@@ -353,7 +353,7 @@ framework instead of a larger application.</p>
 file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -361,13 +361,13 @@ file</p>
 <dl class="py class">
 <dt id="terra.core.settings.ExpandedString">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">ExpandedString</span></code><a class="headerlink" href="#terra.core.settings.ExpandedString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="terra.core.settings.LazyObject">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">LazyObject</span></code><a class="headerlink" href="#terra.core.settings.LazyObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A wrapper class that lazily evaluates (calls <a class="reference internal" href="#terra.core.settings.LazyObject._setup" title="terra.core.settings.LazyObject._setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">LazyObject._setup()</span></code></a>)</p>
 <p><a class="reference internal" href="#terra.core.settings.LazyObject" title="terra.core.settings.LazyObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazyObject</span></code></a> remains unevaluated until one of the supported magic
 functions are called.</p>
@@ -439,7 +439,7 @@ functions are called.</p>
 object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#NotImplementedError" title="(in Python v3.6)"><strong>NotImplementedError</strong></a> – Will throw this exception unless a subclass redefines <a class="reference internal" href="#terra.core.settings.LazyObject._setup" title="terra.core.settings.LazyObject._setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">_setup()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#NotImplementedError" title="(in Python v3.9)"><strong>NotImplementedError</strong></a> – Will throw this exception unless a subclass redefines <a class="reference internal" href="#terra.core.settings.LazyObject._setup" title="terra.core.settings.LazyObject._setup"><code class="xref py py-func docutils literal notranslate"><span class="pre">_setup()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -463,7 +463,7 @@ used the first time settings are needed, if the user hasn’t configured
 settings manually.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – The name used to describe the settings object. Defaults to <code class="docutils literal notranslate"><span class="pre">settings</span></code></p>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – The name used to describe the settings object. Defaults to <code class="docutils literal notranslate"><span class="pre">settings</span></code></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference internal" href="#terra.core.exceptions.ImproperlyConfigured" title="terra.core.exceptions.ImproperlyConfigured"><strong>ImproperlyConfigured</strong></a> – If the settings has already been configured, will throw an error. Under
@@ -479,7 +479,7 @@ settings manually.</p>
 <a class="reference internal" href="#terra.core.settings.global_templates" title="terra.core.settings.global_templates"><code class="xref py py-data docutils literal notranslate"><span class="pre">global_templates</span></code></a> specific for an application</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>templates</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A list of pairs of dictionaries just like <a class="reference internal" href="#terra.core.settings.global_templates" title="terra.core.settings.global_templates"><code class="xref py py-data docutils literal notranslate"><span class="pre">global_templates</span></code></a></p>
+<dd class="field-odd"><p><strong>templates</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – A list of pairs of dictionaries just like <a class="reference internal" href="#terra.core.settings.global_templates" title="terra.core.settings.global_templates"><code class="xref py py-data docutils literal notranslate"><span class="pre">global_templates</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -489,7 +489,7 @@ settings manually.</p>
 <code class="sig-name descname"><span class="pre">configure</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.configure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called to manually configure the settings. The ‘default_settings’
 parameter sets where to retrieve any unspecified values from (its
-argument should be a <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>).</p>
+argument should be a <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -512,7 +512,7 @@ argument should be a <a class="reference external" href="https://docs.python.org
 <dd class="field-odd"><p>Return <code class="docutils literal notranslate"><span class="pre">True</span></code> if has already been configured</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -539,7 +539,7 @@ argument should be a <a class="reference external" href="https://docs.python.org
 <dl class="py class">
 <dt id="terra.core.settings.ObjectDict">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">ObjectDict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.ObjectDict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
 <p>An object dictionary, that accesses dictionary keys using attributes (<code class="docutils literal notranslate"><span class="pre">.</span></code>)
 rather than items (<code class="docutils literal notranslate"><span class="pre">[]</span></code>).</p>
 <dl class="py method">
@@ -589,7 +589,7 @@ the values</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Does not work on <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> since it would be handled
-automatically as a <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
+automatically as a <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
 </div>
 <dl class="py method">
 <dt id="terra.core.settings.TerraJSONEncoder.default">
@@ -618,7 +618,7 @@ implement default like this:</p>
 <dd><p>Convenience function for running <cite>dumps</cite> using this encoder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obj</strong> (<a class="reference internal" href="#terra.core.settings.LazySettings" title="terra.core.settings.LazySettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazySettings</span></code></a>) – Object to be converted to json friendly <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<dd class="field-odd"><p><strong>obj</strong> (<a class="reference internal" href="#terra.core.settings.LazySettings" title="terra.core.settings.LazySettings"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazySettings</span></code></a>) – Object to be converted to json friendly <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -626,7 +626,7 @@ implement default like this:</p>
 <dl class="py method">
 <dt id="terra.core.settings.TerraJSONEncoder.serializableSettings">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">serializableSettings</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.TerraJSONEncoder.serializableSettings" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> object into a json serializable <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
+<dd><p>Convert a <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> object into a json serializable <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>.</p>
 <p>Since <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> can contain <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a>, this
 prevents json serialization. This function will evaluate all
 <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a>’s for you.</p>
@@ -652,14 +652,14 @@ settings</p>
 <dd><p>The list key suffixes that are to be considered for volume translation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py data">
 <dt id="terra.core.settings.global_templates">
-<code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">global_templates</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[({},</span> <span class="pre">{'logging':</span> <span class="pre">{'level':</span> <span class="pre">'ERROR',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">(%(hostname)s:%(zone)s):</span> <span class="pre">%(levelname)s/%(processName)s</span> <span class="pre">-</span> <span class="pre">%(filename)s</span> <span class="pre">-</span> <span class="pre">%(message)s',</span> <span class="pre">'date_format':</span> <span class="pre">None,</span> <span class="pre">'style':</span> <span class="pre">'%',</span> <span class="pre">'server':</span> <span class="pre">{'hostname':</span> <span class="pre">&lt;function</span> <span class="pre">logging_hostname&gt;,</span> <span class="pre">'port':</span> <span class="pre">9020,</span> <span class="pre">'listen_address':</span> <span class="pre">&lt;function</span> <span class="pre">logging_listen_address&gt;},</span> <span class="pre">'log_file':</span> <span class="pre">&lt;function</span> <span class="pre">log_file&gt;},</span> <span class="pre">'executor':</span> <span class="pre">{'num_workers':</span> <span class="pre">2,</span> <span class="pre">'type':</span> <span class="pre">'ProcessPoolExecutor',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.dummy',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'terra':</span> <span class="pre">{'config_file':</span> <span class="pre">&lt;function</span> <span class="pre">config_file&gt;,</span> <span class="pre">'zone':</span> <span class="pre">'controller',</span> <span class="pre">'uuid':</span> <span class="pre">&lt;function</span> <span class="pre">terra_uuid&gt;},</span> <span class="pre">'overwrite':</span> <span class="pre">False,</span> <span class="pre">'service_start':</span> <span class="pre">None,</span> <span class="pre">'service_end':</span> <span class="pre">None,</span> <span class="pre">'settings_dir':</span> <span class="pre">&lt;function</span> <span class="pre">settings_dir&gt;,</span> <span class="pre">'status_file':</span> <span class="pre">&lt;function</span> <span class="pre">status_file&gt;,</span> <span class="pre">'processing_dir':</span> <span class="pre">&lt;function</span> <span class="pre">processing_dir&gt;,</span> <span class="pre">'unittest':</span> <span class="pre">&lt;function</span> <span class="pre">unittest&gt;,</span> <span class="pre">'resume':</span> <span class="pre">False}),</span> <span class="pre">({'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.virtualenv'}},</span> <span class="pre">{'compute':</span> <span class="pre">{'virtualenv_dir':</span> <span class="pre">&lt;function</span> <span class="pre">need_to_set_virtualenv_dir&gt;}}),</span> <span class="pre">({'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'virtualenv'}},</span> <span class="pre">{'compute':</span> <span class="pre">{'virtualenv_dir':</span> <span class="pre">&lt;function</span> <span class="pre">need_to_set_virtualenv_dir&gt;}})]</span></em><a class="headerlink" href="#terra.core.settings.global_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">global_templates</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[({},</span> <span class="pre">{'logging':</span> <span class="pre">{'level':</span> <span class="pre">'ERROR',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">(%(hostname)s:%(zone)s):</span> <span class="pre">%(levelname)s/%(processName)s</span> <span class="pre">-</span> <span class="pre">%(filename)s</span> <span class="pre">-</span> <span class="pre">%(message)s',</span> <span class="pre">'date_format':</span> <span class="pre">None,</span> <span class="pre">'style':</span> <span class="pre">'%',</span> <span class="pre">'server':</span> <span class="pre">{'hostname':</span> <span class="pre">&lt;function</span> <span class="pre">logging_hostname&gt;,</span> <span class="pre">'port':</span> <span class="pre">9020,</span> <span class="pre">'listen_address':</span> <span class="pre">&lt;function</span> <span class="pre">logging_listen_address&gt;},</span> <span class="pre">'log_file':</span> <span class="pre">&lt;function</span> <span class="pre">log_file&gt;},</span> <span class="pre">'executor':</span> <span class="pre">{'num_workers':</span> <span class="pre">2,</span> <span class="pre">'type':</span> <span class="pre">'ProcessPoolExecutor',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.dummy',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'terra':</span> <span class="pre">{'config_file':</span> <span class="pre">&lt;function</span> <span class="pre">config_file&gt;,</span> <span class="pre">'lock_dir':</span> <span class="pre">&lt;function</span> <span class="pre">lock_dir&gt;,</span> <span class="pre">'zone':</span> <span class="pre">'controller',</span> <span class="pre">'uuid':</span> <span class="pre">&lt;function</span> <span class="pre">terra_uuid&gt;},</span> <span class="pre">'overwrite':</span> <span class="pre">False,</span> <span class="pre">'service_start':</span> <span class="pre">None,</span> <span class="pre">'service_end':</span> <span class="pre">None,</span> <span class="pre">'settings_dir':</span> <span class="pre">&lt;function</span> <span class="pre">settings_dir&gt;,</span> <span class="pre">'status_file':</span> <span class="pre">&lt;function</span> <span class="pre">status_file&gt;,</span> <span class="pre">'processing_dir':</span> <span class="pre">&lt;function</span> <span class="pre">processing_dir&gt;,</span> <span class="pre">'unittest':</span> <span class="pre">&lt;function</span> <span class="pre">unittest&gt;,</span> <span class="pre">'resume':</span> <span class="pre">False}),</span> <span class="pre">({'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.virtualenv'}},</span> <span class="pre">{'compute':</span> <span class="pre">{'virtualenv_dir':</span> <span class="pre">&lt;function</span> <span class="pre">need_to_set_virtualenv_dir&gt;}}),</span> <span class="pre">({'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'virtualenv'}},</span> <span class="pre">{'compute':</span> <span class="pre">{'virtualenv_dir':</span> <span class="pre">&lt;function</span> <span class="pre">need_to_set_virtualenv_dir&gt;}}),</span> <span class="pre">({'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.docker'}},</span> <span class="pre">{'compute':</span> <span class="pre">{'tty':</span> <span class="pre">&lt;function</span> <span class="pre">stdin_istty&gt;}}),</span> <span class="pre">({'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'docker'}},</span> <span class="pre">{'compute':</span> <span class="pre">{'tty':</span> <span class="pre">&lt;function</span> <span class="pre">stdin_istty&gt;}})]</span></em><a class="headerlink" href="#terra.core.settings.global_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Templates are how we
 conditionally assign default values. It is a list of pair tuples, where the
 first in the tuple is a “pattern” and the second is the default values. If the
@@ -668,7 +668,7 @@ values.</p>
 <p>Values are copies recursively, but only if not already set by your settings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -680,7 +680,7 @@ values.</p>
 include replacement at load time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -689,6 +689,19 @@ include replacement at load time.</p>
 <dt id="terra.core.settings.json_load">
 <code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">json_load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.json_load" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt id="terra.core.settings.lock_dir">
+<code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">lock_dir</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.lock_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> defining the directory where lock files should be
+stored. In order for multiple terra workers to be able to communicate with
+each other about a <a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource" title="terra.executor.resources.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.resources.Resource</span></code></a>, a common lock
+directory needs to be established (that can be a network drive). The default
+will be in the <a class="reference internal" href="#terra.core.settings.processing_dir" title="terra.core.settings.processing_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">processing_dir()</span></code></a>. However in cases such as celery, this
+will need to be explicitly set, since celery starts before the processing dir
+is defined. The lock_dir can be set by using environment variable
+<code class="docutils literal notranslate"><span class="pre">TERRA_LOCK_DIR</span></code>, or using a settings file to set <code class="docutils literal notranslate"><span class="pre">terra.lock_dir</span></code>.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="terra.core.settings.log_file">
@@ -732,7 +745,7 @@ directory.</p>
 
 <dl class="py data">
 <dt id="terra.core.settings.settings">
-<code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">settings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'logging':</span> <span class="pre">{'level':</span> <span class="pre">'ERROR',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">(%(hostname)s:%(zone)s):</span> <span class="pre">%(levelname)s/%(processName)s</span> <span class="pre">-</span> <span class="pre">%(filename)s</span> <span class="pre">-</span> <span class="pre">%(message)s',</span> <span class="pre">'date_format':</span> <span class="pre">None,</span> <span class="pre">'style':</span> <span class="pre">'%',</span> <span class="pre">'server':</span> <span class="pre">{'hostname':</span> <span class="pre">&lt;function</span> <span class="pre">logging_hostname&gt;,</span> <span class="pre">'port':</span> <span class="pre">9020,</span> <span class="pre">'listen_address':</span> <span class="pre">&lt;function</span> <span class="pre">logging_listen_address&gt;},</span> <span class="pre">'log_file':</span> <span class="pre">&lt;function</span> <span class="pre">log_file&gt;},</span> <span class="pre">'executor':</span> <span class="pre">{'num_workers':</span> <span class="pre">2,</span> <span class="pre">'type':</span> <span class="pre">'ProcessPoolExecutor',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.dummy',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'terra':</span> <span class="pre">{'config_file':</span> <span class="pre">&lt;function</span> <span class="pre">config_file&gt;,</span> <span class="pre">'zone':</span> <span class="pre">'controller',</span> <span class="pre">'uuid':</span> <span class="pre">&lt;function</span> <span class="pre">terra_uuid&gt;},</span> <span class="pre">'overwrite':</span> <span class="pre">False,</span> <span class="pre">'service_start':</span> <span class="pre">None,</span> <span class="pre">'service_end':</span> <span class="pre">None,</span> <span class="pre">'settings_dir':</span> <span class="pre">&lt;function</span> <span class="pre">settings_dir&gt;,</span> <span class="pre">'status_file':</span> <span class="pre">&lt;function</span> <span class="pre">status_file&gt;,</span> <span class="pre">'processing_dir':</span> <span class="pre">&lt;function</span> <span class="pre">processing_dir&gt;,</span> <span class="pre">'unittest':</span> <span class="pre">&lt;function</span> <span class="pre">unittest&gt;,</span> <span class="pre">'resume':</span> <span class="pre">False}</span></em><a class="headerlink" href="#terra.core.settings.settings" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">settings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'logging':</span> <span class="pre">{'level':</span> <span class="pre">'ERROR',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">(%(hostname)s:%(zone)s):</span> <span class="pre">%(levelname)s/%(processName)s</span> <span class="pre">-</span> <span class="pre">%(filename)s</span> <span class="pre">-</span> <span class="pre">%(message)s',</span> <span class="pre">'date_format':</span> <span class="pre">None,</span> <span class="pre">'style':</span> <span class="pre">'%',</span> <span class="pre">'server':</span> <span class="pre">{'hostname':</span> <span class="pre">&lt;function</span> <span class="pre">logging_hostname&gt;,</span> <span class="pre">'port':</span> <span class="pre">9020,</span> <span class="pre">'listen_address':</span> <span class="pre">&lt;function</span> <span class="pre">logging_listen_address&gt;},</span> <span class="pre">'log_file':</span> <span class="pre">&lt;function</span> <span class="pre">log_file&gt;},</span> <span class="pre">'executor':</span> <span class="pre">{'num_workers':</span> <span class="pre">2,</span> <span class="pre">'type':</span> <span class="pre">'ProcessPoolExecutor',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.dummy',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'terra':</span> <span class="pre">{'config_file':</span> <span class="pre">&lt;function</span> <span class="pre">config_file&gt;,</span> <span class="pre">'lock_dir':</span> <span class="pre">&lt;function</span> <span class="pre">lock_dir&gt;,</span> <span class="pre">'zone':</span> <span class="pre">'controller',</span> <span class="pre">'uuid':</span> <span class="pre">&lt;function</span> <span class="pre">terra_uuid&gt;},</span> <span class="pre">'overwrite':</span> <span class="pre">False,</span> <span class="pre">'service_start':</span> <span class="pre">None,</span> <span class="pre">'service_end':</span> <span class="pre">None,</span> <span class="pre">'settings_dir':</span> <span class="pre">&lt;function</span> <span class="pre">settings_dir&gt;,</span> <span class="pre">'status_file':</span> <span class="pre">&lt;function</span> <span class="pre">status_file&gt;,</span> <span class="pre">'processing_dir':</span> <span class="pre">&lt;function</span> <span class="pre">processing_dir&gt;,</span> <span class="pre">'unittest':</span> <span class="pre">&lt;function</span> <span class="pre">unittest&gt;,</span> <span class="pre">'resume':</span> <span class="pre">False}</span></em><a class="headerlink" href="#terra.core.settings.settings" title="Permalink to this definition">¶</a></dt>
 <dd><p>The setting object to use through out all of terra</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -759,7 +772,7 @@ settings structure, similar to a cached lazy evaluation</p>
 <code class="docutils literal notranslate"><span class="pre">self</span></code>, which will refer to the <a class="reference internal" href="#terra.core.settings.Settings" title="terra.core.settings.Settings"><code class="xref py py-class docutils literal notranslate"><span class="pre">Settings</span></code></a> object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.6/glossary.html#term-function" title="(in Python v3.6)"><span class="xref std std-term">function</span></a>) – Function being decorated</p>
+<dd class="field-odd"><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.9/glossary.html#term-function" title="(in Python v3.9)"><span class="xref std std-term">function</span></a>) – Function being decorated</p>
 </dd>
 </dl>
 </dd></dl>
@@ -769,6 +782,14 @@ settings structure, similar to a cached lazy evaluation</p>
 <code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">status_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.status_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default <a class="reference internal" href="#terra.core.settings.settings_property" title="terra.core.settings.settings_property"><code class="xref py py-func docutils literal notranslate"><span class="pre">settings_property()</span></code></a> for the status_file. The default is
 <a class="reference internal" href="#terra.core.settings.processing_dir" title="terra.core.settings.processing_dir"><code class="xref py py-func docutils literal notranslate"><span class="pre">processing_dir/status.json</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="terra.core.settings.stdin_istty">
+<code class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></code><code class="sig-name descname"><span class="pre">stdin_istty</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.stdin_istty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default value for settings.compute.tty for the docker compute. This will
+prevent trying to acquire a tty while the main process has no tty for
+whatever reason.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -797,14 +818,14 @@ same events.</p>
 <dl class="py class">
 <dt id="terra.core.signals.Signal">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.signals.</span></code><code class="sig-name descname"><span class="pre">Signal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">providing_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_caching</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.signals.Signal" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Base class for all signals</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>providing_args</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – A list of the arguments this signal can pass along in a <a class="reference internal" href="#terra.core.signals.Signal.send" title="terra.core.signals.Signal.send"><code class="xref py py-func docutils literal notranslate"><span class="pre">send()</span></code></a>
+<li><p><strong>providing_args</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – A list of the arguments this signal can pass along in a <a class="reference internal" href="#terra.core.signals.Signal.send" title="terra.core.signals.Signal.send"><code class="xref py py-func docutils literal notranslate"><span class="pre">send()</span></code></a>
 call.</p></li>
-<li><p><strong>use_caching</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If use_caching is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then for each distinct sender we cache the
+<li><p><strong>use_caching</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If use_caching is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then for each distinct sender we cache the
 receivers that sender has in <a class="reference internal" href="#terra.core.signals.Signal.sender_receivers_cache" title="terra.core.signals.Signal.sender_receivers_cache"><code class="xref py py-data docutils literal notranslate"><span class="pre">sender_receivers_cache</span></code></a>. The cache is
 cleaned when <a class="reference internal" href="#terra.core.signals.Signal.connect" title="terra.core.signals.Signal.connect"><code class="xref py py-func docutils literal notranslate"><span class="pre">connect()</span></code></a> or <a class="reference internal" href="#terra.core.signals.Signal.disconnect" title="terra.core.signals.Signal.disconnect"><code class="xref py py-func docutils literal notranslate"><span class="pre">disconnect()</span></code></a> is called and
 populated on <a class="reference internal" href="#terra.core.signals.Signal.send" title="terra.core.signals.Signal.send"><code class="xref py py-func docutils literal notranslate"><span class="pre">send()</span></code></a>.</p></li>
@@ -826,20 +847,20 @@ live receivers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>receiver</strong> (<a class="reference external" href="https://docs.python.org/3.6/glossary.html#term-function" title="(in Python v3.6)"><span class="xref std std-term">function</span></a>) – A function or an instance method which is to receive signals.
+<li><p><strong>receiver</strong> (<a class="reference external" href="https://docs.python.org/3.9/glossary.html#term-function" title="(in Python v3.9)"><span class="xref std std-term">function</span></a>) – A function or an instance method which is to receive signals.
 Receivers must be hashable objects.
 If weak is True, then receiver must be weak referenceable.
 Receivers must be able to accept keyword arguments.
 If a receiver is connected with a dispatch_uid argument, it
 will not be added if another receiver was already connected
 with that dispatch_uid.</p></li>
-<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) – The sender to which the receiver should respond. Must either be
+<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – The sender to which the receiver should respond. Must either be
 a Python object, or None to receive events from any sender.</p></li>
-<li><p><strong>weak</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether to use weak references to the receiver. By default, the
+<li><p><strong>weak</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to use weak references to the receiver. By default, the
 module will attempt to use weak references to the receiver
 objects. If this parameter is false, then strong references will
 be used.</p></li>
-<li><p><strong>dispatch_uid</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – An identifier used to uniquely identify a particular instance of
+<li><p><strong>dispatch_uid</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – An identifier used to uniquely identify a particular instance of
 a receiver. This will usually be a string, though it may be
 anything hashable.</p></li>
 </ul>
@@ -856,10 +877,10 @@ will be removed from dispatch automatically.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>receiver</strong> (<a class="reference external" href="https://docs.python.org/3.6/glossary.html#term-function" title="(in Python v3.6)"><span class="xref std std-term">function</span></a>) – The registered receiver to disconnect. May be none if
+<li><p><strong>receiver</strong> (<a class="reference external" href="https://docs.python.org/3.9/glossary.html#term-function" title="(in Python v3.9)"><span class="xref std std-term">function</span></a>) – The registered receiver to disconnect. May be none if
 dispatch_uid is specified.</p></li>
-<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) – The registered sender to disconnect</p></li>
-<li><p><strong>dispatch_uid</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – the unique identifier of the receiver to disconnect</p></li>
+<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – The registered sender to disconnect</p></li>
+<li><p><strong>dispatch_uid</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the unique identifier of the receiver to disconnect</p></li>
 </ul>
 </dd>
 </dl>
@@ -876,7 +897,7 @@ dispatch_uid is specified.</p></li>
 <dd><p>The internal map of all signals that are connected to receivers</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -891,7 +912,7 @@ won’t be called if an error is raised.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) – The sender of the signal. Either a specific object or None.</p></li>
+<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – The sender of the signal. Either a specific object or None.</p></li>
 <li><p><strong>**named</strong> – Named arguments which will be passed to receivers.</p></li>
 </ul>
 </dd>
@@ -915,7 +936,7 @@ unittesting to prevent unexpected behavior</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) – The sender of the signal. Can be any Python object (normally one
+<li><p><strong>sender</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – The sender of the signal. Can be any Python object (normally one
 registered with a connect if you actually want something to
 occur).</p></li>
 <li><p><strong>**named</strong> – Named arguments which will be passed to receivers. These
@@ -945,7 +966,7 @@ unittesting to prevent unexpected behavior</p></li>
 <a class="reference internal" href="#terra.core.signals.Signal.use_caching" title="terra.core.signals.Signal.use_caching"><code class="xref py py-data docutils literal notranslate"><span class="pre">use_caching</span></code></a> is on</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/weakref.html#weakref.WeakKeyDictionary" title="(in Python v3.6)">weakref.WeakKeyDictionary</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/weakref.html#weakref.WeakKeyDictionary" title="(in Python v3.9)">weakref.WeakKeyDictionary</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -956,7 +977,7 @@ unittesting to prevent unexpected behavior</p></li>
 <dd><p>Set if caching was turned on</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1047,7 +1068,7 @@ class.</p>
 <dl class="py class">
 <dt id="terra.core.utils.Handler">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.utils.</span></code><code class="sig-name descname"><span class="pre">Handler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">override_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.Handler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The <a class="reference internal" href="#terra.core.utils.Handler" title="terra.core.utils.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></a> is a generic handler class for abstracting specific
 type of class and the base class, essentially letting you to make calls on a
 “base” class easily, without any complications.</p>
@@ -1068,15 +1089,15 @@ type of class and the base class, essentially letting you to make calls on a
 <dl class="py class">
 <dt id="terra.core.utils.cached_property">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.core.utils.</span></code><code class="sig-name descname"><span class="pre">cached_property</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.utils.cached_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Decorator that converts a method with a single self argument into a
 property cached on the instance.</p>
 <p>Based off of django</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.6/glossary.html#term-function" title="(in Python v3.6)"><span class="xref std std-term">function</span></a>) – The function being wrapped</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – When not used as a decorator, allows you to make cached properties of
+<li><p><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3.9/glossary.html#term-function" title="(in Python v3.9)"><span class="xref std std-term">function</span></a>) – The function being wrapped</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – When not used as a decorator, allows you to make cached properties of
 other methods. (e.g.
 <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">=</span> <span class="pre">cached_property(get_absolute_url,</span> <span class="pre">name='url')</span></code>)</p></li>
 </ul>

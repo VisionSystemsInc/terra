@@ -270,7 +270,7 @@ executor have been reclaimed.</p>
 <span id="terra-executor-process-module"></span><h2>terra.executor.process module<a class="headerlink" href="#module-terra.executor.process" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="terra.executor.process.ProcessPoolExecutor">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.process.</span></code><code class="sig-name descname"><span class="pre">ProcessPoolExecutor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mp_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.process.ProcessPoolExecutor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.process.</span></code><code class="sig-name descname"><span class="pre">ProcessPoolExecutor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.process.ProcessPoolExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.process.ProcessPoolExecutor</span></code>, <a class="reference internal" href="#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
 <dl class="py attribute">
 <dt id="terra.executor.process.ProcessPoolExecutor.multiprocess">
@@ -292,7 +292,7 @@ for you in an easy-to-manage way.</p>
 <dl class="py class">
 <dt id="terra.executor.resources.ProcessLocalStorage">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.resources.</span></code><code class="sig-name descname"><span class="pre">ProcessLocalStorage</span></code><a class="headerlink" href="#terra.executor.resources.ProcessLocalStorage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Processor local storage class</p>
 <dl class="py attribute">
 <dt id="terra.executor.resources.ProcessLocalStorage.instance_id">
@@ -314,15 +314,15 @@ for you in an easy-to-manage way.</p>
 <dl class="py class">
 <dt id="terra.executor.resources.Resource">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.resources.</span></code><code class="sig-name descname"><span class="pre">Resource</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resources</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_softfilelock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.resources.Resource" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A <a class="reference internal" href="#terra.executor.resources.Resource" title="terra.executor.resources.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a> instance represents a set of resources that can be
 shared between multiple threads or processes on a single computer.</p>
 <p>This class will allocate a resource for a task to use by simply calling
-<a class="reference internal" href="#terra.executor.resources.Resource.acquire" title="terra.executor.resources.Resource.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> or using a <a class="reference external" href="https://docs.python.org/3.6/reference/compound_stmts.html#with" title="(in Python v3.6)"><span class="xref std std-ref">with</span></a> context manager.
-Multiple calls to <a class="reference internal" href="#terra.executor.resources.Resource.acquire" title="terra.executor.resources.Resource.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> or using nested <a class="reference external" href="https://docs.python.org/3.6/reference/compound_stmts.html#with" title="(in Python v3.6)"><span class="xref std std-ref">with</span></a>-s
+<a class="reference internal" href="#terra.executor.resources.Resource.acquire" title="terra.executor.resources.Resource.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> or using a <a class="reference external" href="https://docs.python.org/3.9/reference/compound_stmts.html#with" title="(in Python v3.9)"><span class="xref std std-ref">with</span></a> context manager.
+Multiple calls to <a class="reference internal" href="#terra.executor.resources.Resource.acquire" title="terra.executor.resources.Resource.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a> or using nested <a class="reference external" href="https://docs.python.org/3.9/reference/compound_stmts.html#with" title="(in Python v3.9)"><span class="xref std std-ref">with</span></a>-s
 are ok, as it will simply use the same resource every time. For each call to
 <a class="reference internal" href="#terra.executor.resources.Resource.acquire" title="terra.executor.resources.Resource.acquire"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire()</span></code></a>, an equal number of calls to <a class="reference internal" href="#terra.executor.resources.Resource.release" title="terra.executor.resources.Resource.release"><code class="xref py py-meth docutils literal notranslate"><span class="pre">release()</span></code></a> are required.
-For this reason, using <a class="reference external" href="https://docs.python.org/3.6/reference/compound_stmts.html#with" title="(in Python v3.6)"><span class="xref std std-ref">with</span></a> context managers are often
+For this reason, using <a class="reference external" href="https://docs.python.org/3.9/reference/compound_stmts.html#with" title="(in Python v3.9)"><span class="xref std std-ref">with</span></a> context managers are often
 the easier way to go.</p>
 <p>There should not be more workers than resources available for a specific
 queue of workers. Because there are enough resources for every worker, the
@@ -334,14 +334,14 @@ creating worker threads/processes, so that they are configured correctly</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resource_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A unique name of resource. Must not contain symbols incompatible with the
+<li><p><strong>resource_name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A unique name of resource. Must not contain symbols incompatible with the
 filesystem</p></li>
-<li><p><strong>resources</strong> (int or <a class="reference external" href="https://docs.python.org/3.6/glossary.html#term-iterable" title="(in Python v3.6)"><span class="xref std std-term">iterable</span></a>) – A sequence of items to represent the different resources. An integer is
+<li><p><strong>resources</strong> (int or <a class="reference external" href="https://docs.python.org/3.9/glossary.html#term-iterable" title="(in Python v3.9)"><span class="xref std std-term">iterable</span></a>) – A sequence of items to represent the different resources. An integer is
 shorthand for <code class="docutils literal notranslate"><span class="pre">range(0,</span> <span class="pre">items_integer)</span></code>. If objects are used for
 resources, they need to be pickleable, or else multiprocessing will fail.</p></li>
-<li><p><strong>repeat</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, optional) – The number of workers you want to be able to acquire a resource, e.g.,
+<li><p><strong>repeat</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, optional) – The number of workers you want to be able to acquire a resource, e.g.,
 two simultaneous workers per resource.</p></li>
-<li><p><strong>use_softfilelock</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) – If an OS does not support hard locks, <a class="reference external" href="https://filelock.readthedocs.io/en/latest/index.html#filelock.SoftFileLock" title="(in py-filelock v3.0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">filelock.SoftFileLock</span></code></a> will
+<li><p><strong>use_softfilelock</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.9/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – If an OS does not support hard locks, <a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.SoftFileLock" title="(in filelock v3.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">filelock.SoftFileLock</span></code></a> will
 be used automatically. However, even if the OS supports hard locks, some
 filesystems (especially network file systems) may not support successful
 hard locking. In these cases, hardlock support needs to be tested on a
@@ -377,14 +377,14 @@ get the intended result.</p>
 <dl class="py method">
 <dt id="terra.executor.resources.Resource.FileLock">
 <em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">FileLock</span></code><a class="headerlink" href="#terra.executor.resources.Resource.FileLock" title="Permalink to this definition">¶</a></dt>
-<dd><p>The class of <a class="reference external" href="https://filelock.readthedocs.io/en/latest/index.html#filelock.FileLock" title="(in py-filelock v3.0.10)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filelock.FileLock</span></code></a> used for locks in
+<dd><p>The class of <a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.FileLock" title="(in filelock v3.4)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filelock.FileLock</span></code></a> used for locks in
 <a class="reference internal" href="#terra.executor.resources.Resource.lock_dir" title="terra.executor.resources.Resource.lock_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Resource.lock_dir</span></code></a>.</p>
 <p>Hard locking is better, but only works if the OS and Filesystem supports
 it. Sometimes it is necessary to use soft locking, so this property will
 always return the correct class to use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/glossary.html#term-class" title="(in Python v3.6)"><span class="xref std std-term">class</span></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/glossary.html#term-class" title="(in Python v3.9)"><span class="xref std std-term">class</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,7 +399,7 @@ and increase the lock counter.</p>
 <dd class="field-odd"><p>Returns the resource that is allocated to this worker</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a></p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#terra.executor.resources.ResourceError" title="terra.executor.resources.ResourceError"><strong>ResourceError</strong></a> – There are no more resources available. This should not happen if the
@@ -424,14 +424,14 @@ and increase the lock counter.</p>
 <dt id="terra.executor.resources.Resource.lock_dir">
 <code class="sig-name descname"><span class="pre">lock_dir</span></code><a class="headerlink" href="#terra.executor.resources.Resource.lock_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>The directory where the lock files will be stored.</p>
-<p>By default, uses the <code class="docutils literal notranslate"><span class="pre">settings.processing_dir</span></code> to store the lock files. A
+<p>By default, uses the <code class="docutils literal notranslate"><span class="pre">settings.settings_dir</span></code> to store the lock files. A
 specific lock dir represents a specific resource, and contains the pid of
 the parent process so that spawned processes will be able to communicate
 about the same resource. Also contains the hostname so that multiple host
 workers will not collide when using a common network based filesystem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -449,11 +449,11 @@ workers will not collide when using a common network based filesystem.</p>
 decrements the counter, and only releases when the counter reaches zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – If true, the lock counter is ignored and the lock is released in every
+<dd class="field-odd"><p><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If true, the lock counter is ignored and the lock is released in every
 case.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – Raised if the resource is not currently locked</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – Raised if the resource is not currently locked</p>
 </dd>
 </dl>
 </dd></dl>
@@ -463,14 +463,14 @@ case.</p>
 <dl class="py exception">
 <dt id="terra.executor.resources.ResourceError">
 <em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.resources.</span></code><code class="sig-name descname"><span class="pre">ResourceError</span></code><a class="headerlink" href="#terra.executor.resources.ResourceError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Exception thrown when no more resources are available</p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="terra.executor.resources.ResourceManager">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.resources.</span></code><code class="sig-name descname"><span class="pre">ResourceManager</span></code><a class="headerlink" href="#terra.executor.resources.ResourceManager" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A singleton class that provides global scope access to <a class="reference internal" href="#terra.executor.resources.Resource" title="terra.executor.resources.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a>-s</p>
 <p>Resources need to be registered before worker threads or processes are
 created or else they will not inherit the correct resource settings.</p>
@@ -500,14 +500,14 @@ before the Executor spawns workers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A unique name for the resource. Must not contain symbols
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A unique name for the resource. Must not contain symbols
 incompatible with the filesystem. Simple alphanumerics suggested.</p></li>
 <li><p><strong>*args</strong> – Additional args passed to <a class="reference internal" href="#terra.executor.resources.Resource" title="terra.executor.resources.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a> init</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword args passed to <a class="reference internal" href="#terra.executor.resources.Resource" title="terra.executor.resources.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a> init</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><strong>ValueError</strong></a> – If a resource with that name already exists</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If a resource with that name already exists</p>
 </dd>
 </dl>
 </dd></dl>
@@ -529,7 +529,7 @@ incompatible with the filesystem. Simple alphanumerics suggested.</p></li>
 <dl class="py function">
 <dt id="terra.executor.resources.atexit_resource_release">
 <code class="sig-prename descclassname"><span class="pre">terra.executor.resources.</span></code><code class="sig-name descname"><span class="pre">atexit_resource_release</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.resources.atexit_resource_release" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean up all resources before python starts unloading <a class="reference external" href="https://docs.python.org/3.6/library/os.html#module-os" title="(in Python v3.6)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">os</span></code></a> because
+<dd><p>Clean up all resources before python starts unloading <a class="reference external" href="https://docs.python.org/3.9/library/os.html#module-os" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">os</span></code></a> because
 then it’s too late.</p>
 </dd></dl>
 
@@ -583,7 +583,7 @@ executor have been reclaimed.</p>
 <dt id="terra.executor.thread.ThreadPoolExecutor">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.executor.thread.</span></code><code class="sig-name descname"><span class="pre">ThreadPoolExecutor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.executor.thread.ThreadPoolExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.thread.ThreadPoolExecutor</span></code>, <a class="reference internal" href="#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a></p>
-<p>Terra version of <a class="reference external" href="https://docs.python.org/3.6/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code></a></p>
+<p>Terra version of <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code></a></p>
 <p>Unlike other executors, <a class="reference internal" href="#terra.executor.thread.ThreadPoolExecutor" title="terra.executor.thread.ThreadPoolExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></a> has no process isolation.
 This results in a scenario where multiple threads could use terra settings to
 influence each other, which is not typical behavior, given that all other
@@ -631,7 +631,7 @@ compute backend name, or a partial (<code class="docutils literal notranslate"><
 and then returns a connection to the backend</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>self._override_type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, override the name of the backend to load.</p>
+<dd class="field-odd"><p><strong>self._override_type</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, override the name of the backend to load.</p>
 </dd>
 </dl>
 </dd></dl>
