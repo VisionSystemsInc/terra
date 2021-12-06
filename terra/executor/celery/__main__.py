@@ -2,11 +2,7 @@
 
 from os import environ as env
 from . import app, setup_task_controller
-import tempfile
 import warnings
-
-# Terra
-from terra import settings
 
 
 def main():

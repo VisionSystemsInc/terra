@@ -53,6 +53,7 @@ def setup_task_controller(*args, **kwargs):
 
     settings.configure(temp_config)
 
+
 @worker_process_init.connect
 def start_worker_child(*args, **kwargs):
   from terra import settings

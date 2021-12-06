@@ -7,6 +7,7 @@ __all__ = ['ProcessPoolExecutor']
 class ProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor,
                           terra.executor.base.BaseExecutor):
   multiprocess = True
+
   def __init__(self, *args, **kwargs):
     # Workaround for https://github.com/VisionSystemsInc/terra/issues/115 the
     # simplest workaround was to pre-finalize celery and pre-cache the property

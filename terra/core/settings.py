@@ -375,6 +375,7 @@ def lock_dir(self):
   return os.environ.get('TERRA_LOCK_DIR',
                         os.path.join(self.processing_dir, '.resource.locks'))
 
+
 @settings_property
 def stdin_istty(self):
   '''
@@ -383,6 +384,7 @@ def stdin_istty(self):
   whatever reason.
   '''
   return sys.stdin.isatty()
+
 
 global_templates = [
   (

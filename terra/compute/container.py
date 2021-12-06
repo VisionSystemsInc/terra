@@ -32,7 +32,6 @@ class ContainerService(BaseService):
     env_key = f"{app_prefixes[0]}_COMPOSE_SERVICE_RUNNER"
     self.compose_service_name = self.env.get(env_key)
 
-
   def pre_run(self):
     # Need to run Base's pre_run first, so it has a chance to update settings
     # for special executors, etc...
@@ -60,7 +59,7 @@ class ContainerService(BaseService):
     # if TERRA_DISABLE_SETTINGS_DUMP here
     os.makedirs(settings.settings_dir, exist_ok=True)
     self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
-              f'VOLUME_{env_volume_index}'] = \
+             f'VOLUME_{env_volume_index}'] = \
         f'{settings.settings_dir}:{self.env["TERRA_SETTINGS_DOCKER_DIR"]}'
     env_volume_index += 1
 
