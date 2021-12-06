@@ -327,15 +327,11 @@ class _SetupTerraLogger():
       self.main_log_handler.setLevel(level)
       self.main_log_handler.setFormatter(formatter)
 
-    # This disables a message that spams the screen:
+    # This hides the messages that spams the screen:
     # "pipbox received method enable_events() [reply_to:None ticket:None]"
     # This is the only debug message in all of kombu.pidbox, so this is pretty
-    # safe to do
-    pidbox_logger = getLogger('kombu.pidbox')
-    pidbox_logger.setLevel(INFO)
-
-    bootsteps_logger = getLogger('celery.bootsteps')
-    bootsteps_logger.setLevel(INFO)
+    # safe to do, similar for celery.bootsteps and filelock
+    _demoteLevel(('kombu.pidbox', 'celery.bootsteps', 'filelock'), DEBUG1, DEBUG4)
 
   def configure_logger(self, sender=None, signal=None, **kwargs):
     '''
