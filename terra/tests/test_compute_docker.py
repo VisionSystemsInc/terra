@@ -21,7 +21,8 @@ class TestComputeDockerCase(TestSettingsConfigureCase):
                           mock.PropertyMock(return_value=docker.Compute())))
 
     # Configure for docker
-    self.config.compute = {'arch': 'docker'}
+    self.config.compute = {'arch': 'docker',
+                           'tty': True}
 
     # patches.append(mock.patch.dict(base.services, clear=True))
     super().setUp()
@@ -96,7 +97,7 @@ class TestDockerRun(TestComputeDockerCase):
     compute.run(MockJustService())
     # Run a docker service
     self.assertEqual(('--wrap', 'Just-docker-compose',
-                      '-f', 'file1', 'run', '-T', 'launch', 'ls'),
+                      '-f', 'file1', 'run', 'launch', 'ls'),
                      self.just_args)
     self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO'}},
                      self.just_kwargs)
@@ -194,7 +195,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
       TZ: /usr/share/zoneinfo/America/New_York]
@@ -255,7 +256,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
     image: rediscommander/redis-commander
@@ -300,7 +301,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
       TZ: /usr/share/zoneinfo/America/New_York]
@@ -353,7 +354,7 @@ services:
       TERRA_REDIS_PORT_HOST: '6379'
       TERRA_REDIS_SECRET: redis_password
       TERRA_REDIS_SECRET_HOST: redis_secret
-      TERRA_SETTINGS_DIR: /settings
+      TERRA_SETTINGS_DOCKER_DIR: /settings
       TERRA_TERRA_DIR: /terra
       TERRA_TERRA_DIR_HOST: /opt/projects/terra/terra_dsm/external/terra
       TZ: /usr/share/zoneinfo/America/New_York]

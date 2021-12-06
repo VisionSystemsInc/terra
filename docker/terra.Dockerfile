@@ -4,10 +4,11 @@ FROM vsiri/recipe:gosu as gosu
 FROM vsiri/recipe:tini-musl as tini
 FROM vsiri/recipe:vsi as vsi
 FROM vsiri/recipe:pipenv as pipenv
+FROM vsiri/recipe:docker-compose as docker-compose
 
 ###############################################################################
 
-FROM python:3.7-alpine3.13 as dep_stage
+FROM python:3.10.0-alpine3.13 as dep_stage
 SHELL ["/usr/bin/env", "sh", "-euxvc"]
 
 # Install any runtime dependencies
@@ -64,6 +65,7 @@ COPY --from=gosu /usr/local /usr/local
 RUN chmod u+s /usr/local/bin/gosu
 COPY --from=pipenv_cache /venv /venv
 COPY --from=vsi /vsi /vsi
+COPY --from=docker-compose /usr/local /usr/local
 
 # Terra
 COPY terra.env /terra/

@@ -26,18 +26,10 @@ import time
 from logging import NullHandler, StreamHandler
 from logging.handlers import SocketHandler
 
-from celery.signals import setup_logging
-
 from terra.executor.base import BaseFuture, BaseExecutor
 from terra import settings
 from terra.logger import getLogger
 logger = getLogger(__name__)
-
-
-# stop celery from hijacking the logger
-@setup_logging.connect
-def setup_loggers(*args, **kwargs):
-  pass
 
 
 class CeleryExecutorFuture(BaseFuture):
@@ -134,7 +126,7 @@ class CeleryExecutor(BaseExecutor):
     self._monitor_started = False
     self._monitor_stopping = False
     self._monitor = Thread(target=self._update_futures)
-    self._monitor.setDaemon(True)
+    self._monitor.daemon = True
 
   def _update_futures(self):
     while True:

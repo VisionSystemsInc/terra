@@ -235,7 +235,7 @@ class BaseCompute:
           settings.logging.server.port)
       listener_thread = threading.Thread(
           target=sender.tcp_logging_server.serve_until_stopped)
-      listener_thread.setDaemon(True)
+      listener_thread.daemon = True
       listener_thread.start()
 
       # Wait up to a second, to make sure the thread started

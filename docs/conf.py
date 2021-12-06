@@ -63,10 +63,10 @@ extensions = [
 
 # Link to other documentation (e.g., numpy, python, terra, etc.)
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.6', None),
+    'python': ('https://docs.python.org/3.9', None),
     'vsi_common': ('https://visionsystemsinc.github.io/vsi_common/', None),
     'celery': ('https://docs.celeryproject.org/en/stable/', None),
-    'filelock': ('https://filelock.readthedocs.io/en/latest/', None)
+    'filelock': ('https://py-filelock.readthedocs.io/en/latest/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.

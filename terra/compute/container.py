@@ -55,12 +55,20 @@ class ContainerService(BaseService):
         f'{str(temp_dir)}:/tmp_settings'
     env_volume_index += 1
 
-    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
-      os.makedirs(settings.settings_dir, exist_ok=True)
-      self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
-               f'VOLUME_{env_volume_index}'] = \
-          f'{settings.settings_dir}:/settings'
-      env_volume_index += 1
+    # This directory is used for both locking and setting dump, so don't
+    # if TERRA_DISABLE_SETTINGS_DUMP here
+    os.makedirs(settings.settings_dir, exist_ok=True)
+    self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
+             f'VOLUME_{env_volume_index}'] = \
+        f'{settings.settings_dir}:{self.env["TERRA_SETTINGS_DOCKER_DIR"]}'
+    env_volume_index += 1
+
+    # Always mount in the lock dir, in case the resource manager is use
+    # If terra ends up needing other things mounted in, lock_dir should be
+    # renamed to something more generic like terra_var_dir, and everything
+    # share that, if it makes sense.
+    os.makedirs(settings.terra.lock_dir, exist_ok=True)
+    self.add_volume(settings.terra.lock_dir, '/var/lib/terra/lock')
 
     # Copy self.volumes to the environment variables
     for _, ((volume_host, volume_container), volume_flags) in \

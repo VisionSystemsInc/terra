@@ -4,6 +4,7 @@ import re
 
 import yaml
 
+from terra import settings
 from terra.utils.cli import extra_arguments
 from terra.compute.base import BaseCompute, ServiceRunFailed
 from terra.compute.container import ContainerService
@@ -68,9 +69,16 @@ class Compute(BaseCompute):
     optional_args = {}
     optional_args['justfile'] = getattr(service_info, 'justfile', None)
 
+    # Deals with https://github.com/VisionSystemsInc/terra/issues/114 until we
+    # we can understand what is going on here.
+    if settings.compute.tty:
+      tty_args = ()
+    else:
+      tty_args = ('-T')
+
     pid = just("--wrap", "Just-docker-compose",
                *sum([['-f', cf] for cf in service_info.compose_files], []),
-               'run', '-T', service_info.compose_service_name,
+               'run', *tty_args, service_info.compose_service_name,
                *service_info.command + extra_arguments,
                **optional_args,
                env=service_info.env)

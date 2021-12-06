@@ -123,15 +123,14 @@ class Resource:
 
     self.resources = resources
     self.repeat = repeat
-    self.lock_dir = os.path.join(settings.processing_dir,
-                                 '.resource.locks',
+    self.lock_dir = os.path.join(settings.terra.lock_dir,
                                  platform.node(),
                                  str(os.getpid()),
                                  resource_name)
     '''
     str: The directory where the lock files will be stored.
 
-    By default, uses the ``settings.processing_dir`` to store the lock files. A
+    By default, uses the ``settings.settings_dir`` to store the lock files. A
     specific lock dir represents a specific resource, and contains the pid of
     the parent process so that spawned processes will be able to communicate
     about the same resource. Also contains the hostname so that multiple host

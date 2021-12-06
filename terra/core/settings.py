@@ -147,6 +147,7 @@ framework instead of a larger application.
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import sys
 from uuid import uuid4
 # from datetime import datetime
 from logging.handlers import DEFAULT_TCP_LOGGING_PORT
@@ -358,6 +359,33 @@ def logging_listen_address(self):
   return self.logging.server.hostname
 
 
+@settings_property
+def lock_dir(self):
+  '''
+  A :func:`settings_property` defining the directory where lock files should be
+  stored. In order for multiple terra workers to be able to communicate with
+  each other about a :class:`terra.executor.resources.Resource`, a common lock
+  directory needs to be established (that can be a network drive). The default
+  will be in the :func:`processing_dir`. However in cases such as celery, this
+  will need to be explicitly set, since celery starts before the processing dir
+  is defined. The lock_dir can be set by using environment variable
+  ``TERRA_LOCK_DIR``, or using a settings file to set ``terra.lock_dir``.
+  '''
+
+  return os.environ.get('TERRA_LOCK_DIR',
+                        os.path.join(self.processing_dir, '.resource.locks'))
+
+
+@settings_property
+def stdin_istty(self):
+  '''
+  Default value for settings.compute.tty for the docker compute. This will
+  prevent trying to acquire a tty while the main process has no tty for
+  whatever reason.
+  '''
+  return sys.stdin.isatty()
+
+
 global_templates = [
   (
     # Global Defaults
@@ -391,6 +419,7 @@ global_templates = [
       },
       'terra': {
         'config_file': config_file,
+        'lock_dir': lock_dir,
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
         'zone': 'controller',
@@ -414,6 +443,14 @@ global_templates = [
   (  # So much for DRY :(
     {"compute": {"arch": "virtualenv"}},
     {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}
+  ),
+  (
+    {"compute": {"arch": "terra.compute.docker"}},
+    {"compute": {"tty": stdin_istty}}
+  ),
+  (  # So much for DRY :(
+    {"compute": {"arch": "docker"}},
+    {"compute": {"tty": stdin_istty}}
   )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we

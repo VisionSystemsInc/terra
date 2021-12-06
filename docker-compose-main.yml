@@ -37,6 +37,9 @@ services:
         type: volume
         source: terra-venv
         target: /venv
+    secrets:
+      - source: redis_secret
+        target: ${TERRA_REDIS_SECRET}
 
   terra-demo:
     <<: *terra

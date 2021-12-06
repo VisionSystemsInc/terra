@@ -1,7 +1,6 @@
 from distutils.core import setup
 
 extra_requires = {
-  'docker': ['docker-compose'],
   'celery': ["celery[redis]", "flower"]
 }
 
@@ -13,6 +12,7 @@ setup(name="terra",
         "pyyaml",
         "jstyleson",
         # I use signal and task from celery, no matter what
-        "celery"
+        "celery",
+        "filelock"
       ]
 )
