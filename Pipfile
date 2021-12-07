@@ -8,6 +8,7 @@ python_version = "3"
 # python_version = "3.6,3.7,3.8"
 
 [dev-packages]
+flower = "*"
 autopep8 = "*"
 flake8 = "*"
 pylint = "*"
@@ -20,9 +21,8 @@ pywin32-ctypes = {version = ">= 0.2.0", markers = "sys_platform == 'win32'"}
 macholib = {version = ">= 1.8", markers = "sys_platform == 'darwin'"}
 
 [packages]
-vsi-common = {editable = true,path = "./external/vsi_common"}
-
 terra = {path = ".", extras = ["celery"], editable = true}
+# Not technically added as a dependency, as it would be complicated.
+vsi-common = {editable = true,path = "./external/vsi_common"}
 # The Extras don't work on this editable, so manually copy the extra part
 celery = {extras = ["redis"]}
-flower = "*"

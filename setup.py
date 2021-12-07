@@ -1,7 +1,8 @@
 from distutils.core import setup
 
 extra_requires = {
-  'celery': ["celery[redis]", "flower"]
+  'celery': ["celery[redis]"],
+  'flower': ["flower"]
 }
 
 setup(name="terra",

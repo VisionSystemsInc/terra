@@ -199,6 +199,9 @@ function terra_caseify()
       ;;
 
     run_flower) # Start the flower server
+      if ! Terra_Pipenv run python -m flower &> /dev/null; then
+        justify terra pipenv sync --dev
+      fi
       # Flower doesn't actually need the tasks loaded in the app, so clear it
       TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m celery \
                                                         -A terra.executor.celery.app flower
