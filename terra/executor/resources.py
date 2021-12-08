@@ -194,7 +194,8 @@ class Resource:
   def _acquire(self, lock_file, resource_index, repeat):
     lock = self.FileLock(lock_file, 0)
     lock.acquire()
-    # This will break Windows locks https://github.com/tox-dev/py-filelock/issues/15
+    # This will break Windows locks
+    # https://github.com/tox-dev/py-filelock/issues/15
     if self.FileLock == filelock.SoftFileLock:
       os.write(lock._lock_file_fd, str(os.getpid()).encode())
     # If you get this far, the lock is good, so save it in the class
