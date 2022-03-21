@@ -65,7 +65,7 @@ extensions = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.9', None),
     'vsi_common': ('https://visionsystemsinc.github.io/vsi_common/', None),
-    'celery': ('https://docs.celeryproject.org/en/stable/', None),
+    'celery': ('https://docs.celeryq.dev/en/stable/', None),
     'filelock': ('https://py-filelock.readthedocs.io/en/latest/', None)
 }
 
