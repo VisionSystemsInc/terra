@@ -92,17 +92,21 @@ commands:
             # dockerhub access
             docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
 
+            # recipe args
+            : ${JUST_CI_RECIPE_ARGS="--quiet-pull --no-push"}
+
             # push only from selected branches of main repo
             if [[ "${CIRCLE_PROJECT_USERNAME,,}" == "visionsystemsinc" && \
                   ("${CIRCLE_BRANCH}" == "master" || \
                    "${CIRCLE_BRANCH}" == "${JUST_CI_BRANCH_PUSH-}") ]]
             then
-              : ${JUST_CI_CACHE_ARGS=""}
+              : ${JUST_CI_CACHE_ARGS="--quiet-pull --push"}
             else
-              : ${JUST_CI_CACHE_ARGS="--no-push"}
+              : ${JUST_CI_CACHE_ARGS="--quiet-pull --no-push"}
             fi
 
             # export local variables
+            export JUST_CI_RECIPE_ARGS
             export JUST_CI_CACHE_ARGS
 
             # ci_load
