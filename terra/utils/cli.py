@@ -56,6 +56,30 @@ class ArgumentParser(argparse.ArgumentParser):
                       help="Automatically runs debugger's set_trace on an "
                            "unexpected exception")
 
+  def add_settings_file(self, **kwargs):
+    '''
+    Add positional argument for settings file
+    '''
+
+    # add_argument default kwargs
+    aa_kwargs = {
+      'help': 'JSON settings file',
+    }
+
+    # Let TERRA_SETTINGS_FILE (if available) be the default
+    # https://stackoverflow.com/a/4480202
+    TERRA_SETTINGS_FILE = os.getenv('TERRA_SETTINGS_FILE')
+    if TERRA_SETTINGS_FILE:
+      aa_kwargs['default'] = clean_path(TERRA_SETTINGS_FILE)
+      aa_kwargs['nargs'] = '?'
+
+    # apply overrides
+    aa_kwargs.update(kwargs)
+
+    # final add argument
+    self.add_argument('settings_file', type=str, action=FullPaths,
+                      **aa_kwargs)
+
 
 def clean_path(path):
   # This must be done before isabs test, or else you will get a false negative
