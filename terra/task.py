@@ -1,7 +1,8 @@
+import json
 import os
 import inspect
 import subprocess as _subprocess
-from tempfile import gettempdir
+from tempfile import gettempdir, TemporaryDirectory
 
 from celery import shared_task as original_shared_task
 from celery.app.task import Task
@@ -168,7 +169,7 @@ class TerraTask(Task):
   #   return super().on_failure(exc, task_id, args, kwargs, einfo)
 
 
-@shared_task(queue="terra")
+@original_shared_task(queue="terra", bind=True)
 def subprocess(self, *args, **kwargs):
   '''
   Execute shell command via ``subprocess.run(*args, **kwargs)`` as a celery
@@ -195,5 +196,27 @@ def subprocess(self, *args, **kwargs):
                  if not p.startswith(virtual_env)]
     env['PATH'] = f'{os.pathsep}'.join(path_list)
 
+  # retrieve settings from request metadata
+  # (note this is expected to be a simple dictionary able to be serialized
+  # with the built-in json package)
+  settings = getattr(self.request, 'settings', None)
+  logger.debug1(f'Input settings: {json.dumps(settings, indent=2)}')
+
+  # run command with settings saved to temporary file
+  if settings:
+    with TemporaryDirectory() as temp_dir:
+
+      # save settings to file
+      settings_file = os.path.join(temp_dir, 'settings.json')
+      with open(settings_file, 'w') as fid:
+        json.dump(settings, fid, indent=2)
+
+      # add settings file to environment
+      env['TERRA_SETTINGS_FILE'] = settings_file
+
+      # run command
+      return _subprocess.run(*args, env=env, **kwargs)
+
   # run command
-  return _subprocess.run(*args, env=env, **kwargs)
+  else:
+    return _subprocess.run(*args, env=env, **kwargs)
