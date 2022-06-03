@@ -7,10 +7,10 @@ from terra.utils.cli import FullPaths, clean_path
 
 
 class CreateTerraApp:
-  def __init__(self, app_camel_name, python_path, camel_name, under_name,
+  def __init__(self, app_camel_name, module_path, camel_name, under_name,
                dir_name,):
     self.app_camel_name = app_camel_name
-    self.python_path = python_path
+    self.module_path = module_path
     self.dir = dir_name
 
     self.camel_name = camel_name
@@ -64,7 +64,7 @@ import sys
 from os import environ as env
 import glob
 
-from {self.python_path}.workflows import {self.camel_name}Workflow
+from {self.module_path}.workflows import {self.camel_name}Workflow
 
 from terra import settings
 from terra.core.settings import settings_property
@@ -129,7 +129,7 @@ class {self.camel_name}Workflow(PipelineWorkflow):
 
   @resumable
   def {self.camel_name}(self):
-    compute.run('{self.python_path}.service_definitions.{self.camel_name}')
+    compute.run('{self.module_path}.service_definitions.{self.camel_name}')
 ''')
 
   def service_definitions(self):
@@ -226,7 +226,7 @@ class {self.app_camel_name}SingularityService({self.app_camel_name}ContainerServ
 ###############################################################################
 class {self.camel_name}({self.app_camel_name}BaseService):
   service_dir_key = '{self.under_name}_dir'
-  command = ['python', '-m', '{self.python_path}.service_runners.{self.under_name}']
+  command = ['python', '-m', '{self.module_path}.service_runners.{self.under_name}']
 
 
 class {self.camel_name}_container({self.camel_name},
@@ -268,7 +268,7 @@ class {self.camel_name}_singular({self.camel_name}_container,
 from terra import settings
 from terra.executor import Executor
 
-from {self.python_path}.tasks.{self.under_name} import {self.under_name}_in_parallel
+from {self.module_path}.tasks.{self.under_name} import {self.under_name}_in_parallel
 
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -280,7 +280,7 @@ def yield_{self.under_name}_futures(executor, xs, ys):
       yield (future, (x,y))
 
 def main():
-  # Actual algorithm goes here. Here's a parallelism example
+  # Actual algorithm goes here. Here's an example that uses parallelism
   logger.critical('test')
   with Executor(max_workers=settings.executor.num_workers) as executor:
     futures_to_task = {{future: task_id for future, task_id in yield_{self.under_name}_futures(executor, (1,2), (10, 20))}}
@@ -317,9 +317,10 @@ def get_parser():
   parser.add_argument('--AppName', type=str, dest='app_name',
                       default='AppName', help="Name of app to create a "
                       "template for, should be CamelCase")
-  parser.add_argument('--python.path', type=str, dest='python_path',
-                      required=True, help="The python path of the module you "
-                      "are setting up")
+  parser.add_argument('--module.path', type=str, dest='module_path',
+                      required=True, help="The module path (i.e. python path "
+                      "syntax) of the module you are setting up: e.g. "
+                      "'foo.bar'")
   parser.add_argument('--dir', default=clean_path('.'), type=str,
                       action=FullPaths, help="The directory to create the "
                       "template in. Defaults to the current directory")
@@ -333,7 +334,7 @@ def main(args=None):
   args = get_parser().parse_args(args)
   Name = args.name.title().replace(' ', '')
   name = args.name.lower().replace(' ', '_')
-  create_terra_app = CreateTerraApp(args.app_name, args.python_path,
+  create_terra_app = CreateTerraApp(args.app_name, args.module_path,
                                     Name, name, args.dir)
   create_terra_app.generate_files()
 
@@ -350,7 +351,7 @@ def main(args=None):
 
 ''')
 
-  print(f'Simply run: just run {args.python_path} that_config_file.json')
+  print(f'Simply run: just run {args.module_path} that_config_file.json')
 
 
 if __name__ == '__main__':
