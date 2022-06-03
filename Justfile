@@ -449,6 +449,14 @@ function terra_caseify()
       fi
       ;;
 
+    terra_newapp) # Generate a new terra app. $1 is application name in CamelCase \
+                  # (e.g GenerateCatGraph), and $2 is the python path (e.g. foobar.cat). \
+                  # Optional, add a --dir flag to specify the output director, or else . \
+                  # is used
+      justify terra pipenv run python -m terra.utils.new ${@+"${@}"}
+      extra_args="${#}"
+      ;;
+
     terra_pipenv) # Run pipenv commands in Terra's pipenv container. Useful for \
                   # installing/updating pipenv packages into terra
       TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
