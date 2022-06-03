@@ -1,4 +1,5 @@
 from terra import settings
+from terra.compute import compute
 from terra.core.exceptions import NoStackValueError
 from terra.logger import getLogger
 logger = getLogger(__name__)
@@ -13,7 +14,15 @@ class BaseWorkflow:
     pass
 
 
-class PipelineWorkflow:
+class SingleWorkflow(BaseWorkflow):
+  def __init__(self, service):
+    self.service = service
+
+  def run(self):
+    compute.run(self.service)
+
+
+class PipelineWorkflow(BaseWorkflow):
   '''
   A simple workflow that runs a set of services, serially.
 
