@@ -165,4 +165,4 @@ class Service(ContainerService):
   Base docker service class
   '''
 
-  compose_files  = []
+  compose_files = []

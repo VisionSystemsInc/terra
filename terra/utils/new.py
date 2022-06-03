@@ -5,6 +5,7 @@ from os import environ as env
 
 from terra.utils.cli import FullPaths, clean_path
 
+
 class CreateTerraApp:
   def __init__(self, app_camel_name, python_path, camel_name, under_name,
                dir_name,):
@@ -37,7 +38,7 @@ class CreateTerraApp:
 
   def init(self):
     with open(os.path.join(self.dir, '__init__.py'), 'x') as fid:
-      fid.write('''# Example: You would disable warnings for this app here.
+      fid.write(r'''# Example: You would disable warnings for this app here.
 
 #import logging
 #import warnings
@@ -105,7 +106,7 @@ def main(args=None):
 
 if __name__ == '__main__':
   main()
-''')
+''')  # noqa: E501
 
   def workflows(self):
     with open(os.path.join(self.dir, 'workflows.py'), 'x') as fid:
@@ -252,14 +253,16 @@ class {self.camel_name}_docker({self.camel_name}_container,
 class {self.camel_name}_singular({self.camel_name}_container,
                            {self.app_camel_name}SingularityService):
   pass
-''')
+''')  # noqa: E501
 
   def service_runners_init(self):
-    with open(os.path.join(self.dir, 'service_runners', '__init__.py'), 'x') as fid:
-      fid.write(f'')
+    with open(os.path.join(self.dir, 'service_runners',
+                           '__init__.py'), 'x') as fid:
+      fid.write('')
 
   def service_runners(self):
-    with open(os.path.join(self.dir, 'service_runners', f'{self.under_name}.py'), 'x') as fid:
+    with open(os.path.join(self.dir, 'service_runners',
+                           f'{self.under_name}.py'), 'x') as fid:
       fid.write(f'''import concurrent.futures
 
 from terra import settings
@@ -286,16 +289,17 @@ def main():
       x,y = futures_to_task[future]
       logger.info(f"{{x}} + {{y}} = {{future.result()}}")
 
-if __name__=='__main__':
+if __name__ == '__main__':
   main()
-''')
+''')  # noqa: E501
 
   def tasks_init(self):
     with open(os.path.join(self.dir, 'tasks', '__init__.py'), 'x') as fid:
-      fid.write(f'')
+      fid.write('')
 
   def tasks(self):
-    with open(os.path.join(self.dir, 'tasks', f'{self.under_name}.py'), 'x') as fid:
+    with open(os.path.join(self.dir, 'tasks', f'{self.under_name}.py'), 'x') \
+        as fid:
       fid.write(f'''from terra.task import shared_task
 
 # Terra core
@@ -305,22 +309,25 @@ logger = getLogger(__name__)
 @shared_task
 def {self.under_name}_in_parallel(self, x, y):
   return x+y
-''')
+''')  # noqa: E501
 
 
 def get_parser():
   parser = argparse.ArgumentParser()
-  parser.add_argument(
-      '--AppName', type=str, dest='app_name', default='AppName',
-      help="Name of app to create a template for, should be CamelCase")
-  parser.add_argument(
-      '--python.path', type=str, dest='python_path', required=True,
-      help="The python path of the module you are setting up")
-  parser.add_argument('--dir', default=clean_path('.'), type=str, action=FullPaths,
-      help="The directory to create the template in. Defaults to the current director")
+  parser.add_argument('--AppName', type=str, dest='app_name',
+                      default='AppName', help="Name of app to create a "
+                      "template for, should be CamelCase")
+  parser.add_argument('--python.path', type=str, dest='python_path',
+                      required=True, help="The python path of the module you "
+                      "are setting up")
+  parser.add_argument('--dir', default=clean_path('.'), type=str,
+                      action=FullPaths, help="The directory to create the "
+                      "template in. Defaults to the current directory")
   parser.add_argument('--name', default="do something", type=str,
-      help="String to generate the workflow/service/task name: e.g. 'calculate threshold'")
+                      help="String to generate the workflow/service/task name:"
+                      " e.g. 'calculate threshold'")
   return parser
+
 
 def main(args=None):
   args = get_parser().parse_args(args)
@@ -344,6 +351,7 @@ def main(args=None):
 ''')
 
   print(f'Simply run: just run {args.python_path} that_config_file.json')
+
 
 if __name__ == '__main__':
   main()

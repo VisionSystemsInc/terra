@@ -52,7 +52,9 @@ class TestSingular(TestComputeSingularityCase):
                       '--env', 'TERRA_SETTINGS_FILE=/foo/bar',
                       'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'}}, self.just_kwargs)
+    self.assertEqual({'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
+                     self.just_kwargs)
 
     # Test a non-zero return value
     self.return_value = 1
@@ -68,10 +70,13 @@ class TestSingular(TestComputeSingularityCase):
     service.compose_files = service.compose_files + ['file_too', 'fileThree']
     compute.run(service)
     # Run a singularity service
-    self.assertEqual(('singular-compose', '--file', 'file1', '--file', 'file_too',
-                      '--file', 'fileThree', 'run', '--env', 'TERRA_SETTINGS_FILE=/foo/bar', 'launch', 'ls'),
+    self.assertEqual(('singular-compose', '--file', 'file1', '--file',
+                      'file_too', '--file', 'fileThree', 'run', '--env',
+                      'TERRA_SETTINGS_FILE=/foo/bar', 'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'}}, self.just_kwargs)
+    self.assertEqual({'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
+                     self.just_kwargs)
 
     # Test a non-zero return value
     self.return_value = 1
@@ -105,7 +110,8 @@ class TestSingularityConfig(TestComputeSingularityCase):
     self.assertEqual(('singular-compose', '--file', 'file1',
                       'config-null', 'launch'), self.just_args)
 
-    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'},
+    self.assertEqual({'stdout': singularity.PIPE,
+                      'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'},
                       'justfile': None},
                      self.just_kwargs)
 
@@ -119,7 +125,8 @@ class TestSingularityConfig(TestComputeSingularityCase):
                       '--file', 'file15.env', '--file', 'file2.env',
                       'config-null', 'launch'),
                      self.just_args)
-    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'},
+    self.assertEqual({'stdout': singularity.PIPE,
+                      'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'},
                       'justfile': None},
                      self.just_kwargs)
 

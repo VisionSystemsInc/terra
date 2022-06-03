@@ -101,7 +101,9 @@ class TestDockerRun(TestComputeDockerCase):
                       '--env', 'TERRA_SETTINGS_FILE=/foo/bar',
                       'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'}},
+    self.assertEqual({'justfile': None,
+                      'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
                      self.just_kwargs)
 
     # Test a non-zero return value
@@ -139,7 +141,8 @@ class TestDockerConfig(TestComputeDockerCase):
                       'config'), self.just_args)
 
     self.assertEqual({'stdout': docker.PIPE, 'justfile': None,
-                      'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'}},
+                      'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
                      self.just_kwargs)
 
   def test_config_with_multiple_compose_files(self):
@@ -154,7 +157,8 @@ class TestDockerConfig(TestComputeDockerCase):
                       'config'),
                      self.just_args)
     self.assertEqual({'stdout': docker.PIPE, 'justfile': None,
-                      'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'}},
+                      'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
                      self.just_kwargs)
 
 
