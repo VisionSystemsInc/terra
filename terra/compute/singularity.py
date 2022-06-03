@@ -24,8 +24,10 @@ class Compute(BaseCompute):
             {service_info.command}
     '''
     pid = just("singular-compose",
-               *sum([['-f', cf] for cf in service_info.compose_files], []),
+               *sum([['--file', cf] for cf in service_info.compose_files], []),
                'run', service_info.compose_service_name,
+               '--env', 'TERRA_SETTINGS_FILE='
+                        f'{service_info.env["TERRA_SETTINGS_FILE"]}',
                *service_info.command + extra_arguments,
                env=service_info.env)
 
