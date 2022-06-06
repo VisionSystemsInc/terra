@@ -110,4 +110,11 @@ class Service(ContainerService):
   Base singularity service class
   '''
 
-  compose_file = []
+  def __init__(self):
+    super().__init__()
+
+    # default compose file (if file exists)
+    compose_file = os.path.join(self.env['TERRA_APP_DIR'],
+                                'singular-compose.env')
+    if os.path.isfile(compose_file):
+      self.compose_files = [compose_file]
