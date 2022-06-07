@@ -69,7 +69,7 @@ class MockJustService:
   compose_files = ["file1"]
   compose_service_name = "launch"
   command = ["ls"]
-  env = {"BAR": "FOO"}
+  env = {"BAR": "FOO", "TERRA_SETTINGS_FILE": "/foo/bar"}
 
 
 class TestDockerRun(TestComputeDockerCase):
@@ -97,9 +97,13 @@ class TestDockerRun(TestComputeDockerCase):
     compute.run(MockJustService())
     # Run a docker service
     self.assertEqual(('--wrap', 'Just-docker-compose',
-                      '-f', 'file1', 'run', 'launch', 'ls'),
+                      '--file', 'file1', 'run',
+                      '--env', 'TERRA_SETTINGS_FILE=/foo/bar',
+                      'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'justfile': None, 'env': {'BAR': 'FOO'}},
+    self.assertEqual({'justfile': None,
+                      'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
                      self.just_kwargs)
 
     # Test a non-zero return value
@@ -133,11 +137,12 @@ class TestDockerConfig(TestComputeDockerCase):
     compute = docker.Compute()
 
     self.assertEqual(compute.config(MockJustService()), 'out')
-    self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
+    self.assertEqual(('--wrap', 'Just-docker-compose', '--file', 'file1',
                       'config'), self.just_args)
 
     self.assertEqual({'stdout': docker.PIPE, 'justfile': None,
-                      'env': {'BAR': 'FOO'}},
+                      'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
                      self.just_kwargs)
 
   def test_config_with_multiple_compose_files(self):
@@ -147,12 +152,13 @@ class TestDockerConfig(TestComputeDockerCase):
                                                      'file2.yaml']
     self.assertEqual(compute.config_service(service),
                      'out')
-    self.assertEqual(('--wrap', 'Just-docker-compose', '-f', 'file1',
-                      '-f', 'file15.yml', '-f', 'file2.yaml',
+    self.assertEqual(('--wrap', 'Just-docker-compose', '--file', 'file1',
+                      '--file', 'file15.yml', '--file', 'file2.yaml',
                       'config'),
                      self.just_args)
     self.assertEqual({'stdout': docker.PIPE, 'justfile': None,
-                      'env': {'BAR': 'FOO'}},
+                      'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
                      self.just_kwargs)
 
 

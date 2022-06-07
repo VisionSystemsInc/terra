@@ -24,8 +24,11 @@ class Compute(BaseCompute):
             {service_info.command}
     '''
     pid = just("singular-compose",
-               *sum([['-f', cf] for cf in service_info.compose_files], []),
-               'run', service_info.compose_service_name,
+               *sum([['--file', cf] for cf in service_info.compose_files], []),
+               'run',
+               '--env', 'TERRA_SETTINGS_FILE='
+                        f'{service_info.env["TERRA_SETTINGS_FILE"]}',
+               service_info.compose_service_name,
                *service_info.command + extra_arguments,
                env=service_info.env)
 
@@ -41,7 +44,7 @@ class Compute(BaseCompute):
     optional_args['justfile'] = getattr(service_info, 'justfile', None)
 
     args = ["singular-compose"] + \
-        sum([['-f', cf] for cf in service_info.compose_files], []) + \
+        sum([['--file', cf] for cf in service_info.compose_files], []) + \
         ['config-null', service_info.compose_service_name]
 
     pid = just(*args, stdout=PIPE,

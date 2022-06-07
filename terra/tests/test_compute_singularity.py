@@ -26,7 +26,7 @@ class MockJustService:
     self.compose_files = ["file1"]
     self.compose_service_name = "launch"
     self.command = ["ls"]
-    self.env = {"BAR": "FOO"}
+    self.env = {"BAR": "FOO", 'TERRA_SETTINGS_FILE': '/foo/bar'}
 
 
 class TestSingular(TestComputeSingularityCase):
@@ -48,10 +48,13 @@ class TestSingular(TestComputeSingularityCase):
     # This part of the test looks fragile
     compute.run(MockJustService())
     # Run a singularity service
-    self.assertEqual(('singular-compose', '-f', 'file1', 'run', 'launch',
-                      'ls'),
+    self.assertEqual(('singular-compose', '--file', 'file1', 'run',
+                      '--env', 'TERRA_SETTINGS_FILE=/foo/bar',
+                      'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'env': {'BAR': 'FOO'}}, self.just_kwargs)
+    self.assertEqual({'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
+                     self.just_kwargs)
 
     # Test a non-zero return value
     self.return_value = 1
@@ -67,10 +70,13 @@ class TestSingular(TestComputeSingularityCase):
     service.compose_files = service.compose_files + ['file_too', 'fileThree']
     compute.run(service)
     # Run a singularity service
-    self.assertEqual(('singular-compose', '-f', 'file1', '-f', 'file_too',
-                      '-f', 'fileThree', 'run', 'launch', 'ls'),
+    self.assertEqual(('singular-compose', '--file', 'file1', '--file',
+                      'file_too', '--file', 'fileThree', 'run', '--env',
+                      'TERRA_SETTINGS_FILE=/foo/bar', 'launch', 'ls'),
                      self.just_args)
-    self.assertEqual({'env': {'BAR': 'FOO'}}, self.just_kwargs)
+    self.assertEqual({'env': {'BAR': 'FOO',
+                              'TERRA_SETTINGS_FILE': '/foo/bar'}},
+                     self.just_kwargs)
 
     # Test a non-zero return value
     self.return_value = 1
@@ -101,10 +107,11 @@ class TestSingularityConfig(TestComputeSingularityCase):
 
     self.assertEqual(compute.config(MockJustService()),
                      {'environment': {'foo': 'bar'}, 'stuff': ['boo', 'far']})
-    self.assertEqual(('singular-compose', '-f', 'file1',
+    self.assertEqual(('singular-compose', '--file', 'file1',
                       'config-null', 'launch'), self.just_args)
 
-    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO'},
+    self.assertEqual({'stdout': singularity.PIPE,
+                      'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'},
                       'justfile': None},
                      self.just_kwargs)
 
@@ -114,11 +121,12 @@ class TestSingularityConfig(TestComputeSingularityCase):
     service.compose_files = service.compose_files + ['file15.env', 'file2.env']
     self.assertEqual(compute.config_service(service),
                      {'environment': {'foo': 'bar'}, 'stuff': ['boo', 'far']})
-    self.assertEqual(('singular-compose', '-f', 'file1',
-                      '-f', 'file15.env', '-f', 'file2.env',
+    self.assertEqual(('singular-compose', '--file', 'file1',
+                      '--file', 'file15.env', '--file', 'file2.env',
                       'config-null', 'launch'),
                      self.just_args)
-    self.assertEqual({'stdout': singularity.PIPE, 'env': {'BAR': 'FOO'},
+    self.assertEqual({'stdout': singularity.PIPE,
+                      'env': {'BAR': 'FOO', 'TERRA_SETTINGS_FILE': '/foo/bar'},
                       'justfile': None},
                      self.just_kwargs)
 

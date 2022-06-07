@@ -77,8 +77,11 @@ class Compute(BaseCompute):
       tty_args = ('-T')
 
     pid = just("--wrap", "Just-docker-compose",
-               *sum([['-f', cf] for cf in service_info.compose_files], []),
-               'run', *tty_args, service_info.compose_service_name,
+               *sum([['--file', cf] for cf in service_info.compose_files], []),
+               'run', *tty_args,
+               '--env', 'TERRA_SETTINGS_FILE='
+                        f'{service_info.env["TERRA_SETTINGS_FILE"]}',
+               service_info.compose_service_name,
                *service_info.command + extra_arguments,
                **optional_args,
                env=service_info.env)
@@ -95,7 +98,7 @@ class Compute(BaseCompute):
     optional_args['justfile'] = getattr(service_info, 'justfile', None)
 
     args = ["--wrap", "Just-docker-compose"] + \
-        sum([['-f', cf] for cf in service_info.compose_files], []) + \
+        sum([['--file', cf] for cf in service_info.compose_files], []) + \
         ['config']
 
     pid = just(*args, stdout=PIPE,
