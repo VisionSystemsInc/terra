@@ -12,6 +12,14 @@ terra.utils.cli module
    :undoc-members:
    :show-inheritance:
 
+terra.utils.new module
+----------------------
+
+.. automodule:: terra.utils.new
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.utils.workflow module
 ---------------------------
 

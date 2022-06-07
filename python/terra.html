@@ -247,6 +247,7 @@
 <li class="toctree-l1"><a class="reference internal" href="terra.utils.html">terra.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="terra.utils.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.cli">terra.utils.cli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.new">terra.utils.new module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.workflow">terra.utils.workflow module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils">Module contents</a></li>
 </ul>
@@ -524,7 +525,7 @@ task. Note any active pipenv/subprocess will be deactivated prior to run.</p>
 <dl class="py class">
 <dt id="terra.workflow.PipelineWorkflow">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.workflow.</span></code><code class="sig-name descname"><span class="pre">PipelineWorkflow</span></code><a class="headerlink" href="#terra.workflow.PipelineWorkflow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#terra.workflow.BaseWorkflow" title="terra.workflow.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.BaseWorkflow</span></code></a></p>
 <p>A simple workflow that runs a set of services, serially.</p>
 <p>self.pipeline need to be set to a list of services calls.</p>
 <dl class="py method">
@@ -535,6 +536,17 @@ task. Note any active pipenv/subprocess will be deactivated prior to run.</p>
 <dl class="py method">
 <dt id="terra.workflow.PipelineWorkflow.service_index">
 <code class="sig-name descname"><span class="pre">service_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.service_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="terra.workflow.SingleWorkflow">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.workflow.</span></code><code class="sig-name descname"><span class="pre">SingleWorkflow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.SingleWorkflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.workflow.BaseWorkflow" title="terra.workflow.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.BaseWorkflow</span></code></a></p>
+<dl class="py method">
+<dt id="terra.workflow.SingleWorkflow.run">
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.SingleWorkflow.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
