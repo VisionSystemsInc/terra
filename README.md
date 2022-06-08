@@ -4,7 +4,7 @@ Terra project from VSI
 
 ## Requirements
 
-- Python 3.6 or newer
+- Python 3.7 or newer
 - pipenv
 - docker
 - bash
@@ -20,7 +20,7 @@ just terra run
 
 ## Setting up pipenv
 
-There are a number of reasons `pipenv` running python 3.6 or newer may not be available, especially on older operating systems. To automatically setup `pipenv` in a directory for you, run `just terra setup --dir {directory to install pipenv in}`. This does not require elevated permissions.
+There are a number of reasons `pipenv` running python 3.7 or newer may not be available, especially on older operating systems. To automatically setup `pipenv` in a directory for you, run `just terra setup --dir {directory to install pipenv in}`. This does not require elevated permissions.
 
 `just terra setup` will attempt to setup pipenv using a series of different strategies:
 

@@ -365,6 +365,8 @@ function terra_caseify()
       local download_conda=0
       local conda_install
 
+      : ${PYTHON_VERSION=3.7.13}
+
       parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
       if [ -z "${output_dir:+set}" ]; then
@@ -425,10 +427,10 @@ function terra_caseify()
         conda-python-install --dir "${output_dir}/.python" ${installer_args[@]+"${installer_args[@]}"}
       fi
 
-      # Make sure python is 3.6 or newer
+      # Make sure python is 3.7 or newer
       local python_version="$("${python_exe}" --version 2>&1 | awk '{print $2}')"
       source "${VSI_COMMON_DIR}/linux/requirements.bsh"
-      if ! meet_requirements "${python_version}" '>=3.6' '<3.10'; then
+      if ! meet_requirements "${python_version}" '>=3.7' '<3.10'; then
         echo "Python version ${python_version} does not meet the expected requirements" >&2
         echo "Consider adding the --download flag" >&2
         read -srn1 -d '' -p "Press any key to continue, or Ctrl+C to stop"
