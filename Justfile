@@ -46,11 +46,41 @@ function Terra_Pipenv()
       ask_question "Continue anyways?" answer_continue n
       if [ "${answer_continue}" == "0" ]; then
         JUST_IGNORE_EXIT_CODES=1
-        echo "Exiting..." >&2
+        echo "Canceling..." >&2
         return 1
       fi
     fi
-    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
+
+    local env_args=(PIPENV_PIPFILE="${TERRA_CWD}/Pipfile")
+
+    if ! command -v pipenv &> /dev/null; then
+      local install_pipenv="${install_pipenv-}"
+      echo "Pipenv does not appear to be installed. Would you like to install it at:" >&2
+      echo "  ${TERRA_RUN_DIR}/.pipenv" >&2
+      ask_question "Install (requires internet access)?" install_pipenv y
+      if [ "${install_pipenv}" == "0" ]; then
+        JUST_IGNORE_EXIT_CODES=1
+        echo "Canceling..." >&2
+        return 1
+      fi
+
+      add_to_local=y justify terra setup --download --dir "${TERRA_RUN_DIR}/.pipenv"
+
+      # Set what got added to local.env so the current command runs as expected.
+      if [ "${OS-}" = "Windows_NT" ]; then
+        env_args+=("PIPENV_PYTHON=${TERRA_RUN_DIR}/.pipenv/Scripts/python.exe")
+        env_args+=("PATH=${TERRA_RUN_DIR}/.pipenv/Scripts:${PATH}")
+      else
+        env_args+=("PIPENV_PYTHON=${TERRA_RUN_DIR}/.pipenv/bin/python")
+        env_args+=("PATH=${TERRA_RUN_DIR}/.pipenv/bin:${PATH}")
+      fi
+    else
+      if [ -n "${TERRA_PIPENV_PYTHON+set}" ]; then
+        env_args+=("PIPENV_PYTHON=${TERRA_PIPENV_PYTHON}")
+      fi
+    fi
+
+    ${DRYRUN} env ${env_args[@]+"${env_args[@]}"} pipenv ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
@@ -365,7 +395,7 @@ function terra_caseify()
       local download_conda=0
       local conda_install
 
-      : ${PYTHON_VERSION=3.7.13}
+      : ${PYTHON_VERSION=3.8.13}
 
       parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
@@ -447,6 +477,7 @@ function terra_caseify()
       echo "" >&2
       ask_question "Do you want to add \"${output_dir}/${platform_bin}\" to your local.env automatically?" add_to_local y
       if [ "${add_to_local}" == "1" ]; then
+        echo $'\n'"TERRA_PIPENV_PYTHON=\"${output_dir}/${platform_bin}\"/python" >> "${TERRA_CWD}/local.env"
         echo $'\n'"PATH=\"${output_dir}/${platform_bin}:\${PATH}\"" >> "${TERRA_CWD}/local.env"
       fi
       ;;
