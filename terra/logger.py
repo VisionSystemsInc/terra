@@ -360,7 +360,7 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+    if not settings.terra.disable_settings_dump:
       os.makedirs(settings.settings_dir, exist_ok=True)
       settings_dump = os.path.join(
           settings.settings_dir,

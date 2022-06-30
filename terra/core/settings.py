@@ -229,7 +229,7 @@ def settings_dir(self):
   '''
   The default :func:`settings_property` for settings dumps as JSON files.
   The default is :func:`processing_dir/settings<processing_dir>`.
-  This directory is not used if ``TERRA_DISABLE_SETTINGS_DUMP`` is true.
+  This directory is not used if settings.terra.disable_settings_dump is true.
   '''
   return os.path.join(self.processing_dir, 'settings')
 
@@ -419,6 +419,7 @@ global_templates = [
       },
       'terra': {
         'config_file': config_file,
+        'disable_settings_dump': False,
         'lock_dir': lock_dir,
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
