@@ -598,12 +598,12 @@ class LazySettings(LazyObject):
     """
     settings_file = os.environ.get(ENVIRONMENT_VARIABLE)
     if not settings_file:
-      desc = ("setting %s" % name) if name else "settings"
+      desc = (f"setting {name}") if name else "settings"
       raise ImproperlyConfigured(
-          "Requested %s, but settings are not configured. "
-          "You must either define the environment variable %s "
-          "or call settings.configure() before accessing settings." %
-          (desc, ENVIRONMENT_VARIABLE))
+          f"Requested {desc}, but settings are not configured. "
+          "You must either define the environment variable "
+          f"{ENVIRONMENT_VARIABLE} or call settings.configure() before "
+          "accessing settings.")
     # Store in global variable :-\
     config_file.filename = settings_file
     self.configure(json_load(settings_file))
