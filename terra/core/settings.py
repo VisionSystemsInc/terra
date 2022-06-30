@@ -642,6 +642,7 @@ class LazySettings(LazyObject):
       raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
     self._wrapped = Settings(*args, **kwargs)
+    self._wrapped.update(override_config)
 
     for pattern, settings in global_templates:
       if nested_in_dict(pattern, self._wrapped):
@@ -849,6 +850,7 @@ class Settings(ObjectDict):
     self.update(backup)
 
 
+override_config = {}
 settings = LazySettings()
 '''LazySettings: The setting object to use through out all of terra'''
 

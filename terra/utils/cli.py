@@ -3,6 +3,10 @@ Utilities to help write CLIs
 '''
 import os
 import argparse
+import ast
+
+from terra.core.settings import override_config
+
 
 extra_arguments = list()
 
@@ -18,6 +22,9 @@ class DbStopAction(argparse.Action):
     # is a custom action, having a slightly different behavior here is ok.
     debugger = values or parser.get_default('dbstop_if_error')
 
+    # TODO: Replace this with an Env var, and move the rest of the code to be
+    # executed after super().parse_args. Update docker and singularity to pass
+    # the env var instead
     extra_arguments.extend(['--dbstop-if-error', debugger])
 
     try:
@@ -46,6 +53,29 @@ class DbStopAction(argparse.Action):
         original_hook(type, value, tb)
       sys.excepthook = hook
 
+class OverrideAction(argparse.Action):
+  def __call__(self, parser, namespace, values, option_string=None):
+    for setting in values:
+      try:
+        path, value = setting.split('=', 1)
+      except ValueError as e:
+        raise argparse.ArgumentError(self, 'There was no "=" found in setting '
+            f'override "--set {setting}". If this is not a setting, remember '
+            'to separate your args by adding " -- " before it. E.g. '
+            '"--set foo=bar -- command args to python"') from e
+      path = path.split('.')
+
+      try:
+        value = ast.literal_eval(value)
+      except ValueError:
+        pass # Leave it as the original string then
+
+      entry = override_config
+      for key in path[:-1]:
+        if key not in entry:
+          entry[key] = {}
+        entry = entry[key]
+      entry[path[-1]] = value
 
 class ArgumentParser(argparse.ArgumentParser):
   def __init__(self, *args, **kwargs):
@@ -55,6 +85,10 @@ class ArgumentParser(argparse.ArgumentParser):
                       action=DbStopAction,
                       help="Automatically runs debugger's set_trace on an "
                            "unexpected exception")
+
+    self.add_argument('--set', default=[], metavar="KEY=VALUE", nargs='+',
+                      help="Override terra settings, e.g. "
+                           "'--set logging.level=INFO'", action=OverrideAction)
 
   def add_settings_file(self, **kwargs):
     '''
