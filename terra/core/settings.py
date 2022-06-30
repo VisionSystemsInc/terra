@@ -26,17 +26,17 @@ Designating the settings
 
 .. envvar:: TERRA_SETTINGS_FILE
 
-    When you run a Terra App, you have to tell it which settings you’re using.
+    When you run a Terra App, you have to tell it which settings you're using.
     Do this by using an environment variable, :envvar:`TERRA_SETTINGS_FILE`.
 
 Default settings
 ----------------
 
-A Terra settings file doesn’t have to define any settings if it doesn’t need
+A Terra settings file doesn't have to define any settings if it doesn't need
 to. Each setting has a sensible default value. These defaults live in
 :data:`global_templates`.
 
-Here’s the algorithm terra uses in compiling settings:
+Here's the algorithm terra uses in compiling settings:
 
 * Load settings from global_settings.py.
 * Load settings from the specified settings file, overriding the global
@@ -57,7 +57,7 @@ In your Terra apps, use settings by importing the object
     if settings.params.max_time > 15:
         # Do something
 
-Note that :data:`terra.settings` isn’t a module – it’s an object. So importing
+Note that :data:`terra.settings` isn't a module - it's an object. So importing
 individual settings is not possible:
 
 .. code-block: python
@@ -67,8 +67,8 @@ individual settings is not possible:
 Altering settings at runtime
 ----------------------------
 
-You shouldn’t alter settings in your applications at runtime. For example,
-don’t do this in an app:
+You shouldn't alter settings in your applications at runtime. For example,
+don't do this in an app:
 
 .. code-block:: python
 
@@ -87,7 +87,7 @@ Using settings without setting TERRA_SETTINGS_FILE
 
 In some cases, you might want to bypass the :envvar:`TERRA_SETTINGS_FILE`
 environment variable. For example, if you are writing a simple metadata parse
-app, you likely don’t want to have to set up an environment variable pointing
+app, you likely don't want to have to set up an environment variable pointing
 to a settings file for each file.
 
 In these cases, you can configure Terra's settings manually. Do this by
@@ -112,7 +112,7 @@ particular setting is not passed to
 later point, Terra will use the default setting value.
 
 Configuring Terra in this fashion is mostly necessary - and, indeed,
-recommended - when you’re using are running a trivial transient app in the
+recommended - when you're using are running a trivial transient app in the
 framework instead of a larger application.
 
 '''
