@@ -7,6 +7,7 @@ from .utils import TestCase
 
 from terra.core.settings import override_config
 
+
 class TestFullPaths(TestCase):
   def test_full_paths(self):
     parser = argparse.ArgumentParser()
@@ -35,8 +36,8 @@ class TestFullPaths(TestCase):
 
     oa(None, None, ['foo=bar1', 'a.b.c=15'])
     self.assertEqual(override_config,
-        {'foo': 'bar1',
-         'a': {'b': {'c': 15}}})
+                     {'foo': 'bar1',
+                      'a': {'b': {'c': 15}}})
 
     with self.assertRaises(argparse.ArgumentError) as cm:
       oa(None, None, ['oops'])

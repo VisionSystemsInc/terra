@@ -53,22 +53,24 @@ class DbStopAction(argparse.Action):
         original_hook(type, value, tb)
       sys.excepthook = hook
 
+
 class OverrideAction(argparse.Action):
   def __call__(self, parser, namespace, values, option_string=None):
     for setting in values:
       try:
         path, value = setting.split('=', 1)
       except ValueError as e:
-        raise argparse.ArgumentError(self, 'There was no "=" found in setting '
-            f'override "--set {setting}". If this is not a setting, remember '
-            'to separate your args by adding " -- " before it. E.g. '
-            '"--set foo=bar -- command args to python"') from e
+        raise argparse.ArgumentError(
+            self, 'There was no "=" found in setting override "--set '
+            f'{setting}". If this is not a setting, remember to separate your '
+            'args by adding " -- " before it. E.g. "--set foo=bar -- command '
+            'args to python"') from e
       path = path.split('.')
 
       try:
         value = ast.literal_eval(value)
       except ValueError:
-        pass # Leave it as the original string then
+        pass  # Leave it as the original string then
 
       entry = override_config
       for key in path[:-1]:
@@ -76,6 +78,7 @@ class OverrideAction(argparse.Action):
           entry[key] = {}
         entry = entry[key]
       entry[path[-1]] = value
+
 
 class ArgumentParser(argparse.ArgumentParser):
   def __init__(self, *args, **kwargs):

@@ -704,7 +704,8 @@ class TestUnitTests(TestCase):
             "Otherwise unit tests can interfere with each other")
 
   def last_test_override(self):
-    self.assertEqual(override_config, {},
+    self.assertEqual(
+        override_config, {},
         msg="If you are seeing this, one of the other unit tests has "
             "changed the value of override_config. This side effect should be "
             "prevented by mocking out the override_config. Otherwise unit "
