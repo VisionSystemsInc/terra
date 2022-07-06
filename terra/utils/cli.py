@@ -69,7 +69,7 @@ class OverrideAction(argparse.Action):
 
       try:
         value = ast.literal_eval(value)
-      except ValueError:
+      except Exception:
         pass  # Leave it as the original string then
 
       entry = override_config
