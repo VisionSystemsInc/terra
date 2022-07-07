@@ -12,7 +12,7 @@ from vsi.tools.python import args_to_kwargs, ARGS, KWARGS, unwrap_wraps
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
 import terra.logger
-import terra.compute.utils
+from terra.utils.path import translate_settings_paths
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -66,12 +66,10 @@ class TerraTask(Task):
       payload = TerraJSONEncoder.serializableSettings(payload)
       # Go from compute runner to master controller
       if reverse_compute_volume_map:
-        payload = terra.compute.utils.translate_settings_paths(
-            payload, reverse_compute_volume_map)
+        payload = translate_settings_paths(payload, reverse_compute_volume_map)
       # Go from master controller to executor
       if executor_volume_map:
-        payload = terra.compute.utils.translate_settings_paths(
-            payload, executor_volume_map)
+        payload = translate_settings_paths(payload, executor_volume_map)
     return payload
 
   # Don't need to apply translations for apply, it runs locally

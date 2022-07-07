@@ -206,6 +206,3 @@ def just(*args, **kwargs):
   # Have to call bash for windows compatibility, no shebang support
   pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
   return pid
-
-
-from terra.utils.path import pathlib_map, patch_volume, translate_settings_paths
