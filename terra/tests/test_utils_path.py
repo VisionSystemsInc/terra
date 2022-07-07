@@ -101,4 +101,22 @@ class TestTranslateUtils(TestCase):
     self.assertEqual(utils.patch_volume('~/${BAR}/car', volume_map, 'linux'),
                      '/myhome/bar/car')
 
-# No test for translate_settings_paths?
+  def _test_translate_settings_paths(self, container_platform):
+    volume_map = [('/foo/bar', '/dst')]
+
+    config = {'some_dir': '/foo/bar/car',
+              'other_file': '/dst/same',
+              'path_not': '/foo/bar/far'}
+
+    new_config = utils.translate_settings_paths(config, volume_map,
+                                                container_platform)
+    config['some_dir'] = '/dst/car'
+
+    self.assertEqual(new_config, config)
+
+  def test_translate_settings_paths_linux(self):
+    self._test_translate_settings_paths('linux')
+
+  # Testing windows is superfluous until we implement it
+  def test_translate_settings_paths_windows(self):
+    self._test_translate_settings_paths('windows')
