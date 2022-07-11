@@ -4,7 +4,7 @@ import os
 from vsi.tools.python import nested_patch
 
 from terra import settings
-from terra.core.settings import filename_suffixes
+from terra.core.settings import filename_suffixes, TerraJSONEncoder
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -113,8 +113,21 @@ def reverse_volume_map(volume_map):
   return reverse_map
 
 
+def translate_paths_chain(payload, *maps):
+  if any(maps):
+    # If either translation is needed, start by applying the ~ home dir
+    # expansion and settings_property (which wouldn't have made it through
+    # pure json conversion, but the ~ will)
+    payload = TerraJSONEncoder.serializableSettings(payload)
+    # Go from compute runner to master controller
+    for volume_map in maps:
+      if volume_map:
+        payload = translate_settings_paths(payload, volume_map)
+  return payload
+
+
 # Task translate_paths
-# Make a Reverse_map and use in _get_volume_mappings
+
 # terra.utils.cli.clean_path (ANOTHER?)
 
 # geogenx.terra.registry

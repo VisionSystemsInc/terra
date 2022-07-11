@@ -138,3 +138,17 @@ class TestTranslateUtils(TestCase):
                       ['/stuff/thing', '/foo'],
                       ['/stuff', '/foo/bar/car']])
 
+  def test_translate_paths_chain(self):
+    map1 = [['/a', '/b'], ['/b', '/c'], ['/c', '/d']]
+
+    config = {'some_dir': '/a/foo', }
+
+    self.assertEqual(utils.translate_paths_chain(config, map1),
+                     {'some_dir': '/b/foo'})
+
+    self.assertEqual(utils.translate_paths_chain(config, map1, map1),
+                     {'some_dir': '/c/foo'})
+
+    self.assertEqual(utils.translate_paths_chain(config, map1[0:1], map1[1:2],
+                                                 map1[2:3]),
+                     {'some_dir': '/d/foo'})
