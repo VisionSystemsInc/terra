@@ -12,7 +12,9 @@ from vsi.tools.python import args_to_kwargs, ARGS, KWARGS, unwrap_wraps
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
 import terra.logger
-from terra.utils.path import translate_settings_paths, reverse_volume_map
+from terra.utils.path import (
+  translate_settings_paths, reverse_volume_map, translate_paths_chain
+)
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -47,21 +49,6 @@ class TerraTask(Task):
     return (compute_volume_map, reverse_compute_volume_map,
             executor_volume_map, reverse_executor_volume_map)
 
-  def translate_paths(self, payload, reverse_compute_volume_map,
-                      executor_volume_map):
-    if reverse_compute_volume_map or executor_volume_map:
-      # If either translation is needed, start by applying the ~ home dir
-      # expansion and settings_property (which wouldn't have made it through
-      # pure json conversion, but the ~ will)
-      payload = TerraJSONEncoder.serializableSettings(payload)
-      # Go from compute runner to master controller
-      if reverse_compute_volume_map:
-        payload = translate_settings_paths(payload, reverse_compute_volume_map)
-      # Go from master controller to executor
-      if executor_volume_map:
-        payload = translate_settings_paths(payload, executor_volume_map)
-    return payload
-
   # Don't need to apply translations for apply, it runs locally
   # def apply(self, *args, **kwargs):
 
@@ -91,7 +78,7 @@ class TerraTask(Task):
 
         # Load the executor version of the runner's settings
         settings._wrapped.clear()
-        settings._wrapped.update(self.translate_paths(
+        settings._wrapped.update(translate_paths_chain(
             self.request.settings,
             reverse_compute_volume_map,
             executor_volume_map))
@@ -123,18 +110,18 @@ class TerraTask(Task):
           kwargs = args_to_kwargs(func, args, kwargs)
         args_only = kwargs.pop(ARGS, ())
         kwargs.update(kwargs.pop(KWARGS, ()))
-        kwargs = self.translate_paths(kwargs,
-                                      reverse_compute_volume_map,
-                                      executor_volume_map)
+        kwargs = translate_paths_chain(kwargs,
+                                       reverse_compute_volume_map,
+                                       executor_volume_map)
         # Set up logger to talk to master controller
         terra.logger._logs.reconfigure_logger(pre_run_task=True)
         # Don't call func here, you'll miss any other decorators
         return_value = self.run(*args_only, **kwargs)
 
         # Calculate the runner mapped version of the executor's return value
-        return_value = self.translate_paths(return_value,
-                                            reverse_executor_volume_map,
-                                            compute_volume_map)
+        return_value = translate_paths_chain(return_value,
+                                             reverse_executor_volume_map,
+                                             compute_volume_map)
     else:
       # Must call (synchronous) apply or python __call__ with no volume
       # mappings
