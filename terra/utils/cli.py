@@ -107,7 +107,7 @@ class ArgumentParser(argparse.ArgumentParser):
     # https://stackoverflow.com/a/4480202
     TERRA_SETTINGS_FILE = os.getenv('TERRA_SETTINGS_FILE')
     if TERRA_SETTINGS_FILE:
-      aa_kwargs['default'] = clean_path(TERRA_SETTINGS_FILE)
+      aa_kwargs['default'] = resolve_path(TERRA_SETTINGS_FILE)
       aa_kwargs['nargs'] = '?'
 
     # apply overrides
@@ -118,7 +118,7 @@ class ArgumentParser(argparse.ArgumentParser):
                       **aa_kwargs)
 
 
-def clean_path(path):
+def resolve_path(path):
   # This must be done before isabs test, or else you will get a false negative
   path = os.path.expanduser(path)
 
@@ -143,7 +143,7 @@ class FullPaths(argparse.Action):
   """
 
   def __call__(self, parser, namespace, values, option_string=None):
-    setattr(namespace, self.dest, clean_path(values))
+    setattr(namespace, self.dest, resolve_path(values))
 
 
 class FullPathsAppend(argparse._AppendAction):
@@ -158,6 +158,6 @@ class FullPathsAppend(argparse._AppendAction):
     # items = copy.copy(argparse._ensure_value(namespace, self.dest, []))
     items = getattr(namespace, self.dest, None)
     items = argparse._copy_items(items)
-    # items = [clean_path(item) for item in items]
-    items.append(clean_path(values))
+    # items = [resolve_path(item) for item in items]
+    items.append(resolve_path(values))
     setattr(namespace, self.dest, items)

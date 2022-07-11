@@ -4,9 +4,10 @@ import os
 import ntpath
 import posixpath
 
-from .utils import TestCase
+from .utils import TestCase, TestSettingsConfigureCase
 # from .test_compute_utils import TestComputeUtilsCase
 import terra.utils.path as utils
+from terra import settings
 
 
 class TestTranslateUtils(TestCase):
@@ -152,3 +153,24 @@ class TestTranslateUtils(TestCase):
     self.assertEqual(utils.translate_paths_chain(config, map1[0:1], map1[1:2],
                                                  map1[2:3]),
                      {'some_dir': '/d/foo'})
+
+class TestResolvePath(TestSettingsConfigureCase):
+  def setUp(self):
+    self.config.terra = {'zone': 'controller'}
+    self.config.compute = {'volume_map': [['/foo', '/compute']]}
+    self.config.executor = {'volume_map': [['/compute', '/bar']]}
+    super().setUp()
+
+  @mock.patch.dict(os.environ, {'FOO': "BAR"})
+  def test_resolve_path(self):
+
+    self.assertEqual(utils.resolve_path('/foo'), '/foo')
+    self.assertEqual(utils.resolve_path('~'), os.path.expanduser('~'))
+    self.assertEqual(utils.resolve_path('/foo/${FOO}'), '/foo/BAR')
+    self.assertEqual(utils.resolve_path('/foo/stuff/../bar'), '/foo/bar')
+
+    settings.terra.zone = 'compute'
+    self.assertEqual(utils.resolve_path('/foo'), '/compute')
+
+    settings.terra.zone = 'task'
+    self.assertEqual(utils.resolve_path('/foo'), '/bar')

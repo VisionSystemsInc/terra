@@ -126,20 +126,15 @@ def translate_paths_chain(payload, *maps):
   return payload
 
 
-# Task translate_paths
+def resolve_path(path):
+  path = os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
+  if settings.terra.zone == 'controller':
+    return path
+  else:
+    if settings.compute.volume_map:
+      path = patch_volume(path, settings.compute.volume_map)
 
-# terra.utils.cli.clean_path (ANOTHER?)
+    if settings.terra.zone == 'task' and settings.executor.volume_map:
+      path = patch_volume(path, settings.executor.volume_map)
 
-# geogenx.terra.registry
-# def clean_path(self, path):
-#   path = os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
-#   if settings.terra.zone == 'controller':
-#     return path
-#   else:
-#     if settings.compute.volume_map:
-#       path = patch_volume(path, settings.compute.volume_map)
-
-#     if settings.terra.zone == 'task' and settings.executor.volume_map:
-#       path = patch_volume(path, settings.executor.volume_map)
-
-#     return path
+    return path
