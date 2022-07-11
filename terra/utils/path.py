@@ -107,6 +107,12 @@ def translate_settings_paths(container_config, volume_map,
   )
 
 
+def reverse_volume_map(volume_map):
+  reverse_map = [[x[1], x[0]] for x in volume_map]
+  reverse_map.reverse()
+  return reverse_map
+
+
 # Task translate_paths
 # Make a Reverse_map and use in _get_volume_mappings
 # terra.utils.cli.clean_path (ANOTHER?)

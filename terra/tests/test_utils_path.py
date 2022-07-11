@@ -120,3 +120,21 @@ class TestTranslateUtils(TestCase):
   # Testing windows is superfluous until we implement it
   def test_translate_settings_paths_windows(self):
     self._test_translate_settings_paths('windows')
+
+  def test_reverse_map(self):
+    self.assertEqual(utils.reverse_volume_map([]), [])
+
+    volume_map = [['/foo', '/foo']]
+    self.assertEqual(utils.reverse_volume_map(volume_map), volume_map)
+
+    volume_map = (('/foo', '/bar'),)
+    self.assertEqual(utils.reverse_volume_map(volume_map), [['/bar', '/foo']])
+
+    volume_map = (('/foo/bar/car', '/stuff'),
+                  ('/foo', '/stuff/thing'),
+                  ('/bar', '/BAR'))
+    self.assertEqual(utils.reverse_volume_map(volume_map),
+                     [['/BAR', '/bar'],
+                      ['/stuff/thing', '/foo'],
+                      ['/stuff', '/foo/bar/car']])
+

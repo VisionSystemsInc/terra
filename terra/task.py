@@ -12,7 +12,7 @@ from vsi.tools.python import args_to_kwargs, ARGS, KWARGS, unwrap_wraps
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
 import terra.logger
-from terra.utils.path import translate_settings_paths
+from terra.utils.path import translate_settings_paths, reverse_volume_map
 from terra.logger import getLogger
 logger = getLogger(__name__)
 
@@ -36,19 +36,9 @@ class TerraTask(Task):
     executor_volume_map = self.request.settings['executor']['volume_map']
 
     if executor_volume_map:
-      compute_volume_map = \
-          self.request.settings['compute']['volume_map']
-      # Flip each mount point, so it goes from runner to controller
-      reverse_compute_volume_map = [[x[1], x[0]]
-                                    for x in compute_volume_map]
-      # Reverse order. This will be important in case one mount point mounts
-      # inside another
-      reverse_compute_volume_map.reverse()
-
-      reverse_executor_volume_map = [[x[1], x[0]]
-                                     for x in executor_volume_map]
-      reverse_executor_volume_map.reverse()
-
+      compute_volume_map = self.request.settings['compute']['volume_map']
+      reverse_compute_volume_map = reverse_volume_map(compute_volume_map)
+      reverse_executor_volume_map = reverse_volume_map(executor_volume_map)
     else:
       reverse_compute_volume_map = []
       compute_volume_map = []
@@ -94,7 +84,7 @@ class TerraTask(Task):
 
       # Create a settings context, so I can replace it with the task's settings
       with settings:
-        # Calculate the exector's mapped version of the runner's settings
+        # Calculate the executor's mapped version of the runner's settings
         compute_volume_map, reverse_compute_volume_map, \
             executor_volume_map, reverse_executor_volume_map = \
             self._get_volume_mappings()
