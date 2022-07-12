@@ -164,10 +164,14 @@ class TestResolvePath(TestSettingsConfigureCase):
   @mock.patch.dict(os.environ, {'FOO': "BAR"})
   def test_resolve_path(self):
 
+    home = os.path.expanduser('~')
+
     self.assertEqual(utils.resolve_path('/foo'), '/foo')
-    self.assertEqual(utils.resolve_path('~'), os.path.expanduser('~'))
+    self.assertEqual(utils.resolve_path('~'), home)
     self.assertEqual(utils.resolve_path('/foo/${FOO}'), '/foo/BAR')
     self.assertEqual(utils.resolve_path('/foo/stuff/../bar'), '/foo/bar')
+    self.assertEqual(utils.resolve_path('~/foo//${FOO}/./stuff//..//bar'),
+        os.path.join(home, 'foo/BAR/bar'))
 
     settings.terra.zone = 'compute'
     self.assertEqual(utils.resolve_path('/foo'), '/compute')
