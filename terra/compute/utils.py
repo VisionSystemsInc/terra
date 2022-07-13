@@ -33,7 +33,6 @@ from os import environ as env
 from shlex import quote
 from subprocess import Popen
 import distutils.spawn
-import pathlib
 
 from vsi.tools.diff import dict_diff
 

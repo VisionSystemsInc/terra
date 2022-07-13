@@ -154,6 +154,7 @@ class TestTranslateUtils(TestCase):
                                                  map1[2:3]),
                      {'some_dir': '/d/foo'})
 
+
 class TestResolvePath(TestSettingsConfigureCase):
   def setUp(self):
     self.config.terra = {'zone': 'controller'}
@@ -171,7 +172,7 @@ class TestResolvePath(TestSettingsConfigureCase):
     self.assertEqual(utils.resolve_path('/foo/${FOO}'), '/foo/BAR')
     self.assertEqual(utils.resolve_path('/foo/stuff/../bar'), '/foo/bar')
     self.assertEqual(utils.resolve_path('~/foo//${FOO}/./stuff//..//bar'),
-        os.path.join(home, 'foo/BAR/bar'))
+                     os.path.join(home, 'foo/BAR/bar'))
 
     settings.terra.zone = 'compute'
     self.assertEqual(utils.resolve_path('/foo'), '/compute')

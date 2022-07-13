@@ -13,7 +13,7 @@ from terra import settings
 from terra.core.settings import TerraJSONEncoder
 import terra.logger
 from terra.utils.path import (
-  translate_settings_paths, reverse_volume_map, translate_paths_chain
+  reverse_volume_map, translate_paths_chain
 )
 from terra.logger import getLogger
 logger = getLogger(__name__)

@@ -17,6 +17,7 @@ containers.
 These utilities will help with handling those path translations.
 '''
 
+
 def pathlib_map(volume_map, container_platform='linux'):
   '''
   Translate volume mapping from strings to pathlib objects. Source paths on
