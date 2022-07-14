@@ -233,8 +233,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.utils.cli.clean_path">
-<code class="sig-prename descclassname"><span class="pre">terra.utils.cli.</span></code><code class="sig-name descname"><span class="pre">clean_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.clean_path" title="Permalink to this definition">¶</a></dt>
+<dt id="terra.utils.cli.resolve_path">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.cli.</span></code><code class="sig-name descname"><span class="pre">resolve_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.cli.resolve_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -299,6 +299,92 @@
 <dl class="py function">
 <dt id="terra.utils.new.main">
 <code class="sig-prename descclassname"><span class="pre">terra.utils.new.</span></code><code class="sig-name descname"><span class="pre">main</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.new.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-terra.utils.path">
+<span id="terra-utils-path-module"></span><h2>terra.utils.path module<a class="headerlink" href="#module-terra.utils.path" title="Permalink to this headline">¶</a></h2>
+<dl class="py data">
+<dt id="terra.utils.path.logger">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">logger</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;Logger</span> <span class="pre">terra.utils.path</span> <span class="pre">(WARNING)&gt;</span></em><a class="headerlink" href="#terra.utils.path.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terra has multiple zones, the “controller”, the “compute”, the “executor”, and
+in the case of celery, the “task_controller” zone. Each zone has the potential
+to have the same files represented by different paths; e.g. volume binds in
+containers.</p>
+<p>These utilities will help with handling those path translations.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="terra.utils.path.patch_volume">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">patch_volume</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linux'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.path.patch_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate path value according to volume_map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – Path value on the host</p></li>
+<li><p><strong>volume_map</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – List of tuples. Each tuple contains two strings of the form
+<code class="docutils literal notranslate"><span class="pre">(host_str,</span> <span class="pre">container_str)</span></code>.</p></li>
+<li><p><strong>container_platform</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – String specifying container platform, <code class="docutils literal notranslate"><span class="pre">linux</span></code> or <code class="docutils literal notranslate"><span class="pre">windows</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">linux</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Translated path value in the container. If translation is not possible,
+function returns the original value.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="terra.utils.path.pathlib_map">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">pathlib_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linux'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.path.pathlib_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate volume mapping from strings to pathlib objects. Source paths on
+the host system are instantiated as <a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#concrete-paths" title="(in Python v3.9)"><span>Concrete paths</span></a> allowing use of
+the <a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#pathlib.Path.resolve" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pathlib.Path.resolve()</span></code></a> function.  Paths in the container are
+instantiated as <a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#pure-paths" title="(in Python v3.9)"><span>Pure paths</span></a> of the appropriate type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volume_map</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – List of tuples. Each tuple contains two strings of the form
+<code class="docutils literal notranslate"><span class="pre">(host_str,</span> <span class="pre">container_str)</span></code>.</p></li>
+<li><p><strong>container_platform</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – String specifying container platform, <code class="docutils literal notranslate"><span class="pre">linux</span></code> or <code class="docutils literal notranslate"><span class="pre">windows</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">linux</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of tuples. Each tuple contains two pathlib objects of the form
+<code class="docutils literal notranslate"><span class="pre">(host_pathlib,</span> <span class="pre">container_pathlib)</span></code>. <code class="docutils literal notranslate"><span class="pre">host_pathlib</span></code> objects are
+<a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#concrete-paths" title="(in Python v3.9)"><span>Concrete paths</span></a> suitable for the current host OS.
+<code class="docutils literal notranslate"><span class="pre">container_pathlib</span></code> objects are <a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#pure-paths" title="(in Python v3.9)"><span>Pure paths</span></a> suitable
+for the specified <code class="docutils literal notranslate"><span class="pre">container_platform</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/pathlib.html#module-pathlib" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pathlib</span></code></a> objects</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="terra.utils.path.resolve_path">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">resolve_path</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.path.resolve_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="terra.utils.path.reverse_volume_map">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">reverse_volume_map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.path.reverse_volume_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="terra.utils.path.translate_paths_chain">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">translate_paths_chain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">maps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.path.translate_paths_chain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="terra.utils.path.translate_settings_paths">
+<code class="sig-prename descclassname"><span class="pre">terra.utils.path.</span></code><code class="sig-name descname"><span class="pre">translate_settings_paths</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">container_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linux'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.path.translate_settings_paths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

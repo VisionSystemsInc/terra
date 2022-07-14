@@ -20,6 +20,14 @@ terra.utils.new module
    :undoc-members:
    :show-inheritance:
 
+terra.utils.path module
+-----------------------
+
+.. automodule:: terra.utils.path
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.utils.workflow module
 ---------------------------
 
