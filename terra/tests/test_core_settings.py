@@ -14,7 +14,7 @@ from terra import settings
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
   ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder,
-  ExpandedString, LazySettings
+  ExpandedString, LazySettings, override_config
 )
 
 
@@ -659,9 +659,38 @@ class TestSettings(TestLoggerCase):
     self.assertDictEqual(pickled._wrapped, settings._wrapped)
     self.assertIsNot(pickled._wrapped, settings._wrapped)
 
+  @mock.patch('terra.core.settings.override_config',
+              # Nested
+              {"executor": {"num_workers": 12.1,
+                            "type": "ThreadPoolExecutor",
+                            # Value not set by global templates
+                            "foo": "bar",
+                            "unset": True},
+               # Check top level too
+               "resume": "yarp",
+               "foo": "bar",
+               # Nested that doesn't exist already
+               "a": {"b": {"c": 12}}})
+  def test_override_config(self):
+    # Make sure I include overrides that are setting that both are and aren't
+    # specified by the configure command
+    settings.configure({"executor": {"type": "DummyExecutor", "foo": "car"},
+                        "resume": "nope",
+                        "processing_dir": "/foo/bar"})
+    self.assertEqual(settings.resume, "yarp")
+    self.assertEqual(settings.executor.num_workers, 12.1)
+    self.assertEqual(settings.executor.type, "ThreadPoolExecutor")
+    self.assertEqual(settings.executor.foo, "bar")
+    self.assertEqual(settings.executor.unset, True)
+    self.assertEqual(settings.resume, "yarp")
+    self.assertEqual(settings.foo, "bar")
+    self.assertEqual(settings.processing_dir, "/foo/bar")
+    self.assertEqual(settings.compute.arch, "terra.compute.dummy")
+    self.assertEqual(settings.a.b.c, 12)
+
 
 class TestUnitTests(TestCase):
-  # Don't make this part of the TestSettings class
+  # Don't make this part of the TestSettings class, it's a TestLoggerCase
 
   # def test_fail(self):
   #   settings.configure({})
@@ -673,6 +702,14 @@ class TestUnitTests(TestCase):
             "initialized the settings. This side effect should be "
             "prevented by mocking out the settings._wrapped attribute. "
             "Otherwise unit tests can interfere with each other")
+
+  def last_test_override(self):
+    self.assertEqual(
+        override_config, {},
+        msg="If you are seeing this, one of the other unit tests has "
+            "changed the value of override_config. This side effect should be "
+            "prevented by mocking out the override_config. Otherwise unit "
+            "tests can interfere with each other")
 
 
 class TestSettingsClass(TestCase):

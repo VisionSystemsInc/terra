@@ -71,6 +71,7 @@ import socketserver
 import struct
 import select
 import pickle
+import atexit
 
 import terra
 from terra.core.exceptions import (
@@ -253,6 +254,8 @@ class _SetupTerraLogger():
     self.tmp_handler.setFormatter(self.default_formatter)
     self.root_logger.addHandler(self.tmp_handler)
 
+    atexit.register(self.cleanup_temp)
+
     # setup Buffers to use for replay after configure
     self.preconfig_stderr_handler = \
         logging.handlers.MemoryHandler(capacity=1000)
@@ -360,7 +363,7 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.preconfig_main_log_handler)
     self.root_logger.removeHandler(self.tmp_handler)
 
-    if os.environ.get('TERRA_DISABLE_SETTINGS_DUMP') != '1':
+    if not settings.terra.disable_settings_dump:
       os.makedirs(settings.settings_dir, exist_ok=True)
       settings_dump = os.path.join(
           settings.settings_dir,
@@ -417,6 +420,19 @@ class _SetupTerraLogger():
     terra.core.signals.logger_reconfigure.send(sender=self, **kwargs)
 
     self.set_level_and_formatter()
+
+  def cleanup_temp(self):
+    try:
+      # If the file exists and was not /dev/null
+      if self.tmp_file and self.tmp_file.name != os.devnull and \
+         os.path.exists(self.tmp_file.name):
+        if (not self.tmp_file.file.closed and self.tmp_file.tell() == 0) or \
+           (self.tmp_file.file.closed
+            and os.stat(self.tmp_file.name).st_size == 0):
+          # if the filesize is zero, delete it. No point in littering
+          os.unlink(self.tmp_file.name)
+    except AttributeError:
+      pass
 
 
 class TerraAddFilter(Filter):

@@ -224,7 +224,8 @@ class BaseCompute:
         sender._log_file = settings.logging.log_file
       else:
         sender._log_file = os.devnull
-      os.makedirs(settings.processing_dir, exist_ok=True)
+      if settings.processing_dir:
+        os.makedirs(settings.processing_dir, exist_ok=True)
       sender._log_file = open(sender._log_file, 'a')
       sender.main_log_handler = StreamHandler(stream=sender._log_file)
       sender.root_logger.addHandler(sender.main_log_handler)

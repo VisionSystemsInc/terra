@@ -56,7 +56,7 @@ class ContainerService(BaseService):
     env_volume_index += 1
 
     # This directory is used for both locking and setting dump, so don't
-    # if TERRA_DISABLE_SETTINGS_DUMP here
+    # if settings.terra.disable_settings_dump here
     os.makedirs(settings.settings_dir, exist_ok=True)
     self.env[f'{self.env["JUST_PROJECT_PREFIX"]}_'
              f'VOLUME_{env_volume_index}'] = \

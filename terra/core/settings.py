@@ -26,17 +26,17 @@ Designating the settings
 
 .. envvar:: TERRA_SETTINGS_FILE
 
-    When you run a Terra App, you have to tell it which settings you’re using.
+    When you run a Terra App, you have to tell it which settings you're using.
     Do this by using an environment variable, :envvar:`TERRA_SETTINGS_FILE`.
 
 Default settings
 ----------------
 
-A Terra settings file doesn’t have to define any settings if it doesn’t need
+A Terra settings file doesn't have to define any settings if it doesn't need
 to. Each setting has a sensible default value. These defaults live in
 :data:`global_templates`.
 
-Here’s the algorithm terra uses in compiling settings:
+Here's the algorithm terra uses in compiling settings:
 
 * Load settings from global_settings.py.
 * Load settings from the specified settings file, overriding the global
@@ -57,7 +57,7 @@ In your Terra apps, use settings by importing the object
     if settings.params.max_time > 15:
         # Do something
 
-Note that :data:`terra.settings` isn’t a module – it’s an object. So importing
+Note that :data:`terra.settings` isn't a module - it's an object. So importing
 individual settings is not possible:
 
 .. code-block: python
@@ -67,8 +67,8 @@ individual settings is not possible:
 Altering settings at runtime
 ----------------------------
 
-You shouldn’t alter settings in your applications at runtime. For example,
-don’t do this in an app:
+You shouldn't alter settings in your applications at runtime. For example,
+don't do this in an app:
 
 .. code-block:: python
 
@@ -87,7 +87,7 @@ Using settings without setting TERRA_SETTINGS_FILE
 
 In some cases, you might want to bypass the :envvar:`TERRA_SETTINGS_FILE`
 environment variable. For example, if you are writing a simple metadata parse
-app, you likely don’t want to have to set up an environment variable pointing
+app, you likely don't want to have to set up an environment variable pointing
 to a settings file for each file.
 
 In these cases, you can configure Terra's settings manually. Do this by
@@ -112,7 +112,7 @@ particular setting is not passed to
 later point, Terra will use the default setting value.
 
 Configuring Terra in this fashion is mostly necessary - and, indeed,
-recommended - when you’re using are running a trivial transient app in the
+recommended - when you're using are running a trivial transient app in the
 framework instead of a larger application.
 
 '''
@@ -229,7 +229,7 @@ def settings_dir(self):
   '''
   The default :func:`settings_property` for settings dumps as JSON files.
   The default is :func:`processing_dir/settings<processing_dir>`.
-  This directory is not used if ``TERRA_DISABLE_SETTINGS_DUMP`` is true.
+  This directory is not used if settings.terra.disable_settings_dump is true.
   '''
   return os.path.join(self.processing_dir, 'settings')
 
@@ -419,6 +419,7 @@ global_templates = [
       },
       'terra': {
         'config_file': config_file,
+        'disable_settings_dump': False,
         'lock_dir': lock_dir,
         # unlike other settings, this should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
@@ -597,12 +598,12 @@ class LazySettings(LazyObject):
     """
     settings_file = os.environ.get(ENVIRONMENT_VARIABLE)
     if not settings_file:
-      desc = ("setting %s" % name) if name else "settings"
+      desc = (f"setting {name}") if name else "settings"
       raise ImproperlyConfigured(
-          "Requested %s, but settings are not configured. "
-          "You must either define the environment variable %s "
-          "or call settings.configure() before accessing settings." %
-          (desc, ENVIRONMENT_VARIABLE))
+          f"Requested {desc}, but settings are not configured. "
+          "You must either define the environment variable "
+          f"{ENVIRONMENT_VARIABLE} or call settings.configure() before "
+          "accessing settings.")
     # Store in global variable :-\
     config_file.filename = settings_file
     self.configure(json_load(settings_file))
@@ -641,6 +642,7 @@ class LazySettings(LazyObject):
       raise ImproperlyConfigured('Settings already configured.')
     logger.debug2('Pre settings configure')
     self._wrapped = Settings(*args, **kwargs)
+    self._wrapped.update(override_config)
 
     for pattern, settings in global_templates:
       if nested_in_dict(pattern, self._wrapped):
@@ -848,6 +850,7 @@ class Settings(ObjectDict):
     self.update(backup)
 
 
+override_config = {}
 settings = LazySettings()
 '''LazySettings: The setting object to use through out all of terra'''
 
