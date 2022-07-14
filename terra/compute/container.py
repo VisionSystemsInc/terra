@@ -9,7 +9,7 @@ import json
 from terra import settings
 from terra.core.settings import TerraJSONEncoder
 from terra.compute import compute
-from terra.compute.utils import translate_settings_paths
+from terra.utils.path import translate_settings_paths
 from terra.compute.base import BaseService
 from terra.logger import getLogger
 logger = getLogger(__name__)

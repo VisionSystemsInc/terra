@@ -33,16 +33,13 @@ from os import environ as env
 from shlex import quote
 from subprocess import Popen
 import distutils.spawn
-import pathlib
 
 from vsi.tools.diff import dict_diff
-from vsi.tools.python import nested_patch
 
 from terra.core.utils import Handler
 import terra.core.signals
 from terra import settings
 import terra.compute.base
-from terra.core.settings import filename_suffixes
 from terra.logger import getLogger, DEBUG1
 logger = getLogger(__name__)
 
@@ -208,93 +205,3 @@ def just(*args, **kwargs):
   # Have to call bash for windows compatibility, no shebang support
   pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
   return pid
-
-
-def pathlib_map(volume_map, container_platform='linux'):
-  '''
-  Translate volume mapping from strings to pathlib objects. Source paths on
-  the host system are instantiated as :ref:`concrete-paths` allowing use of
-  the :meth:`pathlib.Path.resolve` function.  Paths in the container are
-  instantiated as :ref:`pure-paths` of the appropriate type.
-
-  Parameters
-  ----------
-  volume_map : :obj:`list` of :obj:`tuple` of :obj:`str`
-    List of tuples. Each tuple contains two strings of the form
-    ``(host_str, container_str)``.
-  container_platform : :obj:`str`, optional
-    String specifying container platform, ``linux`` or ``windows``.
-    Defaults to ``linux``
-
-  Returns
-  ----------
-  :obj:`list` of :obj:`tuple` of :obj:`pathlib` objects
-    List of tuples. Each tuple contains two pathlib objects of the form
-    ``(host_pathlib, container_pathlib)``. ``host_pathlib`` objects are
-    :ref:`concrete-paths` suitable for the current host OS.
-    ``container_pathlib`` objects are :ref:`pure-paths` suitable
-    for the specified ``container_platform``.
-
-  '''
-  pure_path = (pathlib.PureWindowsPath if container_platform == 'windows'
-               else pathlib.PurePosixPath)
-
-  return [(pathlib.Path(host_str).resolve(), pure_path(container_str))
-          for host_str, container_str in volume_map]
-
-
-def patch_volume(value, volume_map, container_platform='linux'):
-  '''
-  Translate path value according to volume_map.
-
-  Parameters
-  ----------
-  value : :obj:`str`
-    Path value on the host
-  volume_map : :obj:`list` of :obj:`tuple` of :obj:`str`
-    List of tuples. Each tuple contains two strings of the form
-    ``(host_str, container_str)``.
-  container_platform : :obj:`str`, optional
-    String specifying container platform, ``linux`` or ``windows``.
-    Defaults to ``linux``.
-
-  Returns
-  ----------
-  :obj:`str`
-    Translated path value in the container. If translation is not possible,
-    function returns the original value.
-
-  '''
-  if isinstance(value, str):
-    # If we don't expand before resolve, then both ${FOO} and ~/foo are treated
-    # as relative paths, and the PWD is prepended. Further, without proper
-    # expansion, the correct translations can't be made, so the variables need
-    # to be expanded here, and no later.
-    value_pathlib = pathlib.Path(os.path.expandvars(value))
-    value_pathlib = value_pathlib.expanduser().resolve()
-    volume_map_pathlib = pathlib_map(volume_map, container_platform)
-
-    for host_pathlib, container_pathlib in volume_map_pathlib:
-      try:
-        remainder = value_pathlib.relative_to(host_pathlib)
-      except ValueError:
-        continue
-      return str(container_pathlib / remainder)
-
-  return value
-
-
-def translate_settings_paths(container_config, volume_map,
-                             container_platform='linux'):
-
-  if os.name == "nt":  # pragma: no linux cover
-    logger.warning("Windows volume mapping is experimental.")
-
-  # Apply map translation to settings configuration
-  return nested_patch(
-      container_config,
-      lambda key, value: (isinstance(key, str)
-                          and any(key.endswith(pattern)
-                                  for pattern in filename_suffixes)),
-      lambda key, value: patch_volume(value, reversed(volume_map))
-  )

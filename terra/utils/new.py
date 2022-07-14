@@ -3,7 +3,7 @@ import os
 import ast
 from os import environ as env
 
-from terra.utils.cli import FullPaths, clean_path
+from terra.utils.cli import FullPaths, resolve_path
 
 
 class CreateTerraApp:
@@ -321,7 +321,7 @@ def get_parser():
                       required=True, help="The module path (i.e. python path "
                       "syntax) of the module you are setting up: e.g. "
                       "'foo.bar'")
-  parser.add_argument('--dir', default=clean_path('.'), type=str,
+  parser.add_argument('--dir', default=resolve_path('.'), type=str,
                       action=FullPaths, help="The directory to create the "
                       "template in. Defaults to the current directory")
   parser.add_argument('--name', default="do something", type=str,
