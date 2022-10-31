@@ -540,7 +540,7 @@ class LazyObject:
     '''Supported'''
     if self._wrapped is None:
       self._setup()
-    del(self._wrapped[name])
+    del self._wrapped[name]
 
   def __len__(self):
     '''Supported'''

@@ -35,9 +35,9 @@ class TestLazyObject(TestCase):
     with self.assertRaises(NotImplementedError):
       lazy['test'] = 12
     with self.assertRaises(NotImplementedError):
-      del(lazy.test)
+      del lazy.test
     with self.assertRaises(NotImplementedError):
-      del(lazy['test'])
+      del lazy['test']
     with self.assertRaises(NotImplementedError):
       iter(lazy)
     with self.assertRaises(NotImplementedError):
@@ -96,7 +96,7 @@ class TestLazyObject(TestCase):
     lazy.test = 17
     self.assertTrue(hasattr(lazy, 'test'))
     self.assertTrue(hasattr(lazy._wrapped, 'test'))
-    del(lazy.test)
+    del lazy.test
     self.assertFalse(hasattr(lazy, 'test'))
     self.assertFalse(hasattr(lazy._wrapped, 'test'))
 
@@ -104,7 +104,7 @@ class TestLazyObject(TestCase):
     lazy = LazyObject()
     lazy._wrapped = type("NewDict", (dict,), {})()
     with self.assertRaises(TypeError):
-      del(lazy._wrapped)
+      del lazy._wrapped
 
   def test_lazy_items(self):
     lazy = LazyObject()
@@ -115,7 +115,7 @@ class TestLazyObject(TestCase):
     self.assertEqual(lazy[1], 17)
     self.assertEqual(lazy[2], 33)
     self.assertEqual(len(lazy), 3)
-    del(lazy[0])
+    del lazy[0]
     self.assertEqual(lazy[0], 17)
     self.assertEqual(lazy[1], 33)
     self.assertEqual(len(lazy), 2)

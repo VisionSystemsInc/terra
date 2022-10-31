@@ -120,7 +120,7 @@ class TestResourceLock(TestResourceCase):
     with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
       filename = test._local.lock._lock_file
       self.assertExist(filename)
-      del(test)
+      del test
       self.assertNotExist(filename)
     self.assertIn('A test resource was not released. Cleaning up on delete.',
                   cm.output[0])
