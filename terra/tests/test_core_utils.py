@@ -151,9 +151,9 @@ class TestHandler(TestCase):
     handle._connection.foo = 11
     handle.bar = 15
 
-    del(handle.foo)
+    del handle.foo
     self.assertFalse(hasattr(handle._connection, 'foo'))
-    del(handle._connection.bar)
+    del handle._connection.bar
     self.assertFalse(hasattr(handle, 'bar'))
 
   def test_handler_autoconnect(self):
