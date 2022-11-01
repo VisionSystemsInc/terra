@@ -23,14 +23,21 @@ class Compute(BaseCompute):
             run {service_info.compose_service_name} \\
             {service_info.command}
     '''
+
+    # inject TERRA_SETTINGS_FILE into environment using SINGULARITYENV_*
+    # https://docs.sylabs.io/guides/3.7/user-guide/environment_and_metadata.html#environment-overview
+    # favor SINGULARITYENV_ for compatibility with "just singular-compose",
+    # which currently requires the argument after "run" to be the service name
+    service_info_env = service_info.env.copy()
+    service_info_env['SINGULARITYENV_TERRA_SETTINGS_FILE'] = \
+        f'{service_info_env["TERRA_SETTINGS_FILE"]}'
+
     pid = just("singular-compose",
                *sum([['--file', cf] for cf in service_info.compose_files], []),
                'run',
-               '--env', 'TERRA_SETTINGS_FILE='
-                        f'{service_info.env["TERRA_SETTINGS_FILE"]}',
                service_info.compose_service_name,
                *service_info.command + extra_arguments,
-               env=service_info.env)
+               env=service_info_env)
 
     if pid.wait() != 0:
       raise ServiceRunFailed()
