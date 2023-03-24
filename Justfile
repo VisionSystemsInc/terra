@@ -489,7 +489,7 @@ function terra_caseify()
         array_to_python_ast_list_of_strings terra_apps ${terra_apps[@]+"${terra_apps[@]}"}
         declare -x TERRA_APPS="${terra_apps}"
 
-        Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
+        TERRA_UNITTEST=1 Terra_Pipenv run pyinstaller --noconfirm "${TERRA_CWD}/freeze/terra.spec"
       done
       ;;
     #   local app_prefix
