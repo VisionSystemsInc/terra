@@ -483,7 +483,10 @@ function terra_caseify()
       local indirect
       local app_prefix
       local terra_apps
-      for app_prefix in TERRA_DSM; do #${TERRA_APP_PREFIXES[@]+"${TERRA_APP_PREFIXES[@]}"}; do
+      for app_prefix in ${TERRA_APP_PREFIXES[@]+"${TERRA_APP_PREFIXES[@]}"}; do
+        if [ "${app_prefix}" ==  "TERRA" ]; then
+          continue
+        fi
         indirect="${app_prefix}_APPS[@]"
         terra_apps=(${!indirect+"${!indirect}"})
         array_to_python_ast_list_of_strings terra_apps ${terra_apps[@]+"${terra_apps[@]}"}
