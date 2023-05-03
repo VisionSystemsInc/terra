@@ -39,6 +39,12 @@ function Terra_Pipenv()
   local answer_continue="${answer_continue-}"
 
   if [ "${TERRA_LOCAL-}" = "1" ]; then
+    if ! command -v pipenv &> /dev/null; then
+      add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/pipenv" --download
+      # since I want to continue without re-sourcing local.env
+      export PATH="${TERRA_CWD}/build/pipenv/bin:${PATH}"
+    fi
+
     if [ -n "${VIRTUAL_ENV+set}" ] || [ -n "${CONDA_DEFAULT_ENV+set}" ]; then
       echo "Warning: You appear to be in a virtual/conda env" >&2
       echo "This can interfere with terra and cause unexpected consequences" >&2
@@ -367,6 +373,8 @@ function terra_caseify()
       local conda_install
 
       : ${PYTHON_VERSION=3.7.13}
+      : ${PIPENV_VERSION=2023.4.29}
+      : ${VIRTUALENV_VERSION=20.23.0}
 
       parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
