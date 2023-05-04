@@ -361,7 +361,12 @@ function terra_caseify()
 
     terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
                        # don't call this directly
-      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
+      if [ -z "${PYTHON_EXE+set}" ]; then
+        local PYTHON_EXE=$(command -v python)
+      fi
+      local pipenv_args=(--python "${PYTHON_EXE}")
+
+      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv "${pipenv_args[@]}" sync ${@+"${@}"}
       extra_args=$#
       ;;
 
