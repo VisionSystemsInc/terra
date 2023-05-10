@@ -38,7 +38,7 @@ function Terra_Pipenv()
 {
   local answer_continue="${answer_continue-}"
 
-  if [[ ${TERRA_LOCAL-} == 1 ]]; then
+  if [ "${TERRA_LOCAL-}" = "1" ]; then
     if [ -n "${VIRTUAL_ENV+set}" ] || [ -n "${CONDA_DEFAULT_ENV+set}" ]; then
       echo "Warning: You appear to be in a virtual/conda env" >&2
       echo "This can interfere with terra and cause unexpected consequences" >&2
@@ -79,7 +79,7 @@ function terra_caseify()
       else
         justify build recipes-auto "${TERRA_CWD}/docker/"*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
-        if [[ ${TERRA_LOCAL-} == 0 ]]; then
+        if [ "${TERRA_LOCAL-}" = "0" ]; then
           COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         fi
         justify terra build-services
@@ -136,7 +136,7 @@ function terra_caseify()
       # 2 is the exit code of an error in arg parsing
       # 62 for any other terra error
       local JUST_IGNORE_EXIT_CODES='2$|^62'
-      if [[ ${JUST_RODEO-} == 1 ]]; then
+      if [ "${JUST_RODEO-}" = "1" ]; then
         extra_args=$#
         local app_name="${1}"
         shift 1
@@ -158,7 +158,7 @@ function terra_caseify()
       ;;
 
     terra_run-nopipenv) # Run terra command not in pipenv
-      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+      if [ "${TERRA_LOCAL-}" = "1" ]; then
         ${@+"${@}"}
       else
         Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${terra_service_name-terra} nopipenv ${@+"${@}"} || rv=$?
@@ -170,7 +170,7 @@ function terra_caseify()
 
       # node name (including node location)
       local node_name
-      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+      if [ "${TERRA_LOCAL-}" = "1" ]; then
         node_name="terra-local@%h"
       else
         node_name="terra-container@%h"
@@ -261,7 +261,7 @@ function terra_caseify()
       source "${VSI_COMMON_DIR}/linux/colors.bsh"
       echo "${YELLOW}Running ${GREEN}python ${YELLOW}Tests${NC}"
       JUST_IGNORE_EXIT_CODES=1
-      if [[ $# == 0 ]]; then
+      if [ "${#}" = "0" ]; then
         # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
         Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       else
@@ -312,7 +312,7 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
       justify git_submodule-update # For those users who don't remember!
-      if [[ ${TERRA_LOCAL-} == 0 ]]; then
+      if [ "${TERRA_LOCAL-}" = "0" ]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
         justify terra sync-pipenv
         justify terra build-services
@@ -355,7 +355,18 @@ function terra_caseify()
 
     terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
                        # don't call this directly
-      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv sync ${@+"${@}"}
+      if ! command -v pipenv &> /dev/null; then
+        add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/pipenv" --download
+        # since I want to continue without re-sourcing local.env
+        export PATH="${TERRA_CWD}/build/pipenv/bin:${PATH}"
+      fi
+
+      if [ -z "${PYTHON_EXE+set}" ]; then
+        local PYTHON_EXE=$(command -v python)
+      fi
+      local pipenv_args=(--python "${PYTHON_EXE}")
+
+      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv "${pipenv_args[@]}" sync ${@+"${@}"}
       extra_args=$#
       ;;
 
@@ -366,7 +377,9 @@ function terra_caseify()
       local download_conda=0
       local conda_install
 
-      : ${PYTHON_VERSION=3.7.13}
+      : ${PYTHON_VERSION=${TERRA_PYTHON_VERSION:-3.8.16}}
+      : ${PIPENV_VERSION=${TERRA_PIPENV_VERSION:-2023.4.29}}
+      : ${VIRTUALENV_VERSION=${TERRA_VIRTUALENV_VERSION:-20.23.0}}
 
       parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
@@ -431,7 +444,7 @@ function terra_caseify()
       # Make sure python is 3.7 or newer
       local python_version="$("${python_exe}" --version 2>&1 | awk '{print $2}')"
       source "${VSI_COMMON_DIR}/linux/requirements.bsh"
-      if ! meet_requirements "${python_version}" '>=3.7' '<3.10'; then
+      if ! meet_requirements "${python_version}" '>=3.7'; then
         echo "Python version ${python_version} does not meet the expected requirements" >&2
         echo "Consider adding the --download flag" >&2
         read -srn1 -d '' -p "Press any key to continue, or Ctrl+C to stop"
@@ -471,7 +484,7 @@ function terra_caseify()
       [ "${answer_clean_all}" == "0" ] && return 1
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
       COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker-compose clean terra-redis
-      if [[ ${TERRA_LOCAL-} == 1 ]]; then
+      if [ "${TERRA_LOCAL-}" = "1" ]; then
         Terra_Pipenv --rm
       fi
       ;;
