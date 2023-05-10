@@ -377,9 +377,9 @@ function terra_caseify()
       local download_conda=0
       local conda_install
 
-      : ${PYTHON_VERSION=3.8.16}
-      : ${PIPENV_VERSION=2023.4.29}
-      : ${VIRTUALENV_VERSION=20.23.0}
+      : ${PYTHON_VERSION=${TERRA_PYTHON_VERSION:-3.8.16}}
+      : ${PIPENV_VERSION=${TERRA_PIPENV_VERSION:-2023.4.29}}
+      : ${VIRTUALENV_VERSION=${TERRA_VIRTUALENV_VERSION:-20.23.0}}
 
       parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
 
