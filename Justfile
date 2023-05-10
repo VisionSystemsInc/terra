@@ -444,7 +444,7 @@ function terra_caseify()
       # Make sure python is 3.7 or newer
       local python_version="$("${python_exe}" --version 2>&1 | awk '{print $2}')"
       source "${VSI_COMMON_DIR}/linux/requirements.bsh"
-      if ! meet_requirements "${python_version}" '>=3.7' '<3.10'; then
+      if ! meet_requirements "${python_version}" '>=3.7'; then
         echo "Python version ${python_version} does not meet the expected requirements" >&2
         echo "Consider adding the --download flag" >&2
         read -srn1 -d '' -p "Press any key to continue, or Ctrl+C to stop"
