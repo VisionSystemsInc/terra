@@ -49,3 +49,4 @@ class ThreadPoolExecutor(concurrent.futures.ThreadPoolExecutor,
     future = super().submit(fn, *args, **kwargs)
     future.add_done_callback(auto_clear_exception_frames)
     return future
+  submit.__doc__ = ""
