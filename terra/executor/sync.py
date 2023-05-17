@@ -1,4 +1,5 @@
 from threading import Lock
+from traceback import clear_frames
 
 from terra.executor.base import BaseExecutor, BaseFuture
 
@@ -30,6 +31,7 @@ class SyncExecutor(BaseExecutor):
       try:
         result = fn(*args, **kwargs)
       except BaseException as e:
+        clear_frames(e)
         f.set_exception(e)
       else:
         f.set_result(result)

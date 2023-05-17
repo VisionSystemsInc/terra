@@ -1,9 +1,16 @@
 import concurrent.futures
+import traceback
 
 import terra.executor.base
 import terra.core.settings
 
 __all__ = ['ThreadPoolExecutor']
+
+
+def auto_clear_exception_frames(future):
+  exc = future.exception()
+  if exc is not None:
+    traceback.clear_frames(exc.__traceback__)
 
 
 class ThreadPoolExecutor(concurrent.futures.ThreadPoolExecutor,
@@ -37,3 +44,8 @@ class ThreadPoolExecutor(concurrent.futures.ThreadPoolExecutor,
                       terra.core.settings.LazySettingsThreaded):
       terra.core.settings.LazySettingsThreaded.downcast(terra.settings)
     super().__init__(*args, **kwargs)
+
+  def submit(self, fn, *args, **kwargs):
+    future = super().submit(fn, *args, **kwargs)
+    future.add_done_callback(auto_clear_exception_frames)
+    return future
