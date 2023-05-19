@@ -282,7 +282,7 @@ class Resource:
     if not self.is_locked:
       raise ValueError('Release called with no lock acquired')
 
-    if not force and self._local.lock._lock_counter > 1:
+    if not force and self._local.lock.lock_counter > 1:
       self._local.lock.release()
       return
 
