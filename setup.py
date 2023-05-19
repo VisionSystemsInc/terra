@@ -14,6 +14,6 @@ setup(name="terra",
         "jstyleson",
         # I use signal and task from celery, no matter what
         "celery",
-        "filelock"
+        "filelock>=3.12"
       ]
 )
