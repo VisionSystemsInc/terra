@@ -4,6 +4,7 @@ from concurrent.futures import as_completed
 from multiprocessing import Process, get_context
 import platform
 from unittest import mock
+from time import sleep
 
 import filelock
 from vsi.tools.dir_util import is_dir_empty
@@ -401,7 +402,7 @@ def acquire(name, i, data):
   l1 = data[name].acquire()
   l2 = data[name].acquire()
 
-  import time; time.sleep(0.1)
+  sleep(0.1)
 
   # There is a chance that the same thread/process will be reused because of
   # how concurrent.futures optimizes, but i is unique, and used to prevent
@@ -419,8 +420,6 @@ def acquire(name, i, data):
 
 def simple_acquire(name, data):
   rv = data[name].acquire()
-  # import time
-  # time.sleep(0.1)
   return rv
 
 
@@ -578,10 +577,12 @@ class TestStrayResources(TestCase):
     # mock patches or haven't kept any references around in global persistence
     self.assertSetEqual(Resource._resources, set())
 
+
 class ProcessPoolExecutorSpawn(ProcessPoolExecutor):
   def __init__(self, *args, **kwargs):
     kwargs['mp_context'] = get_context('spawn')
     return super().__init__(*args, **kwargs)
+
 
 class TestResourceProcessSpawn(TestResourceProcess):
   # Test for multiprocess spwan case
