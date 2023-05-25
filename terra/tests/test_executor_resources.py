@@ -394,7 +394,7 @@ class TestResourceSoftLockSelection(TestResourceCase):
 # Cannot be member of test case class, because TestCase is not serializable.
 # Somewhere in testcase's _outcome "cannot serialize '_io.TextIOWrapper'
 # object" error occurs
-def acquire(name, i, data, count):
+def acquire(name, i, data):
   # This function is meant to be called once for a worker, and has some hacks
   # to guarantee simulation of that. If you are adding another test, you
   # probably don't want to use this function, so copy it and make a similar one
