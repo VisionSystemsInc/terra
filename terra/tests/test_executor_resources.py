@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import as_completed
 
-from multiprocessing import Process
+from multiprocessing import Process, get_context
 import platform
 from unittest import mock
 
@@ -391,22 +391,17 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertTrue(is_dir_empty(lock_dir1))
 
 
-# tearDown will auto clear this:
-# 1) preventing inter-test name collisions
-# 2) stopping strong refs of resources from being kept around
-
-data = {}
-
-
 # Cannot be member of test case class, because TestCase is not serializable.
 # Somewhere in testcase's _outcome "cannot serialize '_io.TextIOWrapper'
 # object" error occurs
-def acquire(name, i):
+def acquire(name, i, data, count):
   # This function is meant to be called once for a worker, and has some hacks
   # to guarantee simulation of that. If you are adding another test, you
   # probably don't want to use this function, so copy it and make a similar one
   l1 = data[name].acquire()
   l2 = data[name].acquire()
+
+  import time; time.sleep(0.1)
 
   # There is a chance that the same thread/process will be reused because of
   # how concurrent.futures optimizes, but i is unique, and used to prevent
@@ -422,7 +417,7 @@ def acquire(name, i):
   return (l1, l2)
 
 
-def simple_acquire(name):
+def simple_acquire(name, data):
   rv = data[name].acquire()
   # import time
   # time.sleep(0.1)
@@ -436,15 +431,20 @@ class TestResourceMulti:
 
   def setUp(self):
     self.config.executor = {'type': self.name}
+    self.data = {}
     super().setUp()
 
   def tearDown(self):
-    data.clear()
+    self.data.clear()
     super().tearDown()
 
   def test_acquire(self):
     # test acquiring in parallel
-    data[self.name] = Resource(self.name, 2, 1)
+
+    # tearDown will auto clear this:
+    # 1) preventing inter-test name collisions
+    # 2) stopping strong refs of resources from being kept around
+    self.data[self.name] = Resource(self.name, 2, 1)
 
     futures = []
     results = []
@@ -452,7 +452,7 @@ class TestResourceMulti:
 
     with self.Executor(max_workers=3) as executor:
       for i in range(3):
-        futures.append(executor.submit(acquire, self.name, i))
+        futures.append(executor.submit(acquire, self.name, i, self.data))
 
       for future in as_completed(futures):
         try:
@@ -471,18 +471,18 @@ class TestResourceMulti:
     # test. Test to see that locks are indeed cleaned up automatically in a
     # way that means one executor after the other will not interfere with each
     # other.
-    data[self.name] = Resource(self.name, 1, 1)
+    self.data[self.name] = Resource(self.name, 1, 1)
     for _ in range(2):
       futures = []
       with self.Executor(max_workers=1) as executor:
-        futures.append(executor.submit(simple_acquire, self.name))
+        futures.append(executor.submit(simple_acquire, self.name, self.data))
 
         for future in as_completed(futures):
           future.result()
 
     # double check resource was freed
-    data[self.name].acquire()
-    data[self.name].release()
+    self.data[self.name].acquire()
+    self.data[self.name].release()
 
   def test_local_storage_type(self):
     # test the types are right
@@ -577,3 +577,15 @@ class TestStrayResources(TestCase):
     # run. Passing this means that every test that has run has used the correct
     # mock patches or haven't kept any references around in global persistence
     self.assertSetEqual(Resource._resources, set())
+
+class ProcessPoolExecutorSpawn(ProcessPoolExecutor):
+  def __init__(self, *args, **kwargs):
+    kwargs['mp_context'] = get_context('spawn')
+    return super().__init__(*args, **kwargs)
+
+class TestResourceProcessSpawn(TestResourceProcess):
+  # Test for multiprocess spwan case
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutorSpawn
+    self.name = "terra.tests.test_executor_resources.ProcessPoolExecutorSpawn"
