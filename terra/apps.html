@@ -1,90 +1,48 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Terra Apps &mdash; Terra 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Compute" href="compute.html" />
     <link rel="prev" title="Terra Settings" href="settings.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Terra
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">What is Terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="settings.html">Terra Settings</a></li>
@@ -102,73 +60,32 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Terra</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Terra Apps</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Terra Apps</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/terra/apps.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="terra-apps">
-<h1>Terra Apps<a class="headerlink" href="#terra-apps" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="terra-apps">
+<h1>Terra Apps<a class="headerlink" href="#terra-apps" title="Permalink to this heading"></a></h1>
 <p>An app in terra consists of 6 layers</p>
 <ol class="arabic simple">
 <li><p>A CLI is typically a <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code>. The main goal of an CLI is to setup settings and call the next layer, a workflow.</p></li>
@@ -229,13 +146,13 @@
 <blockquote>
 <div><p class="rubric">Example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of calling a service runner directly: example.service1</span>
-python -m example.service1
+python<span class="w"> </span>-m<span class="w"> </span>example.service1
 
 <span class="c1"># Example of calling using a virtualenv</span>
-pipenv run python -m example.service1
+pipenv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>example.service1
 
 <span class="c1"># Example of calling using a docker</span>
-docker run -it --rm -v /data/stuff:/images service1_image pipenv run python -m example.service1
+docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>-v<span class="w"> </span>/data/stuff:/images<span class="w"> </span>service1_image<span class="w"> </span>pipenv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>example.service1
 </pre></div>
 </div>
 </div></blockquote>
@@ -243,8 +160,8 @@ docker run -it --rm -v /data/stuff:/images service1_image pipenv run python -m e
 <li><p>The “service runner” executed by the “service definition” is the actual algorithm that gets run. It must use the settings to get any paths to files or directories it will access, so that terra can perform any necessary <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">path translations</span></a>. Technically the service runner does not need to be python, as the primary interface is a json file, environment variables, and a single CLI call. But then non-python apps would not be able to take full advantage of the executor layer.</p></li>
 <li><p>The final terra app layer is the “task”. If there are functions that can be called independently in parallel, <a class="reference internal" href="executor.html#executor"><span class="std std-ref">tasks</span></a> offer a single abstract API that will run your function in parallel.</p></li>
 </ol>
-<div class="section" id="adding-apps">
-<h2>Adding Apps<a class="headerlink" href="#adding-apps" title="Permalink to this headline">¶</a></h2>
+<section id="adding-apps">
+<h2>Adding Apps<a class="headerlink" href="#adding-apps" title="Permalink to this heading"></a></h2>
 <p>The main repo should be an app repo and include terra as a submodule. This will include vsi_common in terra, typically <code class="docutils literal notranslate"><span class="pre">{terra</span> <span class="pre">app}/external/terra/external/vsi_common</span></code>.</p>
 <p>The app should add Terra’s <code class="docutils literal notranslate"><span class="pre">Justfile</span></code> as a plugin.</p>
 <p>In order for the app to show up in the terra docker (not currently used), the app’s settings file should include</p>
@@ -255,68 +172,51 @@ docker run -it --rm -v /data/stuff:/images service1_image pipenv run python -m e
 <span class="nv">TERRA_APP2_DIR</span><span class="o">=</span><span class="si">${</span><span class="nv">TERRA_APP2_CWD</span><span class="si">}</span>
 <span class="nv">TERRA_APP2_DIR_DOCKER</span><span class="o">=</span>/src2
 
-set_array_default TERRA_TERRA_VOLUMES <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TERRA_APP1_DIR</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">TERRA_APP1_DIR_DOCKER</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="si">${</span><span class="nv">TERRA_APP2_DIR</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">TERRA_APP2_DIR_DOCKER</span><span class="si">}</span><span class="s2">&quot;</span>
+set_array_default<span class="w"> </span>TERRA_TERRA_VOLUMES<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TERRA_APP1_DIR</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">TERRA_APP1_DIR_DOCKER</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TERRA_APP2_DIR</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">TERRA_APP2_DIR_DOCKER</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="nv">TERRA_APP_PREFIXES</span><span class="o">+=(</span>TERRA_APP1 TERRA_APP2<span class="o">)</span>
-: <span class="si">${</span><span class="nv">TERRA_APP1_JUST_SETTINGS</span><span class="p">=</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}}</span>
+<span class="nv">TERRA_APP_PREFIXES</span><span class="o">+=(</span>TERRA_APP1<span class="w"> </span>TERRA_APP2<span class="o">)</span>
+:<span class="w"> </span><span class="si">${</span><span class="nv">TERRA_APP1_JUST_SETTINGS</span><span class="p">=</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}}</span>
 
 <span class="c1"># Optional</span>
 <span class="c1"># : ${TERRA_CELERY_MAIN_NAME=appname}</span>
 
-set_array_default <span class="nv">TERRA_CELERY_INCLUDE</span><span class="o">=(</span>app1.tasks app2.tasks<span class="o">)</span>
-array_to_python_ast_list_of_strings TERRA_CELERY_INCLUDE <span class="si">${</span><span class="nv">TERRA_CELERY_INCLUDE</span><span class="p">[@]+</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TERRA_CELERY_INCLUDE</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="si">}</span>
-: <span class="si">${</span><span class="nv">TERRA_CELERY_SERVICE</span><span class="p">=app1_celery</span><span class="si">}</span>
+set_array_default<span class="w"> </span><span class="nv">TERRA_CELERY_INCLUDE</span><span class="o">=(</span>app1.tasks<span class="w"> </span>app2.tasks<span class="o">)</span>
+array_to_python_ast_list_of_strings<span class="w"> </span>TERRA_CELERY_INCLUDE<span class="w"> </span><span class="si">${</span><span class="nv">TERRA_CELERY_INCLUDE</span><span class="p">[@]+</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">TERRA_CELERY_INCLUDE</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="si">}</span>
+:<span class="w"> </span><span class="si">${</span><span class="nv">TERRA_CELERY_SERVICE</span><span class="p">=app1_celery</span><span class="si">}</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="compute.html" class="btn btn-neutral float-right" title="Compute" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="settings.html" class="btn btn-neutral float-left" title="Terra Settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compute.html" class="btn btn-neutral float-right" title="Compute" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, VSI.
-
-    </p>
+    <p>&#169; Copyright 2021, VSI.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

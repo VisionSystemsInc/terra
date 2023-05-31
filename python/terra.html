@@ -1,90 +1,48 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>terra package &mdash; Terra 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="terra.compute package" href="terra.compute.html" />
     <link rel="prev" title="terra" href="modules.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Terra
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../terra/getting_started.html">What is Terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../terra/settings.html">Terra Settings</a></li>
@@ -107,11 +65,35 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-terra.logger">terra.logger module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger.DEBUG1"><code class="docutils literal notranslate"><span class="pre">DEBUG1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger.DEBUG2"><code class="docutils literal notranslate"><span class="pre">DEBUG2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger.DEBUG3"><code class="docutils literal notranslate"><span class="pre">DEBUG3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger.DEBUG4"><code class="docutils literal notranslate"><span class="pre">DEBUG4</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger.Logger"><code class="docutils literal notranslate"><span class="pre">Logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger._SetupTerraLogger"><code class="docutils literal notranslate"><span class="pre">_SetupTerraLogger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger._acquireLock"><code class="docutils literal notranslate"><span class="pre">_acquireLock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger._checkLevel"><code class="docutils literal notranslate"><span class="pre">_checkLevel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger._demoteLevel"><code class="docutils literal notranslate"><span class="pre">_demoteLevel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger._releaseLock"><code class="docutils literal notranslate"><span class="pre">_releaseLock()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.logger.getLogger"><code class="docutils literal notranslate"><span class="pre">getLogger()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-terra.task">terra.task module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-terra.workflow">terra.workflow module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-terra">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-terra.task">terra.task module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#terra.task.TerraTask"><code class="docutils literal notranslate"><span class="pre">TerraTask</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.task.shared_task"><code class="docutils literal notranslate"><span class="pre">shared_task()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.task.subprocess"><code class="docutils literal notranslate"><span class="pre">subprocess()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-terra.workflow">terra.workflow module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#terra.workflow.BaseWorkflow"><code class="docutils literal notranslate"><span class="pre">BaseWorkflow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.workflow.PipelineWorkflow"><code class="docutils literal notranslate"><span class="pre">PipelineWorkflow</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#terra.workflow.SingleWorkflow"><code class="docutils literal notranslate"><span class="pre">SingleWorkflow</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-terra">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#terra.settings"><code class="docutils literal notranslate"><span class="pre">settings</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -119,94 +101,151 @@
 <li class="toctree-l1"><a class="reference internal" href="../terra/contributing.html">Contributing Guidlines</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Terra</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="modules.html">terra</a> &raquo;</li>
-        
-      <li>terra package</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">terra</a></li>
+      <li class="breadcrumb-item active">terra package</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/python/terra.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="terra-package">
-<h1>terra package<a class="headerlink" href="#terra-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="terra-package">
+<h1>terra package<a class="headerlink" href="#terra-package" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="terra.compute.html">terra.compute package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="terra.compute.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.base">terra.compute.base module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.container">terra.compute.container module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.docker">terra.compute.docker module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.dummy">terra.compute.dummy module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.singularity">terra.compute.singularity module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.utils">terra.compute.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.virtualenv">terra.compute.virtualenv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.base">terra.compute.base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.base.AlreadyRegisteredException"><code class="docutils literal notranslate"><span class="pre">AlreadyRegisteredException</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute"><code class="docutils literal notranslate"><span class="pre">BaseCompute</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute.configuration_map_service"><code class="docutils literal notranslate"><span class="pre">BaseCompute.configuration_map_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute.configure_logger"><code class="docutils literal notranslate"><span class="pre">BaseCompute.configure_logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute.get_volume_map"><code class="docutils literal notranslate"><span class="pre">BaseCompute.get_volume_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute.reconfigure_logger"><code class="docutils literal notranslate"><span class="pre">BaseCompute.reconfigure_logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute.register"><code class="docutils literal notranslate"><span class="pre">BaseCompute.register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseCompute.run_service"><code class="docutils literal notranslate"><span class="pre">BaseCompute.run_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService"><code class="docutils literal notranslate"><span class="pre">BaseService</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService._env_array"><code class="docutils literal notranslate"><span class="pre">BaseService._env_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService._validate_volume"><code class="docutils literal notranslate"><span class="pre">BaseService._validate_volume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService.add_volume"><code class="docutils literal notranslate"><span class="pre">BaseService.add_volume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService.post_run"><code class="docutils literal notranslate"><span class="pre">BaseService.post_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService.pre_run"><code class="docutils literal notranslate"><span class="pre">BaseService.pre_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.base.BaseService.volumes"><code class="docutils literal notranslate"><span class="pre">BaseService.volumes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.base.ServiceRunFailed"><code class="docutils literal notranslate"><span class="pre">ServiceRunFailed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.container">terra.compute.container module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.container.ContainerService"><code class="docutils literal notranslate"><span class="pre">ContainerService</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.container.ContainerService.add_volume"><code class="docutils literal notranslate"><span class="pre">ContainerService.add_volume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.container.ContainerService.post_run"><code class="docutils literal notranslate"><span class="pre">ContainerService.post_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.container.ContainerService.pre_run"><code class="docutils literal notranslate"><span class="pre">ContainerService.pre_run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.docker">terra.compute.docker module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.docker.Compute"><code class="docutils literal notranslate"><span class="pre">Compute</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.docker.Compute.config_service"><code class="docutils literal notranslate"><span class="pre">Compute.config_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.docker.Compute.configuration_map_service"><code class="docutils literal notranslate"><span class="pre">Compute.configuration_map_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.docker.Compute.get_volume_map"><code class="docutils literal notranslate"><span class="pre">Compute.get_volume_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.docker.Compute.run_service"><code class="docutils literal notranslate"><span class="pre">Compute.run_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.docker.Service"><code class="docutils literal notranslate"><span class="pre">Service</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.docker._docker_volume_flags_re"><code class="docutils literal notranslate"><span class="pre">_docker_volume_flags_re</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.docker.docker_internal_volume_re"><code class="docutils literal notranslate"><span class="pre">docker_internal_volume_re</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.docker.docker_volume_re"><code class="docutils literal notranslate"><span class="pre">docker_volume_re</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.dummy">terra.compute.dummy module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Compute"><code class="docutils literal notranslate"><span class="pre">Compute</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Compute.create_service"><code class="docutils literal notranslate"><span class="pre">Compute.create_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Compute.remove_service"><code class="docutils literal notranslate"><span class="pre">Compute.remove_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Compute.run_service"><code class="docutils literal notranslate"><span class="pre">Compute.run_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Compute.start_service"><code class="docutils literal notranslate"><span class="pre">Compute.start_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Compute.stop_service"><code class="docutils literal notranslate"><span class="pre">Compute.stop_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Service"><code class="docutils literal notranslate"><span class="pre">Service</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Service.post_run"><code class="docutils literal notranslate"><span class="pre">Service.post_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.dummy.Service.pre_run"><code class="docutils literal notranslate"><span class="pre">Service.pre_run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.singularity">terra.compute.singularity module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.singularity.Compute"><code class="docutils literal notranslate"><span class="pre">Compute</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.singularity.Compute.config_service"><code class="docutils literal notranslate"><span class="pre">Compute.config_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.singularity.Compute.configuration_map_service"><code class="docutils literal notranslate"><span class="pre">Compute.configuration_map_service()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.singularity.Compute.get_volume_map"><code class="docutils literal notranslate"><span class="pre">Compute.get_volume_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.singularity.Compute.run_service"><code class="docutils literal notranslate"><span class="pre">Compute.run_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.singularity.Service"><code class="docutils literal notranslate"><span class="pre">Service</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.utils">terra.compute.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.utils.ComputeHandler"><code class="docutils literal notranslate"><span class="pre">ComputeHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.utils.ComputeHandler._connect_backend"><code class="docutils literal notranslate"><span class="pre">ComputeHandler._connect_backend()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.utils.compute"><code class="docutils literal notranslate"><span class="pre">compute</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.utils.get_default_service_class"><code class="docutils literal notranslate"><span class="pre">get_default_service_class()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.utils.just"><code class="docutils literal notranslate"><span class="pre">just()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.utils.load_service"><code class="docutils literal notranslate"><span class="pre">load_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute.virtualenv">terra.compute.virtualenv module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.virtualenv.Compute"><code class="docutils literal notranslate"><span class="pre">Compute</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.virtualenv.Compute.add_volume"><code class="docutils literal notranslate"><span class="pre">Compute.add_volume()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.virtualenv.Compute.run_service"><code class="docutils literal notranslate"><span class="pre">Compute.run_service()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.compute.html#terra.compute.virtualenv.Service"><code class="docutils literal notranslate"><span class="pre">Service</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.virtualenv.Service.post_run"><code class="docutils literal notranslate"><span class="pre">Service.post_run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.compute.html#terra.compute.virtualenv.Service.pre_run"><code class="docutils literal notranslate"><span class="pre">Service.pre_run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="terra.compute.html#module-terra.compute">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="terra.core.html">terra.core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="terra.core.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.exceptions">terra.core.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.exceptions">terra.core.exceptions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.ConfigurationWarning"><code class="docutils literal notranslate"><span class="pre">ConfigurationWarning</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.ImproperlyConfigured"><code class="docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.NO_STACK_EXCEPTIONS"><code class="docutils literal notranslate"><span class="pre">NO_STACK_EXCEPTIONS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.NoStackException"><code class="docutils literal notranslate"><span class="pre">NoStackException</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.NoStackValueError"><code class="docutils literal notranslate"><span class="pre">NoStackValueError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.setup_logging_exception_hook"><code class="docutils literal notranslate"><span class="pre">setup_logging_exception_hook()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.exceptions.setup_logging_ipython_exception_hook"><code class="docutils literal notranslate"><span class="pre">setup_logging_ipython_exception_hook()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.settings">terra.core.settings module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="terra.core.html#the-basics">The basics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.core.html#designating-the-settings">Designating the settings</a></li>
@@ -215,10 +254,109 @@
 <li class="toctree-l3"><a class="reference internal" href="terra.core.html#altering-settings-at-runtime">Altering settings at runtime</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.core.html#available-settings">Available settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="terra.core.html#using-settings-without-setting-terra-settings-file">Using settings without setting TERRA_SETTINGS_FILE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.ENVIRONMENT_VARIABLE"><code class="docutils literal notranslate"><span class="pre">ENVIRONMENT_VARIABLE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.ExpandedString"><code class="docutils literal notranslate"><span class="pre">ExpandedString</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject"><code class="docutils literal notranslate"><span class="pre">LazyObject</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__contains__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__contains__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__delattr__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__delattr__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__delitem__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__delitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__dir__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__dir__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__getattr__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__getattr__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__getitem__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__iter__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__len__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__len__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__setattr__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__setattr__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject.__setitem__"><code class="docutils literal notranslate"><span class="pre">LazyObject.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazyObject._setup"><code class="docutils literal notranslate"><span class="pre">LazyObject._setup()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.signals">terra.core.signals module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.utils">terra.core.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettings"><code class="docutils literal notranslate"><span class="pre">LazySettings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettings._setup"><code class="docutils literal notranslate"><span class="pre">LazySettings._setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettings.add_templates"><code class="docutils literal notranslate"><span class="pre">LazySettings.add_templates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettings.configure"><code class="docutils literal notranslate"><span class="pre">LazySettings.configure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettings.configured"><code class="docutils literal notranslate"><span class="pre">LazySettings.configured</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettingsThreaded"><code class="docutils literal notranslate"><span class="pre">LazySettingsThreaded</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettingsThreaded.__setattr__"><code class="docutils literal notranslate"><span class="pre">LazySettingsThreaded.__setattr__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.LazySettingsThreaded.downcast"><code class="docutils literal notranslate"><span class="pre">LazySettingsThreaded.downcast()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.ObjectDict"><code class="docutils literal notranslate"><span class="pre">ObjectDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.ObjectDict.__dir__"><code class="docutils literal notranslate"><span class="pre">ObjectDict.__dir__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.ObjectDict.__getattr__"><code class="docutils literal notranslate"><span class="pre">ObjectDict.__getattr__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.ObjectDict.__setattr__"><code class="docutils literal notranslate"><span class="pre">ObjectDict.__setattr__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.ObjectDict.update"><code class="docutils literal notranslate"><span class="pre">ObjectDict.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.Settings.__getattr__"><code class="docutils literal notranslate"><span class="pre">Settings.__getattr__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.TerraJSONEncoder"><code class="docutils literal notranslate"><span class="pre">TerraJSONEncoder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.TerraJSONEncoder.default"><code class="docutils literal notranslate"><span class="pre">TerraJSONEncoder.default()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.TerraJSONEncoder.dumps"><code class="docutils literal notranslate"><span class="pre">TerraJSONEncoder.dumps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.settings.TerraJSONEncoder.serializableSettings"><code class="docutils literal notranslate"><span class="pre">TerraJSONEncoder.serializableSettings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.config_file"><code class="docutils literal notranslate"><span class="pre">config_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.filename_suffixes"><code class="docutils literal notranslate"><span class="pre">filename_suffixes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.global_templates"><code class="docutils literal notranslate"><span class="pre">global_templates</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.json_include_suffixes"><code class="docutils literal notranslate"><span class="pre">json_include_suffixes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.json_load"><code class="docutils literal notranslate"><span class="pre">json_load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.lock_dir"><code class="docutils literal notranslate"><span class="pre">lock_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.log_file"><code class="docutils literal notranslate"><span class="pre">log_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.logging_hostname"><code class="docutils literal notranslate"><span class="pre">logging_hostname()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.logging_listen_address"><code class="docutils literal notranslate"><span class="pre">logging_listen_address()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.need_to_set_virtualenv_dir"><code class="docutils literal notranslate"><span class="pre">need_to_set_virtualenv_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.processing_dir"><code class="docutils literal notranslate"><span class="pre">processing_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.settings"><code class="docutils literal notranslate"><span class="pre">settings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.settings_dir"><code class="docutils literal notranslate"><span class="pre">settings_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.settings_property"><code class="docutils literal notranslate"><span class="pre">settings_property()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.status_file"><code class="docutils literal notranslate"><span class="pre">status_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.stdin_istty"><code class="docutils literal notranslate"><span class="pre">stdin_istty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.terra_uuid"><code class="docutils literal notranslate"><span class="pre">terra_uuid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.settings.unittest"><code class="docutils literal notranslate"><span class="pre">unittest()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.signals">terra.core.signals module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal"><code class="docutils literal notranslate"><span class="pre">Signal</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal._live_receivers"><code class="docutils literal notranslate"><span class="pre">Signal._live_receivers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.connect"><code class="docutils literal notranslate"><span class="pre">Signal.connect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.disconnect"><code class="docutils literal notranslate"><span class="pre">Signal.disconnect()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.has_listeners"><code class="docutils literal notranslate"><span class="pre">Signal.has_listeners()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.receivers"><code class="docutils literal notranslate"><span class="pre">Signal.receivers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.send"><code class="docutils literal notranslate"><span class="pre">Signal.send()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.send_robust"><code class="docutils literal notranslate"><span class="pre">Signal.send_robust()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.sender_receivers_cache"><code class="docutils literal notranslate"><span class="pre">Signal.sender_receivers_cache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.signals.Signal.use_caching"><code class="docutils literal notranslate"><span class="pre">Signal.use_caching</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.signals.logger_configure"><code class="docutils literal notranslate"><span class="pre">logger_configure</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.signals.logger_reconfigure"><code class="docutils literal notranslate"><span class="pre">logger_reconfigure</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.signals.post_settings_configured"><code class="docutils literal notranslate"><span class="pre">post_settings_configured</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.signals.post_settings_context"><code class="docutils literal notranslate"><span class="pre">post_settings_context</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.signals.receiver"><code class="docutils literal notranslate"><span class="pre">receiver()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core.utils">terra.core.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.utils.ClassHandler"><code class="docutils literal notranslate"><span class="pre">ClassHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.utils.ClassHandler._connect_backend"><code class="docutils literal notranslate"><span class="pre">ClassHandler._connect_backend()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.utils.Handler"><code class="docutils literal notranslate"><span class="pre">Handler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.utils.Handler._connect_backend"><code class="docutils literal notranslate"><span class="pre">Handler._connect_backend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.utils.Handler.close"><code class="docutils literal notranslate"><span class="pre">Handler.close()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.core.html#terra.core.utils.cached_property"><code class="docutils literal notranslate"><span class="pre">cached_property</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.utils.cached_property.__get__"><code class="docutils literal notranslate"><span class="pre">cached_property.__get__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.utils.cached_property.func"><code class="docutils literal notranslate"><span class="pre">cached_property.func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.core.html#terra.core.utils.cached_property.name"><code class="docutils literal notranslate"><span class="pre">cached_property.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="terra.core.html#module-terra.core">Module contents</a></li>
 </ul>
 </li>
@@ -234,33 +372,142 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="terra.executor.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.base">terra.executor.base module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.dummy">terra.executor.dummy module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.process">terra.executor.process module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.resources">terra.executor.resources module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.sync">terra.executor.sync module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.thread">terra.executor.thread module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.utils">terra.executor.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.base">terra.executor.base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.base.BaseExecutor"><code class="docutils literal notranslate"><span class="pre">BaseExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.base.BaseExecutor.configure_logger"><code class="docutils literal notranslate"><span class="pre">BaseExecutor.configure_logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.base.BaseExecutor.multiprocess"><code class="docutils literal notranslate"><span class="pre">BaseExecutor.multiprocess</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.base.BaseExecutor.reconfigure_logger"><code class="docutils literal notranslate"><span class="pre">BaseExecutor.reconfigure_logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.base.BaseFuture"><code class="docutils literal notranslate"><span class="pre">BaseFuture</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.dummy">terra.executor.dummy module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.dummy.DummyExecutor"><code class="docutils literal notranslate"><span class="pre">DummyExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.dummy.DummyExecutor.shutdown"><code class="docutils literal notranslate"><span class="pre">DummyExecutor.shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.dummy.DummyExecutor.submit"><code class="docutils literal notranslate"><span class="pre">DummyExecutor.submit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.process">terra.executor.process module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.process.ProcessPoolExecutor"><code class="docutils literal notranslate"><span class="pre">ProcessPoolExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.process.ProcessPoolExecutor.multiprocess"><code class="docutils literal notranslate"><span class="pre">ProcessPoolExecutor.multiprocess</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.resources">terra.executor.resources module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ProcessLocalStorage"><code class="docutils literal notranslate"><span class="pre">ProcessLocalStorage</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ProcessLocalStorage.instance_id"><code class="docutils literal notranslate"><span class="pre">ProcessLocalStorage.instance_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ProcessLocalStorage.lock"><code class="docutils literal notranslate"><span class="pre">ProcessLocalStorage.lock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ProcessLocalStorage.resource_id"><code class="docutils literal notranslate"><span class="pre">ProcessLocalStorage.resource_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource"><code class="docutils literal notranslate"><span class="pre">Resource</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource.FileLock"><code class="docutils literal notranslate"><span class="pre">Resource.FileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource.acquire"><code class="docutils literal notranslate"><span class="pre">Resource.acquire()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource.is_locked"><code class="docutils literal notranslate"><span class="pre">Resource.is_locked</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource.lock_dir"><code class="docutils literal notranslate"><span class="pre">Resource.lock_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource.lock_file_name"><code class="docutils literal notranslate"><span class="pre">Resource.lock_file_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.Resource.release"><code class="docutils literal notranslate"><span class="pre">Resource.release()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ResourceError"><code class="docutils literal notranslate"><span class="pre">ResourceError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ResourceManager"><code class="docutils literal notranslate"><span class="pre">ResourceManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ResourceManager.get_resource"><code class="docutils literal notranslate"><span class="pre">ResourceManager.get_resource()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ResourceManager.register_resource"><code class="docutils literal notranslate"><span class="pre">ResourceManager.register_resource()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ResourceManager.resources"><code class="docutils literal notranslate"><span class="pre">ResourceManager.resources</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.ThreadLocalStorage"><code class="docutils literal notranslate"><span class="pre">ThreadLocalStorage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.atexit_resource_release"><code class="docutils literal notranslate"><span class="pre">atexit_resource_release()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.resources.test_dir"><code class="docutils literal notranslate"><span class="pre">test_dir()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.sync">terra.executor.sync module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.sync.SyncExecutor"><code class="docutils literal notranslate"><span class="pre">SyncExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.sync.SyncExecutor.shutdown"><code class="docutils literal notranslate"><span class="pre">SyncExecutor.shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.sync.SyncExecutor.submit"><code class="docutils literal notranslate"><span class="pre">SyncExecutor.submit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.thread">terra.executor.thread module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.thread.ThreadPoolExecutor"><code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.thread.ThreadPoolExecutor.submit"><code class="docutils literal notranslate"><span class="pre">ThreadPoolExecutor.submit()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor.utils">terra.executor.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.utils.Executor"><code class="docutils literal notranslate"><span class="pre">Executor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.executor.html#terra.executor.utils.ExecutorHandler"><code class="docutils literal notranslate"><span class="pre">ExecutorHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.utils.ExecutorHandler._connect_backend"><code class="docutils literal notranslate"><span class="pre">ExecutorHandler._connect_backend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.executor.html#terra.executor.utils.ExecutorHandler.configuration_map"><code class="docutils literal notranslate"><span class="pre">ExecutorHandler.configuration_map()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="terra.executor.html#module-terra.executor">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="terra.utils.html">terra.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="terra.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.cli">terra.utils.cli module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.new">terra.utils.new module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.path">terra.utils.path module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.workflow">terra.utils.workflow module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.cli">terra.utils.cli module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.cli.ArgumentParser"><code class="docutils literal notranslate"><span class="pre">ArgumentParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.cli.ArgumentParser.add_settings_file"><code class="docutils literal notranslate"><span class="pre">ArgumentParser.add_settings_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.cli.DbStopAction"><code class="docutils literal notranslate"><span class="pre">DbStopAction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.cli.FullPaths"><code class="docutils literal notranslate"><span class="pre">FullPaths</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.cli.FullPathsAppend"><code class="docutils literal notranslate"><span class="pre">FullPathsAppend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.cli.OverrideAction"><code class="docutils literal notranslate"><span class="pre">OverrideAction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.cli.resolve_path"><code class="docutils literal notranslate"><span class="pre">resolve_path()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.new">terra.utils.new module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.cli"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.cli()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.generate_files"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.generate_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.init"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.service_definitions"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.service_definitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.service_runners"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.service_runners()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.service_runners_init"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.service_runners_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.tasks"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.tasks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.tasks_init"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.tasks_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.utils.html#terra.utils.new.CreateTerraApp.workflows"><code class="docutils literal notranslate"><span class="pre">CreateTerraApp.workflows()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.new.get_parser"><code class="docutils literal notranslate"><span class="pre">get_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.new.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.path">terra.utils.path module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.patch_volume"><code class="docutils literal notranslate"><span class="pre">patch_volume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.pathlib_map"><code class="docutils literal notranslate"><span class="pre">pathlib_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.resolve_path"><code class="docutils literal notranslate"><span class="pre">resolve_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.reverse_volume_map"><code class="docutils literal notranslate"><span class="pre">reverse_volume_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.translate_paths_chain"><code class="docutils literal notranslate"><span class="pre">translate_paths_chain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.path.translate_settings_paths"><code class="docutils literal notranslate"><span class="pre">translate_settings_paths()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils.workflow">terra.utils.workflow module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="terra.utils.html#terra.utils.workflow.AlreadyRunException"><code class="docutils literal notranslate"><span class="pre">AlreadyRunException</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="terra.utils.html#module-terra.utils">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-terra.logger">
-<span id="terra-logger-module"></span><h2>terra.logger module<a class="headerlink" href="#module-terra.logger" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-terra.logger">
+<span id="terra-logger-module"></span><h2>terra.logger module<a class="headerlink" href="#module-terra.logger" title="Permalink to this heading"></a></h2>
 <p>The logging module for all of terra apps.</p>
 <p>Whether a part of terra core or apps, cli, workflow, service, task, all modules
 should import <a class="reference internal" href="#module-terra.logger" title="terra.logger"><code class="xref py py-mod docutils literal notranslate"><span class="pre">terra.logger</span></code></a> to output all messages to user and developer.</p>
@@ -290,8 +537,8 @@ time on <code class="docutils literal notranslate"><span class="pre">stdout</spa
 expected</p>
 </div>
 <p>See <a class="reference internal" href="../terra/settings.html#settings-logging"><span class="std std-ref">Logging Settings</span></a> for how to customize the logger</p>
-<div class="section" id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h3>
 <p>To use the logger, in any module always:</p>
 <p><code class="docutils literal notranslate"><span class="pre">`</span>
 <span class="pre">from</span> <span class="pre">terra.logging</span> <span class="pre">import</span> <span class="pre">getLogger</span>
@@ -309,9 +556,10 @@ verbose)</p></li>
 <li><p>All logging level variables exist in <a class="reference internal" href="#module-terra.logger" title="terra.logger"><code class="xref py py-mod docutils literal notranslate"><span class="pre">terra.logger</span></code></a>: <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code>,
 <code class="docutils literal notranslate"><span class="pre">WARN</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG2</span></code>, etc…</p></li>
 </ul>
+</section>
 <dl class="py data">
-<dt id="terra.logger.DEBUG1">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">DEBUG1</span></code><em class="property"> <span class="pre">=</span> <span class="pre">10</span></em><a class="headerlink" href="#terra.logger.DEBUG1" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.DEBUG1">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">DEBUG1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#terra.logger.DEBUG1" title="Permalink to this definition"></a></dt>
 <dd><p>Debug level one. Same as the original <code class="xref py py-data docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> level, but now
 called <a class="reference internal" href="#terra.logger.DEBUG1" title="terra.logger.DEBUG1"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG1</span></code></a>.</p>
 <p>Should be used for general runtime debug messages that would be useful for
@@ -319,69 +567,69 @@ users to see</p>
 </dd></dl>
 
 <dl class="py data">
-<dt id="terra.logger.DEBUG2">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">DEBUG2</span></code><em class="property"> <span class="pre">=</span> <span class="pre">9</span></em><a class="headerlink" href="#terra.logger.DEBUG2" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.DEBUG2">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">DEBUG2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#terra.logger.DEBUG2" title="Permalink to this definition"></a></dt>
 <dd><p>Debug level two, more verbose.</p>
 <p>Should be used for general development debug messages that would be useful for
 developer to see when debugging</p>
 </dd></dl>
 
 <dl class="py data">
-<dt id="terra.logger.DEBUG3">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">DEBUG3</span></code><em class="property"> <span class="pre">=</span> <span class="pre">8</span></em><a class="headerlink" href="#terra.logger.DEBUG3" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.DEBUG3">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">DEBUG3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#terra.logger.DEBUG3" title="Permalink to this definition"></a></dt>
 <dd><p>Debug level three, even more verbose.</p>
 <p>Should be used for more specific development debug messages, such as math
 output used to debug algorithms</p>
 </dd></dl>
 
 <dl class="py data">
-<dt id="terra.logger.DEBUG4">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">DEBUG4</span></code><em class="property"> <span class="pre">=</span> <span class="pre">7</span></em><a class="headerlink" href="#terra.logger.DEBUG4" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.DEBUG4">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">DEBUG4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#terra.logger.DEBUG4" title="Permalink to this definition"></a></dt>
 <dd><p>Debug level four, even more verbose.</p>
 <p>Should be used for spamming the screen</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="terra.logger.Logger">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">Logger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/logging.html#logging.Logger" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Logger</span></code></a></p>
+<dt class="sig sig-object py" id="terra.logger.Logger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">Logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/logging.html#logging.Logger" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a></p>
 <dl class="py method">
-<dt id="terra.logger.Logger.debug1">
-<code class="sig-name descname"><span class="pre">debug1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug1" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.Logger.debug1">
+<span class="sig-name descname"><span class="pre">debug1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug1" title="Permalink to this definition"></a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG1" title="terra.logger.DEBUG1"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG1</span></code></a> on this logger. Same as <code class="docutils literal notranslate"><span class="pre">debug</span></code>.
 The arguments are interpreted as for <a class="reference external" href="https://docs.python.org/3.9/library/logging.html#logging.debug" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger.Logger.debug2">
-<code class="sig-name descname"><span class="pre">debug2</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug2" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.Logger.debug2">
+<span class="sig-name descname"><span class="pre">debug2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug2" title="Permalink to this definition"></a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG2" title="terra.logger.DEBUG2"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG2</span></code></a> on this logger. The arguments are
 interpreted as for <a class="reference external" href="https://docs.python.org/3.9/library/logging.html#logging.debug" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger.Logger.debug3">
-<code class="sig-name descname"><span class="pre">debug3</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug3" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.Logger.debug3">
+<span class="sig-name descname"><span class="pre">debug3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug3" title="Permalink to this definition"></a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG3" title="terra.logger.DEBUG3"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG3</span></code></a> on this logger. The arguments are
 interpreted as for <a class="reference external" href="https://docs.python.org/3.9/library/logging.html#logging.debug" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger.Logger.debug4">
-<code class="sig-name descname"><span class="pre">debug4</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug4" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.Logger.debug4">
+<span class="sig-name descname"><span class="pre">debug4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.debug4" title="Permalink to this definition"></a></dt>
 <dd><p>Logs a message with level <a class="reference internal" href="#terra.logger.DEBUG4" title="terra.logger.DEBUG4"><code class="xref py py-data docutils literal notranslate"><span class="pre">DEBUG4</span></code></a> on this logger. The arguments are
 interpreted as for <a class="reference external" href="https://docs.python.org/3.9/library/logging.html#logging.debug" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.debug()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger.Logger.fatal">
-<code class="sig-name descname"><span class="pre">fatal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.fatal" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.Logger.fatal">
+<span class="sig-name descname"><span class="pre">fatal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.fatal" title="Permalink to this definition"></a></dt>
 <dd><p>Delegate a critical call to the underlying logger.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger.Logger.findCaller">
-<code class="sig-name descname"><span class="pre">findCaller</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.findCaller" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.Logger.findCaller">
+<span class="sig-name descname"><span class="pre">findCaller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.Logger.findCaller" title="Permalink to this definition"></a></dt>
 <dd><p>Find the stack frame of the caller so that we can note the source
 file name, line number and function name.</p>
 </dd></dl>
@@ -389,75 +637,75 @@ file name, line number and function name.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="terra.logger._SetupTerraLogger">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">_SetupTerraLogger</span></code><a class="headerlink" href="#terra.logger._SetupTerraLogger" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_SetupTerraLogger</span></span><a class="headerlink" href="#terra.logger._SetupTerraLogger" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A simple logger class used internally to configure the logger before and
 after <a class="reference internal" href="#terra.settings" title="terra.settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">terra.settings</span></code></a> is configured</p>
 <dl class="py method">
-<dt id="terra.logger._SetupTerraLogger.cleanup_temp">
-<code class="sig-name descname"><span class="pre">cleanup_temp</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.cleanup_temp" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.cleanup_temp">
+<span class="sig-name descname"><span class="pre">cleanup_temp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.cleanup_temp" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger._SetupTerraLogger.configure_logger">
-<code class="sig-name descname"><span class="pre">configure_logger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.configure_logger" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.configure_logger">
+<span class="sig-name descname"><span class="pre">configure_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.configure_logger" title="Permalink to this definition"></a></dt>
 <dd><p>Call back function to configure the logger after settings have been
 configured</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="terra.logger._SetupTerraLogger.default_formatter">
-<code class="sig-name descname"><span class="pre">default_formatter</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;logging.Formatter</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#terra.logger._SetupTerraLogger.default_formatter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.default_formatter">
+<span class="sig-name descname"><span class="pre">default_formatter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;logging.Formatter</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#terra.logger._SetupTerraLogger.default_formatter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="terra.logger._SetupTerraLogger.default_stderr_handler_level">
-<code class="sig-name descname"><span class="pre">default_stderr_handler_level</span></code><em class="property"> <span class="pre">=</span> <span class="pre">30</span></em><a class="headerlink" href="#terra.logger._SetupTerraLogger.default_stderr_handler_level" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.default_stderr_handler_level">
+<span class="sig-name descname"><span class="pre">default_stderr_handler_level</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#terra.logger._SetupTerraLogger.default_stderr_handler_level" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="terra.logger._SetupTerraLogger.default_tmp_prefix">
-<code class="sig-name descname"><span class="pre">default_tmp_prefix</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'terra_initial_tmp_'</span></em><a class="headerlink" href="#terra.logger._SetupTerraLogger.default_tmp_prefix" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.default_tmp_prefix">
+<span class="sig-name descname"><span class="pre">default_tmp_prefix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'terra_initial_tmp_'</span></em><a class="headerlink" href="#terra.logger._SetupTerraLogger.default_tmp_prefix" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.main_log_handler">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">main_log_handler</span></span><a class="headerlink" href="#terra.logger._SetupTerraLogger.main_log_handler" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger._SetupTerraLogger.main_log_handler">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">main_log_handler</span></code><a class="headerlink" href="#terra.logger._SetupTerraLogger.main_log_handler" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.reconfigure_logger">
+<span class="sig-name descname"><span class="pre">reconfigure_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.reconfigure_logger" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="terra.logger._SetupTerraLogger.reconfigure_logger">
-<code class="sig-name descname"><span class="pre">reconfigure_logger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.reconfigure_logger" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="terra.logger._SetupTerraLogger.set_level_and_formatter">
-<code class="sig-name descname"><span class="pre">set_level_and_formatter</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.set_level_and_formatter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._SetupTerraLogger.set_level_and_formatter">
+<span class="sig-name descname"><span class="pre">set_level_and_formatter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._SetupTerraLogger.set_level_and_formatter" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.logger._acquireLock">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">_acquireLock</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._acquireLock" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._acquireLock">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_acquireLock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._acquireLock" title="Permalink to this definition"></a></dt>
 <dd><p>Acquire the module-level lock for serializing access to shared data.</p>
 <p>This should be released with _releaseLock().</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.logger._checkLevel">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">_checkLevel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._checkLevel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._checkLevel">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_checkLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._checkLevel" title="Permalink to this definition"></a></dt>
 <dd><p>Translate <code class="docutils literal notranslate"><span class="pre">log_level</span></code> to integer.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.logger._demoteLevel">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">_demoteLevel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._demoteLevel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._demoteLevel">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_demoteLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._demoteLevel" title="Permalink to this definition"></a></dt>
 <dd><p>Demote logging level for specific packages, disabling <code class="docutils literal notranslate"><span class="pre">from_level</span></code> log
 messages unless <code class="docutils literal notranslate"><span class="pre">terra.settings.logging.level</span> <span class="pre">&gt;</span> <span class="pre">to_level</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>package_names</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – List of package names</p></li>
 <li><p><strong>from_level</strong> – Log level to be demoted, default <code class="docutils literal notranslate"><span class="pre">DEBUG1</span></code></p></li>
@@ -468,163 +716,145 @@ messages unless <code class="docutils literal notranslate"><span class="pre">ter
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.logger._releaseLock">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">_releaseLock</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._releaseLock" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger._releaseLock">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_releaseLock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._releaseLock" title="Permalink to this definition"></a></dt>
 <dd><p>Release the module-level lock acquired by calling _acquireLock().</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.logger.getLogger">
-<code class="sig-prename descclassname"><span class="pre">terra.logger.</span></code><code class="sig-name descname"><span class="pre">getLogger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.logger.getLogger">
+<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">getLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger.getLogger" title="Permalink to this definition"></a></dt>
 <dd><p>Return a logger with the specified name, creating it if necessary.</p>
 <p>If no name is specified, return the root logger.</p>
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="module-terra.task">
-<span id="terra-task-module"></span><h2>terra.task module<a class="headerlink" href="#module-terra.task" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-terra.task">
+<span id="terra-task-module"></span><h2>terra.task module<a class="headerlink" href="#module-terra.task" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt id="terra.task.TerraTask">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.task.</span></code><code class="sig-name descname"><span class="pre">TerraTask</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">celery.app.task.</span></code></p>
+<dt class="sig sig-object py" id="terra.task.TerraTask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terra.task.</span></span><span class="sig-name descname"><span class="pre">TerraTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.celeryq.dev/en/stable/reference/celery.app.task.html#celery.app.task.Task" title="(in Celery v5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Task</span></code></a></p>
 <p>A task function that can be run in parallel using <a class="reference internal" href="../terra/executor.html#executor"><span class="std std-ref">Executor</span></a>-s</p>
 <dl class="py method">
-<dt id="terra.task.TerraTask.apply_async">
-<code class="sig-name descname"><span class="pre">apply_async</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask.apply_async" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.task.TerraTask.apply_async">
+<span class="sig-name descname"><span class="pre">apply_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.TerraTask.apply_async" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="terra.task.shared_task">
-<code class="sig-prename descclassname"><span class="pre">terra.task.</span></code><code class="sig-name descname"><span class="pre">shared_task</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.shared_task" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.task.shared_task">
+<span class="sig-prename descclassname"><span class="pre">terra.task.</span></span><span class="sig-name descname"><span class="pre">shared_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.shared_task" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="terra.task.subprocess">
-<code class="sig-prename descclassname"><span class="pre">terra.task.</span></code><code class="sig-name descname"><span class="pre">subprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.subprocess" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.task.subprocess">
+<span class="sig-prename descclassname"><span class="pre">terra.task.</span></span><span class="sig-name descname"><span class="pre">subprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.task.subprocess" title="Permalink to this definition"></a></dt>
 <dd><p>Execute shell command via <code class="docutils literal notranslate"><span class="pre">subprocess.run(*args,</span> <span class="pre">**kwargs)</span></code> as a celery
 task. Note any active pipenv/subprocess will be deactivated prior to run.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-terra.workflow">
-<span id="terra-workflow-module"></span><h2>terra.workflow module<a class="headerlink" href="#module-terra.workflow" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-terra.workflow">
+<span id="terra-workflow-module"></span><h2>terra.workflow module<a class="headerlink" href="#module-terra.workflow" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt id="terra.workflow.BaseWorkflow">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.workflow.</span></code><code class="sig-name descname"><span class="pre">BaseWorkflow</span></code><a class="headerlink" href="#terra.workflow.BaseWorkflow" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.workflow.BaseWorkflow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terra.workflow.</span></span><span class="sig-name descname"><span class="pre">BaseWorkflow</span></span><a class="headerlink" href="#terra.workflow.BaseWorkflow" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The base class for all Terra Workflows</p>
 <dl class="py method">
-<dt id="terra.workflow.BaseWorkflow.run">
-<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.BaseWorkflow.run" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.workflow.BaseWorkflow.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.BaseWorkflow.run" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="terra.workflow.PipelineWorkflow">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.workflow.</span></code><code class="sig-name descname"><span class="pre">PipelineWorkflow</span></code><a class="headerlink" href="#terra.workflow.PipelineWorkflow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#terra.workflow.BaseWorkflow" title="terra.workflow.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.BaseWorkflow</span></code></a></p>
+<dt class="sig sig-object py" id="terra.workflow.PipelineWorkflow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terra.workflow.</span></span><span class="sig-name descname"><span class="pre">PipelineWorkflow</span></span><a class="headerlink" href="#terra.workflow.PipelineWorkflow" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.workflow.BaseWorkflow" title="terra.workflow.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseWorkflow</span></code></a></p>
 <p>A simple workflow that runs a set of services, serially.</p>
 <p>self.pipeline need to be set to a list of services calls.</p>
 <dl class="py method">
-<dt id="terra.workflow.PipelineWorkflow.run">
-<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.run" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.workflow.PipelineWorkflow.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.run" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="terra.workflow.PipelineWorkflow.service_index">
-<code class="sig-name descname"><span class="pre">service_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.service_index" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.workflow.PipelineWorkflow.service_index">
+<span class="sig-name descname"><span class="pre">service_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.PipelineWorkflow.service_index" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="terra.workflow.SingleWorkflow">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">terra.workflow.</span></code><code class="sig-name descname"><span class="pre">SingleWorkflow</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.SingleWorkflow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#terra.workflow.BaseWorkflow" title="terra.workflow.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.workflow.BaseWorkflow</span></code></a></p>
+<dt class="sig sig-object py" id="terra.workflow.SingleWorkflow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">terra.workflow.</span></span><span class="sig-name descname"><span class="pre">SingleWorkflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.SingleWorkflow" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#terra.workflow.BaseWorkflow" title="terra.workflow.BaseWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseWorkflow</span></code></a></p>
 <dl class="py method">
-<dt id="terra.workflow.SingleWorkflow.run">
-<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.SingleWorkflow.run" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.workflow.SingleWorkflow.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.workflow.SingleWorkflow.run" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-terra">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-terra">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-terra" title="Permalink to this heading"></a></h2>
 <p>Terra in an infrastructure with the purpose of running algorithms in a compute
 architecture agnostic way. The goal is, once an algorithm (app) is setup, the
 same algorithm can be deployed on multiple compute arches</p>
 <dl class="std envvar">
-<dt id="envvar-TERRA_UNITTEST">
-<code class="sig-name descname"><span class="pre">TERRA_UNITTEST</span></code><a class="headerlink" href="#envvar-TERRA_UNITTEST" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="envvar-TERRA_UNITTEST">
+<span class="sig-name descname"><span class="pre">TERRA_UNITTEST</span></span><a class="headerlink" href="#envvar-TERRA_UNITTEST" title="Permalink to this definition"></a></dt>
 <dd><p>A environment variable that is <code class="docutils literal notranslate"><span class="pre">1</span></code> when running unit tests.</p>
 </dd></dl>
 
 <dl class="py data">
-<dt id="terra.settings">
-<code class="sig-prename descclassname"><span class="pre">terra.</span></code><code class="sig-name descname"><span class="pre">settings</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'logging':</span> <span class="pre">{'level':</span> <span class="pre">'ERROR',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">(%(hostname)s:%(zone)s):</span> <span class="pre">%(levelname)s/%(processName)s</span> <span class="pre">-</span> <span class="pre">%(filename)s</span> <span class="pre">-</span> <span class="pre">%(message)s',</span> <span class="pre">'date_format':</span> <span class="pre">None,</span> <span class="pre">'style':</span> <span class="pre">'%',</span> <span class="pre">'server':</span> <span class="pre">{'hostname':</span> <span class="pre">&lt;function</span> <span class="pre">logging_hostname&gt;,</span> <span class="pre">'port':</span> <span class="pre">9020,</span> <span class="pre">'listen_address':</span> <span class="pre">&lt;function</span> <span class="pre">logging_listen_address&gt;},</span> <span class="pre">'log_file':</span> <span class="pre">&lt;function</span> <span class="pre">log_file&gt;},</span> <span class="pre">'executor':</span> <span class="pre">{'num_workers':</span> <span class="pre">2,</span> <span class="pre">'type':</span> <span class="pre">'ProcessPoolExecutor',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.dummy',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'terra':</span> <span class="pre">{'config_file':</span> <span class="pre">&lt;function</span> <span class="pre">config_file&gt;,</span> <span class="pre">'disable_settings_dump':</span> <span class="pre">False,</span> <span class="pre">'lock_dir':</span> <span class="pre">&lt;function</span> <span class="pre">lock_dir&gt;,</span> <span class="pre">'zone':</span> <span class="pre">'controller',</span> <span class="pre">'uuid':</span> <span class="pre">&lt;function</span> <span class="pre">terra_uuid&gt;},</span> <span class="pre">'overwrite':</span> <span class="pre">False,</span> <span class="pre">'service_start':</span> <span class="pre">None,</span> <span class="pre">'service_end':</span> <span class="pre">None,</span> <span class="pre">'settings_dir':</span> <span class="pre">&lt;function</span> <span class="pre">settings_dir&gt;,</span> <span class="pre">'status_file':</span> <span class="pre">&lt;function</span> <span class="pre">status_file&gt;,</span> <span class="pre">'processing_dir':</span> <span class="pre">&lt;function</span> <span class="pre">processing_dir&gt;,</span> <span class="pre">'unittest':</span> <span class="pre">&lt;function</span> <span class="pre">unittest&gt;,</span> <span class="pre">'resume':</span> <span class="pre">False}</span></em><a class="headerlink" href="#terra.settings" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="terra.settings">
+<span class="sig-prename descclassname"><span class="pre">terra.</span></span><span class="sig-name descname"><span class="pre">settings</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'logging':</span> <span class="pre">{'level':</span> <span class="pre">'ERROR',</span> <span class="pre">'format':</span> <span class="pre">'%(asctime)s</span> <span class="pre">(%(hostname)s:%(zone)s):</span> <span class="pre">%(levelname)s/%(processName)s</span> <span class="pre">-</span> <span class="pre">%(filename)s</span> <span class="pre">-</span> <span class="pre">%(message)s',</span> <span class="pre">'date_format':</span> <span class="pre">None,</span> <span class="pre">'style':</span> <span class="pre">'%',</span> <span class="pre">'server':</span> <span class="pre">{'hostname':</span> <span class="pre">&lt;function</span> <span class="pre">logging_hostname&gt;,</span> <span class="pre">'port':</span> <span class="pre">9020,</span> <span class="pre">'listen_address':</span> <span class="pre">&lt;function</span> <span class="pre">logging_listen_address&gt;},</span> <span class="pre">'log_file':</span> <span class="pre">&lt;function</span> <span class="pre">log_file&gt;},</span> <span class="pre">'executor':</span> <span class="pre">{'num_workers':</span> <span class="pre">2,</span> <span class="pre">'type':</span> <span class="pre">'ProcessPoolExecutor',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'compute':</span> <span class="pre">{'arch':</span> <span class="pre">'terra.compute.dummy',</span> <span class="pre">'volume_map':</span> <span class="pre">[]},</span> <span class="pre">'terra':</span> <span class="pre">{'config_file':</span> <span class="pre">&lt;function</span> <span class="pre">config_file&gt;,</span> <span class="pre">'disable_settings_dump':</span> <span class="pre">False,</span> <span class="pre">'lock_dir':</span> <span class="pre">&lt;function</span> <span class="pre">lock_dir&gt;,</span> <span class="pre">'zone':</span> <span class="pre">'controller',</span> <span class="pre">'uuid':</span> <span class="pre">&lt;function</span> <span class="pre">terra_uuid&gt;},</span> <span class="pre">'overwrite':</span> <span class="pre">False,</span> <span class="pre">'service_start':</span> <span class="pre">None,</span> <span class="pre">'service_end':</span> <span class="pre">None,</span> <span class="pre">'settings_dir':</span> <span class="pre">&lt;function</span> <span class="pre">settings_dir&gt;,</span> <span class="pre">'status_file':</span> <span class="pre">&lt;function</span> <span class="pre">status_file&gt;,</span> <span class="pre">'processing_dir':</span> <span class="pre">&lt;function</span> <span class="pre">processing_dir&gt;,</span> <span class="pre">'unittest':</span> <span class="pre">&lt;function</span> <span class="pre">unittest&gt;,</span> <span class="pre">'resume':</span> <span class="pre">False}</span></em><a class="headerlink" href="#terra.settings" title="Permalink to this definition"></a></dt>
 <dd><p>The settings object easily accessible from all
 of terra and any terra app</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="terra.core.html#terra.core.settings.Settings" title="terra.core.settings.Settings">terra.core.settings.Settings</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="terra.compute.html" class="btn btn-neutral float-right" title="terra.compute package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="terra" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="terra.compute.html" class="btn btn-neutral float-right" title="terra.compute package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, VSI.
-
-    </p>
+    <p>&#169; Copyright 2021, VSI.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

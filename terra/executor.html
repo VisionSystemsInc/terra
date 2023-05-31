@@ -1,90 +1,48 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Executor &mdash; Terra 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="terra" href="../python/modules.html" />
     <link rel="prev" title="Compute" href="compute.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> Terra
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Terra
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">What is Terra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="settings.html">Terra Settings</a></li>
@@ -110,93 +68,52 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidlines</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Terra</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Executor</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Executor</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/terra/executor.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="executor">
-<span id="id1"></span><h1>Executor<a class="headerlink" href="#executor" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="executor">
+<span id="id1"></span><h1>Executor<a class="headerlink" href="#executor" title="Permalink to this heading"></a></h1>
 <p>In Terra, an executor is a class based on <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.Executor" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.Executor</span></code></a> that is used in order to utilize a single API to execute tasks in parallel using: single threaded, multithreaded, multiprocess, or distributed computer environments. See <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#module-concurrent.futures" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">concurrent.futures</span></code></a> for more information on how to use executors.</p>
 <p>An app need not be limited to always using one type of executor, but the default executor type used will be set by <a class="reference internal" href="settings.html#cmdoption-arg-executor.type"><code class="xref std std-option docutils literal notranslate"><span class="pre">executor.type</span></code></a>.</p>
 <p>A terra task is a function with the <a class="reference internal" href="../python/terra.html#terra.task.shared_task" title="terra.task.shared_task"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.task.shared_task()</span></code></a> decorator (based on <a class="reference external" href="https://docs.celeryq.dev/en/stable/userguide/tasks.html#task-basics" title="(in Celery v5.2)"><span class="xref std std-ref">&#64;shared_task</span></a>). <a class="reference internal" href="../python/terra.html#terra.task.shared_task" title="terra.task.shared_task"><code class="xref py py-func docutils literal notranslate"><span class="pre">terra.task.shared_task()</span></code></a> decorator should be used, and not <a class="reference internal" href="../python/terra.html#terra.task.TerraTask" title="terra.task.TerraTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.task.TerraTask</span></code></a>, since not all executors utilize celery, and tasks should work with all executors, not just celery. <code class="docutils literal notranslate"><span class="pre">bind</span></code> is turned on by default, so all task functions need to have a <code class="docutils literal notranslate"><span class="pre">self</span></code> as the first argument.</p>
 <p>It is good practice to only get filenames from terra settings, and not by reading other files from disk. Tasks can also get filenames from keyword arguments since both task keyword arguments and settings supports <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">Path translation</span></a>.</p>
-<div class="section" id="built-in-executors">
-<h2>Built in executors<a class="headerlink" href="#built-in-executors" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="dummyexecutor">
-<h3>DummyExecutor<a class="headerlink" href="#dummyexecutor" title="Permalink to this headline">¶</a></h3>
+<section id="built-in-executors">
+<h2>Built in executors<a class="headerlink" href="#built-in-executors" title="Permalink to this heading"></a></h2>
+<section id="dummyexecutor">
+<h3>DummyExecutor<a class="headerlink" href="#dummyexecutor" title="Permalink to this heading"></a></h3>
 <p>The <a class="reference internal" href="../python/terra.executor.html#terra.executor.dummy.DummyExecutor" title="terra.executor.dummy.DummyExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.dummy.DummyExecutor</span></code></a> is a debugging tool that simply dry-runs (and logs) what tasks would have been run.</p>
-</div>
-<div class="section" id="syncexecutor">
-<h3>SyncExecutor<a class="headerlink" href="#syncexecutor" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="syncexecutor">
+<h3>SyncExecutor<a class="headerlink" href="#syncexecutor" title="Permalink to this heading"></a></h3>
 <p>The <a class="reference internal" href="../python/terra.executor.html#terra.executor.sync.SyncExecutor" title="terra.executor.sync.SyncExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.sync.SyncExecutor</span></code></a> is a single-threaded executor that runs the tasks synchronously in serial. It is often used as a tool for debugging race conditions.</p>
-</div>
-<div class="section" id="threadpoolexecutor">
-<h3>ThreadPoolExecutor<a class="headerlink" href="#threadpoolexecutor" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="threadpoolexecutor">
+<h3>ThreadPoolExecutor<a class="headerlink" href="#threadpoolexecutor" title="Permalink to this heading"></a></h3>
 <p>The <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ThreadPoolExecutor</span></code></a> is the default executor used due to its ease of setup. However, it is limited by the <a class="reference external" href="https://docs.python.org/3.9/c-api/init.html#threads" title="(in Python v3.9)"><span class="xref std std-ref">GIL</span></a>. So while pickling of task arguments and return values are not required (as they are for <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.ProcessPoolExecutor" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ProcessPoolExecutor</span></code></a>), python code should not be expected to use more than one core at a time, even when multithreaded.</p>
-</div>
-<div class="section" id="processpoolexecutor">
-<h3>ProcessPoolExecutor<a class="headerlink" href="#processpoolexecutor" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="processpoolexecutor">
+<h3>ProcessPoolExecutor<a class="headerlink" href="#processpoolexecutor" title="Permalink to this heading"></a></h3>
 <p>The <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.ProcessPoolExecutor" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ProcessPoolExecutor</span></code></a> is often the executor that gets uses in production. It is relatively easy to setup and use, although task arguments, return values, and exceptions must be pickle-able.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -206,66 +123,49 @@
 <p class="admonition-title">Note</p>
 <p><a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.ProcessPoolExecutor" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">concurrent.futures.ProcessPoolExecutor</span></code></a> is not robust against seg faults. As soon as one worker crashes, the main process halts executing additional tasks and raises <a class="reference external" href="https://docs.python.org/3.9/library/concurrent.futures.html#concurrent.futures.process.BrokenProcessPool" title="(in Python v3.9)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">concurrent.futures.process.BrokenProcessPool</span></code></a>.</p>
 </div>
-</div>
-<div class="section" id="celeryexecutor">
-<h3>CeleryExecutor<a class="headerlink" href="#celeryexecutor" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="celeryexecutor">
+<h3>CeleryExecutor<a class="headerlink" href="#celeryexecutor" title="Permalink to this heading"></a></h3>
 <p>An executor that uses celery to run tasks in workers either locally or distributed onto multiple computers. The celery executor does require that the celery workers be started before the terra app runs. This does require a little finesse, since typically terra decides what directories to mount. However, celery has its own mount table, and as long as its mounts include any possible mounts a task will need, <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">Path translation</span></a> will adjust paths to refer to their new file names.</p>
 <p>For example, if a service mounts <code class="docutils literal notranslate"><span class="pre">/nfs/project1/date15/images</span></code> to <code class="docutils literal notranslate"><span class="pre">/images</span></code>, then a <code class="docutils literal notranslate"><span class="pre">setting.image_file</span></code> value of <code class="docutils literal notranslate"><span class="pre">/data/project1/date15/images/img123.jpg</span></code> will be translated to <code class="docutils literal notranslate"><span class="pre">/images/img123.jpg</span></code> in the service container. If the celery worker mounts <code class="docutils literal notranslate"><span class="pre">/nfs/project1</span></code> to <code class="docutils literal notranslate"><span class="pre">/data</span></code> then <code class="docutils literal notranslate"><span class="pre">setting.image_file</span></code> will become <code class="docutils literal notranslate"><span class="pre">/data/date15/images/img123.jpg</span></code> in the celery worker. While this all happens automatically and it not something you normally have to be aware of, you do need to be aware of this requirement when setting up mounts for celery workers.</p>
-</div>
-</div>
-<div class="section" id="using-custom-executors">
-<span id="custom-executor"></span><h2>Using custom executors<a class="headerlink" href="#using-custom-executors" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="using-custom-executors">
+<span id="custom-executor"></span><h2>Using custom executors<a class="headerlink" href="#using-custom-executors" title="Permalink to this heading"></a></h2>
 <p>To wrap your own executor up for terra, all you have to do is mix-in <a class="reference internal" href="../python/terra.executor.html#terra.executor.base.BaseExecutor" title="terra.executor.base.BaseExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.base.BaseExecutor</span></code></a> into your class. If the executor is multiprocess (on a single node) then <code class="docutils literal notranslate"><span class="pre">multiprocess</span></code> needs to be set to <code class="docutils literal notranslate"><span class="pre">True</span></code> for the class. For example: celery sets multiprocess to <code class="docutils literal notranslate"><span class="pre">True</span></code> because the <a class="reference external" href="https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-worker_pool" title="(in Celery v5.2)"><code class="xref std std-setting docutils literal notranslate"><span class="pre">worker_pool</span></code></a> is defaulted to use prefork, which is multiprocess on a single node. (For example, if another distributed executor used threading to make multiple workers on each node <code class="docutils literal notranslate"><span class="pre">multiprocess</span></code> would be <code class="docutils literal notranslate"><span class="pre">False</span></code>. It would also be <code class="docutils literal notranslate"><span class="pre">False</span></code> if there could only ever be one worker per computer. The fact that a worker process on one computer is a physically different process from a worker process on another computer has no bearing on the <code class="docutils literal notranslate"><span class="pre">multiprocess</span></code> setting.)</p>
 <p>For workers like <a class="reference internal" href="../python/terra.executor.celery.html#terra.executor.celery.executor.CeleryExecutor" title="terra.executor.celery.executor.CeleryExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.executor.celery.executor.CeleryExecutor</span></code></a>, the worker is started before the terra app runs. These types of special workers outlive a single run of terra, and thus need a way to hook into the logger each time it changes. This is done by defining a <code class="docutils literal notranslate"><span class="pre">configure_logger</span></code> and <code class="docutils literal notranslate"><span class="pre">reconfigure_logger</span></code> method to connect to the correct logger for a task.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../python/modules.html" class="btn btn-neutral float-right" title="terra" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="compute.html" class="btn btn-neutral float-left" title="Compute" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../python/modules.html" class="btn btn-neutral float-right" title="terra" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, VSI.
-
-    </p>
+    <p>&#169; Copyright 2021, VSI.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
