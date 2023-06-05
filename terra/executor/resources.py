@@ -16,6 +16,9 @@ import atexit
 import weakref
 from shutil import rmtree
 import filelock
+import atexit
+from multiprocessing.shared_memory import SharedMemory
+from multiprocessing import current_process
 
 from vsi.tools.dir_util import is_dir_empty
 
@@ -45,6 +48,37 @@ class ThreadLocalStorage(ProcessLocalStorage, threading.local):
   '''
   Thread version of :class:`ProcessLocalStorage`
   '''
+
+
+class ParentPID():
+  @classmethod
+  def ppid(cls):
+    try:
+      return cls._ppid
+    except:
+      if 
+      print(Executor._connect_backend(), type(Executor()))
+      if Executor._connect_backend().multiprocess and \
+         Executor()._mp_context._name == "spawn":
+        try:
+          # Only the parent process will be able to create this shared memory
+          ppid_shared_memory = SharedMemory(f'terra_{settings.terra.uuid}',
+                                            size=4, create=True)
+          ppid = os.getpid()
+          ppid_shared_memory.buf[0:4] = ppid.to_bytes(4, 'big', signed=False)
+          atexit.register(ppid_shared_memory.unlink)
+        except FileExistsError:
+          # The children process will fail to create the shared memory block,
+          # and thus they just need to connect to it
+          ppid_shared_memory = SharedMemory(f'terra_{settings.terra.uuid}',
+                                            size=4)
+          ppid = int.from_bytes(ppid_shared_memory.buf[0:4],
+                                'big', signed=False)
+      else:
+        # For everything else, the parent is the current pid, that then forks off
+        ppid = os.getpid()
+      cls._ppid = ppid
+      return cls._ppid
 
 
 class Resource:
@@ -125,7 +159,7 @@ class Resource:
     self.repeat = repeat
     self.lock_dir = os.path.join(settings.terra.lock_dir,
                                  platform.node(),
-                                 str(os.getpid()),
+                                 str(ParentPID.ppid()),
                                  resource_name)
     '''
     str: The directory where the lock files will be stored.
@@ -197,7 +231,7 @@ class Resource:
     # This will break Windows locks
     # https://github.com/tox-dev/py-filelock/issues/15
     if self.FileLock == filelock.SoftFileLock:
-      os.write(lock._lock_file_fd, str(os.getpid()).encode())
+      os.write(lock._lock_file_fd, str(ParentPID.ppid()).encode())
     # If you get this far, the lock is good, so save it in the class
     self._local.lock = lock
     self._local.resource_id = resource_index
