@@ -459,6 +459,10 @@ class TestResourceMulti(TestCase):
     self.config.executor = {'type': self.name}
     super().setUp()
 
+  def tearDown(self):
+    data.clear()
+    super().tearDown()
+
 
 # This has to be a separate class like this so the tests don't get
 class TestResourceMultiTests:
@@ -594,17 +598,6 @@ class TestResourceManager(TestResourceCase):
       ResourceManager.get_resource('unregistered')
 
 
-class TestStrayResources(TestCase):
-  def last_test_stray_resources(self):
-    # Makes sure no tests leave any resources registered, possibly interfering
-    # with other tests.
-    self.assertDictEqual(ResourceManager.resources, {})
-    # Make sure there aren't any resources left over after all the tests have
-    # run. Passing this means that every test that has run has used the correct
-    # mock patches or haven't kept any references around in global persistence
-    self.assertSetEqual(Resource._resources, set())
-
-
 class TestResourceProcessSpawn(TestResourceProcessTests,
                                TestResourceMultiTests,
                                TestSettingsUnconfiguredCase):
@@ -624,11 +617,19 @@ class TestResourceProcessSpawn(TestResourceProcessTests,
              }
     with open(self.settings_filename, 'w') as fid:
       json.dump(config, fid)
-
-    self.data = {}
-
     super().setUp()
 
   def tearDown(self):
-    self.data.clear()
+    data.clear()
     super().tearDown()
+
+
+class TestStrayResources(TestCase):
+  def last_test_stray_resources(self):
+    # Makes sure no tests leave any resources registered, possibly interfering
+    # with other tests.
+    self.assertDictEqual(ResourceManager.resources, {})
+    # Make sure there aren't any resources left over after all the tests have
+    # run. Passing this means that every test that has run has used the correct
+    # mock patches or haven't kept any references around in global persistence
+    self.assertSetEqual(Resource._resources, set())
