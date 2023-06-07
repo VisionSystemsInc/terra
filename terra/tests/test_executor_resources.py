@@ -1,6 +1,6 @@
 import os
 from concurrent.futures import as_completed
-
+import json
 from multiprocessing import Process, get_context
 import platform
 from unittest import mock
@@ -10,14 +10,17 @@ import filelock
 from vsi.tools.dir_util import is_dir_empty
 
 from terra.tests.utils import (
-  TestSettingsConfigureCase, TestCase, TestThreadPoolExecutorCase
+  TestSettingsConfigureCase, TestCase, TestThreadPoolExecutorCase,
+  TestExecutorCase, TestSettingsUnconfiguredCase
 )
-from terra.executor.process import ProcessPoolExecutor
+from terra.executor.process import (
+  ProcessPoolExecutor, ProcessPoolExecutorSpawn
+)
 from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
   ProcessLocalStorage, ThreadLocalStorage, ResourceManager,
-  atexit_resource_release
+  atexit_resource_release, RunnerPID
 )
 from terra import settings
 
@@ -37,10 +40,22 @@ def get_lock_dir(name):
                       platform.node(), str(os.getpid()), name)
 
 
-class TestResourceCase(TestSettingsConfigureCase):
+class TestResourceCase(TestSettingsConfigureCase,
+                       TestExecutorCase):
   def setUp(self):
     self.config.executor = {'type': 'SyncExecutor'}
     super().setUp()
+
+
+class TestRunnerPidCase(TestResourceCase):
+  def test_runner_pid(self):
+    pid = os.getpid()
+
+    with ProcessPoolExecutorSpawn(max_workers=1) as executor:
+      future = executor.submit(RunnerPID.pid)
+      runner_pid = future.result()
+
+    self.assertEqual(pid, runner_pid)
 
 
 class TestResourceSimple(TestResourceCase):
@@ -392,10 +407,20 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertTrue(is_dir_empty(lock_dir1))
 
 
+# In use, Resources are global, so it's best to test them this way. The
+# generation of the Resources are delayed until test time, so that Terra
+# Settings can be mocked ahead of time.
+data = {}
+
+
 # Cannot be member of test case class, because TestCase is not serializable.
 # Somewhere in testcase's _outcome "cannot serialize '_io.TextIOWrapper'
 # object" error occurs
-def acquire(name, i, data):
+def acquire(name, i):
+  # Have to delay creating the resource for spawn workers to regenerate these
+  # with TERRA_SETTINGS_FILE setup
+  if name not in data:
+    data[name] = Resource(name, 2, 1)
   # This function is meant to be called once for a worker, and has some hacks
   # to guarantee simulation of that. If you are adding another test, you
   # probably don't want to use this function, so copy it and make a similar one
@@ -418,32 +443,31 @@ def acquire(name, i, data):
   return (l1, l2)
 
 
-def simple_acquire(name, data):
+def simple_acquire(name):
+  if name not in data:
+    data[name] = Resource(name, 1, 1)
   rv = data[name].acquire()
   return rv
 
-
-class TestResourceMulti:
+class TestResourceMulti(TestCase):
   '''
   Test that Resource works
   '''
 
   def setUp(self):
     self.config.executor = {'type': self.name}
-    self.data = {}
     super().setUp()
 
-  def tearDown(self):
-    self.data.clear()
-    super().tearDown()
 
+# This has to be a separate class like this so the tests don't get
+class TestResourceMultiTests:
   def test_acquire(self):
     # test acquiring in parallel
 
     # tearDown will auto clear this:
     # 1) preventing inter-test name collisions
     # 2) stopping strong refs of resources from being kept around
-    self.data[self.name] = Resource(self.name, 2, 1)
+    data[self.name] = Resource(self.name, 2, 1)
 
     futures = []
     results = []
@@ -451,7 +475,7 @@ class TestResourceMulti:
 
     with self.Executor(max_workers=3) as executor:
       for i in range(3):
-        futures.append(executor.submit(acquire, self.name, i, self.data))
+        futures.append(executor.submit(acquire, self.name, i))
 
       for future in as_completed(futures):
         try:
@@ -470,18 +494,18 @@ class TestResourceMulti:
     # test. Test to see that locks are indeed cleaned up automatically in a
     # way that means one executor after the other will not interfere with each
     # other.
-    self.data[self.name] = Resource(self.name, 1, 1)
+    data[self.name] = Resource(self.name, 1, 1)
     for _ in range(2):
       futures = []
       with self.Executor(max_workers=1) as executor:
-        futures.append(executor.submit(simple_acquire, self.name, self.data))
+        futures.append(executor.submit(simple_acquire, self.name))
 
         for future in as_completed(futures):
           future.result()
 
     # double check resource was freed
-    self.data[self.name].acquire()
-    self.data[self.name].release()
+    data[self.name].acquire()
+    data[self.name].release()
 
   def test_local_storage_type(self):
     # test the types are right
@@ -492,7 +516,7 @@ class TestResourceMulti:
       self.assertIsInstance(resource._local, ThreadLocalStorage)
 
 
-class TestResourceThread(TestResourceMulti,
+class TestResourceThread(TestResourceMulti, TestResourceMultiTests,
                          TestSettingsConfigureCase,
                          TestThreadPoolExecutorCase):
   # Test for multithreaded case
@@ -501,15 +525,7 @@ class TestResourceThread(TestResourceMulti,
     self.Executor = ThreadPoolExecutor
     self.name = "ThreadPoolExecutor"
 
-
-class TestResourceProcess(TestResourceMulti,
-                          TestSettingsConfigureCase):
-  # Test for multiprocess case
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.Executor = ProcessPoolExecutor
-    self.name = "ProcessPoolExecutor"
-
+class TestResourceProcessTests:
   @mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock)
   def test_full(self):
     # Test resource recovery after a premature termination
@@ -539,6 +555,15 @@ class TestResourceProcess(TestResourceMulti,
 
     # Clean up warnings
     resource.release(force=True)
+
+
+class TestResourceProcess(TestResourceMulti, TestResourceMultiTests,
+                          TestSettingsConfigureCase, TestResourceProcessTests):
+  # Test for multiprocess case
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutor
+    self.name = "ProcessPoolExecutor"
 
 
 class TestResourceManager(TestResourceCase):
@@ -578,15 +603,30 @@ class TestStrayResources(TestCase):
     self.assertSetEqual(Resource._resources, set())
 
 
-class ProcessPoolExecutorSpawn(ProcessPoolExecutor):
-  def __init__(self, *args, **kwargs):
-    kwargs['mp_context'] = get_context('spawn')
-    return super().__init__(*args, **kwargs)
-
-
-class TestResourceProcessSpawn(TestResourceProcess):
-  # Test for multiprocess spwan case
+class TestResourceProcessSpawn(TestResourceProcessTests,
+                               TestResourceMultiTests,
+                               TestSettingsUnconfiguredCase):
+  # Test for multiprocess spawn case
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.Executor = ProcessPoolExecutorSpawn
-    self.name = "terra.tests.test_executor_resources.ProcessPoolExecutorSpawn"
+    self.name = "ProcessPoolExecutorSpawn"
+
+  def setUp(self):
+    self.settings_filename = os.path.join(self.temp_dir.name, 'config.json')
+    config = {
+              "processing_dir": self.temp_dir.name,
+              "executor": {
+                            "type": "ProcessPoolExecutorSpawn",
+                          }
+             }
+    with open(self.settings_filename, 'w') as fid:
+      json.dump(config, fid)
+
+    self.data = {}
+
+    super().setUp()
+
+  def tearDown(self):
+    self.data.clear()
+    super().tearDown()

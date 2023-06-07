@@ -1,4 +1,6 @@
 import concurrent.futures
+from multiprocessing import get_context
+
 import terra.executor.base
 
 __all__ = ['ProcessPoolExecutor']
@@ -15,4 +17,9 @@ class ProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor,
     # deadlocks
     from celery import _state
     _state.get_current_app().tasks
+    return super().__init__(*args, **kwargs)
+
+class ProcessPoolExecutorSpawn(ProcessPoolExecutor):
+  def __init__(self, *args, **kwargs):
+    kwargs['mp_context'] = get_context('spawn')
     return super().__init__(*args, **kwargs)
