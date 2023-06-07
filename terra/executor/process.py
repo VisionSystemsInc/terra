@@ -19,6 +19,7 @@ class ProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor,
     _state.get_current_app().tasks
     return super().__init__(*args, **kwargs)
 
+
 class ProcessPoolExecutorSpawn(ProcessPoolExecutor):
   def __init__(self, *args, **kwargs):
     kwargs['mp_context'] = get_context('spawn')

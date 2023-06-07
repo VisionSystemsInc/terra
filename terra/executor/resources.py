@@ -16,8 +16,6 @@ import atexit
 import weakref
 from shutil import rmtree
 import filelock
-import atexit
-from multiprocessing.shared_memory import SharedMemory
 from multiprocessing import current_process
 
 from vsi.tools.dir_util import is_dir_empty

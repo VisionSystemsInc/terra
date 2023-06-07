@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import as_completed
 import json
-from multiprocessing import Process, get_context
+from multiprocessing import Process
 import platform
 from unittest import mock
 from time import sleep
@@ -449,6 +449,7 @@ def simple_acquire(name):
   rv = data[name].acquire()
   return rv
 
+
 class TestResourceMulti(TestCase):
   '''
   Test that Resource works
@@ -524,6 +525,7 @@ class TestResourceThread(TestResourceMulti, TestResourceMultiTests,
     super().__init__(*args, **kwargs)
     self.Executor = ThreadPoolExecutor
     self.name = "ThreadPoolExecutor"
+
 
 class TestResourceProcessTests:
   @mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock)
