@@ -16,6 +16,7 @@ import atexit
 import weakref
 from shutil import rmtree
 import filelock
+from multiprocessing import current_process
 
 from vsi.tools.dir_util import is_dir_empty
 
@@ -45,6 +46,18 @@ class ThreadLocalStorage(ProcessLocalStorage, threading.local):
   '''
   Thread version of :class:`ProcessLocalStorage`
   '''
+
+
+class RunnerPID():
+  @classmethod
+  def pid(cls):
+    # This only works for concurrent.futures children, which is our use case
+    if current_process().name.startswith('Spawn'):
+      # Only spawned children have to separately call to get their parent
+      return os.getppid()
+    else:
+      # For everything else, the parent is the current pid, that then fork
+      return os.getpid()
 
 
 class Resource:
@@ -125,7 +138,7 @@ class Resource:
     self.repeat = repeat
     self.lock_dir = os.path.join(settings.terra.lock_dir,
                                  platform.node(),
-                                 str(os.getpid()),
+                                 str(RunnerPID.pid()),
                                  resource_name)
     '''
     str: The directory where the lock files will be stored.
@@ -197,7 +210,7 @@ class Resource:
     # This will break Windows locks
     # https://github.com/tox-dev/py-filelock/issues/15
     if self.FileLock == filelock.SoftFileLock:
-      os.write(lock._lock_file_fd, str(os.getpid()).encode())
+      os.write(lock._lock_file_fd, str(RunnerPID.pid()).encode())
     # If you get this far, the lock is good, so save it in the class
     self._local.lock = lock
     self._local.resource_id = resource_index

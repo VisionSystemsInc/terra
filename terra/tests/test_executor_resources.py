@@ -1,22 +1,26 @@
 import os
 from concurrent.futures import as_completed
-
+import json
 from multiprocessing import Process
 import platform
 from unittest import mock
+from time import sleep
 
 import filelock
 from vsi.tools.dir_util import is_dir_empty
 
 from terra.tests.utils import (
-  TestSettingsConfigureCase, TestCase, TestThreadPoolExecutorCase
+  TestSettingsConfigureCase, TestCase, TestThreadPoolExecutorCase,
+  TestExecutorCase, TestSettingsUnconfiguredCase
 )
-from terra.executor.process import ProcessPoolExecutor
+from terra.executor.process import (
+  ProcessPoolExecutor, ProcessPoolExecutorSpawn
+)
 from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
   ProcessLocalStorage, ThreadLocalStorage, ResourceManager,
-  atexit_resource_release
+  atexit_resource_release, RunnerPID
 )
 from terra import settings
 
@@ -36,10 +40,22 @@ def get_lock_dir(name):
                       platform.node(), str(os.getpid()), name)
 
 
-class TestResourceCase(TestSettingsConfigureCase):
+class TestResourceCase(TestSettingsConfigureCase,
+                       TestExecutorCase):
   def setUp(self):
     self.config.executor = {'type': 'SyncExecutor'}
     super().setUp()
+
+
+class TestRunnerPidCase(TestResourceCase):
+  def test_runner_pid(self):
+    pid = os.getpid()
+
+    with ProcessPoolExecutorSpawn(max_workers=1) as executor:
+      future = executor.submit(RunnerPID.pid)
+      runner_pid = future.result()
+
+    self.assertEqual(pid, runner_pid)
 
 
 class TestResourceSimple(TestResourceCase):
@@ -391,10 +407,9 @@ class TestResourceSoftLockSelection(TestResourceCase):
     self.assertTrue(is_dir_empty(lock_dir1))
 
 
-# tearDown will auto clear this:
-# 1) preventing inter-test name collisions
-# 2) stopping strong refs of resources from being kept around
-
+# In use, Resources are global, so it's best to test them this way. The
+# generation of the Resources are delayed until test time, so that Terra
+# Settings can be mocked ahead of time.
 data = {}
 
 
@@ -402,11 +417,17 @@ data = {}
 # Somewhere in testcase's _outcome "cannot serialize '_io.TextIOWrapper'
 # object" error occurs
 def acquire(name, i):
+  # Have to delay creating the resource for spawn workers to regenerate these
+  # with TERRA_SETTINGS_FILE setup
+  if name not in data:
+    data[name] = Resource(name, 2, 1)
   # This function is meant to be called once for a worker, and has some hacks
   # to guarantee simulation of that. If you are adding another test, you
   # probably don't want to use this function, so copy it and make a similar one
   l1 = data[name].acquire()
   l2 = data[name].acquire()
+
+  sleep(0.1)
 
   # There is a chance that the same thread/process will be reused because of
   # how concurrent.futures optimizes, but i is unique, and used to prevent
@@ -423,13 +444,13 @@ def acquire(name, i):
 
 
 def simple_acquire(name):
+  if name not in data:
+    data[name] = Resource(name, 1, 1)
   rv = data[name].acquire()
-  # import time
-  # time.sleep(0.1)
   return rv
 
 
-class TestResourceMulti:
+class TestResourceMulti(TestCase):
   '''
   Test that Resource works
   '''
@@ -442,8 +463,15 @@ class TestResourceMulti:
     data.clear()
     super().tearDown()
 
+
+# This has to be a separate class like this so the tests don't get
+class TestResourceMultiTests:
   def test_acquire(self):
     # test acquiring in parallel
+
+    # tearDown will auto clear this:
+    # 1) preventing inter-test name collisions
+    # 2) stopping strong refs of resources from being kept around
     data[self.name] = Resource(self.name, 2, 1)
 
     futures = []
@@ -493,7 +521,7 @@ class TestResourceMulti:
       self.assertIsInstance(resource._local, ThreadLocalStorage)
 
 
-class TestResourceThread(TestResourceMulti,
+class TestResourceThread(TestResourceMulti, TestResourceMultiTests,
                          TestSettingsConfigureCase,
                          TestThreadPoolExecutorCase):
   # Test for multithreaded case
@@ -503,14 +531,7 @@ class TestResourceThread(TestResourceMulti,
     self.name = "ThreadPoolExecutor"
 
 
-class TestResourceProcess(TestResourceMulti,
-                          TestSettingsConfigureCase):
-  # Test for multiprocess case
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.Executor = ProcessPoolExecutor
-    self.name = "ProcessPoolExecutor"
-
+class TestResourceProcessTests:
   @mock.patch.object(filelock, 'FileLock', filelock.SoftFileLock)
   def test_full(self):
     # Test resource recovery after a premature termination
@@ -542,6 +563,15 @@ class TestResourceProcess(TestResourceMulti,
     resource.release(force=True)
 
 
+class TestResourceProcess(TestResourceMulti, TestResourceMultiTests,
+                          TestSettingsConfigureCase, TestResourceProcessTests):
+  # Test for multiprocess case
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutor
+    self.name = "ProcessPoolExecutor"
+
+
 class TestResourceManager(TestResourceCase):
   def setUp(self):
     self.patches.append(mock.patch.dict(ResourceManager.resources))
@@ -566,6 +596,32 @@ class TestResourceManager(TestResourceCase):
     # Test getting unregistered fails
     with self.assertRaises(KeyError):
       ResourceManager.get_resource('unregistered')
+
+
+class TestResourceProcessSpawn(TestResourceProcessTests,
+                               TestResourceMultiTests,
+                               TestSettingsUnconfiguredCase):
+  # Test for multiprocess spawn case
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutorSpawn
+    self.name = "ProcessPoolExecutorSpawn"
+
+  def setUp(self):
+    self.settings_filename = os.path.join(self.temp_dir.name, 'config.json')
+    config = {
+              "processing_dir": self.temp_dir.name,
+              "executor": {
+                            "type": "ProcessPoolExecutorSpawn",
+                          }
+             }
+    with open(self.settings_filename, 'w') as fid:
+      json.dump(config, fid)
+    super().setUp()
+
+  def tearDown(self):
+    data.clear()
+    super().tearDown()
 
 
 class TestStrayResources(TestCase):
