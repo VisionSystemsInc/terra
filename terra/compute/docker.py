@@ -51,7 +51,7 @@ RE Groups
 
 class Compute(BaseCompute):
   '''
-  Docker compute model, specifically ``docker-compose``
+  Docker compute model, specifically ``docker compose``
   '''
 
   def run_service(self, service_info):
@@ -91,7 +91,7 @@ class Compute(BaseCompute):
 
   def config_service(self, service_info):
     '''
-    Returns the ``docker-compose config`` output
+    Returns the ``docker compose config`` output
     '''
 
     optional_args = {}
@@ -168,7 +168,7 @@ class Service(ContainerService):
   def __init__(self):
     super().__init__()
 
-    # default docker-compose file (if file exists)
+    # default docker compose file (if file exists)
     compose_file = os.path.join(self.env['TERRA_APP_DIR'],
                                 'docker-compose.yml')
     if os.path.isfile(compose_file):

@@ -80,7 +80,7 @@ function terra_caseify()
         justify build recipes-auto "${TERRA_CWD}/docker/"*.Dockerfile
         Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
         if [ "${TERRA_LOCAL-}" = "0" ]; then
-          COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+          COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
         fi
         justify terra build-services
       fi
@@ -94,8 +94,8 @@ function terra_caseify()
       ;;
 
     terra_build-services) # Build services. Takes arguments that are passed to the \
-                    # docker-compose build command, such as "redis"
-      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" build ${@+"${@}"}
+                    # docker buildx bake command, such as "redis"
+      Docker buildx bake -f "${TERRA_CWD}/docker-compose.yml" ${@+"${@}"}
       extra_args=$#
       ;;
 
@@ -249,11 +249,6 @@ function terra_caseify()
     terra_down) # Stop redis (and any other services) in the background.
       Just-docker-compose -f "${TERRA_CWD}/docker-compose.yml" down
       ;;
-    terra_deploy) # Deploy services on a swarm
-      Docker-compose -f "${TERRA_CWD}/docker-compose.yml" \
-                     -f "${TERRA_CWD}/docker-compose-swarm.yml" config | \
-          Docker stack deploy -c - terra
-      ;;
 
 
     ### Testing ###
@@ -311,36 +306,45 @@ function terra_caseify()
         # to be run the first time sync is run.
         touch "${TERRA_CWD}/.just_synced"
       fi
+
+      if [ -s "${TERRA_SKIP_DOCKER_COMPOSE_CHECK+set}" ] && ! "${DOCKER_COMPOSE[@]}" &> /dev/null; then
+        source "${VSI_COMMON_DIR}/linux/colors.bsh"
+        echo "${RED}The docker compose plugin does not appear to be installed.${NC}"
+        echo "Please have IT install the 'docker-compose-plugin' or install a local copy in your home directory:"
+
+        local plugin_dir=${DOCKER_CONFIG-~/.docker}/cli-plugins
+        local ver=v2.20.3
+        local url
+        local filename=${plugin_dir}/docker-compose
+        echo "${YELLOW}mkdir -p ${plugin_dir}"
+        if [ "${OS-}" = "Windows_NT" ]; then
+          filename=${filename}.exe
+          url="https://github.com/docker/compose/releases/download/${ver}/docker-compose-windows-x86_64.exe"
+        elif [[ ${OSTYPE-} = darwin* ]]; then
+          if [ "${HOSTTYPE}" = "x86_64" ]; then
+            url="https://github.com/docker/compose/releases/download/${ver}/docker-compose-darwin-x86_64"
+          else
+            url="https://github.com/docker/compose/releases/download/${ver}/docker-compose-darwin-aarch64"
+          fi
+        else
+          url="https://github.com/docker/compose/releases/download/${ver}/docker-compose-linux-x86_64"
+        fi
+        echo "curl -Lo \"${filename}\" \"${url}\""
+        echo "chmod 755 \"${filename}\""
+        echo "${NC}"
+        JUST_IGNORE_EXIT_CODES=1
+        "${DOCKER_COMPOSE[@]}"
+      fi
+
       justify git_submodule-update # For those users who don't remember!
+
       if [ "${TERRA_LOCAL-}" = "0" ]; then
-        COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
+        COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
         justify terra sync-pipenv
         justify terra build-services
       else
         justify terra sync-pipenv
         local pipenv_dir="$(Terra_Pipenv --venv)"
-        if [ "${OS-}" = "Windows_NT" ]; then
-          if [ ! -e "${pipenv_dir}/Scripts/docker-compose.exe" ] || [ "$(stat -c %s "${pipenv_dir}/Scripts/docker-compose.exe")" -lt 1000000 ]; then
-            download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-windows-x86_64.exe \
-                            "${pipenv_dir}/Scripts/docker-compose.exe"
-          fi
-        else
-          if [ ! -e "${pipenv_dir}/bin/docker-compose" ] || [ "$(stat -c %s "${pipenv_dir}/bin/docker-compose")" -lt 1000000 ]; then
-            if [[ ${OSTYPE-} = darwin* ]]; then
-              if [ "${HOSTTYPE}" = "x86_64" ]; then
-                download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-darwin-x86_64 \
-                                "${pipenv_dir}/bin/docker-compose"
-              else
-                download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-darwin-aarch64 \
-                                "${pipenv_dir}/bin/docker-compose"
-              fi
-            else
-              download_to_file https://github.com/docker/compose/releases/download/${TERRA_DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64 \
-                              "${pipenv_dir}/bin/docker-compose"
-            fi
-            chmod 755 "${pipenv_dir}/bin/docker-compose"
-          fi
-        fi
       fi
       ;;
 
@@ -482,8 +486,8 @@ function terra_caseify()
       local answer_clean_all="${answer_clean_all-}"
       ask_question "Are you sure? This will remove packages not in Pipfile!" answer_clean_all
       [ "${answer_clean_all}" == "0" ] && return 1
-      COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker-compose clean terra-venv
-      COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker-compose clean terra-redis
+      COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
+      COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker compose clean terra-redis
       if [ "${TERRA_LOCAL-}" = "1" ]; then
         Terra_Pipenv --rm
       fi

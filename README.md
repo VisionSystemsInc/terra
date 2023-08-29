@@ -8,7 +8,7 @@ Terra project from VSI
 - pipenv
 - docker
 - bash
-- docker-compose
+- docker compose plugin (2.x)
 
 ## Getting started
 
