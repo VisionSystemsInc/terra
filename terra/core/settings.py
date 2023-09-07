@@ -724,7 +724,7 @@ class LazySettingsThreaded(LazySettings):
   @classmethod
   def downcast(cls, obj):
     # This downcast function was intended for LazySettings instances only
-    assert type(obj) == LazySettings
+    assert isinstance(obj, LazySettings)
     # Put settings in __wrapped where property below expects it.
     settings = obj._wrapped
     # Downcast
