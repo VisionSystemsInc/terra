@@ -205,7 +205,7 @@ class {self.app_camel_name}DockerService({self.app_camel_name}ContainerService, 
   def __init__(self):
     super().__init__()
 
-    # default docker-compose files
+    # default docker compose files
     self.compose_files = [
         os.path.join(env['{self.app_prefix}_SOURCE_DIR'], 'docker-compose.yml'),
     ]

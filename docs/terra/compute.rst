@@ -18,7 +18,7 @@ The :py:class:`terra.compute.dummy.Compute` is a debugging tool that simply dry-
 DockerCompute
 ^^^^^^^^^^^^^
 
-The :py:class:`terra.compute.docker.Compute` compute is for running in docker containers, creating and running a container for each service that is run. By default, ``docker-compose`` is used by the service definition to run the container. Supports :ref:`settings-path-translation`.
+The :py:class:`terra.compute.docker.Compute` compute is for running in docker containers, creating and running a container for each service that is run. By default, ``docker compose`` is used by the service definition to run the container. Supports :ref:`settings-path-translation`.
 
 SingularityCompute
 ^^^^^^^^^^^^^^^^^^
