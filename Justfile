@@ -74,11 +74,11 @@ function terra_caseify()
     ### Building docker images ###
     terra_build) # Build Docker image
       if [ "$#" -gt "0" ]; then
-        Docker-compose build ${@+"${@}"}
+        Docker compose build ${@+"${@}"}
         extra_args=$#
       else
         justify build recipes-auto "${TERRA_CWD}/docker/"*.Dockerfile
-        Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" build
+        Docker compose -f "${TERRA_CWD}/docker-compose-main.yml" build
         if [ "${TERRA_LOCAL-}" = "0" ]; then
           COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
         fi
@@ -238,8 +238,8 @@ function terra_caseify()
       if [ ! -s "${TERRA_REDIS_COMMANDER_SECRET_FILE}" ]; then
         justify generate-redis-commander-hash
       fi
-      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" up -d redis-commander
-      Docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" logs -f redis-commander
+      Docker compose -f "${TERRA_CWD}/docker-compose-main.yml" up -d redis-commander
+      Docker compose -f "${TERRA_CWD}/docker-compose-main.yml" logs -f redis-commander
       ;;
 
     ### Deploy command ###
@@ -352,7 +352,7 @@ function terra_caseify()
                          # are applied e.g. after "git checkout" for a singularity build
       justify git_submodule-update # For those users who don't remember!
       justify terra_sync-pipenv
-      if command -v "${DOCKER_COMPOSE}" &> /dev/null; then
+      if "${DOCKER_COMPOSE[@]}" &> /dev/null; then
         justify terra_build-singular
       fi
       ;;
