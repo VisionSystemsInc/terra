@@ -62,20 +62,20 @@ commands:
             tar zc --exclude .git . | docker run -i -v ${SOURCE_DIR}:/repo -w /repo alpine:3.8 tar zx
 
   # run "just ci load" command for repository
-  # - latest cache is pushed only from master branch of main repo (not forks)
+  # - latest cache is pushed only from main branch of main repo (not forks)
   # - assumes python3 with pip is available
   # - required environment variables
   #     $DOCKER_USER - docker username
   #     $DOCKER_PASS - docker password
-  # - optional enviromment variables
-  #   (see https://github.com/VisionSystemsInc/vsi_common/blob/master/linux/just_files/just_ci_functions.bsh)
+  # - optional environment variables
+  #   (see https://github.com/VisionSystemsInc/vsi_common/blob/main/linux/just_files/just_ci_functions.bsh)
   #     $JUST_CI_RECIPE_REPO - dockerhub recipe cache (default = "vsiri/ci_cache_recipes")
   #     $JUST_CI_RECIPE_VERSION - version string for recipe cache (default = "")
   #     $JUST_CI_RECIPE_ARGS - additional `ci_load` arguments for recipe cache (default = "--no-push")
   #     $JUST_CI_CACHE_REPO - dockerhub service cache (default = "vsiri/ci_cache")
   #     $JUST_CI_CACHE_VERSION - version string for service cache (default = "")
   #     $JUST_CI_CACHE_ARGS - additional `ci_load` arguments for service cache
-  #     $JUST_CI_BRANCH_PUSH - branch (besides master) for dockerhub push
+  #     $JUST_CI_BRANCH_PUSH - branch (besides main) for dockerhub push
   ci_load:
     description: "Build dockers (ci_load)"
     steps:
@@ -97,7 +97,7 @@ commands:
 
             # push only from selected branches of main repo
             if [[ "${CIRCLE_PROJECT_USERNAME,,}" == "visionsystemsinc" && \
-                  ("${CIRCLE_BRANCH}" == "master" || \
+                  ("${CIRCLE_BRANCH}" == "main" || \
                    "${CIRCLE_BRANCH}" == "${JUST_CI_BRANCH_PUSH-}") ]]
             then
               : ${JUST_CI_CACHE_ARGS="--quiet-pull --push"}
@@ -196,4 +196,4 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
