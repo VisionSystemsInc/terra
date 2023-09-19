@@ -26,7 +26,9 @@ class TestTranslateUtils(TestCase):
 
     # test data
     test_data = [
+        (('src', ), ('dst', )),
         (('src', 'abc'), ('dst', 'ABC')),
+        (('src', 'abc', 'def'), ('dst', 'ABC', 'DEF')),
         (('src', 'abc_output'), ('dst', 'OUTPUT')),
         (('src', 'def'), ('dst', 'DEF')),
         (('src', 'abc.json'), ('dst', 'ABC.json')),
@@ -64,6 +66,7 @@ class TestTranslateUtils(TestCase):
 
   def _test_patch_volume(self, container_platform):
     volume_map = self._create_volume_map(os.name, container_platform)
+    volume_map_rev = volume_map[::-1]
     host_os, container_os = self._os(os.name, container_platform)
 
     for host_vol, container_vol in volume_map:
@@ -80,6 +83,8 @@ class TestTranslateUtils(TestCase):
         host_item = host_os.join(host_vol, *item)
         container_item = container_os.join(container_vol, *item)
         result = utils.patch_volume(host_item, volume_map, container_platform)
+        self.assertEqual(result, container_item)
+        result = utils.patch_volume(host_item, volume_map_rev, container_platform)
         self.assertEqual(result, container_item)
 
   def test_patch_volume_linux(self):
