@@ -84,7 +84,8 @@ class TestTranslateUtils(TestCase):
         container_item = container_os.join(container_vol, *item)
         result = utils.patch_volume(host_item, volume_map, container_platform)
         self.assertEqual(result, container_item)
-        result = utils.patch_volume(host_item, volume_map_rev, container_platform)
+        result = utils.patch_volume(
+          host_item, volume_map_rev, container_platform)
         self.assertEqual(result, container_item)
 
   def test_patch_volume_linux(self):
