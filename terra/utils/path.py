@@ -82,12 +82,18 @@ def patch_volume(value, volume_map, container_platform='linux'):
     value_pathlib = value_pathlib.expanduser().resolve()
     volume_map_pathlib = pathlib_map(volume_map, container_platform)
 
+    results = []
     for host_pathlib, container_pathlib in volume_map_pathlib:
       try:
         remainder = value_pathlib.relative_to(host_pathlib)
       except ValueError:
         continue
-      return str(container_pathlib / remainder)
+      results.append((len(str(remainder)),
+                      str(container_pathlib / remainder)))
+
+    # return "best" result with minimum remainder length
+    if results:
+      return min(results, key=lambda x: x[0])[-1]
 
   return value
 
