@@ -11,10 +11,11 @@ from vsi.vendored.envcontext import EnvironmentContext
 
 from .utils import TestCase, TestLoggerCase, TestLoggerConfigureCase
 from terra import settings
+from terra import logger
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
   ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder,
-  ExpandedString, LazySettings, override_config
+  ExpandedString, LazySettings, override_config, json_load
 )
 
 
@@ -491,6 +492,48 @@ class TestSettings(TestLoggerCase):
     self.assertEqual(settings.a, 15)
     self.assertNotIn('b', settings)
     self.assertNotIn('c', settings)
+
+  def test_json_load(self):
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{}')
+    self.assertDictEqual(json_load(fid.name), {})
+
+    # Test an empty file is treated as an empty dict instead of erroring
+    self.assertDictEqual(json_load(os.path.devnull), {})
+
+    # Test normal json + comments
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('''{"a": 123, "b": true,
+                    "c": "foo bar",
+                    "d": {
+                      // This is a comment
+                      "e": ""
+                      /*
+                        Also a comment
+                      */
+                      }
+                    }''')
+    self.assertDictEqual(json_load(fid.name),
+                         {"a": 123,
+                          "b": True,
+                          "c": "foo bar",
+                          "d": {"e": ""}})
+
+    # Erroneous json file
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a":')
+    with self.assertLogs(level=logger.FATAL) as cm:
+      with self.assertRaises(SystemExit):
+        json_load(fid.name)
+    self.assertIn("Error parsing the JSON config file", str(cm.output))
+
+    with self.assertLogs(level=logger.FATAL) as cm:
+      with self.assertRaises(SystemExit):
+        json_load(os.path.join(self.temp_dir.name, 'does_not_exist.json'))
+    self.assertIn("Cannot find JSON config file", str(cm.output))
 
   @mock.patch('terra.core.settings.global_templates', [])
   def test_json(self):
