@@ -928,8 +928,8 @@ def json_load(filename):
   try:
     with open(filename, 'r') as fid:
       json_string = fid.read()
-    if not json_string: # handle /dev/null
-      json_string='{}'
+    if not json_string:  # handle /dev/null
+      json_string = '{}'
     return json.loads(json_string)
   except JSONDecodeError as e:
     logger.critical(
