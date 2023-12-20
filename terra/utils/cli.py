@@ -93,7 +93,7 @@ class ArgumentParser(argparse.ArgumentParser):
                       help="Override terra settings, e.g. "
                            "'--set logging.level=INFO'", action=OverrideAction)
 
-  def add_settings_file(self, **kwargs):
+  def add_settings_file(self, default_null=False, **kwargs):
     '''
     Add positional argument for settings file
     '''
@@ -108,6 +108,9 @@ class ArgumentParser(argparse.ArgumentParser):
     TERRA_SETTINGS_FILE = os.getenv('TERRA_SETTINGS_FILE')
     if TERRA_SETTINGS_FILE:
       aa_kwargs['default'] = resolve_path(TERRA_SETTINGS_FILE)
+      aa_kwargs['nargs'] = '?'
+    elif default_null:
+      aa_kwargs['default'] = os.devnull
       aa_kwargs['nargs'] = '?'
 
     # apply overrides
