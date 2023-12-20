@@ -81,7 +81,14 @@ class TestDockerRun(TestComputeDockerCase):
   def mock_just(_self, *args, **kwargs):
     _self.just_args = args
     _self.just_kwargs = kwargs
-    return type('blah', (object,), {'wait': lambda self: _self.return_value})()
+
+    class MockJust:
+      def wait(self):
+        return _self.return_value
+      @property
+      def returncode(self):
+        return _self.return_value
+    return MockJust()
 
   def setUp(self):
     # Mock the just call for recording

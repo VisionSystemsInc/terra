@@ -2,6 +2,7 @@ import ast
 import os
 import time
 import atexit
+import signal
 from logging import StreamHandler
 from logging.handlers import SocketHandler
 import threading
@@ -19,6 +20,23 @@ logger = getLogger(__name__)
 class ServiceRunFailed(Exception):
   ''' Exception thrown when a service runner returns non-zero
   '''
+
+  def __init__(self, return_code=None):
+    self.return_code = return_code
+    if return_code is None:
+      msg = f'The service runner failed, with unknown return code'
+    elif return_code >= 128:
+      sig = signal._int_to_enum(return_code-128, signal.Signals)
+      if isinstance(sig, signal.Signals):
+        msg = f'The service runner failed, throwing {sig.name} ({return_code})'
+        if sig.name == 'SIGKILL':
+          msg += '. This could be due to out of memory'
+      else:
+        msg = f'The service runner failed, throwing return code {return_code}'
+    else:
+      msg = f'The service runner failed, throwing return code {return_code}'
+
+    super().__init__(msg)
 
 
 class BaseService:
