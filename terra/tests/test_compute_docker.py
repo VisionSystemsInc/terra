@@ -85,6 +85,7 @@ class TestDockerRun(TestComputeDockerCase):
     class MockJust:
       def wait(self):
         return _self.return_value
+
       @property
       def returncode(self):
         return _self.return_value

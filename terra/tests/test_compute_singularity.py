@@ -33,9 +33,11 @@ class TestSingular(TestComputeSingularityCase):
   def mock_just(_self, *args, **kwargs):
     _self.just_args = args
     _self.just_kwargs = kwargs
+
     class MockJust:
       def wait(self):
         return _self.return_value
+
       @property
       def returncode(self):
         return _self.return_value

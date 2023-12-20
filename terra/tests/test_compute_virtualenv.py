@@ -40,9 +40,11 @@ class TestVirtualEnv(TestSettingsConfigureCase):
   def mock_popen(_self, *args, **kwargs):
     _self.popen_args = args
     _self.popen_kwargs = kwargs
+
     class MockJust:
       def wait(self):
         return _self.return_value
+
       @property
       def returncode(self):
         return _self.return_value
