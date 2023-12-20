@@ -1,11 +1,52 @@
 from unittest import mock
 import argparse
 import os
+import io
+import contextlib
 
-from terra.utils.cli import FullPaths, FullPathsAppend, OverrideAction
+from terra.utils.cli import (
+  FullPaths, FullPathsAppend, OverrideAction,
+  ArgumentParser as CliArgumentParser
+)
 from .utils import TestCase
 
 from terra.core.settings import override_config
+
+
+class TestSettingsFile(TestCase):
+  def test_settings_file(self):
+    parser = CliArgumentParser()
+    parser.add_settings_file()
+    stderr = io.StringIO()
+    with contextlib.redirect_stderr(stderr):
+      with self.assertRaises(SystemExit):
+        parser.parse_args([])
+    missing_settings = ("error: the following arguments are required: "
+                        "settings_file")
+    self.assertIn(missing_settings, stderr.getvalue())
+
+    parser = CliArgumentParser()
+    parser.add_settings_file()
+    args = parser.parse_args(["/foo"])
+    self.assertEqual(args.settings_file, "/foo")
+
+    with mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='/bar'):
+      parser = CliArgumentParser()
+      parser.add_settings_file()
+      args = parser.parse_args([])
+    self.assertEqual(args.settings_file, "/bar")
+
+    # Test default_null=True
+    parser = CliArgumentParser()
+    parser.add_settings_file(default_null=True)
+    args = parser.parse_args([])
+    self.assertEqual(args.settings_file, os.devnull)
+
+    with mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='/bar'):
+      parser = CliArgumentParser()
+      parser.add_settings_file(default_null=True)
+      args = parser.parse_args([])
+    self.assertEqual(args.settings_file, "/bar")
 
 
 class TestFullPaths(TestCase):
