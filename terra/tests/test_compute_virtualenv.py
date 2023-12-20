@@ -40,8 +40,15 @@ class TestVirtualEnv(TestSettingsConfigureCase):
   def mock_popen(_self, *args, **kwargs):
     _self.popen_args = args
     _self.popen_kwargs = kwargs
-    # Wait will return whatever is in self.return_valu
-    return type('blah', (object,), {'wait': lambda self: _self.return_value})()
+
+    class MockJust:
+      def wait(self):
+        return _self.return_value
+
+      @property
+      def returncode(self):
+        return _self.return_value
+    return MockJust()
 
   def test_run_failed(self):
     compute = virtualenv.Compute()

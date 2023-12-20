@@ -80,7 +80,7 @@ class Compute(BaseCompute):
     pid = Popen(service_info.command, env=env, executable=executable)
 
     if pid.wait() != 0:
-      raise ServiceRunFailed()
+      raise ServiceRunFailed(pid.returncode)
 
   def add_volume(self, local, no_remote=None, flags=None, prefix=None,
                  local_must_exist=False):

@@ -87,7 +87,7 @@ class Compute(BaseCompute):
                env=service_info.env)
 
     if pid.wait() != 0:
-      raise ServiceRunFailed()
+      raise ServiceRunFailed(pid.returncode)
 
   def config_service(self, service_info):
     '''
