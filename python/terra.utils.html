@@ -153,6 +153,110 @@
 <dd></dd></dl>
 
 </section>
+<section id="module-terra.utils.logger">
+<span id="terra-utils-logger-module"></span><h2>terra.utils.logger module<a class="headerlink" href="#module-terra.utils.logger" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="terra.utils.logger.connect_log_terra_version">
+<span class="sig-prename descclassname"><span class="pre">terra.utils.logger.</span></span><span class="sig-name descname"><span class="pre">connect_log_terra_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terra_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.logger.connect_log_terra_version" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to add the commit name of your app to the terra logs for your
+app.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>app_name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – Your app name, used in the the log messages.</p></li>
+<li><p><strong>terra_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, optional) – The environment variable prefix. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;TERRA_&quot;+app_name.upper()</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>In your app <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file, you should include the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">terra.utils.logger</span> <span class="kn">import</span> <span class="n">connect_log_terra_version</span>
+<span class="n">connect_log_terra_version</span><span class="p">(</span><span class="s1">&#39;AppName&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#terra.utils.logger.log_terra_version" title="terra.utils.logger.log_terra_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_terra_version</span></code></a></dt><dd><p>Dispatch handler for this feature.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="terra.utils.logger.log_terra_version">
+<span class="sig-prename descclassname"><span class="pre">terra.utils.logger.</span></span><span class="sig-name descname"><span class="pre">log_terra_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terra_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.utils.logger.log_terra_version" title="Permalink to this definition"></a></dt>
+<dd><p>Log the version of Terra App</p>
+<p>Uses the <a class="reference internal" href="terra.core.html#terra.core.signals.logger_configure" title="terra.core.signals.logger_configure"><code class="xref py py-data docutils literal notranslate"><span class="pre">logger</span> <span class="pre">configured</span> <span class="pre">dispatcher</span></code></a> to log the Terra App version used to
+create the environment. Since this can be a complicated mixture of code
+versions, the Terra App version is logged by the main controller and by each
+service runner. This will capture a wide array of scenarios from development
+environment to fully containerized deploy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>app_name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – Name of app that appears in the logs</p></li>
+<li><p><strong>terra_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – Name of environment variable prefix used</p></li>
+</ul>
+</dd>
+</dl>
+<p>The following environment variables are needed to determine the git version:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>{terra_prefix}_IMAGE_COMMIT</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – This should be set in the app’s image, and should be the output of
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">describe</span> <span class="pre">--all</span> <span class="pre">--long</span> <span class="pre">--always</span> <span class="pre">--dirty</span></code>.</p></li>
+<li><p><strong>{terra_prefix}_DEPLOY_COMMIT</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – This should be set in the deploy image, and should be the output of
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">describe</span> <span class="pre">--all</span> <span class="pre">--long</span> <span class="pre">--always</span> <span class="pre">--dirty</span></code>.</p></li>
+<li><p><strong>{terra_prefix}_CWD</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – When not running in the deploy image, the location of the app source code
+directory is used to determine the current version in the controller.</p></li>
+</ul>
+</dd>
+</dl>
+<p>A typical log will include these lines to tell you what version is running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2024</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">11</span> <span class="mi">08</span><span class="p">:</span><span class="mi">39</span><span class="p">:</span><span class="mi">53</span><span class="p">,</span><span class="mi">820</span> <span class="p">(</span><span class="n">computer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">controller</span><span class="p">):</span> <span class="n">INFO</span><span class="o">/</span><span class="n">MainProcess</span> <span class="o">-</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span> <span class="n">Terra</span> <span class="n">AppName</span> <span class="n">version</span><span class="p">:</span> <span class="n">heads</span><span class="o">/</span><span class="n">main</span><span class="o">-</span><span class="mi">0</span><span class="o">-</span><span class="n">g5e17bc5</span>
+<span class="o">...</span>
+<span class="mi">2024</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">11</span> <span class="mi">08</span><span class="p">:</span><span class="mi">40</span><span class="p">:</span><span class="mi">03</span><span class="p">,</span><span class="mi">382</span> <span class="p">(</span><span class="mi">13</span><span class="n">ab62e95a44</span><span class="p">:</span><span class="n">runner</span><span class="p">):</span> <span class="n">INFO</span><span class="o">/</span><span class="n">MainProcess</span> <span class="o">-</span> <span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span> <span class="n">Terra</span> <span class="n">AppName</span> <span class="n">Runner</span> <span class="n">version</span><span class="p">:</span> <span class="n">heads</span><span class="o">/</span><span class="n">main</span><span class="o">-</span><span class="mi">0</span><span class="o">-</span><span class="n">g5e17bc5</span>
+</pre></div>
+</div>
+<p class="rubric">Examples</p>
+<p>Details in the versions can be used to interpret a variety of situations,
+such as:</p>
+<ul class="simple">
+<li><p>Development environment synced and running on main (as shown above):</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">version:</span> <span class="pre">heads/main-0-g5e17bc5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">Runner</span> <span class="pre">version:</span> <span class="pre">heads/main-0-g5e17bc5</span></code></p></li>
+</ul>
+</li>
+<li><p>Development environment where <cite>just sync</cite> was run off of main, but then
+files were modified but not committed when running</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">version:</span> <span class="pre">heads/main-0-g5e17bc5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">Runner</span> <span class="pre">version:</span> <span class="pre">heads/main-0-g5e17bc5-dirty</span></code></p></li>
+</ul>
+</li>
+<li><p>Development environment where <code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">sync</span></code> was run off sha 7b227ce, but
+then a different commit was used when running</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">version:</span> <span class="pre">heads/example_branch-0-g7b227ce</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">Runner</span> <span class="pre">version:</span> <span class="pre">heads/example_branch-0-g305bcbb</span></code></p></li>
+</ul>
+</li>
+<li><p>Fully containerized:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">Deploy</span> <span class="pre">version:</span> <span class="pre">heads/main-0-g5e17bc5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Terra</span> <span class="pre">AppName</span> <span class="pre">Runner</span> <span class="pre">version:</span> <span class="pre">heads/main-0-g5e17bc5</span></code></p></li>
+<li><p>When ever the deploy image is used, the word “Deploy” will appear.</p></li>
+<li><p>In fully containerize it would be highly irregular for the sha’s to
+differ</p></li>
+<li><p>In official deploy images, they should never be dirty</p></li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+</section>
 <section id="module-terra.utils.new">
 <span id="terra-utils-new-module"></span><h2>terra.utils.new module<a class="headerlink" href="#module-terra.utils.new" title="Permalink to this heading"></a></h2>
 <dl class="py class">

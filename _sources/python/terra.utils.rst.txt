@@ -12,6 +12,14 @@ terra.utils.cli module
    :undoc-members:
    :show-inheritance:
 
+terra.utils.logger module
+-------------------------
+
+.. automodule:: terra.utils.logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 terra.utils.new module
 ----------------------
 
