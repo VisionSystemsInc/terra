@@ -29,19 +29,19 @@ def log_terra_version(sender, signal, app_name=None, terra_prefix=None,
     Name of environment variable prefix used
 
 
-  The following environment variables are needed to determine the git commit:
+  The following environment variables are needed to determine the git version:
 
   Attributes
   ----------
   {terra_prefix}_IMAGE_COMMIT : :obj:`str`
-    This should be set in the container image, and should be the output of
+    This should be set in the app's image, and should be the output of
     ``git describe --all --long --always --dirty``.
   {terra_prefix}_DEPLOY_COMMIT : :obj:`str`
     This should be set in the deploy image, and should be the output of
     ``git describe --all --long --always --dirty``.
   {terra_prefix}_CWD : :obj:`str`
-    The location of the app source code directory, for use in development
-    environment to determine the current git commit.
+    When not running in the deploy image, the location of the app source code
+    directory is used to determine the current version in the controller.
 
 
   A typical log will include these lines to tell you what version is running:
@@ -84,13 +84,17 @@ def log_terra_version(sender, signal, app_name=None, terra_prefix=None,
       differ
     - In official deploy images, they should never be dirty
   '''  # noqa: E501
+
+  # Cover the corner case when settings don't initialized
   if terra.settings.configured:
     if settings.terra.zone == 'controller':
       try:
+        # This is the path when in the deploy image
         terra_version = env[f'{terra_prefix}_DEPLOY_COMMIT']
         logger.info(f"Terra {app_name} Deploy version: {terra_version}")
       except KeyError:
         try:
+          # This is the path for the controller on a dev environment
           terra_version = (
             Popen(
               ['git', 'describe', '--all', '--long', '--always', '--dirty'],
@@ -109,12 +113,15 @@ def log_terra_version(sender, signal, app_name=None, terra_prefix=None,
           logger.warning(f"Terra {app_name} version: Unknown")
     elif settings.terra.zone == 'runner':
       try:
+        # When using a container
         terra_version = env[f'{terra_prefix}_IMAGE_COMMIT']
         logger.info(f"Terra {app_name} Runner version: {terra_version}")
       except KeyError:
+        # Other cases like virtualenv will just say unknown
         logger.warning(f"Terra {app_name} Runner version: Unknown")
   else:
-    logger.warning(f"Preconfig - Terra {app_name} Runner version: Unknown")
+    # This hopefully won't be seen in normal use
+    logger.warning(f"Preconfig - Terra {app_name} version: Unknown")
 
 
 def connect_log_terra_version(app_name, terra_prefix=None):
