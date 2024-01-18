@@ -85,7 +85,7 @@ def log_terra_version(sender, signal, app_name=None, terra_prefix=None,
     - In official deploy images, they should never be dirty
   '''  # noqa: E501
 
-  # Cover the corner case when settings don't initialized
+  # Cover the corner case when settings aren't initialized
   if terra.settings.configured:
     if settings.terra.zone == 'controller':
       try:
