@@ -28,7 +28,7 @@ os.environ['TERRA_SETTINGS_FILE']=os.devnull
 # -- Project information -----------------------------------------------------
 
 project = 'Terra'
-copyright = '2021, VSI'
+copyright = '2024, VSI'
 author = 'VSI'
 
 # The short X.Y version
