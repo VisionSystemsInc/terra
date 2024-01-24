@@ -35,10 +35,10 @@ def log_terra_version(sender, signal, app_name=None, terra_prefix=None,
   ----------
   {terra_prefix}_IMAGE_COMMIT : :obj:`str`
     This should be set in the app's image, and should be the output of
-    ``git describe --all --long --always --dirty``.
+    ``git_commit_description``.
   {terra_prefix}_DEPLOY_COMMIT : :obj:`str`
     This should be set in the deploy image, and should be the output of
-    ``git describe --all --long --always --dirty``.
+    ``git_commit_description``.
   {terra_prefix}_CWD : :obj:`str`
     When not running in the deploy image, the location of the app source code
     directory is used to determine the current version in the controller.
