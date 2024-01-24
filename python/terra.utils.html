@@ -205,9 +205,9 @@ environment to fully containerized deploy.</p>
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>{terra_prefix}_IMAGE_COMMIT</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – This should be set in the app’s image, and should be the output of
-<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">describe</span> <span class="pre">--all</span> <span class="pre">--long</span> <span class="pre">--always</span> <span class="pre">--dirty</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">git_commit_description</span></code>.</p></li>
 <li><p><strong>{terra_prefix}_DEPLOY_COMMIT</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – This should be set in the deploy image, and should be the output of
-<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">describe</span> <span class="pre">--all</span> <span class="pre">--long</span> <span class="pre">--always</span> <span class="pre">--dirty</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">git_commit_description</span></code>.</p></li>
 <li><p><strong>{terra_prefix}_CWD</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – When not running in the deploy image, the location of the app source code
 directory is used to determine the current version in the controller.</p></li>
 </ul>
