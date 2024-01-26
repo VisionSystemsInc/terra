@@ -127,6 +127,7 @@ class BaseService:
     # docker config need to be run to get the container volumes, and that has
     # to be run on the host machine. So this is calculated here.
     settings.executor.volume_map = Executor.configuration_map(self)
+    settings.terra.current_service = self.__class__.__name__
     logger.debug4("Executor Volume map: %s", settings.executor.volume_map)
 
   def post_run(self):
