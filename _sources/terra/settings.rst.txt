@@ -14,6 +14,16 @@ Terra Settings
 
     Default: ``controller``
 
+.. option:: terra.current_service
+
+    The class name of the currently running service. E.g. ``MyAwesomeService_docker``
+
+    The value will be ``None`` before any service has been started. Once a service has started, it will contain the name of that service until the next service starts.
+
+    This variable is automatically updated, and should only be read.
+
+    Default: ``None``
+
 .. _settings-executor:
 
 Executor Settings

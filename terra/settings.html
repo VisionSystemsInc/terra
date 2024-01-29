@@ -92,6 +92,15 @@
 <p>Default: <code class="docutils literal notranslate"><span class="pre">controller</span></code></p>
 </dd></dl>
 
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-arg-terra.current_service">
+<span id="cmdoption-arg-terra-current-service"></span><span class="sig-name descname"><span class="pre">terra.current_service</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-arg-terra.current_service" title="Permalink to this definition"></a></dt>
+<dd><p>The class name of the currently running service. E.g. <code class="docutils literal notranslate"><span class="pre">MyAwesomeService_docker</span></code></p>
+<p>The value will be <code class="docutils literal notranslate"><span class="pre">None</span></code> before any service has been started. Once a service has started, it will contain the name of that service until the next service starts.</p>
+<p>This variable is automatically updated, and should only be read.</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd></dl>
+
 </section>
 <section id="executor-settings">
 <span id="settings-executor"></span><h1>Executor Settings<a class="headerlink" href="#executor-settings" title="Permalink to this heading"></a></h1>
