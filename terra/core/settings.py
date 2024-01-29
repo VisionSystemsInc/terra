@@ -421,8 +421,10 @@ global_templates = [
         'config_file': config_file,
         'disable_settings_dump': False,
         'lock_dir': lock_dir,
-        # unlike other settings, this should NOT be overwritten by a
+        # unlike other settings, these should NOT be overwritten by a
         # config.json file, there is currently nothing to prevent that
+        # as they will be read in by the runners
+        'current_service': None,
         'zone': 'controller',
         # 'start_time': datetime.now(), # Not json serializable yet
         'uuid': terra_uuid

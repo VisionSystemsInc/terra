@@ -364,11 +364,16 @@ class _SetupTerraLogger():
     self.root_logger.removeHandler(self.tmp_handler)
 
     if not settings.terra.disable_settings_dump:
+      settings_dump_file = ('settings_%Y_%m_%d_%H_%M_%S_%f_'
+                            f'{settings.terra.zone}_')
+      if settings.terra.zone == 'runner':
+        settings_dump_file += f'{settings.terra.current_service}_'
+      settings_dump_file += f'{settings.terra.uuid}.json'
+
       os.makedirs(settings.settings_dir, exist_ok=True)
       settings_dump = os.path.join(
           settings.settings_dir,
-          datetime.now(timezone.utc).strftime(
-              f'settings_{settings.terra.uuid}_%Y_%m_%d_%H_%M_%S_%f.json'))
+          datetime.now(timezone.utc).strftime(settings_dump_file))
       with open(settings_dump, 'w') as fid:
         fid.write(TerraJSONEncoder.dumps(settings, indent=2))
 
