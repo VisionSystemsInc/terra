@@ -104,7 +104,7 @@ class Compute(BaseCompute):
     pid = just(*args, stdout=PIPE,
                **optional_args,
                env=service_info.env)
-    return yaml.load(pid.communicate()[0], Loader=yaml.Loader)
+    return yaml.safe_load(pid.communicate()[0])
 
   def get_volume_map(self, config, service_info):
     # TODO: Make an OrderedDict
