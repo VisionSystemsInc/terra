@@ -403,7 +403,7 @@ global_templates = [
           # master controller's values, not their node names, should they be
           # different (such as celery and spark)
           "hostname": logging_hostname,
-          "port": DEFAULT_TCP_LOGGING_PORT,
+          "port": 0,
           "listen_address": logging_listen_address,
         },
         "log_file": log_file,

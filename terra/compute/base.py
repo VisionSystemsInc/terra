@@ -253,6 +253,9 @@ class BaseCompute:
       sender.tcp_logging_server = LogRecordSocketReceiver(
           settings.logging.server.listen_address,
           settings.logging.server.port)
+      if settings.logging.server.port == 0:
+        settings.logging.server.port = \
+            sender.tcp_logging_server.socket.getsockname()[1]
       listener_thread = threading.Thread(
           target=sender.tcp_logging_server.serve_until_stopped)
       listener_thread.daemon = True
