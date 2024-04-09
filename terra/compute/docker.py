@@ -1,6 +1,7 @@
 import os
 from subprocess import PIPE
 import re
+import shlex
 
 import yaml
 
@@ -76,13 +77,24 @@ class Compute(BaseCompute):
     else:
       tty_args = ('-T')
 
+    command = service_info.command + extra_arguments
+
+    # If we debug_service is matches this service name
+    if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
+       any(
+         [x.__name__ == debug_service for x in service_info.__class__.__mro__]
+       ):
+      print("You are going to want to run:")
+      print(shlex.join(command))
+      command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
+
     pid = just("--wrap", "Just-docker-compose",
                *sum([['--file', cf] for cf in service_info.compose_files], []),
                'run', *tty_args,
                '--env', 'TERRA_SETTINGS_FILE='
                         f'{service_info.env["TERRA_SETTINGS_FILE"]}',
                service_info.compose_service_name,
-               *service_info.command + extra_arguments,
+               *command,
                **optional_args,
                env=service_info.env)
 
