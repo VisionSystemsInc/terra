@@ -35,7 +35,7 @@ class Compute(BaseCompute):
 
     command = service_info.command + extra_arguments
 
-    # If debug_service matches this service name
+    # If debug_service matches this service name AND TERRA_DEBUG_SERVICE matches one of the classes in the service runner's class hierarchy
     if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
        any(
          [x.__name__ == debug_service for x in service_info.__class__.__mro__]

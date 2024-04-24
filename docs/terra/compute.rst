@@ -33,15 +33,15 @@ The :py:class:`terra.compute.virtualenv.Compute` is used to run services locally
 Debugging in the compute
 ------------------------
 
-In order to debug in the exact compute environment, two environment were introduced to help:
+In order to debug in the exact compute environment, two environment variables were introduced to help:
 
 .. envvar:: TERRA_DEBUG_SERVICE
 
-Since there are many complicated steps that go into starting an environment for a service runner (i.e. starting a docker container with the right mounts and temporary settings file). Setting :envvar:`TERRA_DEBUG_SERVICE` will start the environment and run the command :envvar:`TERRA_DEBUG_SHELL` to allow you to debug in the actual environment with ease. :envvar:`TERRA_DEBUG_SERVICE` must be set to the service runner name or any class in it's class hierarchy (e.g. ``MyServiceRunner_docker``, ``MyServiceRunner``, or to stop on all runners ``object``).
+Since there are many complicated steps that go into starting an environment for a service runner (i.e. starting a docker container with the right mounts and temporary settings file). Setting :envvar:`TERRA_DEBUG_SERVICE` will start the environment and run the command :envvar:`TERRA_DEBUG_SHELL` to allow you to debug in the actual environment with ease. :envvar:`TERRA_DEBUG_SERVICE` must be set to the service runner name or any class in its class hierarchy (e.g. ``MyServiceRunner_docker``, ``MyServiceRunner``, or to stop on all runners ``object``).
 
 .. envvar:: TERRA_DEBUG_SHELL
 
-The command that is when the service is debugged. Default: ``bash``, but you can set it to anything (e.g. ``bash --rcfile "/test_argument/dir with spaces/my.rc"``).
+The command that is run when the service is debugged. Default: ``bash``, but you can set it to anything (e.g. ``bash --rcfile "/test_argument/dir with spaces/my.rc"``).
 
 Using custom computes
 ---------------------
