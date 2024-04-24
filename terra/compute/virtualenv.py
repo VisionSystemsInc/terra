@@ -1,7 +1,7 @@
 import distutils.spawn
 import json
 import os
-from shlex import quote
+import shlex
 from subprocess import Popen
 from tempfile import TemporaryDirectory
 
@@ -40,9 +40,6 @@ class Compute(BaseCompute):
         Arguments sent to ``Popen`` command
     '''
 
-    logger.debug('Running: ' + ' '.join(
-        [quote(x) for x in service_info.command]))
-
     env = service_info.env
 
     # Replace 'python' command with virtual environment python executable
@@ -76,8 +73,18 @@ class Compute(BaseCompute):
                      "If you weren't expecting this, then make sure the "
                      "compute.virtualenv_dir is correct.")
 
+    command = service_info.command
+    # If debug_service matches this service name
+    if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
+       any(
+         [x.__name__ == debug_service for x in service_info.__class__.__mro__]
+       ):
+      print("To start the service runner, run:")
+      print(shlex.join(command))
+      command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
+
     # run command -- command must be a list of strings
-    pid = Popen(service_info.command, env=env, executable=executable)
+    pid = Popen(command, env=env, executable=executable)
 
     if pid.wait() != 0:
       raise ServiceRunFailed(pid.returncode)

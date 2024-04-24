@@ -1,5 +1,6 @@
 import os
 from subprocess import PIPE
+import shlex
 
 from terra.utils.cli import extra_arguments
 from terra.compute.base import BaseCompute
@@ -32,11 +33,22 @@ class Compute(BaseCompute):
     service_info_env['SINGULARITYENV_TERRA_SETTINGS_FILE'] = \
         f'{service_info_env["TERRA_SETTINGS_FILE"]}'
 
+    command = service_info.command + extra_arguments
+
+    # If debug_service matches this service name
+    if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
+       any(
+         [x.__name__ == debug_service for x in service_info.__class__.__mro__]
+       ):
+      print("To start the service runner, run:")
+      print(shlex.join(command))
+      command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
+
     pid = just("singular-compose",
                *sum([['--file', cf] for cf in service_info.compose_files], []),
                'run',
                service_info.compose_service_name,
-               *service_info.command + extra_arguments,
+               *command,
                env=service_info_env)
 
     if pid.wait() != 0:

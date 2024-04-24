@@ -136,4 +136,4 @@ Logging Settings
 
 .. option:: logging.server.port
 
-  The port that the logging server will listen on. The default is to used the default logging port 9020. However when launching multiple terra runs in parallel, it may become neccesary to prevent port collisions. Setting the port to ``0`` will avoid this issue and allow the OS to select a random port whose value will be accessible via ``terra.settings.loggin.server.port``.
+  The port that the logging server will listen on. The default is to use the default logging port 9020. However when launching multiple terra runs in parallel, it may become necessary to prevent port collisions. Setting the port to ``0`` will avoid this issue and allow the OS to select a random port whose value will be accessible via ``terra.settings.loggin.server.port``.

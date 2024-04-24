@@ -79,12 +79,12 @@ class Compute(BaseCompute):
 
     command = service_info.command + extra_arguments
 
-    # If we debug_service is matches this service name
+    # If debug_service matches this service name
     if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
        any(
          [x.__name__ == debug_service for x in service_info.__class__.__mro__]
        ):
-      print("You are going to want to run:")
+      print("To start the service runner, run:")
       print(shlex.join(command))
       command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
 
