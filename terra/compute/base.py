@@ -220,7 +220,8 @@ class BaseCompute:
        any(
          [x.__name__ == debug_service for x in service_info.__class__.__mro__]
        ):
-      print(f"You are now entering the environment for {service_info.__class__.__name__}")
+      print("You are now entering the environment for "
+            f"{service_info.__class__.__name__}")
       print("To start the service runner, run:")
       print(shlex.join(command))
       command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
