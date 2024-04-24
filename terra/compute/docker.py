@@ -1,12 +1,10 @@
 import os
 from subprocess import PIPE
 import re
-import shlex
 
 import yaml
 
 from terra import settings
-from terra.utils.cli import extra_arguments
 from terra.compute.base import BaseCompute, ServiceRunFailed
 from terra.compute.container import ContainerService
 from terra.compute.utils import just
@@ -77,16 +75,7 @@ class Compute(BaseCompute):
     else:
       tty_args = ('-T')
 
-    command = service_info.command + extra_arguments
-
-    # If debug_service matches this service name AND TERRA_DEBUG_SERVICE matches one of the classes in the service runner's class hierarchy.
-    if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
-       any(
-         [x.__name__ == debug_service for x in service_info.__class__.__mro__]
-       ):
-      print("To start the service runner, run:")
-      print(shlex.join(command))
-      command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
+    command = self._get_command(service_info)
 
     pid = just("--wrap", "Just-docker-compose",
                *sum([['--file', cf] for cf in service_info.compose_files], []),

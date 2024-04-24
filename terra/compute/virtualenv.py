@@ -1,7 +1,6 @@
 import distutils.spawn
 import json
 import os
-import shlex
 from subprocess import Popen
 from tempfile import TemporaryDirectory
 
@@ -73,15 +72,7 @@ class Compute(BaseCompute):
                      "If you weren't expecting this, then make sure the "
                      "compute.virtualenv_dir is correct.")
 
-    command = service_info.command
-    # If debug_service matches this service name AND TERRA_DEBUG_SERVICE matches one of the classes in the service runner's class hierarchy
-    if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
-       any(
-         [x.__name__ == debug_service for x in service_info.__class__.__mro__]
-       ):
-      print("To start the service runner, run:")
-      print(shlex.join(command))
-      command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
+    command = self._get_command(service_info)
 
     # run command -- command must be a list of strings
     pid = Popen(command, env=env, executable=executable)
