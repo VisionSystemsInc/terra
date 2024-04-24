@@ -267,14 +267,14 @@ def config_file(self):
   A :func:`settings_property` for passing the filename of the config_file to
   settings
   '''
-  # There was a chicken-egg problem with determing settings.processing_dir:
+  # There was a chicken-egg problem with determining settings.processing_dir:
   # #. Call ``_setup``
   #   #. Calls ``configure``
   #   #. Send signal
   #     #. Logger receives signal, and start setting up logger
   #     #. Needs to know where to put log files, so check
   #        ``settings.processing_dir``
-  #     #. settings.processing_dir looks for `setttings.terra.config_file``,
+  #     #. settings.processing_dir looks for `settings.terra.config_file``,
   #        doesn't see it yet
   # 2. Returns to ``_setup``
   # #. Then set ``settings.terra.config_file``, but it's too late
@@ -403,7 +403,7 @@ global_templates = [
           # master controller's values, not their node names, should they be
           # different (such as celery and spark)
           "hostname": logging_hostname,
-          "port": 0,
+          "port": DEFAULT_TCP_LOGGING_PORT,
           "listen_address": logging_listen_address,
         },
         "log_file": log_file,

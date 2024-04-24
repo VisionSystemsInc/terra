@@ -48,6 +48,11 @@ class TestLogger(TestLoggerConfigureCase):
       with self.assertRaises(ImproperlyConfigured):
         self._logs.configure_logger(None)
 
+  def test_port_0(self):
+    settings.configure({'logging': {'server': {'port': 0}},
+                        'processing_dir': self.temp_dir.name})
+    self.assertEqual(settings.logging.server.port,  67890)
+
   def test_temp_file_cleanup(self):
     tmp_file = self._logs.tmp_file.name
     self.assertExist(tmp_file)
