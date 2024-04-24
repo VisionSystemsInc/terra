@@ -1,7 +1,6 @@
 import distutils.spawn
 import json
 import os
-from shlex import quote
 from subprocess import Popen
 from tempfile import TemporaryDirectory
 
@@ -40,9 +39,6 @@ class Compute(BaseCompute):
         Arguments sent to ``Popen`` command
     '''
 
-    logger.debug('Running: ' + ' '.join(
-        [quote(x) for x in service_info.command]))
-
     env = service_info.env
 
     # Replace 'python' command with virtual environment python executable
@@ -76,8 +72,10 @@ class Compute(BaseCompute):
                      "If you weren't expecting this, then make sure the "
                      "compute.virtualenv_dir is correct.")
 
+    command = self._get_command(service_info)
+
     # run command -- command must be a list of strings
-    pid = Popen(service_info.command, env=env, executable=executable)
+    pid = Popen(command, env=env, executable=executable)
 
     if pid.wait() != 0:
       raise ServiceRunFailed(pid.returncode)

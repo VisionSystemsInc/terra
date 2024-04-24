@@ -5,7 +5,6 @@ import re
 import yaml
 
 from terra import settings
-from terra.utils.cli import extra_arguments
 from terra.compute.base import BaseCompute, ServiceRunFailed
 from terra.compute.container import ContainerService
 from terra.compute.utils import just
@@ -76,13 +75,15 @@ class Compute(BaseCompute):
     else:
       tty_args = ('-T')
 
+    command = self._get_command(service_info)
+
     pid = just("--wrap", "Just-docker-compose",
                *sum([['--file', cf] for cf in service_info.compose_files], []),
                'run', *tty_args,
                '--env', 'TERRA_SETTINGS_FILE='
                         f'{service_info.env["TERRA_SETTINGS_FILE"]}',
                service_info.compose_service_name,
-               *service_info.command + extra_arguments,
+               *command,
                **optional_args,
                env=service_info.env)
 

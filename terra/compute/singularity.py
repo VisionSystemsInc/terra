@@ -1,7 +1,6 @@
 import os
 from subprocess import PIPE
 
-from terra.utils.cli import extra_arguments
 from terra.compute.base import BaseCompute
 from terra.compute.container import ContainerService
 from terra.compute.utils import just
@@ -32,11 +31,13 @@ class Compute(BaseCompute):
     service_info_env['SINGULARITYENV_TERRA_SETTINGS_FILE'] = \
         f'{service_info_env["TERRA_SETTINGS_FILE"]}'
 
+    command = self._get_command(service_info)
+
     pid = just("singular-compose",
                *sum([['--file', cf] for cf in service_info.compose_files], []),
                'run',
                service_info.compose_service_name,
-               *service_info.command + extra_arguments,
+               *command,
                env=service_info_env)
 
     if pid.wait() != 0:

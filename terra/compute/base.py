@@ -7,9 +7,11 @@ from logging import StreamHandler
 from logging.handlers import SocketHandler
 import threading
 import warnings
+import shlex
 
 from terra import settings
 import terra.compute.utils
+from terra.utils.cli import extra_arguments
 from terra.executor import Executor
 from terra.logger import (
   getLogger, LogRecordSocketReceiver, SkipStdErrAddFilter
@@ -209,6 +211,20 @@ class BaseCompute:
     # bind function and return it
     return defaultCommand.__get__(self, type(self))
 
+  def _get_command(self, service_info):
+    command = service_info.command + extra_arguments
+
+    # If debug_service matches this service name AND TERRA_DEBUG_SERVICE
+    # matches one of the classes in the service runner's class hierarchy
+    if (debug_service := os.environ.get('TERRA_DEBUG_SERVICE', None)) and \
+       any(
+         [x.__name__ == debug_service for x in service_info.__class__.__mro__]
+       ):
+      print("To start the service runner, run:")
+      print(shlex.join(command))
+      command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
+    return command
+
   def get_volume_map(self, config, service_info):
     return []
 
@@ -253,6 +269,9 @@ class BaseCompute:
       sender.tcp_logging_server = LogRecordSocketReceiver(
           settings.logging.server.listen_address,
           settings.logging.server.port)
+      if settings.logging.server.port == 0:
+        settings.logging.server.port = \
+            sender.tcp_logging_server.socket.getsockname()[1]
       listener_thread = threading.Thread(
           target=sender.tcp_logging_server.serve_until_stopped)
       listener_thread.daemon = True
