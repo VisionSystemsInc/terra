@@ -266,6 +266,12 @@
 <dd><p>The format style, <code class="docutils literal notranslate"><span class="pre">%</span></code>, <code class="docutils literal notranslate"><span class="pre">{</span></code>, or <code class="docutils literal notranslate"><span class="pre">$</span></code> notation. Default: <code class="docutils literal notranslate"><span class="pre">%</span></code></p>
 </dd></dl>
 
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-arg-logging.server.port">
+<span id="cmdoption-arg-logging-server-port"></span><span class="sig-name descname"><span class="pre">logging.server.port</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-arg-logging.server.port" title="Permalink to this definition"></a></dt>
+<dd><p>The port that the logging server will listen on. The default is to use the default logging port 9020. However when launching multiple terra runs in parallel, it may become necessary to prevent port collisions. Setting the port to <code class="docutils literal notranslate"><span class="pre">0</span></code> will avoid this issue and allow the OS to select a random port whose value will be accessible via <code class="docutils literal notranslate"><span class="pre">terra.settings.loggin.server.port</span></code>.</p>
+</dd></dl>
+
 </section>
 
 

@@ -59,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#virtualenvcompute">VirtualEnvCompute</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#debugging-in-the-compute">Debugging in the compute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-custom-computes">Using custom computes</a></li>
 </ul>
 </li>
@@ -112,6 +113,22 @@
 <h3>VirtualEnvCompute<a class="headerlink" href="#virtualenvcompute" title="Permalink to this heading"></a></h3>
 <p>The <a class="reference internal" href="../python/terra.compute.html#terra.compute.virtualenv.Compute" title="terra.compute.virtualenv.Compute"><code class="xref py py-class docutils literal notranslate"><span class="pre">terra.compute.virtualenv.Compute</span></code></a> is used to run services locally in a virtualenv. While terra itself runs in a virtualenv, the terra app has its own virtualenv, which typically exists in the container, but exists locally when using this compute. This compute does not use <a class="reference internal" href="getting_started.html#settings-path-translation"><span class="std std-ref">Path translation</span></a>.</p>
 </section>
+</section>
+<section id="debugging-in-the-compute">
+<h2>Debugging in the compute<a class="headerlink" href="#debugging-in-the-compute" title="Permalink to this heading"></a></h2>
+<p>In order to debug in the exact compute environment, two environment variables were introduced to help:</p>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-TERRA_DEBUG_SERVICE">
+<span class="sig-name descname"><span class="pre">TERRA_DEBUG_SERVICE</span></span><a class="headerlink" href="#envvar-TERRA_DEBUG_SERVICE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Since there are many complicated steps that go into starting an environment for a service runner (i.e. starting a docker container with the right mounts and temporary settings file). Setting <span class="target" id="index-0"></span><a class="reference internal" href="#envvar-TERRA_DEBUG_SERVICE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_DEBUG_SERVICE</span></code></a> will start the environment and run the command <span class="target" id="index-1"></span><a class="reference internal" href="#envvar-TERRA_DEBUG_SHELL"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_DEBUG_SHELL</span></code></a> to allow you to debug in the actual environment with ease. <span class="target" id="index-2"></span><a class="reference internal" href="#envvar-TERRA_DEBUG_SERVICE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">TERRA_DEBUG_SERVICE</span></code></a> must be set to the service runner name or any class in its class hierarchy (e.g. <code class="docutils literal notranslate"><span class="pre">MyServiceRunner_docker</span></code>, <code class="docutils literal notranslate"><span class="pre">MyServiceRunner</span></code>, or to stop on all runners <code class="docutils literal notranslate"><span class="pre">object</span></code>).</p>
+<dl class="std envvar">
+<dt class="sig sig-object std" id="envvar-TERRA_DEBUG_SHELL">
+<span class="sig-name descname"><span class="pre">TERRA_DEBUG_SHELL</span></span><a class="headerlink" href="#envvar-TERRA_DEBUG_SHELL" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>The command that is run when the service is debugged. Default: <code class="docutils literal notranslate"><span class="pre">bash</span></code>, but you can set it to anything (e.g. <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">--rcfile</span> <span class="pre">&quot;/test_argument/dir</span> <span class="pre">with</span> <span class="pre">spaces/my.rc&quot;</span></code>).</p>
 </section>
 <section id="using-custom-computes">
 <h2>Using custom computes<a class="headerlink" href="#using-custom-computes" title="Permalink to this heading"></a></h2>
