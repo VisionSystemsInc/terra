@@ -220,6 +220,7 @@ class BaseCompute:
        any(
          [x.__name__ == debug_service for x in service_info.__class__.__mro__]
        ):
+      print(f"You are now entering the environment for {service_info.__class__.__name__}")
       print("To start the service runner, run:")
       print(shlex.join(command))
       command = shlex.split(os.environ.get('TERRA_DEBUG_SHELL', 'bash'))
@@ -269,6 +270,8 @@ class BaseCompute:
       sender.tcp_logging_server = LogRecordSocketReceiver(
           settings.logging.server.listen_address,
           settings.logging.server.port)
+      # Get and store the value of the port used, so the runners/tasks will be
+      # able to connect
       if settings.logging.server.port == 0:
         settings.logging.server.port = \
             sender.tcp_logging_server.socket.getsockname()[1]
