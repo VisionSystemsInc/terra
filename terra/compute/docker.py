@@ -73,7 +73,7 @@ class Compute(BaseCompute):
     if settings.compute.tty:
       tty_args = ()
     else:
-      tty_args = ('-T')
+      tty_args = ('-T',)
 
     command = self._get_command(service_info)
 
