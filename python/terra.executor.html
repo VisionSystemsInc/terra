@@ -285,7 +285,7 @@ shorthand for <code class="docutils literal notranslate"><span class="pre">range
 resources, they need to be pickleable, or else multiprocessing will fail.</p></li>
 <li><p><strong>repeat</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, optional) – The number of workers you want to be able to acquire a resource, e.g.,
 two simultaneous workers per resource.</p></li>
-<li><p><strong>use_softfilelock</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em> or </em><em>None</em>) – If an OS does not support hard locks, <a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.SoftFileLock" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">filelock.SoftFileLock</span></code></a> will
+<li><p><strong>use_softfilelock</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em> or </em><em>None</em>) – If an OS does not support hard locks, <a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.SoftFileLock" title="(in Project name not set v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">filelock.SoftFileLock</span></code></a> will
 be used automatically. However, even if the OS supports hard locks, some
 filesystems (especially network file systems) may not support successful
 hard locking. In these cases, hardlock support needs to be tested on a
@@ -321,7 +321,7 @@ get the intended result.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="terra.executor.resources.Resource.FileLock">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FileLock</span></span><a class="headerlink" href="#terra.executor.resources.Resource.FileLock" title="Permalink to this definition"></a></dt>
-<dd><p>The class of <a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.FileLock" title="(in Python v3.15)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filelock.FileLock</span></code></a> used for locks in
+<dd><p>The class of <a class="reference external" href="https://py-filelock.readthedocs.io/en/latest/api.html#filelock.FileLock" title="(in Project name not set v3.15)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filelock.FileLock</span></code></a> used for locks in
 <a class="reference internal" href="#terra.executor.resources.Resource.lock_dir" title="terra.executor.resources.Resource.lock_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Resource.lock_dir</span></code></a>.</p>
 <p>Hard locking is better, but only works if the OS and Filesystem supports
 it. Sometimes it is necessary to use soft locking, so this property will
