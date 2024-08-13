@@ -50,7 +50,7 @@ function Terra_Pipenv()
         return 1
       fi
     fi
-    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" pipenv ${@+"${@}"} || return $?
+    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" "${PIPENV_EXE-${TERRA_CWD}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
@@ -359,7 +359,7 @@ function terra_caseify()
 
     terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
                        # don't call this directly
-      if ! command -v pipenv &> /dev/null; then
+      if ! command "${PIPENV_EXE-${TERRA_CWD}/build/pipenv/bin/pipenv}" &> /dev/null; then
         add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/pipenv" --download
         # since I want to continue without re-sourcing local.env
         export PATH="${TERRA_CWD}/build/pipenv/bin:${PATH}"
