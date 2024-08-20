@@ -317,7 +317,10 @@ class Resource:
     lock.release(force)
 
     if os.path.isdir(self.lock_dir) and is_dir_empty(self.lock_dir):
-      os.rmdir(self.lock_dir)
+      try:
+        os.rmdir(self.lock_dir)
+      except FileNotFoundError:
+        pass  # we don't care if it doesn't exist due to race condition
 
   def __enter__(self):
     return self.acquire()
