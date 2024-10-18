@@ -1,0 +1,14 @@
+#!/usr/bin/env false
+
+function troubleshoot_terra_pipenv()
+{
+  cd "${TERRA_TERRA_DIR}"
+  . setup.env
+  just terra run python -c "import terra; terra.settings"
+}
+
+function error_terra_pipenv()
+{
+  echo "${RED}Terra does not appear to be working"
+  echo "Did you run: ${YELLOW}just sync${RED}? (That should run \"just terra sync\" for you)${NC}"
+}
