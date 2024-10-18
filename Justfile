@@ -307,7 +307,7 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
 
-      if [ -s "${TERRA_SKIP_DOCKER_COMPOSE_CHECK+set}" ] && ! "${DOCKER_COMPOSE[@]}" &> /dev/null; then
+      if [ -z "${TERRA_SKIP_DOCKER_COMPOSE_CHECK+set}" ] && ! "${DOCKER_COMPOSE[@]}" &> /dev/null; then
         source "${VSI_COMMON_DIR}/linux/colors.bsh"
         echo "${RED}The docker compose plugin does not appear to be installed.${NC}"
         echo "Please have IT install the 'docker-compose-plugin' or install a local copy in your home directory:"
