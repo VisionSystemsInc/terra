@@ -105,6 +105,8 @@ class ContainerService(BaseService):
     with open(temp_dir / 'config.json', 'w') as fid:
       json.dump(container_config, fid)
 
+    self.env['JUST_IGNORE_EXIT_CODES'] = '62'
+
   def post_run(self):
     super().post_run()
     # Delete temp_dir

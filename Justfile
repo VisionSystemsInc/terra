@@ -135,7 +135,7 @@ function terra_caseify()
     run) # Run python module/cli in terra
       # 2 is the exit code of an error in arg parsing
       # 62 for any other terra error
-      local JUST_IGNORE_EXIT_CODES='2$|^62'
+      local JUST_IGNORE_EXIT_CODES=${JUST_IGNORE_EXIT_CODES-'2$|^62'}
       if [ "${JUST_RODEO-}" = "1" ]; then
         extra_args=$#
         local app_name="${1}"

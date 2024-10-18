@@ -164,7 +164,7 @@ import copy
 from json.decoder import JSONDecodeError
 
 from terra.core.exceptions import (
-  ImproperlyConfigured, ConfigurationWarning, handledExitCode
+  ImproperlyConfigured, ConfigurationWarning, ranButFailedExitCode
 )
 # Do not import terra.logger or terra.signals here, or any module that
 # imports them
@@ -936,10 +936,10 @@ def json_load(filename):
   except JSONDecodeError as e:
     logger.critical(
         f'Error parsing the JSON config file {filename}: ' + str(e))
-    raise SystemExit(handledExitCode)
+    raise SystemExit(ranButFailedExitCode)
   except FileNotFoundError as e:
     logger.critical('Cannot find JSON config file: ' + str(e))
-    raise SystemExit(handledExitCode)
+    raise SystemExit(ranButFailedExitCode)
 
 
 import terra.logger  # noqa
