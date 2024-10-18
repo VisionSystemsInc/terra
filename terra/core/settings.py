@@ -393,6 +393,8 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
+        "severe_level": "ERROR",
+        "severe_buffer_length": 20,
         "format": "%(asctime)s (%(hostname)s:%(zone)s): "
                   "%(levelname)s/%(processName)s - %(filename)s - %(message)s",
         "date_format": None,
