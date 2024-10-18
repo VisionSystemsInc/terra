@@ -156,6 +156,7 @@ from functools import wraps
 from json import JSONEncoder
 import multiprocessing
 import socket
+import ipaddress
 import platform
 import warnings
 import threading
@@ -323,6 +324,18 @@ def log_file(self):
     return None
 
 
+def check_is_loopback(hostname):
+  # Get the first IP
+  try:
+    addr = socket.getaddrinfo(hostname, None)[0][4][0]
+    ip = ipaddress.ip_address(addr)
+    return ip.is_loopback
+  except KeyboardInterrupt:
+    raise
+  except Exception:
+    return True
+
+
 @settings_property
 def logging_hostname(self):
   '''
@@ -331,7 +344,10 @@ def logging_hostname(self):
   will attempt to resolve the IP address of the default host route as per
   https://stackoverflow.com/a/28950776.
   '''
-  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1":
+
+  node_name = platform.node()
+
+  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1" or check_is_loopback(node_name):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
       # doesn't even have to be reachable
@@ -344,7 +360,7 @@ def logging_hostname(self):
       s.close()
 
   # default return
-  return platform.node()
+  return node_name
 
 
 @settings_property
