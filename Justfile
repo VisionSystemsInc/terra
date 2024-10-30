@@ -466,6 +466,7 @@ function terra_caseify()
       ask_question "Do you want to add \"${output_dir}/${platform_bin}\" to your local.env automatically?" add_to_local y
       if [ "${add_to_local}" == "1" ]; then
         echo $'\n'"PATH=\"${output_dir}/${platform_bin}:\${PATH}\"" >> "${TERRA_CWD}/local.env"
+        echo "PIPENV_EXE=\"${output_dir}/${platform_bin}/pipenv\"" >> "${TERRA_CWD}/local.env"
       fi
       ;;
 
