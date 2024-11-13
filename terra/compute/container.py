@@ -153,3 +153,45 @@ class ContainerService(BaseService):
 
     self.volumes.append((local, remote))
     self.volumes_flags.append(flags)
+
+  def add_volume_input(self, local, remote):
+    '''
+    Add a read-only input volume, confirming if the local file/folder
+    exists. Raise a :obj:`ValueError` should validation fail.
+    '''
+
+    self.add_volume(local, remote, flags = 'ro',
+                    local_must_exist = True)
+
+  def add_file_input(self, local, remote, use_local_extension=False):
+    '''
+    Add a read-only input file, confirming that the local file exists.
+    Maintain local file extension if requested.
+    '''
+
+    # replace remote extension with local extension
+    if use_local_extension:
+      local_ext = os.path.splitext(local)[1].lower()
+      remote = os.path.splitext(remote)[0] + local_ext
+
+    # update volume
+    self.add_volume_input(local, remote, local_must_exist = True)
+
+  def add_file(self, local, remote, use_local_extension=False):
+    '''
+    Add a input file, creating the local file if it does not exist.
+    Maintain local file extension if requested.
+    '''
+
+    # replace remote extension with local extension
+    if use_local_extension:
+      local_ext = os.path.splitext(local)[1].lower()
+      remote = os.path.splitext(remote)[0] + local_ext
+
+    # Make sure parent exists, and is not a file
+    parent = os.path.dirname(local)
+    if os.path.exists(parent) and not os.path.isdir(parent):
+      raise FileExitsError(f"{parent} exists as a file, instead of a directory")
+
+    # update volume
+    self.add_volume(local, remote)
