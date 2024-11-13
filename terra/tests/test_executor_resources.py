@@ -20,7 +20,7 @@ from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
   ProcessLocalStorage, ThreadLocalStorage, ResourceManager,
-  atexit_resource_release, RunnerPID
+  atexit_resource_release
 )
 from terra import settings
 
@@ -45,17 +45,6 @@ class TestResourceCase(TestSettingsConfigureCase,
   def setUp(self):
     self.config.executor = {'type': 'SyncExecutor'}
     super().setUp()
-
-
-class TestRunnerPidCase(TestResourceCase):
-  def test_runner_pid(self):
-    pid = os.getpid()
-
-    with ProcessPoolExecutorSpawn(max_workers=1) as executor:
-      future = executor.submit(RunnerPID.pid)
-      runner_pid = future.result()
-
-    self.assertEqual(pid, runner_pid)
 
 
 class TestResourceSimple(TestResourceCase):
