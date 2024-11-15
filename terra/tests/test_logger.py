@@ -75,12 +75,23 @@ class TestLogger(TestLoggerConfigureCase):
       self.tb = tb
     sys.excepthook = save_exec_info
     setup_logging_exception_hook()
+
+    def mock_exit(code=None):
+      # Store the exit code, it should be 62
+      self.code = code
+      # Pretend something else went wrong, using the same exception,
+      # to test the "in case something else goes wrong in exception
+      # handling" path. This will cause save_exec_info to be called
+      raise
+
+
     with mock.patch('sys.stderr', new_callable=io.StringIO):
-      with self.assertLogs() as cm:
-        # with self.assertRaises(ZeroDivisionError):
-        tb = make_traceback()
-        sys.excepthook(ZeroDivisionError,
-                       ZeroDivisionError('division by almost zero'), tb)
+      with mock.patch('sys.exit', new=mock_exit):
+        with self.assertLogs() as cm:
+          tb = make_traceback()
+          sys.excepthook(ZeroDivisionError,
+                         ZeroDivisionError('division by almost zero'),
+                         tb)
 
     self.assertIn('division by almost zero', str(cm.output))
     # Test stack trace stuff in there
@@ -88,6 +99,7 @@ class TestLogger(TestLoggerConfigureCase):
     self.assertEqual(self.exc_type, ZeroDivisionError)
     self.assertIsInstance(self.exc, ZeroDivisionError)
     self.assertIs(self.tb, tb)
+    self.assertEqual(self.code, 62)
 
   def test_root_logger_setup(self):
     self.assertEqual(self._logs.root_logger, logging.getLogger(None))
@@ -267,7 +279,6 @@ class TestUnitTests(TestCase):
   def last_test_logger(self):
     import logging
     root_logger = logging.getLogger(None)
-
     self.assertFalse(
         root_logger.handlers,
         msg="If you are seeing this, one of the other unit tests has "
@@ -275,3 +286,7 @@ class TestUnitTests(TestCase):
         "prevented for you automatically. If you are seeing this, you "
         "have configured logging manually, and should make sure you "
         "restore it.")
+
+  def last_test_excepthook(self):
+    # Make sure no test messed with the exception hook without using the correct TestLoggerCase
+    self.assertEqual(sys.excepthook.__qualname__, 'excepthook')

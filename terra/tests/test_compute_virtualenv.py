@@ -58,12 +58,16 @@ class TestVirtualEnv(TestSettingsConfigureCase):
 
     import warnings
     with warnings.catch_warnings():
-      with self.assertRaises(base.ServiceRunFailed):
-        warnings.simplefilter('ignore')
-        compute.run(service)
-      # Delete the service now, so that the temp directory is cleaned up, so
-      # the warning is captured now, in the context
-      del service
+      with self.assertLogs() as cm:
+        with self.assertRaises(base.ServiceRunFailed):
+          warnings.simplefilter('ignore')
+          compute.run(service)
+        # Delete the service now, so that the temp directory is cleaned up, so
+        # the warning is captured now, in the context
+        del service
+
+    self.assertIn(f'The service runner failed, throwing return code {self.return_value}',
+                  str(cm.output))
 
   def test_run_simple(self):
     compute = virtualenv.Compute()
