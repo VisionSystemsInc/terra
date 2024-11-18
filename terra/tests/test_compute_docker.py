@@ -121,8 +121,8 @@ class TestDockerRun(TestComputeDockerCase):
       with self.assertRaises(base.ServiceRunFailed):
         compute.run(MockJustService())
 
-    self.assertIn(f'The service runner failed, throwing return code {self.return_value}',
-                  str(cm.output))
+    self.assertIn('The service runner failed, throwing return code '
+                  f'{self.return_value}', str(cm.output))
 
 
 ###############################################################################

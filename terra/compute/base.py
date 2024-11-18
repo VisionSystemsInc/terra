@@ -185,11 +185,13 @@ class BaseCompute:
         elif crash.code >= 128:
           sig = signal._int_to_enum(crash.code - 128, signal.Signals)
           if isinstance(sig, signal.Signals):
-            msg = f'The service runner failed, throwing {sig.name} ({crash.code})'
+            msg = f'The service runner failed, throwing {sig.name} ' + \
+                  f'({crash.code})'
             if sig.name == 'SIGKILL':
               msg += '. This could be due to out of memory'
           else:
-            msg = f'The service runner failed, throwing return code {crash.code}'
+            msg = 'The service runner failed, ' + \
+                  f'throwing return code {crash.code}'
         else:
           msg = f'The service runner failed, throwing return code {crash.code}'
         logger.critical(msg)

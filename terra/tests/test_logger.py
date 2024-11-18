@@ -84,7 +84,6 @@ class TestLogger(TestLoggerConfigureCase):
       # handling" path. This will cause save_exec_info to be called
       raise
 
-
     with mock.patch('sys.stderr', new_callable=io.StringIO):
       with mock.patch('sys.exit', new=mock_exit):
         with self.assertLogs() as cm:
@@ -288,5 +287,6 @@ class TestUnitTests(TestCase):
         "restore it.")
 
   def last_test_excepthook(self):
-    # Make sure no test messed with the exception hook without using the correct TestLoggerCase
+    # Make sure no test messed with the exception hook without using the
+    # correct TestLoggerCase
     self.assertEqual(sys.excepthook.__qualname__, 'excepthook')

@@ -71,8 +71,8 @@ class TestSingular(TestComputeSingularityCase):
       with self.assertRaises(base.ServiceRunFailed):
         compute.run(MockJustService())
 
-    self.assertIn(f'The service runner failed, throwing return code {self.return_value}',
-                  str(cm.output))
+    self.assertIn('The service runner failed, throwing return code '
+                  f'{self.return_value}', str(cm.output))
 
   def test_run_multiple_compose_files(self):
     compute = singularity.Compute()
@@ -99,8 +99,8 @@ class TestSingular(TestComputeSingularityCase):
       with self.assertRaises(base.ServiceRunFailed):
         compute.run(MockJustService())
 
-    self.assertIn(f'The service runner failed, throwing return code {self.return_value}',
-                  str(cm.output))
+    self.assertIn('The service runner failed, throwing return code '
+                  f'{self.return_value}', str(cm.output))
 
 
 class TestSingularityConfig(TestComputeSingularityCase):

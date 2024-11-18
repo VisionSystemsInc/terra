@@ -65,7 +65,8 @@ def setup_logging_exception_hook():
     try:
       # sys.executable for frozen, untested?
 
-      # May not work when frozen or various other corner cases. Interactive python/Jupyter
+      # May not work when frozen or various other corner cases. Interactive
+      # python/Jupyter
       spec = sys.modules['__main__'].__spec__
       if spec is None:
         # Interactive, just use cwd and hope for best
@@ -82,12 +83,16 @@ def setup_logging_exception_hook():
 
       extracted_summary = traceback.extract_tb(exc_traceback)
 
-      our_scripts = [any(x.filename.startswith(main_dir) for main_dir in main_dirs) for x in extracted_summary]
+      our_scripts = [any(x.filename.startswith(main_dir)
+                     for main_dir in main_dirs) for x in extracted_summary]
 
       msg = extracted_summary.format()
-      msg = ['\x1b[31m' + msg + '\x1b[0m' if color else msg for msg, color in zip(extracted_summary.format(), our_scripts)]
+      msg = ['\x1b[31m' + msg + '\x1b[0m'
+             if color else msg
+             for msg, color in zip(extracted_summary.format(), our_scripts)]
       msg = ''.join(msg)
-      msg += '\x1b[33m' + ''.join(traceback.format_exception_only(exc_value)) + '\x1b[0m'
+      msg += '\x1b[33m' + \
+             ''.join(traceback.format_exception_only(exc_value)) + '\x1b[0m'
       print(msg, file=sys.stderr, end='')
       sys.exit(ranButFailedExitCode)
     except Exception:

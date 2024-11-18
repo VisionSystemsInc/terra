@@ -347,7 +347,8 @@ def logging_hostname(self):
 
   node_name = platform.node()
 
-  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1" or check_is_loopback(node_name):
+  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1" or \
+     check_is_loopback(node_name):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
       # doesn't even have to be reachable

@@ -96,10 +96,12 @@ __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
 class RingMemoryHandler(logging.handlers.MemoryHandler):
   def flush(self):
     if len(self.buffer) >= self.capacity:
-      self.buffer=self.buffer[-self.capacity:]
+      self.buffer = self.buffer[-self.capacity:]
     super().flush()
+
   def filter_level(self, level):
-     self.buffer = [b for b in self.buffer if b.levelno >= self.level]
+    self.buffer = [b for b in self.buffer if b.levelno >= self.level]
+
 
 class HandlerLoggingContext(object):
   '''

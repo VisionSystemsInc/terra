@@ -66,8 +66,8 @@ class TestVirtualEnv(TestSettingsConfigureCase):
         # the warning is captured now, in the context
         del service
 
-    self.assertIn(f'The service runner failed, throwing return code {self.return_value}',
-                  str(cm.output))
+    self.assertIn('The service runner failed, throwing return code '
+                  f'{self.return_value}', str(cm.output))
 
   def test_run_simple(self):
     compute = virtualenv.Compute()
