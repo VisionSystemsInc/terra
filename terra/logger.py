@@ -72,6 +72,7 @@ import struct
 import select
 import pickle
 import atexit
+from collections import deque
 
 import terra
 from terra.core.exceptions import (
@@ -94,13 +95,28 @@ __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
 
 
 class RingMemoryHandler(logging.handlers.MemoryHandler):
-  def flush(self):
-    if len(self.buffer) >= self.capacity:
-      self.buffer = self.buffer[-self.capacity:]
-    super().flush()
+  '''
+  A Ring Memory Handler that keeps the last n messages of a certain severity.
 
-  def filter_level(self, level):
-    self.buffer = [b for b in self.buffer if b.levelno >= self.level]
+  Since this is designed for terra's settings, it starts off as a normal
+  :py:class:`logging.handlers.MemoryHandler`, and records all the messages.
+  Once settings have initialized, it swaps over to a deque for the buffer,
+  and only keeps the last ``self.capacity`` of ``self.level`` or higher.
+  '''
+
+  def shouldFlush(self, record):
+    # Disable auto flushing. We only want to flush at the end with the report
+    return False
+
+  def activate_ring(self):
+    '''
+    Once ``self.capacity`` and ``setLevel`` are set, call ``activate_ring`` to
+    turn on the ring buffer. This is delayed from ``__init__`` so that you can
+    have a change to log everything before you know the max severity and count.
+    '''
+    with self.lock:
+      self.buffer = deque((b for b in self.buffer if b.levelno >= self.level),
+                          maxlen=self.capacity)
 
 
 class HandlerLoggingContext(object):
@@ -254,7 +270,7 @@ class _SetupTerraLogger():
     self.root_logger.addHandler(self.stderr_handler)
 
     # A buffer that prints at the end to generate a report
-    self.report_buffer = RingMemoryHandler(capacity=100)
+    self.report_buffer = RingMemoryHandler(100)  # capacity doesn't matter here
     self.report_buffer.setLevel(0)
     self.report_buffer.setFormatter(self.default_formatter)
     self.report_buffer.addFilter(StdErrFilter())
@@ -351,7 +367,7 @@ class _SetupTerraLogger():
     if getattr(self, 'report_buffer', None) is not None:
       self.report_buffer.setLevel(settings.logging.severe_level)
       self.report_buffer.capacity = settings.logging.severe_buffer_length
-      self.report_buffer.filter_level(settings.logging.severe_level)
+      self.report_buffer.activate_ring()
 
     # This hides the messages that spams the screen:
     # "pipbox received method enable_events() [reply_to:None ticket:None]"

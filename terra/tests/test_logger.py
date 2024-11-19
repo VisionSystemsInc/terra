@@ -9,7 +9,9 @@ import warnings
 
 from terra.core.exceptions import ImproperlyConfigured
 from terra import settings
-from .utils import TestCase, make_traceback, TestLoggerConfigureCase
+from .utils import (
+  TestCase, make_traceback, TestLoggerConfigureCase, TestLoggerCase
+)
 from terra import logger
 from terra.core.exceptions import setup_logging_exception_hook
 
@@ -272,6 +274,52 @@ class TestLogger(TestLoggerConfigureCase):
     with self.assertLogs(level=logger.WARNING) as cm:
       warnings.warn(message)
     self.assertIn(message, str(cm.output))
+
+
+class TestRingBuffer(TestLoggerCase):
+  def test_ring_buffer(self):
+    test_logger = logger.getLogger(f'{__name__}.test_ring_buffer')
+    handler = logger.RingMemoryHandler(1)
+    # handler.setLevel(logger.ERROR)
+    test_logger.setLevel(logger.DEBUG2)
+    test_logger.addHandler(handler)
+
+    with self.assertLogs(level=logger.FATAL):
+      test_logger.critical('1')
+      test_logger.error('2')
+      test_logger.warning('3')
+      test_logger.info('4')
+      test_logger.debug('5')
+
+    self.assertEqual(len(handler.buffer), 5)
+
+    handler.capacity = 5
+    handler.activate_ring()
+    self.assertEqual(len(handler.buffer), 5)
+
+    handler.setLevel(logging.WARNING)
+    handler.activate_ring()
+    self.assertEqual(len(handler.buffer), 3)
+    self.assertEqual(handler.buffer[0].msg, '1')
+    self.assertEqual(handler.buffer[1].msg, '2')
+    self.assertEqual(handler.buffer[2].msg, '3')
+
+    handler.capacity = 2
+    handler.activate_ring()
+    self.assertEqual(len(handler.buffer), 2)
+    self.assertEqual(handler.buffer[0].msg, '2')
+    self.assertEqual(handler.buffer[1].msg, '3')
+
+    with self.assertLogs(level=logger.FATAL):
+      test_logger.critical('11')
+      test_logger.error('12')
+      test_logger.warning('13')
+      test_logger.info('14')
+      test_logger.debug('15')
+
+    self.assertEqual(len(handler.buffer), 2)
+    self.assertEqual(handler.buffer[0].msg, '12')
+    self.assertEqual(handler.buffer[1].msg, '13')
 
 
 class TestUnitTests(TestCase):
