@@ -156,6 +156,7 @@ from functools import wraps
 from json import JSONEncoder
 import multiprocessing
 import socket
+import ipaddress
 import platform
 import warnings
 import threading
@@ -164,7 +165,7 @@ import copy
 from json.decoder import JSONDecodeError
 
 from terra.core.exceptions import (
-  ImproperlyConfigured, ConfigurationWarning, handledExitCode
+  ImproperlyConfigured, ConfigurationWarning, ranButFailedExitCode
 )
 # Do not import terra.logger or terra.signals here, or any module that
 # imports them
@@ -323,6 +324,18 @@ def log_file(self):
     return None
 
 
+def check_is_loopback(hostname):
+  # Get the first IP
+  try:
+    addr = socket.getaddrinfo(hostname, None)[0][4][0]
+    ip = ipaddress.ip_address(addr)
+    return ip.is_loopback
+  except KeyboardInterrupt:
+    raise
+  except Exception:
+    return True
+
+
 @settings_property
 def logging_hostname(self):
   '''
@@ -331,7 +344,11 @@ def logging_hostname(self):
   will attempt to resolve the IP address of the default host route as per
   https://stackoverflow.com/a/28950776.
   '''
-  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1":
+
+  node_name = platform.node()
+
+  if os.environ.get('TERRA_RESOLVE_HOSTNAME', None) == "1" or \
+     check_is_loopback(node_name):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
       # doesn't even have to be reachable
@@ -344,7 +361,7 @@ def logging_hostname(self):
       s.close()
 
   # default return
-  return platform.node()
+  return node_name
 
 
 @settings_property
@@ -393,6 +410,8 @@ global_templates = [
     {
       "logging": {
         "level": "ERROR",
+        "severe_level": "ERROR",
+        "severe_buffer_length": 20,
         "format": "%(asctime)s (%(hostname)s:%(zone)s): "
                   "%(levelname)s/%(processName)s - %(filename)s - %(message)s",
         "date_format": None,
@@ -936,10 +955,10 @@ def json_load(filename):
   except JSONDecodeError as e:
     logger.critical(
         f'Error parsing the JSON config file {filename}: ' + str(e))
-    raise SystemExit(handledExitCode)
+    raise SystemExit(ranButFailedExitCode)
   except FileNotFoundError as e:
     logger.critical('Cannot find JSON config file: ' + str(e))
-    raise SystemExit(handledExitCode)
+    raise SystemExit(ranButFailedExitCode)
 
 
 import terra.logger  # noqa

@@ -19,26 +19,13 @@ from terra.logger import (
 logger = getLogger(__name__)
 
 
-class ServiceRunFailed(Exception):
+class ServiceRunFailed(SystemExit):
   ''' Exception thrown when a service runner returns non-zero
   '''
 
-  def __init__(self, return_code=None):
-    self.return_code = return_code
-    if return_code is None:
-      msg = 'The service runner failed, with unknown return code'
-    elif return_code >= 128:
-      sig = signal._int_to_enum(return_code - 128, signal.Signals)
-      if isinstance(sig, signal.Signals):
-        msg = f'The service runner failed, throwing {sig.name} ({return_code})'
-        if sig.name == 'SIGKILL':
-          msg += '. This could be due to out of memory'
-      else:
-        msg = f'The service runner failed, throwing return code {return_code}'
-    else:
-      msg = f'The service runner failed, throwing return code {return_code}'
-
-    super().__init__(msg)
+  def __init__(self, code=None):
+    self.code = code
+    super().__init__(code)
 
 
 class BaseService:
@@ -189,8 +176,26 @@ class BaseCompute:
         pre_call(*args, **kwargs)
 
       # Call command implementation
-      rv = self.__getattribute__(implementation)(
-          service_info, *args, **kwargs)
+      try:
+        rv = self.__getattribute__(implementation)(
+            service_info, *args, **kwargs)
+      except ServiceRunFailed as crash:
+        if crash.code is None:
+          msg = 'The service runner failed, with unknown return code'
+        elif crash.code >= 128:
+          sig = signal._int_to_enum(crash.code - 128, signal.Signals)
+          if isinstance(sig, signal.Signals):
+            msg = f'The service runner failed, throwing {sig.name} ' + \
+                  f'({crash.code})'
+            if sig.name == 'SIGKILL':
+              msg += '. This could be due to out of memory'
+          else:
+            msg = 'The service runner failed, ' + \
+                  f'throwing return code {crash.code}'
+        else:
+          msg = f'The service runner failed, throwing return code {crash.code}'
+        logger.critical(msg)
+        raise crash
 
       # Check and call post_ call
       post_call = getattr(service_info, 'post_' + name, None)
