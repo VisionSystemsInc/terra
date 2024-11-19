@@ -111,8 +111,10 @@ class RingMemoryHandler(logging.handlers.MemoryHandler):
   def activate_ring(self):
     '''
     Once ``self.capacity`` and ``setLevel`` are set, call ``activate_ring`` to
-    turn on the ring buffer. This is delayed from ``__init__`` so that you can
-    have a change to log everything before you know the max severity and count.
+    enable the ring buffer. This is delayed from ``__init__`` so that you can
+    capture all the logs before you know the max severity and count; then
+    keep only the last ``self.capacity`` messages of severity ``self.level`` or
+    higher.
     '''
     with self.lock:
       self.buffer = deque((b for b in self.buffer if b.levelno >= self.level),
