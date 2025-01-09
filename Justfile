@@ -135,7 +135,7 @@ function terra_caseify()
     run) # Run python module/cli in terra
       # 2 is the exit code of an error in arg parsing
       # 62 for any other terra error
-      local JUST_IGNORE_EXIT_CODES='2$|^62'
+      local JUST_IGNORE_EXIT_CODES=${JUST_IGNORE_EXIT_CODES-'2$|^62'}
       if [ "${JUST_RODEO-}" = "1" ]; then
         extra_args=$#
         local app_name="${1}"
@@ -307,7 +307,7 @@ function terra_caseify()
         touch "${TERRA_CWD}/.just_synced"
       fi
 
-      if [ -s "${TERRA_SKIP_DOCKER_COMPOSE_CHECK+set}" ] && ! "${DOCKER_COMPOSE[@]}" &> /dev/null; then
+      if [ -z "${TERRA_SKIP_DOCKER_COMPOSE_CHECK+set}" ] && ! "${DOCKER_COMPOSE[@]}" &> /dev/null; then
         source "${VSI_COMMON_DIR}/linux/colors.bsh"
         echo "${RED}The docker compose plugin does not appear to be installed.${NC}"
         echo "Please have IT install the 'docker-compose-plugin' or install a local copy in your home directory:"

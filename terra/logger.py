@@ -72,6 +72,7 @@ import struct
 import select
 import pickle
 import atexit
+from collections import deque
 
 import terra
 from terra.core.exceptions import (
@@ -91,6 +92,33 @@ from logging import (
 __all__ = ['getLogger', 'CRITICAL', 'ERROR', 'INFO', 'FATAL', 'WARN',
            'WARNING', 'NOTSET', 'DEBUG1', 'DEBUG2', 'DEBUG3', 'DEBUG4',
            'Logger']
+
+
+class RingMemoryHandler(logging.handlers.MemoryHandler):
+  '''
+  A Ring Memory Handler that keeps the last n messages of a certain severity.
+
+  Since this is designed for terra's settings, it starts off as a normal
+  :py:class:`logging.handlers.MemoryHandler`, and records all the messages.
+  Once settings have initialized, it swaps over to a deque for the buffer,
+  and only keeps the last ``self.capacity`` of ``self.level`` or higher.
+  '''
+
+  def shouldFlush(self, record):
+    # Disable auto flushing. We only want to flush at the end with the report
+    return False
+
+  def activate_ring(self):
+    '''
+    Once ``self.capacity`` and ``setLevel`` are set, call ``activate_ring`` to
+    enable the ring buffer. This is delayed from ``__init__`` so that you can
+    capture all the logs before you know the max severity and count; then
+    keep only the last ``self.capacity`` messages of severity ``self.level`` or
+    higher.
+    '''
+    with self.lock:
+      self.buffer = deque((b for b in self.buffer if b.levelno >= self.level),
+                          maxlen=self.capacity)
 
 
 class HandlerLoggingContext(object):
@@ -243,6 +271,14 @@ class _SetupTerraLogger():
     self.stderr_handler.addFilter(StdErrFilter())
     self.root_logger.addHandler(self.stderr_handler)
 
+    # A buffer that prints at the end to generate a report
+    self.report_buffer = RingMemoryHandler(100)  # capacity doesn't matter here
+    self.report_buffer.setLevel(0)
+    self.report_buffer.setFormatter(self.default_formatter)
+    self.report_buffer.addFilter(StdErrFilter())
+    self.root_logger.addHandler(self.report_buffer)
+    atexit.register(self.print_log_report)
+
     # Set up temporary file logger
     if os.environ.get('TERRA_DISABLE_TERRA_LOG') != '1':
       self.tmp_file = tempfile.NamedTemporaryFile(
@@ -329,6 +365,11 @@ class _SetupTerraLogger():
     if getattr(self, 'main_log_handler', None) is not None:
       self.main_log_handler.setLevel(level)
       self.main_log_handler.setFormatter(formatter)
+
+    if getattr(self, 'report_buffer', None) is not None:
+      self.report_buffer.setLevel(settings.logging.severe_level)
+      self.report_buffer.capacity = settings.logging.severe_buffer_length
+      self.report_buffer.activate_ring()
 
     # This hides the messages that spams the screen:
     # "pipbox received method enable_events() [reply_to:None ticket:None]"
@@ -437,6 +478,32 @@ class _SetupTerraLogger():
           # if the filesize is zero, delete it. No point in littering
           os.unlink(self.tmp_file.name)
     except AttributeError:
+      pass
+
+  def print_log_report(self):
+    try:
+      from terra import settings
+      if settings.terra.zone == 'controller':
+        print('\nTerra Logging report', file=sys.stderr)
+        print('====================', file=sys.stderr)
+        if self.report_buffer.buffer:
+          print(f'Here are the last {len(self.report_buffer.buffer)} error(s)'
+                f' (max: {self.report_buffer.capacity})',
+                file=sys.stderr)
+
+          formatter = ColorFormatter(fmt=settings.logging.format,
+                                     datefmt=settings.logging.date_format,
+                                     style=settings.logging.style)
+
+          report_handler = logging.StreamHandler(sys.stderr)
+          report_handler.setLevel(settings.logging.severe_level)
+          report_handler.setFormatter(formatter)
+          report_handler.addFilter(StdErrFilter())
+          self.report_buffer.setTarget(report_handler)
+          self.report_buffer.flush()
+        else:
+          print('No severe log message, good job!', file=sys.stderr)
+    except Exception:
       pass
 
 
