@@ -55,8 +55,9 @@ class TestLogger(TestLoggerConfigureCase, TestSettingsConfigureCase):
 
     # Other zones should not be spamming the logs
     settings.terra.zone = 'task'
-    with self.assertNoLogs() as cm:
-      log_terra_version(None, None, 'Test App', 'TERRA_BLAH')
+    with self.assertRaises(AssertionError):
+      with self.assertLogs(): # In python 3.10, use assertNoLogs
+        log_terra_version(None, None, 'Test App', 'TERRA_BLAH')
 
 
 class TestLoggerUnconfiguredSettings(TestLoggerConfigureCase):

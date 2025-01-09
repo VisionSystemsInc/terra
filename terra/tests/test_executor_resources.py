@@ -37,7 +37,7 @@ from terra import settings
 
 def get_lock_dir(name):
   return os.path.join(settings.processing_dir, '.resource.locks',
-                      platform.node(), str(os.getpid()), name)
+                      platform.node(), str(settings.terra.uuid), name)
 
 
 class TestResourceCase(TestSettingsConfigureCase,
@@ -180,6 +180,7 @@ class TestResourceLock(TestResourceCase):
     self.assertExist(lock_file)
     resource.release()
     self.assertNotExist(lock_file)
+    atexit_resource_release()
     self.assertNotExist(resource.lock_dir)
 
   def test_with_context(self):
@@ -602,7 +603,11 @@ class TestResourceProcessSpawn(TestResourceProcessTests,
               "processing_dir": self.temp_dir.name,
               "executor": {
                             "type": "ProcessPoolExecutorSpawn",
-                          }
+                          },
+              "terra": {
+                # Simulate the config dumps that terra does for you.
+                "uuid": "myuuid"
+              }
              }
     with open(self.settings_filename, 'w') as fid:
       json.dump(config, fid)
