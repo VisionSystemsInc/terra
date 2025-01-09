@@ -154,7 +154,7 @@ class ContainerService(BaseService):
     self.volumes.append((local, remote))
     self.volumes_flags.append(flags)
 
-  def add_volume_input(self, local, remote):
+  def add_volume_readonly(self, local, remote):
     '''
     Add a read-only input volume, confirming if the local file/folder
     exists. Raise a :obj:`ValueError` should validation fail.
@@ -163,7 +163,7 @@ class ContainerService(BaseService):
     self.add_volume(local, remote, flags='ro',
                     local_must_exist=True)
 
-  def add_file_input(self, local, remote, use_local_extension=False):
+  def add_file_readonly(self, local, remote, use_local_extension=False):
     '''
     Add a read-only input file, confirming that the local file exists.
     Maintain local file extension if requested.
@@ -175,7 +175,7 @@ class ContainerService(BaseService):
       remote = os.path.splitext(remote)[0] + local_ext
 
     # update volume
-    self.add_volume_input(local, remote, local_must_exist=True)
+    self.add_volume_readonly(local, remote, local_must_exist=True)
 
   def add_file(self, local, remote, use_local_extension=False):
     '''
