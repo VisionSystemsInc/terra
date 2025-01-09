@@ -191,7 +191,7 @@ class ContainerService(BaseService):
     # Make sure parent exists, and is not a file
     parent = os.path.dirname(local)
     if os.path.exists(parent) and not os.path.isdir(parent):
-      raise FileExitsError(  # noqa: F821
+      raise FileExistsError(
         f"{parent} exists as a file, instead of a directory")
 
     # update volume
