@@ -27,7 +27,7 @@ logger = getLogger(__name__)
 
 
 ###############################################################################
-#                        Generic Service                                     #
+#                               Generic Service                               #
 ###############################################################################
 class Generic(BaseService):
   def __init__(self):
@@ -55,20 +55,20 @@ class Generic_container(Generic, ContainerService):
     self.add_volume(settings.processing_dir,
                     generic_mount_points['processing_dir'])
 
-    self.add_volume_input(env.get('TERRA_APP_DIR', '/src'),
+    self.add_volume_readonly(env.get('TERRA_APP_DIR', '/src'),
                           generic_mount_points['source_dir'])
 
     for mount in settings.mounts:
       if os.path.exists(mount[0]) and not os.path.isdir(mount[0]):
         self.add_volume(mount[0], mount[1])
       else:
-        self.add_volume(mount[0], mount[1])
+        self.add_file(mount[0], mount[1])
 
     for mount in settings.mountsro:
       if os.path.exists(mount[0]) and not os.path.isdir(mount[0]):
-        self.add_volume_input(mount[0], mount[1])
+        self.add_volume_readonly(mount[0], mount[1])
       else:
-        self.add_volume_input(mount[0], mount[1])
+        self.add_file_readonly(mount[0], mount[1])
 
 
 @VenvCompute.register(Generic)

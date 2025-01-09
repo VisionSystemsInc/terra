@@ -16,7 +16,8 @@ class FullPathsPairAppend(_AppendAction):
 
 
 def get_parser():
-  parser = ArgumentParser(description="AnnotationTransfer Runner")
+  parser = ArgumentParser(
+    description="Generic CLI to execute a Service Runner")
   aa = parser.add_argument
   aa('--output', type=str, default=None, action=FullPaths)
   aa('--shell', default=False, action='store_true')

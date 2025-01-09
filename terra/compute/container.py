@@ -156,7 +156,7 @@ class ContainerService(BaseService):
 
   def add_volume_readonly(self, local, remote):
     '''
-    Add a read-only input volume, confirming if the local file/folder
+    Add a read-only input volume, confirming that the local file/folder
     exists. Raise a :obj:`ValueError` should validation fail.
     '''
 
