@@ -1,12 +1,7 @@
-import os
-import sys
-from os import environ as env
-import glob
 from argparse import _AppendAction, _copy_items
 
 from terra import settings
 from terra.workflow import SingleWorkflow
-from terra.core.settings import settings_property
 from terra.logger import getLogger
 from terra.utils.cli import FullPaths, ArgumentParser, resolve_path
 
@@ -32,6 +27,7 @@ def get_parser():
 
   return parser
 
+
 generic_templates = [
   (
     {},
@@ -47,6 +43,7 @@ generic_templates = [
     }
   )
 ]
+
 
 def main(args=None):
   args = get_parser().parse_args(args)
@@ -66,6 +63,7 @@ def main(args=None):
 
   generic = SingleWorkflow('terra.generic.definitions.Generic')
   generic.run()
+
 
 if __name__ == '__main__':
   main()

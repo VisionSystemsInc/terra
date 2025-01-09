@@ -15,15 +15,15 @@ from terra.compute.singularity import (
   Compute as SingularityCompute
 )
 
-# Terra logger
-from terra.logger import getLogger
-logger = getLogger(__name__)
-
 from terra.compute.base import BaseService
 from terra.compute.docker import Service as DockerService
 from terra.compute.container import ContainerService
 from terra.compute.singularity import Service as SingularityService
 from terra.compute.virtualenv import Service as VenvService
+
+# Terra logger
+from terra.logger import getLogger
+logger = getLogger(__name__)
 
 
 ###############################################################################
@@ -52,9 +52,11 @@ class Generic_container(Generic, ContainerService):
 
     super().__init__()
 
-    self.add_volume(settings.processing_dir, generic_mount_points['processing_dir'])
+    self.add_volume(settings.processing_dir,
+                    generic_mount_points['processing_dir'])
 
-    self.add_volume_input(env.get('TERRA_APP_DIR', '/src'), generic_mount_points['source_dir'])
+    self.add_volume_input(env.get('TERRA_APP_DIR', '/src'),
+                          generic_mount_points['source_dir'])
 
     for mount in settings.mounts:
       if os.path.exists(mount[0]) and not os.path.isdir(mount[0]):

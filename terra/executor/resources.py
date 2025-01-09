@@ -16,7 +16,6 @@ import atexit
 import weakref
 from shutil import rmtree
 import filelock
-from multiprocessing import current_process
 
 from vsi.tools.dir_util import is_dir_empty
 

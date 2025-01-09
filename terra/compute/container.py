@@ -160,8 +160,8 @@ class ContainerService(BaseService):
     exists. Raise a :obj:`ValueError` should validation fail.
     '''
 
-    self.add_volume(local, remote, flags = 'ro',
-                    local_must_exist = True)
+    self.add_volume(local, remote, flags='ro',
+                    local_must_exist=True)
 
   def add_file_input(self, local, remote, use_local_extension=False):
     '''
@@ -175,7 +175,7 @@ class ContainerService(BaseService):
       remote = os.path.splitext(remote)[0] + local_ext
 
     # update volume
-    self.add_volume_input(local, remote, local_must_exist = True)
+    self.add_volume_input(local, remote, local_must_exist=True)
 
   def add_file(self, local, remote, use_local_extension=False):
     '''
@@ -191,7 +191,8 @@ class ContainerService(BaseService):
     # Make sure parent exists, and is not a file
     parent = os.path.dirname(local)
     if os.path.exists(parent) and not os.path.isdir(parent):
-      raise FileExitsError(f"{parent} exists as a file, instead of a directory")
+      raise FileExitsError(  # noqa: F821
+        f"{parent} exists as a file, instead of a directory")
 
     # update volume
     self.add_volume(local, remote)
