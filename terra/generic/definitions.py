@@ -56,7 +56,7 @@ class Generic_container(Generic, ContainerService):
                     generic_mount_points['processing_dir'])
 
     self.add_volume_readonly(env.get('TERRA_APP_DIR', '/src'),
-                          generic_mount_points['source_dir'])
+                             generic_mount_points['source_dir'])
 
     for mount in settings.mounts:
       if os.path.exists(mount[0]) and not os.path.isdir(mount[0]):
