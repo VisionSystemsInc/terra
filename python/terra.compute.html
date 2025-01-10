@@ -59,6 +59,7 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">terra.compute package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="terra.core.html">terra.core package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="terra.executor.html">terra.executor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="terra.generic.html">terra.generic package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="terra.utils.html">terra.utils package</a></li>
 </ul>
 </li>
@@ -253,9 +254,30 @@ Executors that need a separate volume translation</p>
 <dd><p>Bases: <a class="reference internal" href="#terra.compute.base.BaseService" title="terra.compute.base.BaseService"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseService</span></code></a></p>
 <p>Base container service class</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="terra.compute.container.ContainerService.add_file">
+<span class="sig-name descname"><span class="pre">add_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_local_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_file" title="Permalink to this definition"></a></dt>
+<dd><p>Add a input file, creating the local file if it does not exist.
+Maintain local file extension if requested.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="terra.compute.container.ContainerService.add_file_readonly">
+<span class="sig-name descname"><span class="pre">add_file_readonly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_local_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_file_readonly" title="Permalink to this definition"></a></dt>
+<dd><p>Add a read-only input file, confirming that the local file exists.
+Maintain local file extension if requested.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="terra.compute.container.ContainerService.add_volume">
 <span class="sig-name descname"><span class="pre">add_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_must_exist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_volume" title="Permalink to this definition"></a></dt>
 <dd><p>Add a volume to the service</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="terra.compute.container.ContainerService.add_volume_readonly">
+<span class="sig-name descname"><span class="pre">add_volume_readonly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.container.ContainerService.add_volume_readonly" title="Permalink to this definition"></a></dt>
+<dd><p>Add a read-only input volume, confirming that the local file/folder
+exists. Raise a <a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> should validation fail.</p>
 </dd></dl>
 
 <dl class="py method">

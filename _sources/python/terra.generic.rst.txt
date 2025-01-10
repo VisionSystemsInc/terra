@@ -1,0 +1,21 @@
+terra.generic package
+=====================
+
+Submodules
+----------
+
+terra.generic.definitions module
+--------------------------------
+
+.. automodule:: terra.generic.definitions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: terra.generic
+   :members:
+   :undoc-members:
+   :show-inheritance:

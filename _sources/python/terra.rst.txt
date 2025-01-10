@@ -10,6 +10,7 @@ Subpackages
    terra.compute
    terra.core
    terra.executor
+   terra.generic
    terra.utils
 
 Submodules
