@@ -122,6 +122,9 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
 def resolve_path(path):
+  # Handle lists. When nargs is used, the value is a list of strings
+  if isinstance(path, list):
+    return [resolve_path(x) for x in path]
   # This must be done before isabs test, or else you will get a false negative
   path = os.path.expanduser(path)
 

@@ -20,7 +20,7 @@ from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
   Resource, ResourceError, test_dir, logger as resource_logger,
   ProcessLocalStorage, ThreadLocalStorage, ResourceManager,
-  atexit_resource_release, RunnerPID
+  atexit_resource_release
 )
 from terra import settings
 
@@ -37,7 +37,7 @@ from terra import settings
 
 def get_lock_dir(name):
   return os.path.join(settings.processing_dir, '.resource.locks',
-                      platform.node(), str(os.getpid()), name)
+                      platform.node(), str(settings.terra.uuid), name)
 
 
 class TestResourceCase(TestSettingsConfigureCase,
@@ -45,17 +45,6 @@ class TestResourceCase(TestSettingsConfigureCase,
   def setUp(self):
     self.config.executor = {'type': 'SyncExecutor'}
     super().setUp()
-
-
-class TestRunnerPidCase(TestResourceCase):
-  def test_runner_pid(self):
-    pid = os.getpid()
-
-    with ProcessPoolExecutorSpawn(max_workers=1) as executor:
-      future = executor.submit(RunnerPID.pid)
-      runner_pid = future.result()
-
-    self.assertEqual(pid, runner_pid)
 
 
 class TestResourceSimple(TestResourceCase):
@@ -191,6 +180,7 @@ class TestResourceLock(TestResourceCase):
     self.assertExist(lock_file)
     resource.release()
     self.assertNotExist(lock_file)
+    atexit_resource_release()
     self.assertNotExist(resource.lock_dir)
 
   def test_with_context(self):
@@ -613,7 +603,11 @@ class TestResourceProcessSpawn(TestResourceProcessTests,
               "processing_dir": self.temp_dir.name,
               "executor": {
                             "type": "ProcessPoolExecutorSpawn",
-                          }
+                          },
+              "terra": {
+                # Simulate the config dumps that terra does for you.
+                "uuid": "myuuid"
+              }
              }
     with open(self.settings_filename, 'w') as fid:
       json.dump(config, fid)

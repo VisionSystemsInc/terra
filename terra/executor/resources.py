@@ -16,7 +16,6 @@ import atexit
 import weakref
 from shutil import rmtree
 import filelock
-from multiprocessing import current_process
 
 from vsi.tools.dir_util import is_dir_empty
 
@@ -46,18 +45,6 @@ class ThreadLocalStorage(ProcessLocalStorage, threading.local):
   '''
   Thread version of :class:`ProcessLocalStorage`
   '''
-
-
-class RunnerPID():
-  @classmethod
-  def pid(cls):
-    # This only works for concurrent.futures children, which is our use case
-    if current_process().name.startswith('Spawn'):
-      # Only spawned children have to separately call to get their parent
-      return os.getppid()
-    else:
-      # For everything else, the parent is the current pid, that then fork
-      return os.getpid()
 
 
 class Resource:
@@ -138,7 +125,7 @@ class Resource:
     self.repeat = repeat
     self.lock_dir = os.path.join(settings.terra.lock_dir,
                                  platform.node(),
-                                 str(RunnerPID.pid()),
+                                 settings.terra.uuid,
                                  resource_name)
     '''
     str: The directory where the lock files will be stored.
@@ -210,7 +197,7 @@ class Resource:
     # This will break Windows locks
     # https://github.com/tox-dev/py-filelock/issues/15
     if self.FileLock == filelock.SoftFileLock:
-      os.write(lock._lock_file_fd, str(RunnerPID.pid()).encode())
+      os.write(lock._lock_file_fd, settings.terra.uuid.encode())
     # If you get this far, the lock is good, so save it in the class
     self._local.lock = lock
     self._local.resource_id = resource_index
@@ -316,12 +303,6 @@ class Resource:
         os.remove(lock.lock_file)
     lock.release(force)
 
-    if os.path.isdir(self.lock_dir) and is_dir_empty(self.lock_dir):
-      try:
-        os.rmdir(self.lock_dir)
-      except FileNotFoundError:
-        pass  # we don't care if it doesn't exist due to race condition
-
   def __enter__(self):
     return self.acquire()
 
@@ -336,34 +317,6 @@ class Resource:
       self.release(force=True)
 
 
-# class CachedResource(Resource):
-#   '''
-#   Like the :class:`Resource`, but instead of using normal context managers,
-#   it uses `cached context managers <https://www.python.org/dev/peps/pep-0343/
-#   #caching-context-managers>`_
-#
-#   Calls to :meth:`release` are never needed. The only time a resource needs
-#   to be released is when the thread/process is ending, in which case it is
-#   called automatically on delete at exit.
-#   '''
-#   def __exit__(self, exc_type, exc_value, exc_tb):
-#      pass
-
-#   def acquire(self):
-#     '''
-#     Unlike :meth:`Resource.acquire`, :class:`CachedResource` does not use a
-#     counter on the lock. Instead multiple calls to acquire returns the
-#     resource object.
-#     '''
-#     # Reuse for life of thread/process, unless someone calls release
-#     if self.is_locked:
-#       return self.resources[self._local.resource_id]
-#     return super().acquire()
-
-#   def __del__(self):
-#     if self.is_locked:
-#       self.release()
-
 @atexit.register
 def atexit_resource_release():
   '''
@@ -373,6 +326,9 @@ def atexit_resource_release():
   for resource in Resource._resources:
     if resource.is_locked:
       resource.release(force=True)
+    if settings.terra.zone == 'controller':
+      if os.path.isdir(resource.lock_dir) and is_dir_empty(resource.lock_dir):
+        os.rmdir(resource.lock_dir)
 
 
 class ResourceManager:
