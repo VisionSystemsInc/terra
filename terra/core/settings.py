@@ -860,7 +860,7 @@ class Settings(ObjectDict):
       try:
         memo[id(memo)].append(x)
       except KeyError:
-        memo[id(memo)]=[x]
+        memo[id(memo)] = [x]
 
     d = id(self)
     if memo is None:
@@ -882,6 +882,8 @@ class Settings(ObjectDict):
     rv = {}
     for k in self.keys():
       value = getattr(self, k)
+      # By forcing all values to be pulled out via getattr, any Settings
+      # expansions are evaluated.
       if isinstance(value, Settings):
         rv[k] = value.to_dict()
       else:
