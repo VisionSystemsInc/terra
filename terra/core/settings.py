@@ -854,6 +854,42 @@ class Settings(ObjectDict):
       raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__qualname__, name)) from None
 
+  # this is copy.deepcopy, but uses __to_dict__ instead of __deepcopy__
+  def to_dict(self, memo=None, _nil=[]):
+    def _keep_alive(x, memo):
+      try:
+        memo[id(memo)].append(x)
+      except KeyError:
+        memo[id(memo)] = [x]
+
+    d = id(self)
+    if memo is None:
+      memo = {}
+    else:
+      y = memo.get(d, _nil)
+      if y is not _nil:
+        return y
+
+    y = self.__to_dict__(memo)
+
+    if y is not self:
+      memo[d] = y
+      _keep_alive(self, memo)
+    return y
+
+  def __to_dict__(self, memo):
+    # Custom copier for to_dict
+    rv = {}
+    for k in self.keys():
+      value = getattr(self, k)
+      # By forcing all values to be pulled out via getattr, any Settings
+      # expansions are evaluated.
+      if isinstance(value, Settings):
+        rv[k] = value.to_dict()
+      else:
+        rv[k] = copy.deepcopy(value, memo)
+    return rv
+
   def __enter__(self):
     import copy
     try:
