@@ -50,6 +50,7 @@ class DbStopAction(argparse.Action):
         pdb.pm()
         original_hook(type, value, tb)
       sys.excepthook = hook
+    # Set a flag used by the executors, so the stack frames don't get cleared during debugging
     sys.excepthook.debugger = debugger
 
 
