@@ -29,9 +29,7 @@ class DbStopAction(argparse.Action):
 
     try:
       if debugger == "pdb":
-        # This doesn't exist, and will cause an ImportError
-        import vsi.tools.vdb_pdb
-        vsi.tools.vdb_pdb.dbstop_if_error()
+        raise ImportError("pdb")
       elif debugger == "ipdb":
         import vsi.tools.vdb_ipdb
         vsi.tools.vdb_ipdb.dbstop_if_error()
@@ -52,6 +50,9 @@ class DbStopAction(argparse.Action):
         pdb.pm()
         original_hook(type, value, tb)
       sys.excepthook = hook
+    # Set a flag used by the executors, so the stack frames don't get cleared
+    # during debugging
+    sys.excepthook.debugger = debugger
 
 
 class OverrideAction(argparse.Action):
