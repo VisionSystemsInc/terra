@@ -1,3 +1,4 @@
+import sys
 from threading import Lock
 from traceback import clear_frames
 
@@ -31,7 +32,8 @@ class SyncExecutor(BaseExecutor):
       try:
         result = fn(*args, **kwargs)
       except BaseException as e:
-        clear_frames(e.__traceback__)
+        if getattr(sys.excepthook, 'debugger', None) is None:
+          clear_frames(e.__traceback__)
         f.set_exception(e)
       else:
         f.set_result(result)
