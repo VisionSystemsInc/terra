@@ -47,6 +47,8 @@ def setup_logging_exception_hook():
       # Skip calling the original_hook when I don't want to print the stack
       if issubclass(exc_type, NO_STACK_EXCEPTIONS):
         print(f'ERROR: ({exc_type.__name__}) {exc_value}', file=sys.stderr)
+        if hasattr(sys, 'ps1'):  # If interactive mode
+          return original_hook(exc_type, exc_value, exc_traceback)
         sys.exit(ranButFailedExitCode)
 
     except Exception:  # pragma: no cover
@@ -61,6 +63,9 @@ def setup_logging_exception_hook():
       zone = 'preconfig'
     print(f'Exception in {zone} on {platform.node()}',
           file=sys.stderr)
+
+    if hasattr(sys, 'ps1'):  # If interactive mode
+      return original_hook(exc_type, exc_value, exc_traceback)
 
     try:
       # sys.executable for frozen, untested?
@@ -92,7 +97,8 @@ def setup_logging_exception_hook():
              for msg, color in zip(extracted_summary.format(), our_scripts)]
       msg = ''.join(msg)
       msg += '\x1b[33m' + \
-             ''.join(traceback.format_exception_only(exc_value)) + '\x1b[0m'
+             ''.join(traceback.format_exception_only(exc_type, exc_value)) + \
+             '\x1b[0m'
       print(msg, file=sys.stderr, end='')
       sys.exit(ranButFailedExitCode)
     except Exception:
