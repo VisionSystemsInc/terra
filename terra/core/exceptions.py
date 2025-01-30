@@ -48,7 +48,7 @@ def setup_logging_exception_hook():
       if issubclass(exc_type, NO_STACK_EXCEPTIONS):
         print(f'ERROR: ({exc_type.__name__}) {exc_value}', file=sys.stderr)
         if hasattr(sys, 'ps1'):  # If interactive mode
-          return
+          return original_hook(exc_type, exc_value, exc_traceback)
         sys.exit(ranButFailedExitCode)
 
     except Exception:  # pragma: no cover
