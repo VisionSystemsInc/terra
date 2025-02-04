@@ -50,7 +50,7 @@ function Terra_Pipenv()
         return 1
       fi
     fi
-    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_CWD}/Pipfile" "${PIPENV_EXE-${TERRA_CWD}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
+    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_PIPENV_PIPFILE-${TERRA_CWD}/Pipfile}" "${PIPENV_EXE-${TERRA_CWD}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
