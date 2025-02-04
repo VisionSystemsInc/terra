@@ -204,7 +204,7 @@ class Resource:
       return lock._lock_counter
     else:
       raise AttributeError(f"{type(lock)} object has no attribute "
-                            "'lock_counter' or '_lock_counter'")
+                           "'lock_counter' or '_lock_counter'")
 
   def _acquire(self, lock_file, resource_index, repeat):
     lock = self.FileLock(lock_file, 0)
