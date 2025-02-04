@@ -151,14 +151,14 @@ class TestResourceLock(TestResourceCase):
     self.assertFalse(test.is_locked)
     test.acquire()
     self.assertTrue(test.is_locked)
-    self.assertEqual(test._local.lock._lock_counter, 1)
+    self.assertEqual(test.lock_counter, 1)
     test.acquire()
     self.assertTrue(test.is_locked)
-    self.assertEqual(test._local.lock._lock_counter, 2)
+    self.assertEqual(test.lock_counter, 2)
 
     test.release()
     self.assertTrue(test.is_locked)
-    self.assertEqual(test._local.lock._lock_counter, 1)
+    self.assertEqual(test.lock_counter, 1)
 
     test.release()
     self.assertFalse(test.is_locked)
@@ -196,7 +196,7 @@ class TestResourceLock(TestResourceCase):
     with resource as r2:
       with resource as r3:
         self.assertTrue(resource.is_locked)
-        self.assertEqual(resource._local.lock._lock_counter, 2)
+        self.assertEqual(resource.lock_counter, 2)
       self.assertTrue(resource.is_locked)
     self.assertFalse(resource.is_locked)
 

@@ -191,6 +191,21 @@ class Resource:
       return False
     return self._local.lock.is_locked
 
+  @property
+  def lock_counter(self):
+
+    # filelock>=3.12 uses ``lock_counter``
+    # filelock<3.12 uses ``_lock_counter``
+    # https://github.com/tox-dev/filelock/pull/232
+    lock = self._local.lock
+    if hasattr(lock, 'lock_counter'):
+      return lock.lock_counter
+    elif hasattr(lock, '_lock_counter'):
+      return lock._lock_counter
+    else:
+      raise AttributeError(f"{type(lock)} object has no attribute "
+                           "'lock_counter' or '_lock_counter'")
+
   def _acquire(self, lock_file, resource_index, repeat):
     lock = self.FileLock(lock_file, 0)
     lock.acquire()
@@ -282,7 +297,7 @@ class Resource:
     if not self.is_locked:
       raise ValueError('Release called with no lock acquired')
 
-    if not force and self._local.lock._lock_counter > 1:
+    if not force and self.lock_counter > 1:
       self._local.lock.release()
       return
 
