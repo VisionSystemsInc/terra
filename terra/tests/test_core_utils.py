@@ -51,7 +51,7 @@ class TestCachedProperty(TestCase):
     """
     Disallow this case because the decorated function wouldn't be cached.
     """
-    with self.assertRaises(RuntimeError) as cm:
+    with self.assertRaises(TypeError) as cm:
       class ReusedCachedProperty:
         @cached_property
         def a(self):
@@ -59,7 +59,7 @@ class TestCachedProperty(TestCase):
         b = a
     self.assertIn(
         "Cannot assign the same cached_property to two different names",
-        str(cm.exception.__context__))
+        str(cm.exception))
 
   def test_class_mockability(self):
     # Test that mocking works
