@@ -23,7 +23,7 @@ source "${VSI_COMMON_DIR}/linux/web_tools.bsh"
 if [ "${JUSTFILE}" != "${BASH_SOURCE[0]}" ]; then
   JUST_HELP_FILES+=("${BASH_SOURCE[0]}")
 else
-  cd "${TERRA_CWD}"
+  cd "${TERRA_TERRA_DIR}"
   # Allow terra to be run as a non-plugin too
   function caseify()
   {
@@ -50,9 +50,9 @@ function Terra_Pipenv()
         return 1
       fi
     fi
-    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_PIPENV_PIPFILE-${TERRA_CWD}/Pipfile}" "${PIPENV_EXE-${TERRA_CWD}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
+    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_PIPENV_PIPFILE-${TERRA_TERRA_DIR}/Pipfile}" "${PIPENV_EXE-${TERRA_TERRA_DIR}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
   else
-    Just-docker-compose -f "${TERRA_CWD}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
+    Just-docker-compose -f "${TERRA_TERRA_DIR}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
   fi
 }
 
@@ -77,25 +77,25 @@ function terra_caseify()
         Docker compose build ${@+"${@}"}
         extra_args=$#
       else
-        justify build recipes-auto "${TERRA_CWD}/docker/"*.Dockerfile
-        Docker compose -f "${TERRA_CWD}/docker-compose-main.yml" build
+        justify build recipes-auto "${TERRA_TERRA_DIR}/docker/"*.Dockerfile
+        Docker compose -f "${TERRA_TERRA_DIR}/docker-compose-main.yml" build
         if [ "${TERRA_LOCAL-}" = "0" ]; then
-          COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
+          COMPOSE_FILE="${TERRA_TERRA_DIR}/docker-compose-main.yml" justify docker compose clean terra-venv
         fi
         justify terra build-services
       fi
       ;;
 
     ci_load) # Load images and rebuild from dockerhub cache
-      justify ci load-recipes-auto "${TERRA_CWD}/docker/terra.Dockerfile"
-      justify ci load-services "${TERRA_CWD}/docker-compose-main.yml" terra terra_pipenv ${@+"${@}"}
+      justify ci load-recipes-auto "${TERRA_TERRA_DIR}/docker/terra.Dockerfile"
+      justify ci load-services "${TERRA_TERRA_DIR}/docker-compose-main.yml" terra terra_pipenv ${@+"${@}"}
       # terra_pipenv is needed for `justify terra pipenv sync --dev` in terra_pep8
       extra_args=$#
       ;;
 
     terra_build-services) # Build services. Takes arguments that are passed to the \
                     # docker buildx bake command, such as "redis"
-      Docker buildx bake -f "${TERRA_CWD}/docker-compose.yml" ${@+"${@}"}
+      Docker buildx bake -f "${TERRA_TERRA_DIR}/docker-compose.yml" ${@+"${@}"}
       extra_args=$#
       ;;
 
