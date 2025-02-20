@@ -1,4 +1,4 @@
-import distutils.spawn
+import shutil
 import json
 import os
 from subprocess import Popen
@@ -58,8 +58,8 @@ class Compute(BaseCompute):
     # executable is not found on the path, possibly because Popen doesn't
     # search the env's path, but this will manually search and find the right
     # command
-    executable = distutils.spawn.find_executable(service_info.command[0],
-                                                 path=env['PATH'])
+    executable = shutil.which(service_info.command[0],
+                              path=env['PATH'])
 
     # Check if the executable was found in the virtualenv_dir.
     # If it wasn't, warn the user in case they made a mistake

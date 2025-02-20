@@ -497,7 +497,8 @@ class TestResourceMultiTests:
     # test. Test to see that locks are indeed cleaned up automatically in a
     # way that means one executor after the other will not interfere with each
     # other.
-    data[self.name] = Resource(self.name, 1, 1)
+    data[self.name] = Resource(self.name, 2, 1)
+
     for _ in range(2):
       futures = []
       with self.Executor(max_workers=1) as executor:
@@ -505,7 +506,7 @@ class TestResourceMultiTests:
 
         for future in as_completed(futures):
           future.result()
-
+    del future, executor
     # double check resource was freed
     data[self.name].acquire()
     data[self.name].release()

@@ -10,7 +10,6 @@ setup(name="terra",
       description="Terra",
       extra_requires=extra_requires,
       install_requires=[
-        "setuptools", # Use distutils
         "pyyaml",
         "jstyleson",
         # I use signal and task from celery, no matter what
