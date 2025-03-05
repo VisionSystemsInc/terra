@@ -123,7 +123,10 @@ class TestResourceLock(TestResourceCase):
     test.acquire()
 
     with self.assertLogs('terra.executor.resources', level='WARNING') as cm:
-      filename = test._local.lock._lock_file
+      try:
+        filename = test._local.lock._lock_file
+      except AttributeError:
+        filename = test._local.lock.lock_file
       self.assertExist(filename)
       del test
       self.assertNotExist(filename)
@@ -138,8 +141,13 @@ class TestResourceLock(TestResourceCase):
     test3.acquire()
     test3.acquire()
 
-    filename2 = test2._local.lock._lock_file
-    filename3 = test3._local.lock._lock_file
+    try:
+      filename2 = test2._local.lock._lock_file
+      filename3 = test3._local.lock._lock_file
+    except AttributeError:
+      filename2 = test2._local.lock.lock_file
+      filename3 = test3._local.lock.lock_file
+
     self.assertExist(filename2)
     self.assertExist(filename3)
     atexit_resource_release()
@@ -437,6 +445,7 @@ def simple_acquire(name):
   if name not in data:
     data[name] = Resource(name, 1, 1)
   rv = data[name].acquire()
+  data[name].release()
   return rv
 
 
@@ -490,14 +499,16 @@ class TestResourceMultiTests:
     # way that means one executor after the other will not interfere with each
     # other.
     data[self.name] = Resource(self.name, 1, 1)
+
     for _ in range(2):
       futures = []
       with self.Executor(max_workers=1) as executor:
         futures.append(executor.submit(simple_acquire, self.name))
+        futures.append(executor.submit(simple_acquire, self.name))
 
         for future in as_completed(futures):
           future.result()
-
+    del future, executor
     # double check resource was freed
     data[self.name].acquire()
     data[self.name].release()

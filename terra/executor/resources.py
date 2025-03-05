@@ -212,7 +212,10 @@ class Resource:
     # This will break Windows locks
     # https://github.com/tox-dev/py-filelock/issues/15
     if self.FileLock == filelock.SoftFileLock:
-      os.write(lock._lock_file_fd, settings.terra.uuid.encode())
+      try:
+        os.write(lock._context.lock_file_fd, settings.terra.uuid.encode())
+      except AttributeError:
+        os.write(lock._lock_file_fd, settings.terra.uuid.encode())
     # If you get this far, the lock is good, so save it in the class
     self._local.lock = lock
     self._local.resource_id = resource_index

@@ -32,7 +32,7 @@ import os
 from os import environ as env
 from shlex import quote
 from subprocess import Popen
-import distutils.spawn
+import shutil
 
 from vsi.tools.diff import dict_diff
 
@@ -201,7 +201,7 @@ def just(*args, **kwargs):
   # 0, 0, os.environ, None, None) even fails.
   # Microsoft probably has a special exception for the word "bash" that
   # calls WSL bash on execute :(
-  kwargs['executable'] = distutils.spawn.find_executable('bash')
+  kwargs['executable'] = shutil.which('bash')
   # Have to call bash for windows compatibility, no shebang support
   pid = Popen(('bash', 'just') + args, env=just_env, **kwargs)
   return pid
