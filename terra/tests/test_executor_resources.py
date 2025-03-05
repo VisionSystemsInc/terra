@@ -445,6 +445,7 @@ def simple_acquire(name):
   if name not in data:
     data[name] = Resource(name, 1, 1)
   rv = data[name].acquire()
+  data[name].release()
   return rv
 
 
@@ -497,11 +498,12 @@ class TestResourceMultiTests:
     # test. Test to see that locks are indeed cleaned up automatically in a
     # way that means one executor after the other will not interfere with each
     # other.
-    data[self.name] = Resource(self.name, 2, 1)
+    data[self.name] = Resource(self.name, 1, 1)
 
     for _ in range(2):
       futures = []
       with self.Executor(max_workers=1) as executor:
+        futures.append(executor.submit(simple_acquire, self.name))
         futures.append(executor.submit(simple_acquire, self.name))
 
         for future in as_completed(futures):
