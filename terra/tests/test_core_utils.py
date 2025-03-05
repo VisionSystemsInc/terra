@@ -59,11 +59,11 @@ class TestCachedProperty(TestCase):
           pass
         b = a
 
-    if sys.version_info.major >3 or sys.version_info.minor >=12:
+    if sys.version_info.major > 3 or sys.version_info.minor >= 12:
       self.assertIn(
           "Cannot assign the same cached_property to two different names",
           str(cm.exception))
-    else: # 3.11 and older behavior
+    else:  # 3.11 and older behavior
       self.assertIn(
           "Cannot assign the same cached_property to two different names",
           str(cm.exception.__context__))

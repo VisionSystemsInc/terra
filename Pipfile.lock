@@ -544,7 +544,7 @@
                 "sha256:557bbfa1bb255c20e9abafe7ed6cd8046b48d9525db2f9b77d3122a63a2a8bf8"
             ],
             "markers": "sys_platform == 'darwin'",
-            "version": "==>= 1.8"
+            "version": "==1.8"
         },
         "matplotlib-inline": {
             "hashes": [
@@ -591,7 +591,7 @@
                 "sha256:cf914a82f5ee5e73cc2cd2ad5602b2b78dd45589c04ca4fe31516dfd9436c96c"
             ],
             "markers": "sys_platform == 'win32'",
-            "version": "==>= 2017.8.1"
+            "version": "==2017.8.1"
         },
         "pexpect": {
             "hashes": [
@@ -736,7 +736,7 @@
                 "sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98"
             ],
             "markers": "sys_platform == 'win32'",
-            "version": "==>= 0.2.0"
+            "version": "==0.2.0"
         },
         "pyzmq": {
             "hashes": [
