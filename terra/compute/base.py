@@ -16,6 +16,7 @@ from terra.executor import Executor
 from terra.logger import (
   getLogger, LogRecordSocketReceiver, SkipStdErrAddFilter
 )
+from vsi.utils import file_utils
 logger = getLogger(__name__)
 
 
@@ -100,6 +101,38 @@ class BaseService:
 
     self._validate_volume(local, remote, local_must_exist=local_must_exist)
     self.volumes.append((local, remote))
+
+
+  def create_service_dir(self, service_dir, overwrite):
+    '''
+    Creates a directory for a service. If this directory already
+    exists, either it will be overwritten or a RuntimeError
+    is thrown.
+
+    Parameters
+    ----------
+    service_dir : str
+      The directory to create.
+    overwrite : bool
+      Whether the directory should be overwritten.
+
+    Raises
+    ------
+    RuntimeError
+        If the directory already exists, but overwrite is False.
+    '''
+
+    if os.path.isdir(service_dir):
+      if overwrite:
+        # TODO: Make this a question, and get user response
+        logger.warning(f"Service directory {service_dir} already exists, and overwrite "
+                      "is True. Overwriting this directory!")
+        file_utils.rmtree(service_dir, rmdir=False)
+      else:
+        raise RuntimeError(f"Service directory {service_dir} already exists, "
+                          "yet overwrite is False.")
+
+    os.makedirs(service_dir, exist_ok=True)
 
   def pre_run(self):
     '''
