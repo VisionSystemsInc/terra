@@ -36,7 +36,8 @@ class TestServiceBase(TestSettingsConfigureCase):
 
       service = terra.compute.base.BaseService()
       overwrite = False
-      # a Runtime error should occur because the directory exists and overwrite is false
+      # a Runtime error should occur because the directory exists
+      # and overwrite is false
       with self.assertRaises(RuntimeError):
         service.create_service_dir(foo_dir, overwrite)
 
@@ -51,7 +52,8 @@ class TestServiceBase(TestSettingsConfigureCase):
       dirs = os.listdir(foo_dir)
       self.assertEqual(len(dirs), 0)
 
-      # since the sub service dir was removed, test creating it wit create_service_dir
+      # since the sub service dir was removed, test creating it
+      # with create_service_dir
       service.create_service_dir(foo_sub_dir, overwrite)
       # foo dir should now have a sub directory
       dirs = os.listdir(foo_dir)
