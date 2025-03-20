@@ -102,7 +102,6 @@ class BaseService:
     self._validate_volume(local, remote, local_must_exist=local_must_exist)
     self.volumes.append((local, remote))
 
-
   def create_service_dir(self, service_dir, overwrite):
     '''
     Creates a directory for a service. If this directory already
