@@ -130,7 +130,7 @@ class BaseService:
         file_utils.rmtree(service_dir, keep_base_dir=True)
       else:
         raise RuntimeError(f"Service directory {service_dir} already exists, "
-                          "yet overwrite is False.")
+                           "yet overwrite is False.")
 
     os.makedirs(service_dir, exist_ok=True)
 
