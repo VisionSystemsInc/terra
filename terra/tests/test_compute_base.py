@@ -1,4 +1,5 @@
 import os
+import tempfile
 from unittest import mock
 
 from terra import settings
@@ -28,6 +29,35 @@ class TestServiceBase(TestSettingsConfigureCase):
     service.add_volume("/local", "/remote")
     # Make sure it's in the list
     self.assertIn(("/local", "/remote"), service.volumes)
+
+  def test_create_service_dir(self):
+    # first create a temp dir
+    with tempfile.TemporaryDirectory() as foo_dir:
+
+      service = terra.compute.base.BaseService()
+      overwrite = False
+      # a Runtime error should occur because the directory exists
+      # and overwrite is false
+      with self.assertRaises(RuntimeError):
+        service.create_service_dir(foo_dir, overwrite)
+
+      # set overwrite to true
+      overwrite = True
+      # create a subdir to test overwriting the directory
+      # only the contents of the service dir are overwritten
+      foo_sub_dir = os.path.join(foo_dir, 'service_dir')
+      os.makedirs(foo_sub_dir, exist_ok=True)
+      service.create_service_dir(foo_dir, overwrite)
+      # foo dir should now be empty
+      dirs = os.listdir(foo_dir)
+      self.assertEqual(len(dirs), 0)
+
+      # since the sub service dir was removed, test creating it
+      # with create_service_dir
+      service.create_service_dir(foo_sub_dir, overwrite)
+      # foo dir should now have a sub directory
+      dirs = os.listdir(foo_dir)
+      self.assertEqual(len(dirs), 1)
 
   def test_registry(self):
     with mock.patch.dict(terra.compute.base.services, clear=True):
