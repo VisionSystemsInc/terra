@@ -126,7 +126,7 @@ class BaseService:
       if overwrite:
         # TODO: Make this a question, and get user response
         logger.warning(f"Service directory {service_dir} already exists, and overwrite "
-                      "is True. Overwriting this directory!")
+                       "is True. Overwriting this directory!")
         file_utils.rmtree(service_dir, keep_base_dir=True)
       else:
         raise RuntimeError(f"Service directory {service_dir} already exists, "
