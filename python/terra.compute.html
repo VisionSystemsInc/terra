@@ -216,6 +216,25 @@ following conditions:</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="terra.compute.base.BaseService.create_service_dir">
+<span class="sig-name descname"><span class="pre">create_service_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.create_service_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a directory for a service. If this directory already
+exists, either it will be overwritten or a RuntimeError
+is thrown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The directory to create.</p></li>
+<li><p><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether the directory should be overwritten.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – If the directory already exists, but overwrite is False.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="terra.compute.base.BaseService.post_run">
 <span class="sig-name descname"><span class="pre">post_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.compute.base.BaseService.post_run" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
