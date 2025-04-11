@@ -306,8 +306,7 @@ class BaseCompute:
 
       # setup the TCP socket listener
       sender.tcp_logging_server = LogRecordSocketReceiver(
-          settings.logging.server.listen_address,
-          settings.logging.server.port)
+          settings.logging.server.listen_address)
       # Get and store the value of the port used, so the runners/tasks will be
       # able to connect
       if settings.logging.server.port == 0:

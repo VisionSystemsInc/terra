@@ -365,15 +365,25 @@ def logging_hostname(self):
 
 
 @settings_property
-def logging_listen_address(self):
+def logging_listen_host(self):
   '''
-  A :func:`settings_property` defining the address on which the main
+  A :func:`settings_property` defining the host on which the main
   logger will listen. In some environments this may need to be overridden
   (e.g., ``0.0.0.0``) to ensure appropriate capture of service & task logs.
   '''
 
   # is 0.0.0.0 as default better?
   return self.logging.server.hostname
+
+
+@settings_property
+def logging_listen_address(self):
+  '''
+  A :func:`settings_property` defining the address on which the main
+  logger will listen. In some environments this may need to be overridden
+  (e.g., ``0.0.0.0``) to ensure appropriate capture of service & task logs.
+  '''
+  return (self.logging.server.listen_host, self.logging.server.port)
 
 
 @settings_property
@@ -423,7 +433,8 @@ global_templates = [
           # different (such as celery and spark)
           "hostname": logging_hostname,
           "port": DEFAULT_TCP_LOGGING_PORT,
-          "listen_address": logging_listen_address,
+          "listen_host": logging_listen_host,
+          "listen_address": logging_listen_address
         },
         "log_file": log_file,
       },
