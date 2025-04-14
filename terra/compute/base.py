@@ -306,7 +306,8 @@ class BaseCompute:
 
       # setup the TCP socket listener
       sender.tcp_logging_server = LogRecordSocketReceiver(
-          settings.logging.server.listen_address)
+          settings.logging.server.listen_address,
+          settings.logging.server.family)
       # Get and store the value of the port used, so the runners/tasks will be
       # able to connect
       if settings.logging.server.port == 0:
@@ -337,8 +338,12 @@ class BaseCompute:
                         "gracefully. Attempting to exit anyways.",
                         RuntimeWarning)
     elif settings.terra.zone == 'runner':
-      sender.main_log_handler = SocketHandler(
-          settings.logging.server.hostname, settings.logging.server.port)
+      if settings.logging.server.family == 'AF_UNIX':
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.listen_address, None)
+      else:
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.hostname, settings.logging.server.port)
       # All runners have access to the master controller's stderr by virtue of
       # running on the same host. By default, we go ahead and let them log
       # there. Consequently, there is no need for the master controller to echo

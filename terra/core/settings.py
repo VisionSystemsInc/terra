@@ -147,6 +147,7 @@ framework instead of a larger application.
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from pathlib import Path
 import sys
 from uuid import uuid4
 # from datetime import datetime
@@ -383,7 +384,18 @@ def logging_listen_address(self):
   logger will listen. In some environments this may need to be overridden
   (e.g., ``0.0.0.0``) to ensure appropriate capture of service & task logs.
   '''
-  return (self.logging.server.listen_host, self.logging.server.port)
+  if platform.system() == "Windows":
+    # Python still doesn't support named BSD sockets, even though Windows has
+    # since 2019: https://github.com/python/cpython/issues/77589
+    return (self.logging.server.listen_host, self.logging.server.port)
+  else:
+    return str(Path(self.processing_dir) / ".terra_log.sock")
+
+@settings_property
+def logging_family(self):
+  if isinstance(self.logging.server.listen_address, str):
+    return 'AF_UNIX'
+  return 'AF_INET'
 
 
 @settings_property
@@ -434,7 +446,8 @@ global_templates = [
           "hostname": logging_hostname,
           "port": DEFAULT_TCP_LOGGING_PORT,
           "listen_host": logging_listen_host,
-          "listen_address": logging_listen_address
+          "listen_address": logging_listen_address,
+          "family": logging_family
         },
         "log_file": log_file,
       },

@@ -67,6 +67,7 @@ import traceback
 import io
 import warnings
 from datetime import datetime, timezone
+import socket
 import socketserver
 import struct
 import select
@@ -209,10 +210,28 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 
   allow_reuse_address = True
 
-  def __init__(self, address=('localhost',
-                              logging.handlers.DEFAULT_TCP_LOGGING_PORT),
+  def __init__(self,
+               address=('localhost',
+                        logging.handlers.DEFAULT_TCP_LOGGING_PORT),
+               family='AF_INET',
                handler=LogRecordStreamHandler):
+
+    if family == 'AF_INET':
+      self.address_family = socket.AF_INET
+    elif family == 'AF_INET6':
+      self.address_family = socket.AF_INET6
+    elif family == 'AF_UNIX':
+      self.address_family = socket.AF_UNIX
+    else:
+      raise ValueError(f'Invalid value of socket family: {family}. Currently '
+                       'only AF_INET and AF_UNIX are supported')
     socketserver.ThreadingTCPServer.__init__(self, address, handler)
+
+    # Auto delete file socket, or else it'll cause a bind error next time, plus
+    # it looks ugly to leave these around
+    if self.address_family == socket.AF_UNIX:
+      atexit.register(cleanup_named_socket, self.server_address)
+
     self.abort = False
     self.ready = False
     self.timeout = 0.1
@@ -230,6 +249,11 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
       abort = self.abort
     self.ready = False
 
+def cleanup_named_socket(server_address):
+  try:
+    os.remove(server_address)
+  except Exception:
+    pass
 
 class _SetupTerraLogger():
   '''
