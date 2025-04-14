@@ -134,6 +134,18 @@ Logging Settings
 
   The format style, ``%``, ``{``, or ``$`` notation. Default: ``%``
 
+.. option:: logging.server.hostname
+
+  The hostname for the logging server. The default is to use ``platform.node()`` to get the default hostname. If the environment variable ``TERRA_RESOLVE_HOSTNAME`` is set to ``1``, then a test socket is used to determine the active IP address used for internet access, and that IP is used for the hostname.
+
+.. option:: logging.server.listen_host
+
+  The hostname or IP address the logging server will listen on. The default is :option:`logging.server.hostname`. In the case of multiple ethernet devices, this can be used to force ``localhost`` (which does not work in containers), choose a specific IP, or set to ``0.0.0.0`` for all devices.
+
+.. option:: logging.server.listen_address
+
+  The combined address the controller will use for listening. The default is ``(`` :option:`logging.server.listen_host` ``,`` :option:`logging.server.port` ``)``. Can also be used to listen via a file socket on Linux.
+
 .. option:: logging.server.port
 
   The port that the logging server will listen on. The default is to use the default logging port 9020. However when launching multiple terra runs in parallel, it may become necessary to prevent port collisions. Setting the port to ``0`` will avoid this issue and allow the OS to select a random port whose value will be accessible via ``terra.settings.loggin.server.port``.
