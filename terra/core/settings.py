@@ -389,7 +389,9 @@ def logging_listen_address(self):
     # since 2019: https://github.com/python/cpython/issues/77589
     return (self.logging.server.listen_host, self.logging.server.port)
   else:
-    return str(Path(self.processing_dir) / ".terra_log.sock")
+    return str(Path(self.processing_dir) / (
+        ".terra_log_" + self.terra.uuid + ".sock"))
+
 
 @settings_property
 def logging_family(self):

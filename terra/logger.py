@@ -249,11 +249,13 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
       abort = self.abort
     self.ready = False
 
+
 def cleanup_named_socket(server_address):
   try:
     os.remove(server_address)
   except Exception:
     pass
+
 
 class _SetupTerraLogger():
   '''
