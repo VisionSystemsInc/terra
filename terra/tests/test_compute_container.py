@@ -60,7 +60,7 @@ class TestContainerService(TestComputeContainerCase,
 
   def common(self, compute, service):
     with open(settings.logging.server.listen_address, 'w'):
-        pass
+      pass
 
     service.pre_run()
     setup_dir = service.temp_dir.name
