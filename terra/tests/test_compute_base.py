@@ -39,7 +39,7 @@ class TestServiceBase(TestSettingsConfigureCase):
       # a Runtime error should occur because the directory exists
       # and overwrite is false
       with self.assertRaises(RuntimeError):
-        with self.assertLogs("terra.compute.base", level='WARNING') as cm:
+        with self.assertLogs("terra.compute.base", level='WARNING'):
           service.create_service_dir(foo_dir, overwrite)
 
       # set overwrite to true
