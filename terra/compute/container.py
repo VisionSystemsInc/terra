@@ -39,7 +39,7 @@ class ContainerService(BaseService):
 
     if settings.logging.server.family == 'AF_UNIX':
       self.add_file_readonly(settings.logging.server.listen_address,
-                             settings.logging.server.listen_address)
+                             "/terra_log.sock")
 
     self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")
     if self.env.get('TERRA_KEEP_TEMP_DIR', None) == "1":

@@ -304,7 +304,6 @@ class BaseCompute:
         os.makedirs(settings.processing_dir, exist_ok=True)
 
       if settings.logging.server.family == "AF_UNIX":
-        # import pdb; pdb.set_trace()
         socket_dir = Path(settings.logging.server.listen_address).parent
         os.makedirs(socket_dir, exist_ok=True)
         temp_filename = socket_dir / (
