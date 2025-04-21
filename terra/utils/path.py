@@ -104,6 +104,11 @@ def translate_settings_paths(container_config, volume_map,
   if os.name == "nt":  # pragma: no linux cover
     logger.warning("Windows volume mapping is experimental.")
 
+  if container_config.logging.server.family == 'AF_UNIX':
+    container_config.logging.server.listen_address = patch_volume(
+        container_config.logging.server.listen_address,
+        reversed(volume_map))
+
   # Apply map translation to settings configuration
   return nested_patch(
       container_config,

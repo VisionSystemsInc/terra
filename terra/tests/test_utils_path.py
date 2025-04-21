@@ -7,6 +7,7 @@ import posixpath
 from .utils import TestCase, TestSettingsConfigureCase
 # from .test_compute_utils import TestComputeUtilsCase
 import terra.utils.path as utils
+from terra.core.settings import ObjectDict
 from terra import settings
 
 
@@ -57,6 +58,14 @@ class TestTranslateUtils(TestCase):
     for host_obj, container_obj in pathlib_map:
       self.assertIsInstance(host_obj, host_obj_type)
       self.assertIsInstance(container_obj, container_obj_type)
+
+  def _mock_terra_config(self, base={}):
+    config = ObjectDict()
+    config.logging = {}
+    config.logging.server = {}
+    config.logging.server.family = 'AF_INET'
+    config.update(base)
+    return config
 
   def test_pathlib_map_linux(self):
     self._test_pathlib_map('linux')
@@ -111,9 +120,9 @@ class TestTranslateUtils(TestCase):
   def _test_translate_settings_paths(self, container_platform):
     volume_map = [('/foo/bar', '/dst')]
 
-    config = {'some_dir': '/foo/bar/car',
-              'other_file': '/dst/same',
-              'path_not': '/foo/bar/far'}
+    config = self._mock_terra_config({'some_dir': '/foo/bar/car',
+                                      'other_file': '/dst/same',
+                                      'path_not': '/foo/bar/far'})
 
     new_config = utils.translate_settings_paths(config, volume_map,
                                                 container_platform)
@@ -127,6 +136,26 @@ class TestTranslateUtils(TestCase):
   # Testing windows is superfluous until we implement it
   def test_translate_settings_paths_windows(self):
     self._test_translate_settings_paths('windows')
+
+  def test_logger_address(self):
+    # Test that the BSD Unix Socket translates the name properly
+    config = self._mock_terra_config()
+    volume_map = [('/foo/bar.sock', '/boofar.sock')]
+    original_address = '/foo/bar.sock'
+    new_address = '/boofar.sock'
+
+    config.logging.server.listen_address = original_address
+
+    # This setting shouldn't be messed with until AF_UNIX is being used
+    new_config = utils.translate_settings_paths(config, volume_map)
+    self.assertEqual(new_config.logging.server.listen_address,
+                     original_address)
+
+    # Check that this special translation is functioning
+    config.logging.server.family = 'AF_UNIX'
+    new_config = utils.translate_settings_paths(config, volume_map)
+    self.assertEqual(new_config.logging.server.listen_address,
+                     new_address)
 
   def test_reverse_map(self):
     self.assertEqual(utils.reverse_volume_map([]), [])
@@ -148,17 +177,17 @@ class TestTranslateUtils(TestCase):
   def test_translate_paths_chain(self):
     map1 = [['/a', '/b'], ['/b', '/c'], ['/c', '/d']]
 
-    config = {'some_dir': '/a/foo', }
+    config = self._mock_terra_config({'some_dir': '/a/foo', })
 
-    self.assertEqual(utils.translate_paths_chain(config, map1),
-                     {'some_dir': '/b/foo'})
+    self.assertEqual(utils.translate_paths_chain(config, map1).some_dir,
+                     '/b/foo')
 
-    self.assertEqual(utils.translate_paths_chain(config, map1, map1),
-                     {'some_dir': '/c/foo'})
+    self.assertEqual(utils.translate_paths_chain(config, map1, map1).some_dir,
+                     '/c/foo')
 
     self.assertEqual(utils.translate_paths_chain(config, map1[0:1], map1[1:2],
-                                                 map1[2:3]),
-                     {'some_dir': '/d/foo'})
+                                                 map1[2:3]).some_dir,
+                     '/d/foo')
 
 
 class TestResolvePath(TestSettingsConfigureCase):

@@ -48,7 +48,8 @@ class TestServiceBase(TestSettingsConfigureCase):
       # only the contents of the service dir are overwritten
       foo_sub_dir = os.path.join(foo_dir, 'service_dir')
       os.makedirs(foo_sub_dir, exist_ok=True)
-      service.create_service_dir(foo_dir, overwrite)
+      with self.assertLogs("terra.compute.base", level='WARNING'):
+        service.create_service_dir(foo_dir, overwrite)
       # foo dir should now be empty
       dirs = os.listdir(foo_dir)
       self.assertEqual(len(dirs), 0)
