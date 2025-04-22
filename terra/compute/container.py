@@ -37,6 +37,10 @@ class ContainerService(BaseService):
     # for special executors, etc...
     super().pre_run()
 
+    if settings.logging.server.family == 'AF_UNIX':
+      self.add_file_readonly(settings.logging.server.listen_address,
+                             "/terra_log.sock")
+
     self.temp_dir = TemporaryDirectory(suffix=f"_{type(self).__name__}")
     if self.env.get('TERRA_KEEP_TEMP_DIR', None) == "1":
       self.temp_dir._finalizer.detach()
@@ -177,7 +181,7 @@ class ContainerService(BaseService):
       remote = os.path.splitext(remote)[0] + local_ext
 
     # update volume
-    self.add_volume_readonly(local, remote, local_must_exist=True)
+    self.add_volume_readonly(local, remote)
 
   def add_file(self, local, remote, use_local_extension=False):
     '''

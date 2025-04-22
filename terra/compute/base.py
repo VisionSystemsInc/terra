@@ -8,6 +8,8 @@ from logging.handlers import SocketHandler
 import threading
 import warnings
 import shlex
+from pathlib import Path
+import socket
 
 from terra import settings
 import terra.compute.utils
@@ -300,13 +302,38 @@ class BaseCompute:
         sender._log_file = os.devnull
       if settings.processing_dir:
         os.makedirs(settings.processing_dir, exist_ok=True)
+
+      if settings.logging.server.family == "AF_UNIX":
+        socket_dir = Path(settings.logging.server.listen_address).parent
+        os.makedirs(socket_dir, exist_ok=True)
+        temp_filename = socket_dir / (
+            ".terra_test_" + settings.terra.uuid + ".sock")
+        temp_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+          temp_sock.bind(str(temp_filename))
+          temp_sock.close()
+        except OSError:
+          # /dev/shm should always work on Linux
+          settings.logging.server.listen_address = str(
+              Path("/dev/shm") / (
+                  ".terra_log_" + settings.terra.uuid + ".sock"))
+          logger.info(
+              f"{socket_dir} cannot handle file sockets. "
+              f"Using {settings.logging.server.listen_address} instead.")
+        finally:
+          try:
+            os.remove(temp_filename)
+          except Exception:
+            pass
+
       sender._log_file = open(sender._log_file, 'a')
       sender.main_log_handler = StreamHandler(stream=sender._log_file)
       sender.root_logger.addHandler(sender.main_log_handler)
 
       # setup the TCP socket listener
       sender.tcp_logging_server = LogRecordSocketReceiver(
-          settings.logging.server.listen_address)
+          settings.logging.server.listen_address,
+          settings.logging.server.family)
       # Get and store the value of the port used, so the runners/tasks will be
       # able to connect
       if settings.logging.server.port == 0:
@@ -337,8 +364,12 @@ class BaseCompute:
                         "gracefully. Attempting to exit anyways.",
                         RuntimeWarning)
     elif settings.terra.zone == 'runner':
-      sender.main_log_handler = SocketHandler(
-          settings.logging.server.hostname, settings.logging.server.port)
+      if settings.logging.server.family == 'AF_UNIX':
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.listen_address, None)
+      else:
+        sender.main_log_handler = SocketHandler(
+            settings.logging.server.hostname, settings.logging.server.port)
       # All runners have access to the master controller's stderr by virtue of
       # running on the same host. By default, we go ahead and let them log
       # there. Consequently, there is no need for the master controller to echo
@@ -362,7 +393,7 @@ class BaseCompute:
 
       # Check to see if _log_file is unset. If it is, this is due to _log_file
       # being called without configure being called. While it is not important
-      # this work, it's more likely for unit testsing
+      # this work, it's more likely for unit testing
       # if not os.path.samefile(log_file, sender._log_file.name):
       if getattr(sender, '_log_file', None) is not None and \
          log_file != sender._log_file.name:
