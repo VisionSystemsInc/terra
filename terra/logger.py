@@ -229,7 +229,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 
     # Auto delete file socket, or else it'll cause a bind error next time, plus
     # it looks ugly to leave these around
-    if self.address_family == socket.AF_UNIX:
+    if self.address_family == getattr(socket, 'AF_UNIX', None):
       atexit.register(cleanup_named_socket, self.server_address)
 
     self.abort = False
