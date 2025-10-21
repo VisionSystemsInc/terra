@@ -510,6 +510,14 @@ values.
 Values are copies recursively, but only if not already set by your settings.'''
 
 
+global_renamed_attributes = []
+''':class:`list` of (:obj:`str`, :obj:`str`): A list of tuples representing
+nested attributes that have been renamed. If a user inputs an attribute that
+has been renamed, a warning will be issued and the old nested attribute will
+be moved to the new nested attribute. If the new nested attribute is already
+present, the old nested attribute will be deleted.'''
+
+
 class LazyObject:
   '''
   A wrapper class that lazily evaluates (calls :func:`LazyObject._setup`)
@@ -691,6 +699,20 @@ class LazySettings(LazyObject):
     self._wrapped = Settings(*args, **kwargs)
     self._wrapped.update(override_config)
 
+    # move renamed input attributes if present
+    for src, dst in global_renamed_attributes:
+      if src in self._wrapped:
+        msg = (f"**** Setting names have changed **** : "
+               f"please change '{src}' to '{dst}' : ")
+        if dst in self._wrapped:
+          msg += f"deleting '{src}' as '{dst}' is already specified"
+          _ = self._wrapped.pop(src)
+        else:
+          msg += f"renaming '{src}' to '{dst}'"
+          self._wrapped.moveattr(src, dst)
+        logger.warning(msg)
+
+    # apply global template attributes
     for pattern, settings in global_templates:
       if nested_in_dict(pattern, self._wrapped):
         # Not the most efficient way to do this, but insignificant "preupdate"
@@ -751,6 +773,19 @@ class LazySettings(LazyObject):
     offset = len(global_templates)
     for template in templates:
       global_templates.insert(-offset, template)
+
+  def add_renamed_attributes(self, attrs):
+    """
+    Helper function to easily expose adding more renamed attributes
+    :data:`global_renamed_attributes` specific for an application
+
+    Arguments
+    ---------
+    attrs : list
+      A list of pairs of attribute names just like
+      :data:`global_renamed_attributes`
+    """
+    global_renamed_attributes.extend(attrs)
 
   def __enter__(self):
     if self._wrapped is None:
