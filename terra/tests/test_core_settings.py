@@ -279,7 +279,8 @@ class TestObjectDict(TestCase):
     self.assertEqual(d.b.c.f, 'value')
     self.assertEqual(d.b.c.d, 10)
 
-    self.assertDictEqual(d, {'a': 3, 'b': {'c': {'d': 10, 'e': 12, 'f': 'value'}}})
+    self.assertDictEqual(
+      d, {'a': 3, 'b': {'c': {'d': 10, 'e': 12, 'f': 'value'}}})
 
   def test_moveattr(self):
     d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
