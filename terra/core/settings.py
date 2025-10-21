@@ -821,14 +821,20 @@ class ObjectDict(dict):
   def __getattr__(self, name):
     """ Supported """
     try:
-      return self[name]
+      node, key = self._findnode(name)
+      return node[key]
     except KeyError:
       raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__qualname__, name)) from None
 
   def __setattr__(self, name, value):
     """ Supported """
-    self.update([(name, value)])
+    if '.' in name:
+      def _dict(k, v):
+        return {k[0]: _dict(k[1:], v)} if k else v
+      self.update(_dict(name.split('.'), value))
+    else:
+      self.update([(name, value)])
 
   def __contains__(self, name):
     if '.' in name:
@@ -840,6 +846,37 @@ class ObjectDict(dict):
     """ Supported """
 
     nested_update(self, *args, **kwargs)
+
+  def pop(self, name):
+    """ Supported """
+    try:
+      if '.' in name:
+        node, key = self._findnode(name)
+        return node.pop(key)
+      else:
+        return super().pop(name)
+    except KeyError:
+      raise AttributeError("'{}' object has no attribute '{}'".format(
+          self.__class__.__qualname__, name)) from None
+
+  def copyattr(self, src, dst):
+    """ Copy nested attribute via a dot delimited string """
+    setattr(self, dst, copy.deepcopy(getattr(self, src)))
+
+  def moveattr(self, src, dst):
+    """ Move nested attribute via a dot delimited string """
+    setattr(self, dst, self.pop(src))
+
+  def _findnode(self, name):
+    """ Find leaf node from dot delimited string """
+    if '.' in name:
+      node = self
+      keys = name.split('.')
+      for key in keys[:-1]:
+        node = node[key]
+      return (node, keys[-1])
+    else:
+      return (self, name)
 
 
 class ExpandedString(str):

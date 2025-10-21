@@ -229,6 +229,63 @@ class TestObjectDict(TestCase):
     self.assertNotIn('c', dir(d))
     self.assertIn('c', dir(d.b[0][0]))
 
+  def test_getattr(self):
+    d = ObjectDict({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+    self.assertEqual(getattr(d, 'a'), 3)
+    self.assertEqual(getattr(d, 'b.c.d'), 'value')
+    self.assertEqual(getattr(d, 'b.c.e'), 12)
+    with self.assertRaises(AttributeError):
+      _ = getattr(d, 'b.c.z')
+
+  def test_setattr(self):
+    d = ObjectDict()
+    setattr(d, 'a', 3)
+    setattr(d, 'b.c.d', 'value')
+    setattr(d, 'b.c.e', 12)
+    self.assertEqual(d.a, 3)
+    self.assertEqual(d.b.c.d, 'value')
+    self.assertEqual(d.b.c.e, 12)
+    setattr(d, 'b.c.d', 13)
+    self.assertEqual(d.b.c.d, 13)
+
+    self.assertDictEqual(d, {'a': 3, 'b': {'c': {'d': 13, 'e': 12}}})
+
+  def test_pop(self):
+    d = ObjectDict({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    with self.assertRaises(AttributeError):
+      _ = d.pop('b.c.z')
+
+    self.assertEqual(d.pop('b.c.e'), 12)
+    self.assertNotIn('b.c.e', d)
+
+    self.assertEqual(d.pop('b'), {'c': {'d': 'value'}})
+    self.assertNotIn('b', d)
+
+    self.assertDictEqual(d, {'a': 3})
+
+  def test_copyattr(self):
+    d = ObjectDict({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    d.copyattr('b.c.d', 'b.c.f')
+    self.assertEqual(d.b.c.f, 'value')
+    self.assertEqual(d.b.c.d, 'value')
+
+    d.b.c.d = 10
+    self.assertEqual(d.b.c.f, 'value')
+    self.assertEqual(d.b.c.d, 10)
+
+    self.assertDictEqual(d, {'a': 3, 'b': {'c': {'d': 10, 'e': 12, 'f': 'value'}}})
+
+  def test_moveattr(self):
+    d = ObjectDict({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    d.moveattr('b.c.d', 'b.c.f')
+    self.assertEqual(d.b.c.f, 'value')
+    self.assertNotIn('b.c.d', d)
+
+    self.assertDictEqual(d, {'a': 3, 'b': {'c': {'e': 12, 'f': 'value'}}})
+
 
 class TestSettings(TestLoggerCase):
   # TestLoggerCase sets TERRA_SETTINGS_FILE to a valid file, in order to get
