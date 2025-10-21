@@ -131,13 +131,17 @@ class TestLazyObject(TestCase):
 
 
 class TestObjectDict(TestCase):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.cls = ObjectDict
+
   def test_basic(self):
-    d = ObjectDict({'foo': 3})
+    d = self.cls({'foo': 3})
     self.assertEqual(d.foo, 3)
     self.assertEqual(d['foo'], 3)
 
   def test_missing_entry(self):
-    d = ObjectDict()
+    d = self.cls()
 
     with self.assertRaises(KeyError):
       d['bar']
@@ -147,17 +151,17 @@ class TestObjectDict(TestCase):
       d.bar
 
   def test_set_attribute(self):
-    d = ObjectDict()
+    d = self.cls()
     d.far = 5
     self.assertEqual(d.far, 5)
 
   def test_set_index(self):
-    d = ObjectDict()
+    d = self.cls()
     d['bar'] = 4
     self.assertEqual(d['bar'], 4)
 
   def test_cross_setting(self):
-    d = ObjectDict()
+    d = self.cls()
 
     # Set one way
     d['bar'] = 4
@@ -167,22 +171,22 @@ class TestObjectDict(TestCase):
     self.assertEqual(d['far'], 5)
 
   def test_constructor_corner_case(self):
-    self.assertEqual(ObjectDict({}), {})
-    self.assertEqual(ObjectDict(), {})
+    self.assertEqual(self.cls({}), {})
+    self.assertEqual(self.cls(), {})
 
     with self.assertRaises(TypeError):
-      ObjectDict({'a': 1}, {'b': 5})
+      self.cls({'a': 1}, {'b': 5})
 
   def test_dict_constructor(self):
     a = {'a': 1}
-    self.assertEqual(ObjectDict(**a), a)
+    self.assertEqual(self.cls(**a), a)
 
   def test_nested_attributes(self):
-    d = ObjectDict()
+    d = self.cls()
 
-    # set var to a dict, which should auto convert to ObjectDict
+    # set var to a dict, which should auto convert to self.cls
     d.bar = {'prop': 'value'}
-    self.assertIsInstance(d.bar, ObjectDict)
+    self.assertIsInstance(d.bar, self.cls)
 
     # test Reading
     self.assertEqual(d.bar.prop, 'value')
@@ -192,7 +196,7 @@ class TestObjectDict(TestCase):
     self.assertEqual(d.bar.prop, 'newer')
 
   def test_comparison(self):
-    d = ObjectDict()
+    d = self.cls()
     d.bar = {'prop': 'value'}
     d.foo = 3
 
@@ -200,7 +204,7 @@ class TestObjectDict(TestCase):
     self.assertEqual(d, {'foo': 3, 'bar': {'prop': 'value'}})
 
   def test_extraction_list(self):
-    d = ObjectDict({'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]})
+    d = self.cls({'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]})
 
     self.assertTrue(isinstance(d.bar, list))
 
@@ -208,26 +212,90 @@ class TestObjectDict(TestCase):
     self.assertEqual([getattr(x, 'y') for x in d.bar], [2, 4])
 
   def test_extraction_empty_list(self):
-    d = ObjectDict()
+    d = self.cls()
     self.assertEqual(list(d.keys()), [])
 
   def test_constructor_dict(self):
-    d = ObjectDict(foo=3, bar=dict(x=1, y=2))
+    d = self.cls(foo=3, bar=dict(x=1, y=2))
     self.assertEqual(d.foo, 3)
     self.assertEqual(d.bar.x, 1)
-    self.assertIsInstance(d.bar, ObjectDict)
+    self.assertIsInstance(d.bar, self.cls)
 
   def test_constructor_multiple_lists(self):
-    d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
+    d = self.cls({'a': 15, 'b': [[{'c': "foo"}]]})
     self.assertEqual(d.b[0][0].c, 'foo')
-    self.assertIsInstance(d.b[0][0], ObjectDict)
+    self.assertIsInstance(d.b[0][0], self.cls)
 
   def test_dir(self):
-    d = ObjectDict({'a': 15, 'b': [[{'c': "foo"}]]})
+    d = self.cls({'a': 15, 'b': [[{'c': "foo"}]]})
     self.assertIn('a', dir(d))
     self.assertIn('b', dir(d))
     self.assertNotIn('c', dir(d))
     self.assertIn('c', dir(d.b[0][0]))
+
+  def test_getattr(self):
+    d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+    self.assertEqual(getattr(d, 'a'), 3)
+    self.assertEqual(getattr(d, 'b.c.d'), 'value')
+    self.assertEqual(getattr(d, 'b.c.e'), 12)
+    with self.assertRaises(AttributeError):
+      _ = getattr(d, 'b.c.z')
+
+  def test_setattr(self):
+    d = self.cls()
+    setattr(d, 'a', 3)
+    setattr(d, 'b.c.d', 'value')
+    setattr(d, 'b.c.e', 12)
+    self.assertEqual(d.a, 3)
+    self.assertEqual(d.b.c.d, 'value')
+    self.assertEqual(d.b.c.e, 12)
+    setattr(d, 'b.c.d', 13)
+    self.assertEqual(d.b.c.d, 13)
+
+    self.assertDictEqual(d, {'a': 3, 'b': {'c': {'d': 13, 'e': 12}}})
+
+  def test_pop(self):
+    d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    with self.assertRaises(AttributeError):
+      _ = d.pop('b.c.z')
+
+    self.assertEqual(d.pop('b.c.e'), 12)
+    self.assertNotIn('b.c.e', d)
+
+    self.assertEqual(d.pop('b'), {'c': {'d': 'value'}})
+    self.assertNotIn('b', d)
+
+    self.assertDictEqual(d, {'a': 3})
+
+  def test_copyattr(self):
+    d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    d.copyattr('b.c.d', 'b.c.f')
+    self.assertEqual(d.b.c.f, 'value')
+    self.assertEqual(d.b.c.d, 'value')
+
+    d.b.c.d = 10
+    self.assertEqual(d.b.c.f, 'value')
+    self.assertEqual(d.b.c.d, 10)
+
+    self.assertDictEqual(
+      d, {'a': 3, 'b': {'c': {'d': 10, 'e': 12, 'f': 'value'}}})
+
+  def test_moveattr(self):
+    d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    d.moveattr('b.c.d', 'b.c.f')
+    self.assertEqual(d.b.c.f, 'value')
+    self.assertNotIn('b.c.d', d)
+
+    self.assertDictEqual(d, {'a': 3, 'b': {'c': {'e': 12, 'f': 'value'}}})
+
+
+class TestObjectDictSettings(TestObjectDict):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.cls = Settings
 
 
 class TestSettings(TestLoggerCase):

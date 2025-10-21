@@ -821,14 +821,20 @@ class ObjectDict(dict):
   def __getattr__(self, name):
     """ Supported """
     try:
-      return self[name]
+      node, key = self._findnode(name)
+      return node[key]
     except KeyError:
       raise AttributeError("'{}' object has no attribute '{}'".format(
           self.__class__.__qualname__, name)) from None
 
   def __setattr__(self, name, value):
     """ Supported """
-    self.update([(name, value)])
+    if '.' in name:
+      def _dict(k, v):
+        return {k[0]: _dict(k[1:], v)} if k else v
+      self.update(_dict(name.split('.'), value))
+    else:
+      self.update([(name, value)])
 
   def __contains__(self, name):
     if '.' in name:
@@ -840,6 +846,37 @@ class ObjectDict(dict):
     """ Supported """
 
     nested_update(self, *args, **kwargs)
+
+  def pop(self, name):
+    """ Supported """
+    try:
+      if '.' in name:
+        node, key = self._findnode(name)
+        return node.pop(key)
+      else:
+        return super().pop(name)
+    except KeyError:
+      raise AttributeError("'{}' object has no attribute '{}'".format(
+          self.__class__.__qualname__, name)) from None
+
+  def copyattr(self, src, dst):
+    """ Copy nested attribute via a dot delimited string """
+    setattr(self, dst, copy.deepcopy(getattr(self, src)))
+
+  def moveattr(self, src, dst):
+    """ Move nested attribute via a dot delimited string """
+    setattr(self, dst, self.pop(src))
+
+  def _findnode(self, name):
+    """ Find leaf node from dot delimited string """
+    if '.' in name:
+      node = self
+      keys = name.split('.')
+      for key in keys[:-1]:
+        node = node[key]
+      return (node, keys[-1])
+    else:
+      return (self, name)
 
 
 class ExpandedString(str):
@@ -859,21 +896,21 @@ class Settings(ObjectDict):
     # the settings_property evaluation has to be here.
 
     try:
-      val = self[name]
+      val = super().__getattr__(name)
       if isfunction(val) and getattr(val, 'settings_property', None):
         # Ok this ONE line is a bit of a hack :( But I argue it's specific to
         # this singleton implementation, so I approve!
         val = val(settings)
 
         # cache result, because the documentation said this should happen
-        self[name] = val
+        super().__setattr__(name, val)
 
       if isinstance(val, str) and not isinstance(val, ExpandedString):
         val = os.path.expandvars(val)
         if any(name.endswith(pattern) for pattern in filename_suffixes):
           val = os.path.expanduser(val)
         val = ExpandedString(val)
-        self[name] = val
+        super().__setattr__(name, val)
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
