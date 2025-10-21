@@ -896,21 +896,21 @@ class Settings(ObjectDict):
     # the settings_property evaluation has to be here.
 
     try:
-      val = self[name]
+      val = super().__getattr__(name)
       if isfunction(val) and getattr(val, 'settings_property', None):
         # Ok this ONE line is a bit of a hack :( But I argue it's specific to
         # this singleton implementation, so I approve!
         val = val(settings)
 
         # cache result, because the documentation said this should happen
-        self[name] = val
+        super().__setattr__(name, val)
 
       if isinstance(val, str) and not isinstance(val, ExpandedString):
         val = os.path.expandvars(val)
         if any(name.endswith(pattern) for pattern in filename_suffixes):
           val = os.path.expanduser(val)
         val = ExpandedString(val)
-        self[name] = val
+        super().__setattr__(name, val)
       return val
     except KeyError:
       # Throw a KeyError to prevent a recursive corner case
