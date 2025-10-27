@@ -487,6 +487,46 @@ class TestSettings(TestLoggerCase):
     self.assertEqual(settings.b, 22)
     self.assertNotIn("c", settings)
 
+  @mock.patch('terra.core.settings.global_compatibility_settings',
+              [('foo', 'a')])
+  def test_add_compatibility_settings(self):
+    import terra.core.settings as s
+    self.assertEqual(s.global_compatibility_settings,
+                     [('foo', 'a')])
+    settings.add_compatibility_settings([('c.bar', 'c.y')])
+    self.assertEqual(s.global_compatibility_settings,
+                     [('foo', 'a'), ('c.bar', 'c.y')])
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': {'c': 33, 'd': 44}})])
+  @mock.patch('terra.core.settings.global_compatibility_settings',
+              [('foo', 'a'), ('b.bar', 'b.c')])
+  def test_compatibility_settings(self):
+
+    # input settings
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{ "foo": 55, "b": {"bar": 66, "c": 77} }')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # not yet configured
+    self.assertFalse(settings.configured)
+
+    # capture logs & configure settings
+    with self.assertLogs(level='WARNING') as cm, settings:
+      pass
+
+    # check logs
+    self.assertIn("renaming 'foo' to 'a'", cm.output[0])
+    self.assertIn("deleting 'b.bar' as 'b.c'", cm.output[1])
+
+    # check settings
+    self.assertTrue(settings.configured)
+    self.assertNotIn('foo', settings)
+    self.assertNotIn('b.bar', settings)
+    self.assertDictEqual(settings.to_dict(),
+                         {'a': 55, 'b': {'c': 77, 'd': 44}})
+
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': 22})])
   def test_add_templates_order(self):
