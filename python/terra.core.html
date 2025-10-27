@@ -390,6 +390,19 @@ settings manually.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="terra.core.settings.LazySettings.add_compatibility_settings">
+<span class="sig-name descname"><span class="pre">add_compatibility_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.add_compatibility_settings" title="Permalink to this definition"></a></dt>
+<dd><p>Helper function to easily expose adding more compatibility settings to
+<a class="reference internal" href="#terra.core.settings.global_compatibility_settings" title="terra.core.settings.global_compatibility_settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">global_compatibility_settings</span></code></a> specific for an application</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attrs</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – A list of pairs of attribute names just like
+<a class="reference internal" href="#terra.core.settings.global_compatibility_settings" title="terra.core.settings.global_compatibility_settings"><code class="xref py py-data docutils literal notranslate"><span class="pre">global_compatibility_settings</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="terra.core.settings.LazySettings.add_templates">
 <span class="sig-name descname"><span class="pre">add_templates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">templates</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.core.settings.LazySettings.add_templates" title="Permalink to this definition"></a></dt>
 <dd><p>Helper function to easily expose adding more defaults templates to
@@ -604,6 +617,21 @@ settings</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="terra.core.settings.global_compatibility_settings">
+<span class="sig-prename descclassname"><span class="pre">terra.core.settings.</span></span><span class="sig-name descname"><span class="pre">global_compatibility_settings</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#terra.core.settings.global_compatibility_settings" title="Permalink to this definition"></a></dt>
+<dd><p>A list of tuples representing
+nested compatibility settings that have been renamed. If a user inputs a
+setting that has been renamed, a warning will be issued and the old nested
+setting will be moved to the new nested setting. If the new nested setting is
+already present, the old nested setting will be deleted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a> of (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>)</p>
 </dd>
 </dl>
 </dd></dl>
