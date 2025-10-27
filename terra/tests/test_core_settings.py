@@ -487,21 +487,21 @@ class TestSettings(TestLoggerCase):
     self.assertEqual(settings.b, 22)
     self.assertNotIn("c", settings)
 
-  @mock.patch('terra.core.settings.global_renamed_attributes',
+  @mock.patch('terra.core.settings.global_compatibility_settings',
               [('foo', 'a')])
-  def test_add_renamed_attributes(self):
+  def test_add_compatibility_settings(self):
     import terra.core.settings as s
-    self.assertEqual(s.global_renamed_attributes,
+    self.assertEqual(s.global_compatibility_settings,
                      [('foo', 'a')])
-    settings.add_renamed_attributes([('c.bar', 'c.y')])
-    self.assertEqual(s.global_renamed_attributes,
+    settings.add_compatibility_settings([('c.bar', 'c.y')])
+    self.assertEqual(s.global_compatibility_settings,
                      [('foo', 'a'), ('c.bar', 'c.y')])
 
   @mock.patch('terra.core.settings.global_templates',
               [({}, {'a': 11, 'b': {'c': 33, 'd': 44}})])
-  @mock.patch('terra.core.settings.global_renamed_attributes',
+  @mock.patch('terra.core.settings.global_compatibility_settings',
               [('foo', 'a'), ('b.bar', 'b.c')])
-  def test_renamed_attributes(self):
+  def test_compatibility_settings(self):
 
     # input settings
     with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
