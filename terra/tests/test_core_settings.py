@@ -241,6 +241,21 @@ class TestObjectDict(TestCase):
     with self.assertRaises(AttributeError):
       _ = getattr(d, 'b.c.z')
 
+  def test_getattr_default(self):
+    d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    with self.assertRaises(AttributeError):
+      _ = getattr(d, 'x')
+    self.assertIsNone(getattr(d, 'x', None))
+
+    with self.assertRaises(AttributeError):
+      _ = getattr(d, 'x.y.z')
+    self.assertIsNone(getattr(d, 'x.y.z', None))
+
+    with self.assertRaises(AttributeError):
+      _ = getattr(d, 'b.c.z')
+    self.assertIsNone(getattr(d, 'b.c.z', None))
+
   def test_setattr(self):
     d = self.cls()
     setattr(d, 'a', 3)
@@ -267,6 +282,21 @@ class TestObjectDict(TestCase):
     self.assertNotIn('b', d)
 
     self.assertDictEqual(d, {'a': 3})
+
+  def test_pop_default(self):
+    d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    with self.assertRaises(AttributeError):
+      _ = d.pop('x')
+    self.assertIsNone(d.pop('x', None))
+
+    with self.assertRaises(AttributeError):
+      _ = d.pop('x.y.z')
+    self.assertIsNone(d.pop('x.y.z', None))
+
+    with self.assertRaises(AttributeError):
+      _ = d.pop('b.c.z')
+    self.assertIsNone(d.pop('b.c.z', None))
 
   def test_copyattr(self):
     d = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
