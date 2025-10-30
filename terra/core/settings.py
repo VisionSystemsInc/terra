@@ -853,14 +853,17 @@ class ObjectDict(dict):
     return list(set(d + [x for x in self.keys()
                          if isinstance(x, str) and x.isidentifier()]))
 
-  def __getattr__(self, name):
+  def __getattr__(self, name, *args):
     """ Supported """
     try:
       node, key = self._findnode(name)
       return node[key]
     except KeyError:
-      raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__qualname__, name)) from None
+      if args:
+        return args[0]
+      else:
+        raise AttributeError("'{}' object has no attribute '{}'".format(
+            self.__class__.__qualname__, name)) from None
 
   def __setattr__(self, name, value):
     """ Supported """
@@ -882,7 +885,7 @@ class ObjectDict(dict):
 
     nested_update(self, *args, **kwargs)
 
-  def pop(self, name):
+  def pop(self, name, *args):
     """ Supported """
     try:
       if '.' in name:
@@ -890,9 +893,12 @@ class ObjectDict(dict):
         return node.pop(key)
       else:
         return super().pop(name)
-    except KeyError:
-      raise AttributeError("'{}' object has no attribute '{}'".format(
-          self.__class__.__qualname__, name)) from None
+    except (KeyError, AttributeError):
+      if args:
+        return args[0]
+      else:
+        raise AttributeError("'{}' object has no attribute '{}'".format(
+            self.__class__.__qualname__, name)) from None
 
   def copyattr(self, src, dst):
     """ Copy nested attribute via a dot delimited string """
