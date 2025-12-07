@@ -304,6 +304,7 @@ class BaseCompute:
         os.makedirs(settings.processing_dir, exist_ok=True)
 
       if settings.logging.server.family == "AF_UNIX":
+        # Test filesystem handles named sockets
         socket_dir = Path(settings.logging.server.listen_address).parent
         os.makedirs(socket_dir, exist_ok=True)
         temp_filename = socket_dir / (
@@ -334,11 +335,16 @@ class BaseCompute:
       sender.tcp_logging_server = LogRecordSocketReceiver(
           settings.logging.server.listen_address,
           settings.logging.server.family)
-      # Get and store the value of the port used, so the runners/tasks will be
-      # able to connect
-      if settings.logging.server.port == 0:
-        settings.logging.server.port = \
-            sender.tcp_logging_server.socket.getsockname()[1]
+
+      if settings.logging.server.family.startswith("AF_INET"):
+        # Get and store the value of the port used, so the runners/tasks will be
+        # able to connect
+        if settings.logging.server.listen_address[1] == 0:
+          settings.logging.server.listen_address = (
+              settings.logging.server.listen_address[0],
+              sender.tcp_logging_server.socket.getsockname()[1]
+          )
+
       listener_thread = threading.Thread(
           target=sender.tcp_logging_server.serve_until_stopped)
       listener_thread.daemon = True
@@ -364,12 +370,14 @@ class BaseCompute:
                         "gracefully. Attempting to exit anyways.",
                         RuntimeWarning)
     elif settings.terra.zone == 'runner':
-      if settings.logging.server.family == 'AF_UNIX':
+      if settings.logging.server.family in ('AF_UNIX', 'AF_PIPE'):
         sender.main_log_handler = SocketHandler(
             settings.logging.server.listen_address, None)
-      else:
+      elif settings.logging.server.family in ('AF_INET', 'AF_INET5'):
         sender.main_log_handler = SocketHandler(
-            settings.logging.server.hostname, settings.logging.server.port)
+            settings.logging.server.hostname, settings.logging.server.listen_address[0])
+      else:
+        raise Exception(f"Server family {settings.logging.server.family} not supported")
       # All runners have access to the master controller's stderr by virtue of
       # running on the same host. By default, we go ahead and let them log
       # there. Consequently, there is no need for the master controller to echo
@@ -401,9 +409,12 @@ class BaseCompute:
         sender._log_file.close()
         sender._log_file = open(log_file, 'a')
     elif settings.terra.zone == 'runner':
-      # Only if it's changed
-      if settings.logging.server.hostname != sender.main_log_handler.host or \
-         settings.logging.server.port != sender.main_log_handler.port:
+      # Only if it's changed (shared worker across multiple terra runs support)
+      # Primarily this is only celery which is only going to work via TCP
+      if settings.logging.server.family.startswith('INET') and (
+           settings.logging.server.hostname != sender.main_log_handler.host or
+           settings.logging.server.listen_address[1] != sender.main_log_handler.port
+         ):
         # Reconnect Socket Handler
         sender.main_log_handler.close()
         try:
@@ -412,7 +423,8 @@ class BaseCompute:
           pass
 
         sender.main_log_handler = SocketHandler(
-            settings.logging.server.hostname, settings.logging.server.port)
+            settings.logging.server.hostname,
+            settings.logging.server.listen_address[1])
         sender.root_logger.addHandler(sender.main_log_handler)
 
 

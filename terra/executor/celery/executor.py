@@ -278,7 +278,7 @@ class CeleryExecutor(BaseExecutor):
             pass
         sender.main_log_handler = SocketHandler(
             settings.logging.server.hostname,
-            settings.logging.server.port)
+            settings.logging.server.listen_address[1])
         sender.root_logger.addHandler(sender.main_log_handler)
       if post_settings_context:
         # when the celery task is done, its logger is automatically
