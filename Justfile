@@ -50,6 +50,9 @@ function Terra_Pipenv()
         return 1
       fi
     fi
+    if [ "${OS-}" = "Windows_NT" ]; then
+      source "${TERRA_DSM_ACTIVATE_WINDOWS}"
+    fi
     ${DRYRUN} env PIPENV_PIPFILE="${TERRA_PIPENV_PIPFILE-${TERRA_TERRA_DIR}/Pipfile}" "${PIPENV_EXE-${TERRA_TERRA_DIR}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_TERRA_DIR}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
