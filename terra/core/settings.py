@@ -164,6 +164,7 @@ import threading
 import concurrent.futures
 import copy
 from json.decoder import JSONDecodeError
+import difflib
 
 from terra.core.exceptions import (
   ImproperlyConfigured, ConfigurationWarning, ranButFailedExitCode
@@ -1014,6 +1015,90 @@ class Settings(ObjectDict):
 override_config = {}
 settings = LazySettings()
 '''LazySettings: The setting object to use through out all of terra'''
+
+
+def default_settings():
+  '''
+  Default settings, ignoring any user input from a settings file
+  or the command line. This will process all ``global_templates``
+  in their default state.
+  '''
+
+  # temporary TERRA_UNITTEST to skip signal error
+  TERRA_UNITTEST = os.getenv("TERRA_UNITTEST")
+  os.environ["TERRA_UNITTEST"] = "1"
+
+  # temporary override_config to ignore ``--set`` inputs
+  _override_config = copy.deepcopy(override_config)
+  override_config.clear()
+
+  # default settings
+  _settings = LazySettings()
+  _settings.configure({})
+
+  # return TERRA_UNITTEST
+  if TERRA_UNITTEST is None:
+    os.environ.pop("TERRA_UNITTEST")
+  else:
+    os.environ["TERRA_UNITTEST"] = TERRA_UNITTEST
+
+  # return override_config
+  override_config.update(_override_config)
+
+  return _settings
+
+
+def validate_keys():
+  '''
+  Validate that every key in the settings object is also present in the
+  default settings object. An exception will report:
+
+  - Unrecognized settings not in the default settings object, offering
+    an alternative similar setting if found
+  - any settings that were expected to contain a nested dictionary
+  '''
+
+  def _validate(test, expected, parent=None):
+    '''Recursively validate that keys in ``test`` are  in ``expected``'''
+
+    messages = list()
+
+    for key in test.keys():
+      dot_key = f"{parent}.{key}" if parent else key
+
+      # if test dict has an unexpected key, that key is bad
+      if key not in expected:
+        msg = f'"{dot_key}" not recognized'
+        best_match = difflib.get_close_matches(key, expected.keys(), n=1)
+        if best_match:
+          _key = best_match[0]
+          _dot_key = f"{parent}.{_key}" if parent else _key
+          msg += f', did you mean "{_dot_key}"?'
+
+        messages.append(msg)
+        continue
+
+      # nested value
+      _test = getattr(test, key)
+      _expected = getattr(expected, key)
+
+      # recursion when _expected is a dictionary
+      if hasattr(_expected, 'keys'):
+        if hasattr(_test, 'keys'):
+          messages.extend(_validate(_test, _expected, parent=dot_key))
+        else:
+          messages.append(f'"{dot_key}" should be a dictionary')
+
+      # otherwise we're done!
+
+    return messages
+
+  def_settings = default_settings()
+  messages = _validate(settings, def_settings)
+  if messages:
+    report = '\n'.join(f"- {m}" for m in messages)
+    raise ValueError(
+      f"Settings validation failed with the following issues:\n{report}")
 
 
 class TerraJSONEncoder(JSONEncoder):
