@@ -870,6 +870,36 @@ class TestSettings(TestLoggerCase):
     self.assertEqual(settings.compute.arch, "terra.compute.dummy")
     self.assertEqual(settings.a.b.c, 12)
 
+  def test_tty(self):
+    '''Test tty for default compute'''
+    settings.configure({})
+    self.assertEqual(settings.compute.arch, "terra.compute.dummy")
+    self.assertEqual(settings.compute.tty, None)
+
+  @mock.patch('terra.core.settings.sys.stdin.isatty', return_value="foo")
+  def test_tty_docker(self, mock_sys):
+    '''Test tty for docker compute'''
+    settings.configure({"compute": {"arch": "terra.compute.docker"}})
+    self.assertEqual(settings.compute.arch, "terra.compute.docker")
+    self.assertEqual(settings.compute.tty, "foo")
+
+  def test_virtualenv_dir(self):
+    '''Test virtualenv_dir for default compute'''
+    settings.configure({})
+    self.assertEqual(settings.compute.arch, "terra.compute.dummy")
+    self.assertEqual(settings.compute.virtualenv_dir, None)
+
+  def test_virtualenv_dir_virtualenv(self):
+    '''Test virtualenv_dir for virtualenv compute'''
+
+    settings.configure({"compute": {"arch": "terra.compute.virtualenv"}})
+    self.assertEqual(settings.compute.arch, "terra.compute.virtualenv")
+
+    with self.assertWarns(Warning) as cm:
+      _ = settings.compute.virtualenv_dir
+    self.assertIn("did not set settings.compute.virtualenv_dir",
+                  str(cm.warning))
+
 
 class TestDefaultSettings(TestLoggerCase):
 
