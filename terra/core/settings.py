@@ -430,6 +430,22 @@ def stdin_istty(self):
 
 global_templates = [
   (
+    {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}  # Defaults
+  ),
+  (  # So much for DRY :(
+    {"compute": {"arch": "virtualenv"}},
+    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}
+  ),
+  (
+    {"compute": {"arch": "terra.compute.docker"}},
+    {"compute": {"tty": stdin_istty}}
+  ),
+  (  # So much for DRY :(
+    {"compute": {"arch": "docker"}},
+    {"compute": {"tty": stdin_istty}}
+  ),
+  (
     # Global Defaults
     {},
     {
@@ -461,7 +477,11 @@ global_templates = [
       },
       "compute": {
         "arch": "terra.compute.dummy",
-        'volume_map': []
+        'volume_map': [],
+        # settings that apply to only some compute.arch, included here
+        # to enable successful validate_keys()
+        "tty": None,
+        "virtualenv_dir": None,
       },
       'terra': {
         'config_file': config_file,
@@ -485,22 +505,6 @@ global_templates = [
       'resume': False
     }
   ),
-  (
-    {"compute": {"arch": "terra.compute.virtualenv"}},  # Pattern
-    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}  # Defaults
-  ),
-  (  # So much for DRY :(
-    {"compute": {"arch": "virtualenv"}},
-    {"compute": {"virtualenv_dir": need_to_set_virtualenv_dir}}
-  ),
-  (
-    {"compute": {"arch": "terra.compute.docker"}},
-    {"compute": {"tty": stdin_istty}}
-  ),
-  (  # So much for DRY :(
-    {"compute": {"arch": "docker"}},
-    {"compute": {"tty": stdin_istty}}
-  )
 ]
 ''':class:`list` of (:class:`dict`, :class:`dict`): Templates are how we
 conditionally assign default values. It is a list of pair tuples, where the

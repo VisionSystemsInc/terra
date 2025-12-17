@@ -980,6 +980,27 @@ class TestValidateKeys(TestLoggerCase):
     self.assertIn('"b.oo" not recognized, did you mean "b.foo"?',
                   str(cm.exception))
 
+  @mock.patch('terra.core.settings.global_templates',
+              [({'a': 111}, {'foo': 'bar'}), ({}, {'a': 11, 'b': 22})])
+  def test_validate_keys_dynamic_setting(self):
+    '''
+    Test validate_keys with a "dynamic" setting that is not included in the
+    default template. In this case, validate_keys will raise an exception
+    as the dynamic setting key is not recognized.
+    '''
+
+    # settings file, activating the a==111 template and "foo" setting
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 111}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # fail to recognize "foo" which is not in the default settings
+    with self.assertRaises(ValueError) as cm:
+      validate_keys()
+
+    self.assertIn('"foo" not recognized', str(cm.exception))
+
 
 class TestUnitTests(TestCase):
   # Don't make this part of the TestSettings class, it's a TestLoggerCase
