@@ -15,7 +15,8 @@ from terra import logger
 from terra.core.exceptions import ImproperlyConfigured
 from terra.core.settings import (
   ObjectDict, settings_property, Settings, LazyObject, TerraJSONEncoder,
-  ExpandedString, LazySettings, override_config, json_load
+  ExpandedString, LazySettings, override_config, json_load,
+  default_settings, validate_keys
 )
 
 
@@ -868,6 +869,167 @@ class TestSettings(TestLoggerCase):
     self.assertEqual(settings.processing_dir, "/foo/bar")
     self.assertEqual(settings.compute.arch, "terra.compute.dummy")
     self.assertEqual(settings.a.b.c, 12)
+
+  def test_tty(self):
+    '''Test tty for default compute'''
+    settings.configure({})
+    self.assertEqual(settings.compute.arch, "terra.compute.dummy")
+    self.assertEqual(settings.compute.tty, None)
+
+  @mock.patch('terra.core.settings.sys.stdin.isatty', return_value="foo")
+  def test_tty_docker(self, mock_sys):
+    '''Test tty for docker compute'''
+    settings.configure({"compute": {"arch": "terra.compute.docker"}})
+    self.assertEqual(settings.compute.arch, "terra.compute.docker")
+    self.assertEqual(settings.compute.tty, "foo")
+
+  def test_virtualenv_dir(self):
+    '''Test virtualenv_dir for default compute'''
+    settings.configure({})
+    self.assertEqual(settings.compute.arch, "terra.compute.dummy")
+    self.assertEqual(settings.compute.virtualenv_dir, None)
+
+  def test_virtualenv_dir_virtualenv(self):
+    '''Test virtualenv_dir for virtualenv compute'''
+
+    settings.configure({"compute": {"arch": "terra.compute.virtualenv"}})
+    self.assertEqual(settings.compute.arch, "terra.compute.virtualenv")
+
+    with self.assertWarns(Warning) as cm:
+      _ = settings.compute.virtualenv_dir
+    self.assertIn("did not set settings.compute.virtualenv_dir",
+                  str(cm.warning))
+
+
+class TestDefaultSettings(TestLoggerCase):
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': {'c': 33, 'd': 44}})])
+  def test_ignore_settings_file(self):
+    '''Test that default settings ignore settings file'''
+
+    # settings file
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"b": {"c": 333, "e": 555} }')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # regular settings
+    self.assertFalse(settings.configured)
+    self.assertEqual(settings.a, 11)
+    self.assertTrue(settings.configured)
+    self.assertEqual(settings.b.c, 333)
+    self.assertEqual(settings.b.d, 44)
+    self.assertEqual(settings.b.e, 555)
+
+    # default settings
+    _settings = default_settings()
+
+    self.assertTrue(_settings.configured)
+    self.assertEqual(_settings.a, 11)
+    self.assertEqual(_settings.b.c, 33)
+    self.assertEqual(_settings.b.d, 44)
+    with self.assertRaises(AttributeError):
+      _ = _settings.b.e
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': {'c': 33, 'd': 44}})])
+  @mock.patch('terra.core.settings.override_config',
+              {"b": {"c": 333, "e": 555}})
+  def test_ignore_override_config(self):
+    '''Test that default settings ignore ``--set`` actions'''
+
+    # regular settings
+    self.assertFalse(settings.configured)
+    self.assertEqual(settings.a, 11)
+    self.assertTrue(settings.configured)
+    self.assertEqual(settings.b.c, 333)
+    self.assertEqual(settings.b.d, 44)
+    self.assertEqual(settings.b.e, 555)
+
+    # default settings
+    _settings = default_settings()
+
+    self.assertTrue(_settings.configured)
+    self.assertEqual(_settings.a, 11)
+    self.assertEqual(_settings.b.c, 33)
+    self.assertEqual(_settings.b.d, 44)
+    with self.assertRaises(AttributeError):
+      _ = _settings.b.e
+
+
+class TestValidateKeys(TestLoggerCase):
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': {'c': 33, 'd': 44}})])
+  def test_validate_keys_unrecognized(self):
+    '''Test validate_keys with an unrecognized key'''
+
+    # settings file - "b.e" is not a recognized key
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"b": {"c": 333, "e": 555} }')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # unrecognized "b.e"
+    with self.assertRaises(ValueError):
+      validate_keys()
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': {'c': 33, 'd': 44}})])
+  def test_validate_keys_missing_dict(self):
+    '''Test validate_keys with a missing dictionary'''
+
+    # settings file - "b" should be a dict
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 11, "b": 22}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # unrecognized "b.e"
+    with self.assertRaises(ValueError):
+      validate_keys()
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({}, {'a': 11, 'b': {'c': 33, 'foo': 44}})])
+  def test_validate_keys_did_you_mean(self):
+    '''Test validate_keys "did you mean" report'''
+
+    # settings file
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 11, "b": {"fo": 44, "oo": 55} }')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # test that "did you mean" is helpful
+    with self.assertRaises(ValueError) as cm:
+      validate_keys()
+
+    self.assertIn('"b.fo" not recognized, did you mean "b.foo"?',
+                  str(cm.exception))
+    self.assertIn('"b.oo" not recognized, did you mean "b.foo"?',
+                  str(cm.exception))
+
+  @mock.patch('terra.core.settings.global_templates',
+              [({'a': 111}, {'foo': 'bar'}), ({}, {'a': 11, 'b': 22})])
+  def test_validate_keys_dynamic_setting(self):
+    '''
+    Test validate_keys with a "dynamic" setting that is not included in the
+    default template. In this case, validate_keys will raise an exception
+    as the dynamic setting key is not recognized.
+    '''
+
+    # settings file, activating the a==111 template and "foo" setting
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"a": 111}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # fail to recognize "foo" which is not in the default settings
+    with self.assertRaises(ValueError) as cm:
+      validate_keys()
+
+    self.assertIn('"foo" not recognized', str(cm.exception))
 
 
 class TestUnitTests(TestCase):
