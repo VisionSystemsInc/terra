@@ -51,7 +51,8 @@ class TestLogger(TestLoggerConfigureCase):
         self._logs.configure_logger(None)
 
   def test_port_0(self):
-    settings.configure({'logging': {'server': {'port': 0, 'family': 'AF_INET'}},
+    settings.configure({'logging': {'server': {'port': 0,
+                                               'family': 'AF_INET'}},
                         'processing_dir': self.temp_dir.name})
     self.assertEqual(settings.logging.server.listen_address[1], 67890)
 

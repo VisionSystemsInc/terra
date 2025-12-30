@@ -337,8 +337,8 @@ class BaseCompute:
           settings.logging.server.family)
 
       if settings.logging.server.family.startswith("AF_INET"):
-        # Get and store the value of the port used, so the runners/tasks will be
-        # able to connect
+        # Get and store the value of the port used, so the runners/tasks will
+        # be able to connect
         if settings.logging.server.listen_address[1] == 0:
           settings.logging.server.listen_address = (
               settings.logging.server.listen_address[0],
@@ -373,11 +373,13 @@ class BaseCompute:
       if settings.logging.server.family in ('AF_UNIX', 'AF_PIPE'):
         sender.main_log_handler = SocketHandler(
             settings.logging.server.listen_address, None)
-      elif settings.logging.server.family in ('AF_INET', 'AF_INET5'):
+      elif settings.logging.server.family in ('AF_INET', 'AF_INET6'):
         sender.main_log_handler = SocketHandler(
-            settings.logging.server.hostname, settings.logging.server.listen_address[0])
+            settings.logging.server.hostname,
+            settings.logging.server.listen_address[0])
       else:
-        raise Exception(f"Server family {settings.logging.server.family} not supported")
+        raise Exception(
+            f"Server family {settings.logging.server.family} not supported")
       # All runners have access to the master controller's stderr by virtue of
       # running on the same host. By default, we go ahead and let them log
       # there. Consequently, there is no need for the master controller to echo
@@ -412,9 +414,9 @@ class BaseCompute:
       # Only if it's changed (shared worker across multiple terra runs support)
       # Primarily this is only celery which is only going to work via TCP
       if settings.logging.server.family.startswith('INET') and (
-           settings.logging.server.hostname != sender.main_log_handler.host or
-           settings.logging.server.listen_address[1] != sender.main_log_handler.port
-         ):
+        settings.logging.server.hostname != sender.main_log_handler.host
+        or settings.logging.server.listen_address[1]
+              != sender.main_log_handler.port):
         # Reconnect Socket Handler
         sender.main_log_handler.close()
         try:

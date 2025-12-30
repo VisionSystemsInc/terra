@@ -393,7 +393,8 @@ def logging_listen_address(self):
     case 'AF_PIPE':
       return f'\\\\.\\pipe\\terra-log-{self.terra.uuid}'
     case _:
-      raise ValueError(f'Unknown logging.server.family {self.logging.server.family}')
+      raise ValueError(
+          f'Unknown logging.server.family {self.logging.server.family}')
 
 
 @settings_property
