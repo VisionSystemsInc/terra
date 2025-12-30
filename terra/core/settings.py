@@ -385,20 +385,26 @@ def logging_listen_address(self):
   logger will listen. In some environments this may need to be overridden
   (e.g., ``0.0.0.0``) to ensure appropriate capture of service & task logs.
   '''
-  if platform.system() == "Windows":
-    # Python still doesn't support named BSD sockets, even though Windows has
-    # since 2019: https://github.com/python/cpython/issues/77589
-    return (self.logging.server.listen_host, self.logging.server.port)
-  else:
-    return str(Path(self.processing_dir) / (
-        ".terra_log_" + self.terra.uuid + ".sock"))
+  match self.logging.server.family:
+    case 'AF_INET' | 'AF_INET6':
+      return (self.logging.server.listen_host, self.logging.server.port)
+    case 'AF_UNIX':
+      return str(Path(self.processing_dir) / (
+          ".terra_log_" + self.terra.uuid + ".sock"))
+    case 'AF_PIPE':
+      return f'\\\\.\\pipe\\terra-log-{self.terra.uuid}'
+    case _:
+      raise ValueError(
+          f'Unknown logging.server.family {self.logging.server.family}')
 
 
 @settings_property
 def logging_family(self):
-  if isinstance(self.logging.server.listen_address, str):
+  if platform.system() == "Windows":
+    # return 'AF_PIPE'
+    return 'AF_INET'
+  else:
     return 'AF_UNIX'
-  return 'AF_INET'
 
 
 @settings_property
