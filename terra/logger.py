@@ -497,6 +497,8 @@ class _SetupTerraLogger():
         if (not self.tmp_file.file.closed and self.tmp_file.tell() == 0) or \
            (self.tmp_file.file.closed
             and os.stat(self.tmp_file.name).st_size == 0):
+          # double check it is closed, more important in windows
+          self.tmp_file.close()
           # if the filesize is zero, delete it. No point in littering
           os.unlink(self.tmp_file.name)
     except AttributeError:
