@@ -401,8 +401,7 @@ def logging_listen_address(self):
 @settings_property
 def logging_family(self):
   if platform.system() == "Windows":
-    # return 'AF_PIPE'
-    return 'AF_INET'
+    return 'AF_PIPE'
   else:
     return 'AF_UNIX'
 

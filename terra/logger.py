@@ -223,9 +223,12 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
       self.address_family = socket.AF_INET6
     elif family == 'AF_UNIX':
       self.address_family = socket.AF_UNIX
+    elif family == 'AF_PIPE':
+      self.address_family = socket.AF_PIPE
     else:
       raise ValueError(f'Invalid value of socket family: {family}. Currently '
-                       'only AF_INET, AF_INET6 and AF_UNIX are supported')
+                       'only AF_INET, AF_INET6, AF_UNIX and AF_PIPE are '
+                       'supported')
     socketserver.ThreadingTCPServer.__init__(self, address, handler)
 
     # Auto delete file socket, or else it'll cause a bind error next time, plus
