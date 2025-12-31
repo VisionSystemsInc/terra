@@ -346,7 +346,7 @@ class BaseCompute:
           )
 
       listener_thread = threading.Thread(
-          target=sender.tcp_logging_server.serve_until_stopped)
+          target=sender.tcp_logging_server.serve_forever)
       listener_thread.daemon = True
       listener_thread.start()
 
@@ -363,7 +363,7 @@ class BaseCompute:
       # Auto cleanup
       @atexit.register
       def cleanup_thread():
-        sender.tcp_logging_server.abort = 1
+        sender.tcp_logging_server.shutdown()
         listener_thread.join(timeout=5)
         if listener_thread.is_alive():  # pragma: no cover
           warnings.warn("TCP Logger Server Thread did not shut down "

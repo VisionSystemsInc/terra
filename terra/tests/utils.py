@@ -72,7 +72,7 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
 
   def setUp(self):
     self.original_system_hook = sys.excepthook
-    attrs = {'serve_until_stopped.return_value': True, 'ready': True,
+    attrs = {'serve_forever.return_value': True, 'ready': True,
              'socket.getsockname.return_value': (None, 67890)}
     MockLogRecordSocketReceiver = mock.Mock(return_value=mock.Mock(**attrs))
     self.patches.append(mock.patch('terra.logger.LogRecordSocketReceiver',

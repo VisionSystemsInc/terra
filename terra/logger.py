@@ -74,6 +74,7 @@ import select
 import pickle
 import atexit
 from collections import deque
+from threading import Event
 
 import terra
 from terra.core.exceptions import (
@@ -232,21 +233,13 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
     if self.address_family == getattr(socket, 'AF_UNIX', None):
       atexit.register(cleanup_named_socket, self.server_address)
 
-    self.abort = False
     self.ready = False
     self.timeout = 0.1
     self.logname = None
 
-  def serve_until_stopped(self):
-    abort = False
+  def serve_forever(self):
     self.ready = True
-    while not abort:
-      rd, wr, ex = select.select([self.socket.fileno()],
-                                 [], [],
-                                 self.timeout)
-      if rd:
-        self.handle_request()
-      abort = self.abort
+    super().serve_forever()
     self.ready = False
 
 

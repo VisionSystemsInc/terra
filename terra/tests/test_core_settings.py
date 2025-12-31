@@ -1075,7 +1075,7 @@ class TestCircularDependency(TestLoggerConfigureCase):
     terra.core.settings.settings._setup()
 
     # Shut down TCP server
-    terra.logger._logs.tcp_logging_server.abort = True
+    terra.logger._logs.tcp_logging_server.shutdown()
 
     for x in range(1000):
       if not terra.logger._logs.tcp_logging_server.ready:
