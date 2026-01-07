@@ -2,8 +2,12 @@ name: Windows tests
 
 on: [push, pull_request]
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  build-and-test:
+  build-venv-and-test:
     runs-on: windows-latest
     steps:
       - name: Checkout repository code
@@ -15,6 +19,11 @@ jobs:
         run: |
           git config --global --add safe.directory '*'
           git config --global protocol.file.allow always
+
+      - name: Sync Terra venv
+        run: |
+          source setup.env
+          just terra sync
 
       - name: Unit tests
         run: |
