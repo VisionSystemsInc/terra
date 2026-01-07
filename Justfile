@@ -450,7 +450,7 @@ function terra_caseify()
         if [ -n "${conda_exe:+set}" ]; then
           installer_args+=("--conda" "${conda_exe}")
         fi
-
+        set -xv
         # sets python_exe
         conda-python-install --dir "${output_dir}/.python" ${installer_args[@]+"${installer_args[@]}"}
       fi
