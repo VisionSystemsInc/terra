@@ -1,4 +1,5 @@
 import os
+import platform
 from unittest import mock
 import warnings
 
@@ -151,7 +152,10 @@ class TestBaseJust(TestCase):
     args, kwargs = utils.just("foo", "bar", env={"FOO": "BAR"})
     self.assertEqual(args, (('bash', 'just', 'foo', 'bar'),))
     self.assertEqual(set(kwargs.keys()), {'executable', 'env'})
-    self.assertTrue(kwargs.pop('executable').endswith('bash'))
+    if platform.system() == "Windows":
+      self.assertTrue(kwargs.pop('executable').lower().endswith('bash.exe'))
+    else:
+      self.assertTrue(kwargs.pop('executable').endswith('bash'))
     self.assertEqual(kwargs, {'env': {'FOO': 'BAR',
                                       'JUSTFILE': default_justfile}})
 

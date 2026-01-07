@@ -202,12 +202,17 @@ class TestResolvePath(TestSettingsConfigureCase):
 
     home = os.path.expanduser('~')
 
-    self.assertEqual(utils.resolve_path('/foo'), '/foo')
     self.assertEqual(utils.resolve_path('~'), home)
-    self.assertEqual(utils.resolve_path('/foo/${FOO}'), '/foo/BAR')
-    self.assertEqual(utils.resolve_path('/foo/stuff/../bar'), '/foo/bar')
     self.assertEqual(utils.resolve_path('~/foo//${FOO}/./stuff//..//bar'),
-                     os.path.join(home, 'foo/BAR/bar'))
+                     os.path.join(home, 'foo', 'BAR', 'bar'))
+
+    anchor = pathlib.Path("/").anchor
+    for (input, ans) in ((['foo'], ['foo']),
+                         (['foo', '${FOO}'], ['foo', 'BAR']),
+                         (['foo', 'stuff', '..', 'bar'], ['foo', 'bar'])):
+      input = str(pathlib.Path(anchor, *input))
+      ans = str(pathlib.Path(anchor, *ans))
+      self.assertEqual(utils.resolve_path(input), ans)
 
     settings.terra.zone = 'compute'
     self.assertEqual(utils.resolve_path('/foo'), '/compute')

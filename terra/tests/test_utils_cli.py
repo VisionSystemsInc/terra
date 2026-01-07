@@ -3,6 +3,7 @@ import argparse
 import os
 import io
 import contextlib
+import platform
 
 from terra.utils.cli import (
   FullPaths, FullPathsAppend, OverrideAction,
@@ -25,16 +26,23 @@ class TestSettingsFile(TestCase):
                         "settings_file")
     self.assertIn(missing_settings, stderr.getvalue())
 
+    if platform.system() == "Windows":
+      foo_file = r"C:\foo"
+      bar_file = r"C:\bar"
+    else:
+      foo_file = "/foo"
+      bar_file = "/bar"
+
     parser = CliArgumentParser()
     parser.add_settings_file()
-    args = parser.parse_args(["/foo"])
-    self.assertEqual(args.settings_file, "/foo")
+    args = parser.parse_args([foo_file])
+    self.assertEqual(args.settings_file, foo_file)
 
-    with mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='/bar'):
+    with mock.patch.dict(os.environ, TERRA_SETTINGS_FILE=bar_file):
       parser = CliArgumentParser()
       parser.add_settings_file()
       args = parser.parse_args([])
-    self.assertEqual(args.settings_file, "/bar")
+    self.assertEqual(args.settings_file, bar_file)
 
     # Test default_null=True
     parser = CliArgumentParser()
@@ -42,11 +50,11 @@ class TestSettingsFile(TestCase):
     args = parser.parse_args([])
     self.assertEqual(args.settings_file, os.devnull)
 
-    with mock.patch.dict(os.environ, TERRA_SETTINGS_FILE='/bar'):
+    with mock.patch.dict(os.environ, TERRA_SETTINGS_FILE=bar_file):
       parser = CliArgumentParser()
       parser.add_settings_file(default_null=True)
       args = parser.parse_args([])
-    self.assertEqual(args.settings_file, "/bar")
+    self.assertEqual(args.settings_file, bar_file)
 
 
 class TestFullPaths(TestCase):
@@ -59,14 +67,20 @@ class TestFullPaths(TestCase):
   def test_full_paths_append(self):
     parser = argparse.ArgumentParser()
     parser.add_argument('--foo', action=FullPathsAppend)
+    if platform.system() == "Windows":
+      ok_txt = r'c:\ok.txt'
+    else:
+      ok_txt = '/ok.txt'
+
     args = parser.parse_args(['--foo', './foo.txt',
-                              '--foo', '/ok.txt',
+                              '--foo', ok_txt,
                               '--foo', '~/home.txt',
                               '--foo', './bar.txt'])
     ans = [os.path.join(os.getcwd(), 'foo.txt'),
-           os.path.abspath(os.path.expanduser('/ok.txt')),
+           os.path.abspath(os.path.expanduser(ok_txt)),
            os.path.join(os.path.expanduser('~'), 'home.txt'),
            os.path.join(os.getcwd(), 'bar.txt')]
+
     self.assertEqual(ans, args.foo)
 
   @mock.patch.dict('terra.core.settings.override_config', {})

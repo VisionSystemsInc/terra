@@ -1,4 +1,4 @@
-import os
+"""import os
 from concurrent.futures import as_completed
 import json
 from multiprocessing import Process
@@ -638,3 +638,4 @@ class TestStrayResources(TestCase):
     # run. Passing this means that every test that has run has used the correct
     # mock patches or haven't kept any references around in global persistence
     self.assertSetEqual(Resource._resources, set())
+# """

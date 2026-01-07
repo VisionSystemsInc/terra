@@ -126,6 +126,12 @@ def resolve_path(path):
   # Handle lists. When nargs is used, the value is a list of strings
   if isinstance(path, list):
     return [resolve_path(x) for x in path]
+
+  # there is a bug in os.path.isabs for devnull on windows ('nul') that returns
+  # false when it is indeed true. This shortcut patches that behavior
+  if path == os.devnull:
+    return path
+
   # This must be done before isabs test, or else you will get a false negative
   path = os.path.expanduser(path)
 

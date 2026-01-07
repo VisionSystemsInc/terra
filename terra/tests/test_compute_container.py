@@ -59,8 +59,8 @@ class TestContainerService(TestComputeContainerCase,
     self.config = config
 
   def common(self, compute, service):
-    with open(settings.logging.server.listen_address, 'w'):
-      pass
+    # with open(settings.logging.server.listen_address, 'w'):
+    #   pass
 
     service.pre_run()
     setup_dir = service.temp_dir.name
@@ -101,7 +101,7 @@ class TestContainerService(TestComputeContainerCase,
       self.common(compute, service)
 
   @skipIf(os.name != "nt", "Requires Windows")
-  @mock.patch.object(base.BaseCompute, 'configuration_map_service', mock_map)
+  @mock.patch.object(base.BaseCompute, 'configuration_map_service', mock_map_lcow)
   def test_service_simple_nt(self):
     # Test and code not fully written yet?
     with mock.patch.dict(settings._wrapped, {}):
