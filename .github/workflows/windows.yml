@@ -1,0 +1,22 @@
+name: Windows tests
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Fix git breaking on purpose
+        run: |
+          git config --global --add safe.directory '*'
+          git config --global protocol.file.allow always
+
+      - name: Unit tests
+        run: |
+          source setup.env
+          just terra test
