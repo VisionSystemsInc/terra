@@ -1,6 +1,7 @@
 import os
 import ntpath
 import json
+import platform
 from unittest import mock, skipIf
 
 from terra import settings
@@ -59,8 +60,9 @@ class TestContainerService(TestComputeContainerCase,
     self.config = config
 
   def common(self, compute, service):
-    # with open(settings.logging.server.listen_address, 'w'):
-    #   pass
+    if platform.system() != "Windows":
+      with open(settings.logging.server.listen_address, 'w'):
+        pass
 
     service.pre_run()
     setup_dir = service.temp_dir.name
