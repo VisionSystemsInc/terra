@@ -70,11 +70,9 @@ from datetime import datetime, timezone
 import socket
 import socketserver
 import struct
-import select
 import pickle
 import atexit
 from collections import deque
-from threading import Event
 
 import terra
 from terra.core.exceptions import (

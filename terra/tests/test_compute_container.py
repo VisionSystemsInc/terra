@@ -103,7 +103,8 @@ class TestContainerService(TestComputeContainerCase,
       self.common(compute, service)
 
   @skipIf(os.name != "nt", "Requires Windows")
-  @mock.patch.object(base.BaseCompute, 'configuration_map_service', mock_map_lcow)
+  @mock.patch.object(base.BaseCompute, 'configuration_map_service',
+                     mock_map_lcow)
   def test_service_simple_nt(self):
     # Test and code not fully written yet?
     with mock.patch.dict(settings._wrapped, {}):
