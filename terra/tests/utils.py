@@ -113,6 +113,9 @@ class TestLoggerCase(TestSettingsUnconfiguredCase, TestNamedTemporaryFileCase):
         self._logs.configure_logger)
     terra.core.signals.post_settings_context.disconnect(
         self._logs.reconfigure_logger)
+    # Windows requires this for cleanup routines to work
+    if log_file := getattr(self._logs, '_log_file', None):
+      log_file.close()
     super().tearDown()
 
 
