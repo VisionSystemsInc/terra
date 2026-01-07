@@ -23,6 +23,7 @@ jobs:
       - name: Sync Terra venv
         run: |
           source setup.env
+          just --wrap declare -p TERRA_CWD
           just terra sync
 
       - name: Unit tests
