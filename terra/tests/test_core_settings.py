@@ -1031,6 +1031,35 @@ class TestValidateKeys(TestLoggerCase):
 
     self.assertIn('"foo" not recognized', str(cm.exception))
 
+  @mock.patch('terra.core.settings.global_templates', [])
+  def test_validate_keys_no_func(self):
+    '''
+    Test that ``validate_keys`` does not evaluate ``settings_property``
+    in the default settings dictionary
+    '''
+
+    # mock to keep track of function calls
+    # for example, ``mock_obj.func.assert_not_called``
+    mock_obj = mock.Mock()
+    mock_obj.func = mock.Mock(return_value=5)
+
+    # template with settings_property using mock_obj
+    @settings_property
+    def a(self):
+      return mock_obj.func()
+
+    settings.add_templates([({}, {'a': a, 'b': 11})])
+
+    # settings file
+    with NamedTemporaryFile(mode='w', dir=self.temp_dir.name,
+                            delete=False) as fid:
+      fid.write('{"b": 22}')
+    os.environ['TERRA_SETTINGS_FILE'] = fid.name
+
+    # validate_keys must not evaluate settings_property
+    validate_keys()
+    mock_obj.func.assert_not_called()
+
 
 class TestUnitTests(TestCase):
   # Don't make this part of the TestSettings class, it's a TestLoggerCase

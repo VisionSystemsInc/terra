@@ -1088,9 +1088,9 @@ def validate_keys():
         messages.append(msg)
         continue
 
-      # nested value
-      _test = getattr(test, key)
-      _expected = getattr(expected, key)
+      # nested value - use __getitem__ to avoid evaluation of lazy settings
+      _test = test.__getitem__(key)
+      _expected = expected.__getitem__(key)
 
       # recursion when _expected is a dictionary
       if hasattr(_expected, 'keys'):
