@@ -85,7 +85,7 @@ from terra.core.exceptions import (
 
 from logging import (
   CRITICAL, ERROR, INFO, FATAL, WARN, WARNING, NOTSET, Filter,
-  getLogger, _acquireLock, _releaseLock, currentframe, Formatter,
+  getLogger, currentframe, Formatter, _lock as logging_lock,
   _srcfile as logging_srcfile, Logger as Logger_original
 )
 
@@ -143,19 +143,13 @@ class HandlerLoggingContext(object):
       self.logger = logger
 
   def __enter__(self):
-    try:
-      _acquireLock()
+    with logging_lock:
       self.old_handlers = self.logger.handlers
       self.logger.handlers = self.handlers
-    finally:
-      _releaseLock()
 
   def __exit__(self, et, ev, tb):
-    try:
-      _acquireLock()
+    with logging_lock:
       self.logger.handlers = self.old_handlers
-    finally:
-      _releaseLock()
     # implicit return of None => don't swallow exceptions
 
 
