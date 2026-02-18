@@ -72,10 +72,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#terra.logger.DEBUG4"><code class="docutils literal notranslate"><span class="pre">DEBUG4</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#terra.logger.Logger"><code class="docutils literal notranslate"><span class="pre">Logger</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#terra.logger._SetupTerraLogger"><code class="docutils literal notranslate"><span class="pre">_SetupTerraLogger</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#terra.logger._acquireLock"><code class="docutils literal notranslate"><span class="pre">_acquireLock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#terra.logger._checkLevel"><code class="docutils literal notranslate"><span class="pre">_checkLevel()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#terra.logger._demoteLevel"><code class="docutils literal notranslate"><span class="pre">_demoteLevel()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#terra.logger._releaseLock"><code class="docutils literal notranslate"><span class="pre">_releaseLock()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#terra.logger.getLogger"><code class="docutils literal notranslate"><span class="pre">getLogger()</span></code></a></li>
 </ul>
 </li>
@@ -728,13 +726,6 @@ configured</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="terra.logger._acquireLock">
-<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_acquireLock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._acquireLock" title="Permalink to this definition"></a></dt>
-<dd><p>Acquire the module-level lock for serializing access to shared data.</p>
-<p>This should be released with _releaseLock().</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="terra.logger._checkLevel">
 <span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_checkLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._checkLevel" title="Permalink to this definition"></a></dt>
 <dd><p>Translate <code class="docutils literal notranslate"><span class="pre">log_level</span></code> to integer.</p>
@@ -754,12 +745,6 @@ messages unless <code class="docutils literal notranslate"><span class="pre">ter
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="terra.logger._releaseLock">
-<span class="sig-prename descclassname"><span class="pre">terra.logger.</span></span><span class="sig-name descname"><span class="pre">_releaseLock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#terra.logger._releaseLock" title="Permalink to this definition"></a></dt>
-<dd><p>Release the module-level lock acquired by calling _acquireLock().</p>
 </dd></dl>
 
 <dl class="py function">
