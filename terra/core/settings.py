@@ -930,6 +930,24 @@ class ObjectDict(dict):
     else:
       return (self, name)
 
+  def deepcopy(self, attrs=None):
+    """
+    Deepcopy a subset of nested attributes
+
+    Arguments
+    ---------
+    attrs: :obj:`list`
+        Optional list of dot-delimited attribute names to copy
+    """
+    if not attrs:
+      result = copy.deepcopy(self)
+    else:
+      result = self.__class__()
+      for attr in attrs:
+        setattr(result, attr, copy.deepcopy(getattr(self, attr)))
+
+    return result
+
 
 class ExpandedString(str):
   pass

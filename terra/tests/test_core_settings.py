@@ -322,6 +322,25 @@ class TestObjectDict(TestCase):
 
     self.assertDictEqual(d, {'a': 3, 'b': {'c': {'e': 12, 'f': 'value'}}})
 
+  def test_deepcopy(self):
+    src = self.cls({'a': 3, 'b': {'c': {'d': 'value', 'e': 12}}})
+
+    obj1 = src.deepcopy()
+    obj2 = src.deepcopy(('a', 'b.c.d'))
+
+    src.a = 30
+    src.b.c.d = 'different-value'
+    src.b.c.e = 120
+
+    self.assertEqual(obj1.a, 3)
+    self.assertEqual(obj1.b.c.d, 'value')
+    self.assertEqual(obj1.b.c.e, 12)
+
+    self.assertEqual(obj2.a, 3)
+    self.assertEqual(obj2.b.c.d, 'value')
+    with self.assertRaises(AttributeError):
+      _ = getattr(obj2, 'b.c.e')
+
 
 class TestObjectDictSettings(TestObjectDict):
   def __init__(self, *args, **kwargs):
