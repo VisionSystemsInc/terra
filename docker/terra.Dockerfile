@@ -15,7 +15,7 @@ SHELL ["/usr/bin/env", "sh", "-euxvc"]
 RUN apk add --no-cache bash libressl tzdata
 
 ENV WORKON_HOME=/venv \
-    PIPENV_PIPFILE=/terra/Pipfile \
+    PIPENV_PIPFILE=/src/Pipfile \
     PIPENV_CACHE_DIR=/venv/cache \
     # Needed for pipenv shell
     PYENV_SHELL=/bin/bash \
@@ -33,15 +33,15 @@ RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers \
     # More dependencies for cryptography, which takes 75 seconds to compile
     rust cargo
 
-COPY external/vsi_common/setup.py /terra/external/vsi_common/
-COPY setup.py Pipfile Pipfile.lock /terra/
+COPY external/vsi_common/setup.py /src/external/vsi_common/
+COPY setup.py Pipfile Pipfile.lock /src/
 
     # Install all packages into the image
-RUN (cd /terra/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
-    (cd /terra; /usr/local/pipenv/bin/fake_package terra terra); \
+RUN (cd /src/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
+    (cd /src; /usr/local/pipenv/bin/fake_package terra terra); \
     pipenv sync; \
-    # Cleanup and make way for the real /terra that will be mounted at runtime
-    rm -rf /terra/* /tmp/pip*
+    # Cleanup and make way for the real /src that will be mounted at runtime
+    rm -rf /src/* /tmp/pip*
 
 ###############################################################################
 
@@ -68,8 +68,8 @@ COPY --from=vsi /vsi /vsi
 COPY --from=docker-compose /usr/local /usr/local
 
 # Terra
-COPY terra.env /terra/
-COPY docker/terra.Justfile /terra/docker/
+COPY terra.env /src/
+COPY docker/terra.Justfile /src/docker/
 
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/vsi/linux/just_files/just_entrypoint.sh"]
 
