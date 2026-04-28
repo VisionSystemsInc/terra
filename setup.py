@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-extra_requires = {
+extras_require = {
   'celery': ["celery[redis]"],
   'flower': ["flower"]
 }
@@ -8,7 +8,7 @@ extra_requires = {
 setup(name="terra",
       packages=["terra"],
       description="Terra",
-      extra_requires=extra_requires,
+      extras_require=extras_require,
       install_requires=[
         "pyyaml",
         "jstyleson",
