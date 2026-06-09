@@ -1,3 +1,31 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta:__legacy__"
+requires = [
+  "setuptools>=61.0.0",
+  "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "terra"
+version = "0.0.0"
+description = "Terra"
+dependencies = [
+  "pyyaml",
+  "jstyleson",
+  # I use signal and task from celery, no matter what
+  "celery",
+  "filelock",
+]
+readme = "README.md"
+
+[project.optional-dependencies]
+celery = [
+  "celery[redis]",
+]
+flower = [
+  "flower",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+namespaces = false

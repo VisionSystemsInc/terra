@@ -34,7 +34,7 @@ RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers \
     rust cargo
 
 COPY external/vsi_common/setup.py /src/external/vsi_common/
-COPY setup.py Pipfile Pipfile.lock /src/
+COPY pyproject.toml Pipfile Pipfile.lock /src/
 
     # Install all packages into the image
 RUN (cd /src/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/vsi); \
