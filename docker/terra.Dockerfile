@@ -1,14 +1,14 @@
 # syntax=docker/dockerfile
 
-FROM vsiri/recipe:gosu as gosu
-FROM vsiri/recipe:tini-musl as tini
-FROM vsiri/recipe:vsi as vsi
-FROM vsiri/recipe:pipenv as pipenv
-FROM vsiri/recipe:docker-compose as docker-compose
+FROM vsiri/recipe:gosu AS gosu
+FROM vsiri/recipe:tini-musl AS tini
+FROM vsiri/recipe:vsi AS vsi
+FROM vsiri/recipe:pipenv AS pipenv
+FROM vsiri/recipe:docker-compose AS docker-compose
 
 ###############################################################################
 
-FROM python:3.10.0-alpine3.13 as dep_stage
+FROM python:3.10.0-alpine3.13 AS dep_stage
 SHELL ["/usr/bin/env", "sh", "-euxvc"]
 
 # Install any runtime dependencies
@@ -27,13 +27,13 @@ RUN for patch in /usr/local/share/just/container_build_patch/*; do "${patch}"; d
 
 ###############################################################################
 
-FROM dep_stage as pipenv_cache
+FROM dep_stage AS pipenv_cache
 
 RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers \
     # More dependencies for cryptography, which takes 75 seconds to compile
     rust cargo
 
-COPY external/vsi_common/setup.py /src/external/vsi_common/
+COPY external/vsi_common/pyproject.toml /src/external/vsi_common/
 COPY pyproject.toml Pipfile Pipfile.lock /src/
 
     # Install all packages into the image
@@ -45,7 +45,7 @@ RUN (cd /src/external/vsi_common; /usr/local/pipenv/bin/fake_package vsi python/
 
 ###############################################################################
 
-FROM pipenv_cache as pipenv_run
+FROM pipenv_cache AS pipenv_run
 
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 COPY --from=vsi /vsi /vsi
