@@ -1,6 +1,6 @@
-FROM vsiri/recipe:gosu as gosu
-FROM vsiri/recipe:tini-musl as tini
-FROM vsiri/recipe:vsi as vsi
+FROM vsiri/recipe:gosu AS gosu
+FROM vsiri/recipe:tini-musl AS tini
+FROM vsiri/recipe:vsi AS vsi
 
 FROM redis:5.0.4-alpine3.9
 
