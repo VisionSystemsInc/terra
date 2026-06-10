@@ -33,7 +33,7 @@ RUN apk add --no-cache gcc g++ libffi-dev libressl-dev make linux-headers \
     # More dependencies for cryptography, which takes 75 seconds to compile
     rust cargo
 
-COPY external/vsi_common/setup.py /src/external/vsi_common/
+COPY external/vsi_common/pyproject.toml /src/external/vsi_common/
 COPY pyproject.toml Pipfile Pipfile.lock /src/
 
     # Install all packages into the image
