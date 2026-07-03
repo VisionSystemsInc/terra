@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# ~~Replace Terra_Pipenv~~
+# Replace pipenv
+# pipenv_dir
+
 source "${VSI_COMMON_DIR}/linux/just_files/just_env" "$(dirname "${BASH_SOURCE[0]}")"/'terra.env'
 
 # Plugins
@@ -34,7 +38,7 @@ fi
 # Always add this to the list, because of how the caseify above works
 JUST_DEFAULTIFY_FUNCTIONS+=(terra_caseify)
 
-function Terra_Pipenv()
+function Terra_Uv()
 {
   local answer_continue="${answer_continue-}"
 
@@ -50,9 +54,10 @@ function Terra_Pipenv()
         return 1
       fi
     fi
-    ${DRYRUN} env PIPENV_PIPFILE="${TERRA_PIPENV_PIPFILE-${TERRA_TERRA_DIR}/Pipfile}" "${PIPENV_EXE-${TERRA_TERRA_DIR}/build/pipenv/bin/pipenv}" ${@+"${@}"} || return $?
+    UV_PROJECT_ENVIRONMENT="/venv/src"
+    ${DRYRUN} env UV_PROJECT="${TERRA_UV_PROJECT-${TERRA_TERRA_DIR}}" "${UV_EXE-${TERRA_TERRA_DIR}/build/uv/uv}" ${@+"${@}"} || return $?
   else
-    Just-docker-compose -f "${TERRA_TERRA_DIR}/docker-compose-main.yml" run ${TERRA_PIPENV_IMAGE-terra} pipenv ${@+"${@}"} || return $?
+    Just-docker-compose -f "${TERRA_TERRA_DIR}/docker-compose-main.yml" run ${TERRA_UV_IMAGE-terra} uv ${@+"${@}"} || return $?
   fi
 }
 
@@ -88,8 +93,8 @@ function terra_caseify()
 
     ci_load) # Load images and rebuild from dockerhub cache
       justify ci load-recipes-auto "${TERRA_TERRA_DIR}/docker/terra.Dockerfile"
-      justify ci load-services "${TERRA_TERRA_DIR}/docker-compose-main.yml" terra terra_pipenv ${@+"${@}"}
-      # terra_pipenv is needed for `justify terra pipenv sync --dev` in terra_pep8
+      justify ci load-services "${TERRA_TERRA_DIR}/docker-compose-main.yml" terra terra_uv ${@+"${@}"}
+      # terra_uv is needed for `justify terra pipenv sync --dev` in terra_pep8
       extra_args=$#
       ;;
 
@@ -142,17 +147,17 @@ function terra_caseify()
         shift 1
         ${DRYRUN} "${TERRA_RUN_DIR}/${app_name}" ${@+"${@}"}
       else
-        Terra_Pipenv run python -m ${@+"${@}"}
+        Terra_Uv run python -m ${@+"${@}"}
         extra_args=$#
       fi
       ;;
     run_pdb) # Run pdb module/cli in terra
-      Terra_Pipenv run python -m pdb -m ${@+"${@}"}
+      Terra_Uv run python -m pdb -m ${@+"${@}"}
       extra_args=$#
       ;;
     terra_run) # Run command (arguments) in terra
       local rv=0
-      Terra_Pipenv run ${@+"${@}"} || rv=$?
+      Terra_Uv run ${@+"${@}"} || rv=$?
       extra_args=$#
       return $rv
       ;;
@@ -184,30 +189,30 @@ function terra_caseify()
       fi
 
       # We might be able to use CELERY_LOADER to avoid the -A argument
-      Terra_Pipenv run python -m celery \
-                              -A terra.executor.celery.app worker \
-                              --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" \
-                              -n "${node_name}" \
-                              ${TERRA_CELERY_WORKERS+ -c ${TERRA_CELERY_WORKERS}} \
-                              -Q "$(IFS=','; echo "${TERRA_CELERY_QUEUES[*]}")" \
-                              -I "$(IFS=','; echo "${TERRA_CELERY_INCLUDE[*]}")"
+      Terra_Uv run python -m celery \
+                          -A terra.executor.celery.app worker \
+                          --loglevel="${TERRA_CELERY_LOG_LEVEL-INFO}" \
+                          -n "${node_name}" \
+                          ${TERRA_CELERY_WORKERS+ -c ${TERRA_CELERY_WORKERS}} \
+                          -Q "$(IFS=','; echo "${TERRA_CELERY_QUEUES[*]}")" \
+                          -I "$(IFS=','; echo "${TERRA_CELERY_INCLUDE[*]}")"
       ;;
 
     terra_celery-status) # Get the status on all celery workers currently connected
-      Terra_Pipenv run python -m celery \
-                              -A terra.executor.celery.app status
+      Terra_Uv run python -m celery \
+                          -A terra.executor.celery.app status
       ;;
 
     run_flower) # Start the flower server
-      if ! Terra_Pipenv run python -m flower &> /dev/null; then
+      if ! Terra_Uv run python -m flower &> /dev/null; then
         justify terra pipenv sync --dev
       fi
       # Flower doesn't actually need the tasks loaded in the app, so clear it
-      TERRA_CELERY_INCLUDE='[]' Terra_Pipenv run python -m celery \
-                                                        -A terra.executor.celery.app flower
+      TERRA_CELERY_INCLUDE='[]' Terra_Uv run python -m celery \
+                                                    -A terra.executor.celery.app flower
       ;;
     shutdown_celery) # Shuts down all celery workers on all nodes
-      Terra_Pipenv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"
+      Terra_Uv run python -c "from terra.executor.celery import app; app.control.broadcast('shutdown')"
       ;;
 
     ### Run Debugging containers ###
@@ -258,9 +263,9 @@ function terra_caseify()
       JUST_IGNORE_EXIT_CODES=1
       if [ "${#}" = "0" ]; then
         # Use bash -c So that TERRA_TERRA_DIR is evaluated correctly inside the environment
-        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
+        Terra_Uv run env TERRA_UNITTEST=1 bash -c 'python -m unittest discover "${TERRA_TERRA_DIR}/terra"'
       else
-        Terra_Pipenv run env TERRA_UNITTEST=1 python -m unittest "${@}"
+        Terra_Uv run env TERRA_UNITTEST=1 python -m unittest "${@}"
       fi
       extra_args=$#
       ;;
@@ -271,7 +276,7 @@ function terra_caseify()
         report_rcfile="${TERRA_CWD}/.coveragerc_nt"
       fi
       pushd "${TERRA_CWD}" &> /dev/null # Not needed because of a cd line above
-        Terra_Pipenv run env TERRA_UNITTEST=1 bash -c "coverage run && coverage report -m --rcfile '${report_rcfile}'"
+        Terra_Uv run env TERRA_UNITTEST=1 bash -c "coverage run && coverage report -m --rcfile '${report_rcfile}'"
       popd &> /dev/null # but added this so an app developer would know to add it
       ;;
 
@@ -279,19 +284,19 @@ function terra_caseify()
     # At least not as far as I can tell.
     terra_autopep8) # Check PEP 8 compliance in ./terra using autopep8
       echo "Checking for autopep8..."
-      if ! Terra_Pipenv run sh -c "command -v autopep8" &> /dev/null; then
+      if ! Terra_Uv run sh -c "command -v autopep8" &> /dev/null; then
         justify terra pipenv sync --dev
       fi
 
       echo "Running autopep8..."
-      Terra_Pipenv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
-                                "${TERRA_TERRA_DIR}/terra"'
+      Terra_Uv run bash -c 'autopep8 --global-config "${TERRA_TERRA_DIR}/autopep8.ini" --ignore-local-config \
+                            "${TERRA_TERRA_DIR}/terra"'
       ;;
     terra_flake8) # Check PEP 8 compliance in ./terra using flake8
       echo "Running flake8..."
-      Terra_Pipenv run bash -c 'cd ${TERRA_TERRA_DIR};
-                                flake8 \
-                                "${TERRA_TERRA_DIR}/terra"'
+      Terra_Uv run bash -c 'cd ${TERRA_TERRA_DIR};
+                            flake8 \
+                            "${TERRA_TERRA_DIR}/terra"'
       ;;
 
     terra_pep8) # Run PEP 8 tests
@@ -340,134 +345,57 @@ function terra_caseify()
 
       if [ "${TERRA_LOCAL-}" = "0" ]; then
         COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
-        justify terra sync-pipenv
+        justify terra sync-uv
         justify terra build-services
       else
-        justify terra sync-pipenv
-        local pipenv_dir="$(Terra_Pipenv --venv)"
+        justify terra sync-uv
+        local pipenv_dir="$(Terra_Uv --venv)"
       fi
       ;;
 
     terra_sync-singular) # Synchronize the many aspects of the project when new code changes \
                          # are applied e.g. after "git checkout" for a singularity build
       justify git_submodule-update # For those users who don't remember!
-      justify terra_sync-pipenv
+      justify terra sync-uv
       if "${DOCKER_COMPOSE[@]}" &> /dev/null; then
         justify terra_build-singular
       fi
       ;;
 
-    terra_sync-pipenv) # Synchronize the local pipenv for terra. You normally \
-                       # don't call this directly
-      if ! command "${PIPENV_EXE-${TERRA_CWD}/build/pipenv/bin/pipenv}" &> /dev/null; then
-        add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/pipenv" --download
+    terra_sync-uv) # Synchronize the local uv venv for terra. You normally \
+                   # don't call this directly
+      if ! command "${UV_EXE-${TERRA_CWD}/build/uv/uv}" &> /dev/null; then
+        add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/uv"
         # since I want to continue without re-sourcing local.env
-        export PATH="${TERRA_CWD}/build/pipenv/bin:${PATH}"
+        export PATH="${TERRA_CWD}/build/uv:${PATH}"
       fi
 
-      if [ -z "${PYTHON_EXE+set}" ]; then
-        local PYTHON_EXE=$(command -v python)
-      fi
-      local pipenv_args=(--python "${PYTHON_EXE}")
+      # if [ -z "${PYTHON_EXE+set}" ]; then
+      #   local PYTHON_EXE=$(command -v python)
+      # fi
+      # local pipenv_args=(--python "${PYTHON_EXE}")
 
-      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv "${pipenv_args[@]}" sync ${@+"${@}"}
+      TERRA_PIPENV_IMAGE=terra_uv Terra_Uv sync ${@+"${@}"}
       extra_args=$#
       ;;
 
     terra_setup) # Setup pipenv using system python and/or conda
       local output_dir
-      local conda_exe
-      local python_exe
-      local download_conda=0
-      local conda_install
 
-      : ${PYTHON_VERSION=${TERRA_PYTHON_VERSION:-3.12.9}}
-      : ${PIPENV_VERSION=${TERRA_PIPENV_VERSION:-2024.4.1}}
-      : ${VIRTUALENV_VERSION=${TERRA_VIRTUALENV_VERSION:-20.29.0}}
+      : ${UV_VERSION=${TERRA_UV_VERSION:-latest}}
 
-      parse_args extra_args --dir output_dir: --python python_exe: --conda conda_exe: --download download_conda --conda-install conda_install: -- ${@+"${@}"}
+      parse_args extra_args --dir output_dir: -- ${@+"${@}"}
 
       if [ -z "${output_dir:+set}" ]; then
         echo "--dir must be specified" >& 2
         exit 2
       fi
 
-      if [ -n "${conda_install:+set}" ]; then
-        download_conda=1
-      fi
-
       mkdir -p "${output_dir}"
       # relative to absolute
       output_dir="$(cd "${output_dir}"; pwd)"
 
-      local use_conda
-      local platform_bin
-
-      if [ "${OS-}" = "Windows_NT" ]; then
-        platform_bin=Scripts
-      else
-        platform_bin=bin
-      fi
-
-      local installer_args
-      local python_activate
-      local python_version
-      local conda_python_extra_args
-
-      if [ -n "${python_exe:+set}" ]; then
-        :
-      elif [ -n "${conda_exe:+set}" ]; then
-        use_conda=1
-      elif [ "${download_conda}" != "0" ]; then
-        use_conda=1
-      elif command -v python3 &> /dev/null; then
-        python_exe="$(command -v python3)"
-      elif command -v python &> /dev/null; then
-        python_exe="$(command -v python)"
-      else
-        use_conda=1
-      fi
-
-      if [ "${use_conda-}" = "1" ]; then
-        installer_args=()
-
-        if [ "${download_conda}" != "0" ]; then
-          installer_args+=("--download")
-        fi
-        if [ -n "${conda_install:+set}" ]; then
-          installer_args+=("--conda-install" "${conda_install}")
-        fi
-        if [ -n "${conda_exe:+set}" ]; then
-          installer_args+=("--conda" "${conda_exe}")
-        fi
-
-        # sets python_exe
-        conda-python-install --dir "${output_dir}/.python" ${installer_args[@]+"${installer_args[@]}"}
-      fi
-
-      # Make sure python is 3.7 or newer
-      local python_version="$("${python_exe}" --version 2>&1 | awk '{print $2}')"
-      source "${VSI_COMMON_DIR}/linux/requirements.bsh"
-      if ! meet_requirements "${python_version}" '>=3.7'; then
-        echo "Python version ${python_version} does not meet the expected requirements" >&2
-        echo "Consider adding the --download flag" >&2
-        read -srn1 -d '' -p "Press any key to continue, or Ctrl+C to stop"
-        echo
-      fi
-
-      installer_args=()
-      if [ -n "${python_activate:+set}" ]; then
-        installer_args+=("--python-activate" "${python_activate}")
-      fi
-      pipenv-install --python "${python_exe}" --dir "${output_dir}" ${installer_args[@]+"${installer_args[@]}"}
-
-      local add_to_local="${add_to_local-}"
-      echo "" >&2
-      ask_question "Do you want to add \"${output_dir}/${platform_bin}\" to your local.env automatically?" add_to_local y
-      if [ "${add_to_local}" == "1" ]; then
-        echo $'\n'"PATH=\"${output_dir}/${platform_bin}:\${PATH}\"" >> "${TERRA_CWD}/local.env"
-        echo "PIPENV_EXE=\"${output_dir}/${platform_bin}/pipenv\"" >> "${TERRA_CWD}/local.env"
-      fi
+      uv-install --dir uv_dir: --version uv_ver:
       ;;
 
     terra_newapp) # Generate a new terra app. Required: --AppName for the application name \
@@ -477,9 +405,9 @@ function terra_caseify()
       extra_args="${#}"
       ;;
 
-    terra_pipenv) # Run pipenv commands in Terra's pipenv container. Useful for \
+    terra_uv) # Run pipenv commands in Terra's pipenv container. Useful for \
                   # installing/updating pipenv packages into terra
-      TERRA_PIPENV_IMAGE=terra_pipenv Terra_Pipenv ${@+"${@}"}
+      TERRA_PIPENV_IMAGE=terra_uv Terra_Uv ${@+"${@}"}
       extra_args=$#
       ;;
 
