@@ -85,12 +85,12 @@ services:
         /redis-commander/docker/entrypoint.sh'
     # " Fix vscode syntax highlighting error
 
-  terra_pipenv:
+  terra_uv:
     <<: *terra
     build:
       <<: *terra_build
-      target: pipenv_run
-    image: ${TERRA_DOCKER_REPO}:terra_pipenv_${TERRA_USERNAME}
+      target: uv_run
+    image: ${TERRA_DOCKER_REPO}:terra_uv_${TERRA_USERNAME}
     volumes:
       - <<: *terra_source_volume
         # egg-info directory will need to be writable

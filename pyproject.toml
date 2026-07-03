@@ -7,25 +7,46 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "terra"
-version = "0.0.0"
+version = "0.1.0"
 description = "Terra"
+requires-python = ">=3.8"
 dependencies = [
   "pyyaml",
   "jstyleson",
   # I use signal and task from celery, no matter what
   "celery",
   "filelock",
+  "vsi-common",
 ]
 readme = "README.md"
 
-[project.optional-dependencies]
+[dependency-groups]
 celery = [
   "celery[redis]",
 ]
+
 flower = [
   "flower",
+]
+
+dev = [
+  "flower",
+  "autopep8",
+  "flake8",
+  "pylint",
+  "ipykernel",
+  "coverage",
+  "pyinstaller"
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
 namespaces = false
+
+[tool.uv.workspace]
+members = [
+    "external/vsi_common",
+]
+
+[tool.uv.sources]
+vsi-common = { workspace = true, editable = true }

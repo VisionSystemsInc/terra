@@ -54,8 +54,10 @@ function Terra_Uv()
         return 1
       fi
     fi
-    UV_PROJECT_ENVIRONMENT="/venv/src"
-    ${DRYRUN} env UV_PROJECT="${TERRA_UV_PROJECT-${TERRA_TERRA_DIR}}" "${UV_EXE-${TERRA_TERRA_DIR}/build/uv/uv}" ${@+"${@}"} || return $?
+    # UV_PROJECT_ENVIRONMENT="/venv/src"
+    ${DRYRUN} env UV_PROJECT="${TERRA_UV_PROJECT-${TERRA_TERRA_DIR}}" \
+                  UV_PROJECT_ENVIRONMENT="${TERRA_UV_VENV}" \
+                  "${UV_EXE-${TERRA_TERRA_DIR}/build/uv/uv}" ${@+"${@}"} || return $?
   else
     Just-docker-compose -f "${TERRA_TERRA_DIR}/docker-compose-main.yml" run ${TERRA_UV_IMAGE-terra} uv ${@+"${@}"} || return $?
   fi
@@ -349,7 +351,8 @@ function terra_caseify()
         justify terra build-services
       else
         justify terra sync-uv
-        local pipenv_dir="$(Terra_Uv --venv)"
+        # Why was this here?
+        # local pipenv_dir="$(Terra_Uv --venv)"
       fi
       ;;
 
@@ -364,8 +367,9 @@ function terra_caseify()
 
     terra_sync-uv) # Synchronize the local uv venv for terra. You normally \
                    # don't call this directly
-      if ! command "${UV_EXE-${TERRA_CWD}/build/uv/uv}" &> /dev/null; then
-        add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/uv"
+
+      if ! command -v "${UV_EXE-${TERRA_CWD}/build/uv/uv}" &> /dev/null; then
+        add_to_local=y justify terra setup --dir "${TERRA_CWD}/build/uv" --version "${TERRA_UV_VERSION-latest}"
         # since I want to continue without re-sourcing local.env
         export PATH="${TERRA_CWD}/build/uv:${PATH}"
       fi
@@ -375,27 +379,41 @@ function terra_caseify()
       # fi
       # local pipenv_args=(--python "${PYTHON_EXE}")
 
-      TERRA_PIPENV_IMAGE=terra_uv Terra_Uv sync ${@+"${@}"}
+      TERRA_PIPENV_IMAGE=terra_uv Terra_Uv python install "$(cat "${TERRA_TERRA_DIR}/.python-version")" ${@+"${@}"}
+      TERRA_PIPENV_IMAGE=terra_uv Terra_Uv sync --no-default-groups --frozen ${@+"${@}"}
       extra_args=$#
       ;;
 
     terra_setup) # Setup pipenv using system python and/or conda
       local output_dir
+      local uv_version
 
-      : ${UV_VERSION=${TERRA_UV_VERSION:-latest}}
-
-      parse_args extra_args --dir output_dir: -- ${@+"${@}"}
+      parse_args extra_args --dir output_dir: --version uv_version: -- ${@+"${@}"}
 
       if [ -z "${output_dir:+set}" ]; then
         echo "--dir must be specified" >& 2
         exit 2
       fi
 
+      if [ -z "${uv_version:+set}" ]; then
+        uv_version=latest
+      fi
+
       mkdir -p "${output_dir}"
       # relative to absolute
       output_dir="$(cd "${output_dir}"; pwd)"
 
-      uv-install --dir uv_dir: --version uv_ver:
+      local add_to_local="${add_to_local-}"
+      echo "" >&2
+      ask_question "Do you want to add \"${output_dir}\" to your local.env automatically?" add_to_local y
+      if [ "${add_to_local}" == "1" ]; then
+        local path_line="PATH=\"${output_dir}:\${PATH}\""
+        if ! grep -qF "${path_line}" "${TERRA_CWD}/local.env" &> /dev/null; then
+          echo $'\n'"${path_line}" >> "${TERRA_CWD}/local.env"
+        fi
+      fi
+
+      uv-install --dir "${output_dir}" --version "${uv_version}"
       ;;
 
     terra_newapp) # Generate a new terra app. Required: --AppName for the application name \
@@ -418,13 +436,13 @@ function terra_caseify()
       COMPOSE_FILE="${TERRA_CWD}/docker-compose-main.yml" justify docker compose clean terra-venv
       COMPOSE_FILE="${TERRA_CWD}/docker-compose.yml" justify docker compose clean terra-redis
       if [ "${TERRA_LOCAL-}" = "1" ]; then
-        Terra_Pipenv --rm
+        Terra_Uv venv -c
       fi
       ;;
 
     terra_pyinstaller) # Deploy terra using pyinstaller
-      if ! Terra_Pipenv run sh -c "command -v pyinstaller" &> /dev/null; then
-        justify terra pipenv sync --dev
+      if ! Terra_Uv run sh -c "command -v pyinstaller" &> /dev/null; then
+        justify terra uv sync --dev
       fi
       local indirect
       local app_prefix
