@@ -516,10 +516,10 @@ class TestResourceMultiTests:
   def test_local_storage_type(self):
     # test the types are right
     resource = Resource('storage', 2, 1)
-    if self.Executor.multiprocess:
-      self.assertIsInstance(resource._local, ProcessLocalStorage)
-    else:
+    if self.Executor.concurrency == 'multithreaded':
       self.assertIsInstance(resource._local, ThreadLocalStorage)
+    else:
+      self.assertIsInstance(resource._local, ProcessLocalStorage)
 
 
 class TestResourceThread(TestResourceMulti, TestResourceMultiTests,

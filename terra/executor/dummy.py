@@ -13,6 +13,8 @@ class DummyExecutor(BaseExecutor):
   Note: Don't base new executors off of this example
   """
 
+  concurrency = None
+
   def __init__(self, *arg, **kwargs):
     self._shutdown = False
     self._shutdown_lock = Lock()

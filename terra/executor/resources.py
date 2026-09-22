@@ -155,10 +155,11 @@ class Resource:
                        'now for soft-lock support.')
         rmtree(self.lock_dir)
 
-    if Executor._connect_backend().multiprocess:
-      self._local = ProcessLocalStorage()
-    else:
+    # Multithreading needs special isolation
+    if Executor._connection.concurrency == 'multithreaded':
       self._local = ThreadLocalStorage()
+    else:
+      self._local = ProcessLocalStorage()
 
     Resource._resources.add(self)
 

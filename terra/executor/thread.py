@@ -40,6 +40,8 @@ class ThreadPoolExecutor(concurrent.futures.ThreadPoolExecutor,
   potentially have other unintended consequences.
   '''
 
+  concurrency = 'multithreaded'
+
   def __init__(self, *args, **kwargs):
     # Make terra.setting "thread safe"
     if not isinstance(terra.settings,

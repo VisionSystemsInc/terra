@@ -17,6 +17,8 @@ class SyncExecutor(BaseExecutor):
   Based on a snippet from https://stackoverflow.com/a/10436851/798575
   """
 
+  concurrency = 'single'
+
   def __init__(self, *arg, **kwargs):
     self._shutdown = False
     self._shutdown_lock = Lock()

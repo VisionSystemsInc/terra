@@ -101,9 +101,9 @@ class CeleryExecutor(BaseExecutor):
       Delay time between checks for Future state changes
   """
 
-  # This is only true when using prefork, eventlet, gevent, and solo are
-  # single process
-  multiprocess = True
+  # This is only multiple processes on a node when using prefork
+  # eventlet, gevent, and solo are single process
+  concurrency = 'distributed'
 
   def __init__(self, predelay=None, postdelay=None, applyasync_kwargs=None,
                retry_kwargs=None, retry_queue='', update_delay=0.1,

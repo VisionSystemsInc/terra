@@ -392,7 +392,7 @@ def logging_listen_address(self):
       return str(Path(self.processing_dir) / (
           ".terra_log_" + self.terra.uuid + ".sock"))
     case 'AF_PIPE':
-      return f'\\\\.\\pipe\\terra-log-{self.terra.uuid}'
+      return f'\\\\.\\pipe\\terra\\log-{self.terra.uuid}'
     case _:
       raise ValueError(
           f'Unknown logging.server.family {self.logging.server.family}')
@@ -405,6 +405,26 @@ def logging_family(self):
     return 'AF_INET'
   else:
     return 'AF_UNIX'
+
+
+@settings_property
+def multiprocess_manager_remote_address(self):
+  '''
+  A :func:`settings_property` defining the address on which the multiprocess
+  memory manager will run on. Defaults to pipe communication for speed.
+  '''
+  # If Executor.concurrency == "distributed"
+  if self.executor.type == "CeleryExecutor":
+    return (self.logging.server.listen_host, 0)
+  if platform.system() == "Windows":
+    return f'\\\\.\\pipe\\terra\\manager-{self.terra.uuid}'
+  else:
+    return str(Path(self.processing_dir) / (
+          ".terra_manager_" + self.terra.uuid + ".sock"))
+
+@settings_property
+def multiprocess_manager_remote_address(self):
+
 
 
 @settings_property
@@ -490,6 +510,11 @@ global_templates = [
         "virtualenv_dir": None,
       },
       'terra': {
+        'multiprocess_manager':
+        {
+          'address': ...,
+          'auth_key': settings_property(lambda self:self.terra.uuid)
+        }
         'config_file': config_file,
         'disable_settings_dump': False,
         'lock_dir': lock_dir,

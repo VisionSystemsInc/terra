@@ -8,7 +8,7 @@ __all__ = ['ProcessPoolExecutor']
 
 class ProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor,
                           terra.executor.base.BaseExecutor):
-  multiprocess = True
+  concurrency = 'multiprocess'
 
   def __init__(self, *args, **kwargs):
     # Workaround for https://github.com/VisionSystemsInc/terra/issues/115 the
