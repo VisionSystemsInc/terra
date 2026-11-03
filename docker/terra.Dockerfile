@@ -8,7 +8,7 @@ FROM vsiri/recipe:docker-compose AS docker-compose
 
 ###############################################################################
 
-FROM python:3.10.0-alpine3.13 AS dep_stage
+FROM python:3.13.17-alpine3.24 AS dep_stage
 SHELL ["/usr/bin/env", "sh", "-euxvc"]
 
 # Install any runtime dependencies
