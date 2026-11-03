@@ -68,37 +68,8 @@ def setup_logging_exception_hook():
       return original_hook(exc_type, exc_value, exc_traceback)
 
     try:
-      # sys.executable for frozen, untested?
-
-      # May not work when frozen or various other corner cases. Interactive
-      # python/Jupyter
-      spec = sys.modules['__main__'].__spec__
-      if spec is None:
-        # Interactive, just use cwd and hope for best
-        main_dirs = [os.getcwd()]
-      else:
-        top_module = sys.modules.get(spec.name.split('.')[0])
-        if top_module:
-          spec = top_module.__spec__
-
-        try:
-          main_dirs = [os.path.dirname(spec.origin)]
-        except AttributeError:
-          main_dirs = spec.submodule_search_locations
-
-      extracted_summary = traceback.extract_tb(exc_traceback)
-
-      our_scripts = [any(x.filename.startswith(main_dir)
-                     for main_dir in main_dirs) for x in extracted_summary]
-
-      msg = extracted_summary.format()
-      msg = ['\x1b[31m' + msg + '\x1b[0m'
-             if color else msg
-             for msg, color in zip(extracted_summary.format(), our_scripts)]
-      msg = ''.join(msg)
-      msg += '\x1b[33m' + \
-             ''.join(traceback.format_exception_only(exc_type, exc_value)) + \
-             '\x1b[0m'
+      tbe = traceback.TracebackException(exc_type, exc_value, exc_traceback)
+      msg = ''.join(tbe.format(colorize=True))
       print(msg, file=sys.stderr, end='')
       sys.exit(ranButFailedExitCode)
     except Exception:
