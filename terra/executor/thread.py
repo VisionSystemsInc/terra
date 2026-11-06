@@ -9,7 +9,10 @@ __all__ = ['ThreadPoolExecutor']
 
 
 def auto_clear_exception_frames(future):
-  exc = future.exception()
+  try:
+    exc = future.exception()
+  except concurrent.futures.CancelledError:
+    exc = None
   if getattr(sys.excepthook, 'debugger', None) is None and \
      exc is not None:
     traceback.clear_frames(exc.__traceback__)
