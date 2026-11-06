@@ -40,6 +40,6 @@ class SyncExecutor(BaseExecutor):
 
       return f
 
-  def shutdown(self, wait=True):
+  def shutdown(self, wait=True, **kwargs):
     with self._shutdown_lock:
       self._shutdown = True
