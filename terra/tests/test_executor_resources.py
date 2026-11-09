@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import as_completed
 import json
-from multiprocessing import Process
+from multiprocessing import Process, forkserver
 import platform
 from unittest import mock
 from time import sleep
@@ -14,7 +14,7 @@ from terra.tests.utils import (
   TestExecutorCase, TestSettingsUnconfiguredCase
 )
 from terra.executor.process import (
-  ProcessPoolExecutor, ProcessPoolExecutorSpawn
+  ProcessPoolExecutor, ProcessPoolExecutorSpawn, ProcessPoolExecutorForkServer
 )
 from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
@@ -599,21 +599,15 @@ class TestResourceManager(TestResourceCase):
       ResourceManager.get_resource('unregistered')
 
 
-class TestResourceProcessSpawn(TestResourceProcessTests,
-                               TestResourceMultiTests,
-                               TestSettingsUnconfiguredCase):
-  # Test for multiprocess spawn case
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-    self.Executor = ProcessPoolExecutorSpawn
-    self.name = "ProcessPoolExecutorSpawn"
+class TestResourceConfigFileTests(TestResourceMultiTests,
+                                  TestResourceProcessTests):
 
   def setUp(self):
     self.settings_filename = os.path.join(self.temp_dir.name, 'config.json')
     config = {
               "processing_dir": self.temp_dir.name,
               "executor": {
-                            "type": "ProcessPoolExecutorSpawn",
+                            "type": self.name,
                           },
               "terra": {
                 # Simulate the config dumps that terra does for you.
@@ -626,6 +620,29 @@ class TestResourceProcessSpawn(TestResourceProcessTests,
 
   def tearDown(self):
     data.clear()
+    super().tearDown()
+
+
+class TestResourceProcessSpawn(TestResourceConfigFileTests,
+                               TestSettingsUnconfiguredCase):
+  # Test for multiprocess spawn case
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutorSpawn
+    self.name = "ProcessPoolExecutorSpawn"
+
+
+class TestResourceProcessForkServer(TestResourceConfigFileTests,
+                                    TestSettingsUnconfiguredCase):
+  # Test for multiprocess forkserver case
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Executor = ProcessPoolExecutorForkServer
+    self.name = "ProcessPoolExecutorForkServer"
+
+  def tearDown(self):
+    # Force-terminate the underlying forkserver process
+    forkserver._forkserver._stop()
     super().tearDown()
 
 
