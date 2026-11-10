@@ -46,6 +46,9 @@ class ExecutorHandler(ClassHandler):
     elif backend_name == "ProcessPoolExecutorSpawn":
       from terra.executor.process import ProcessPoolExecutorSpawn
       return ProcessPoolExecutorSpawn
+    elif backend_name == "ProcessPoolExecutorForkServer":
+      from terra.executor.process import ProcessPoolExecutorForkServer
+      return ProcessPoolExecutorForkServer
     elif backend_name == "CeleryExecutor":
       from terra.executor.celery import CeleryExecutor
       return CeleryExecutor
