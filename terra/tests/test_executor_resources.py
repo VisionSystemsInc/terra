@@ -14,7 +14,9 @@ from terra.tests.utils import (
   TestExecutorCase, TestSettingsUnconfiguredCase
 )
 from terra.executor.process import (
-  ProcessPoolExecutor, ProcessPoolExecutorSpawn, ProcessPoolExecutorForkServer
+  ProcessPoolExecutorFork,
+  ProcessPoolExecutorSpawn,
+  ProcessPoolExecutorForkServer,
 )
 from terra.executor.thread import ThreadPoolExecutor
 from terra.executor.resources import (
@@ -564,13 +566,15 @@ class TestResourceProcessTests:
     resource.release(force=True)
 
 
-class TestResourceProcess(TestResourceMulti, TestResourceMultiTests,
-                          TestSettingsConfigureCase, TestResourceProcessTests):
+class TestResourceProcessFork(TestResourceMulti,
+                              TestResourceMultiTests,
+                              TestSettingsConfigureCase,
+                              TestResourceProcessTests):
   # Test for multiprocess case
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self.Executor = ProcessPoolExecutor
-    self.name = "ProcessPoolExecutor"
+    self.Executor = ProcessPoolExecutorFork
+    self.name = "ProcessPoolExecutorFork"
 
 
 class TestResourceManager(TestResourceCase):

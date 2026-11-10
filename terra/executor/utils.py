@@ -43,6 +43,9 @@ class ExecutorHandler(ClassHandler):
         backend_name == "concurrent.futures.ProcessPoolExecutor":
       from terra.executor.process import ProcessPoolExecutor
       return ProcessPoolExecutor
+    elif backend_name == "ProcessPoolExecutorFork":
+      from terra.executor.process import ProcessPoolExecutorFork
+      return ProcessPoolExecutorFork
     elif backend_name == "ProcessPoolExecutorSpawn":
       from terra.executor.process import ProcessPoolExecutorSpawn
       return ProcessPoolExecutorSpawn

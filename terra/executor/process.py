@@ -20,13 +20,19 @@ class ProcessPoolExecutor(concurrent.futures.ProcessPoolExecutor,
     return super().__init__(*args, **kwargs)
 
 
-class ProcessPoolExecutorForkServer(ProcessPoolExecutor):
+class ProcessPoolExecutorFork(ProcessPoolExecutor):
   def __init__(self, *args, **kwargs):
-    kwargs['mp_context'] = get_context('forkserver')
+    kwargs['mp_context'] = get_context('fork')
     return super().__init__(*args, **kwargs)
 
 
 class ProcessPoolExecutorSpawn(ProcessPoolExecutor):
   def __init__(self, *args, **kwargs):
     kwargs['mp_context'] = get_context('spawn')
+    return super().__init__(*args, **kwargs)
+
+
+class ProcessPoolExecutorForkServer(ProcessPoolExecutor):
+  def __init__(self, *args, **kwargs):
+    kwargs['mp_context'] = get_context('forkserver')
     return super().__init__(*args, **kwargs)
